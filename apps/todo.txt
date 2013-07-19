@@ -1,0 +1,40 @@
+- Create XML file that specifies:
+  * location of odometry ladar file
+  * units of ladar measurement
+  * transform from robot to ladar
+
+- class that creates an occupancy grid map using pure odometry
+  * assume ladar is parallel to ground
+  * allow an arbitrary number of ladar
+
+-- display display application for all of this
+
+- create an input that reads filtered input from rawlog
+  * run through same application as above
+
+
+
+
+-----------------------------------------
+- Projects
+
+Visual Odometry
+-----------------
+- Stereo
+  * Triangulate
+  * Track in both
+  * If reprojection error is large in either image drop
+- Mono
+
+
+SLAM
+----------------
+- Register using KLT type algorithm
+- Map image that is registered:
+  - flood fill to get contour of what it might see
+
+Simple to build mapping robot
+----------------
+- finds sensors
+- automatically calibrates geometry
+  * determines sensor locations and finds transforms

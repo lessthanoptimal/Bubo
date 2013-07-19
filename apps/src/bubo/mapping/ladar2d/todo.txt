@@ -1,0 +1,10 @@
+- fix ladar map project
+- chain Se2_F64 to go from sensor to map coordinates
+
+
+
+
+--- Long Term
+
+- gui application that allows processing step by step
+- non-interactive processing application.  can display results in window

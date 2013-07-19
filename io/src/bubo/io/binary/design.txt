@@ -1,0 +1,2 @@
+- would like to be able to output any arbitrary object
+- also have easy to work with things where you just pass in the class and that's it

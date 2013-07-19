@@ -1,0 +1,28 @@
+- For unknown objects so the output from toString()
+- Grab public variables
+  * show if no equivalent accessor
+- display for enum
+
+- Option to rescale image or to show at native size
+
+- if data file is compressed
+  * decompressed to a temp file
+  * delete on exit
+
+
+- Save preferences to a file
+  - save location of the directory where it last opened something
+
+Viewer
+
+- Button bar
+ - filter on/off
+
+- Add data type specific config dialogs
+
+- Application Config
+ * playback speed
+
+- handle gziped logs better.  temporary unzip
+- Handle bad index files.  When load object fails, delete old index file, load new one
+  * change to a binary format latter

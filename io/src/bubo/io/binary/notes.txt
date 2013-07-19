@@ -1,0 +1,64 @@
+- Use stuff in bubo.io.serialization
+
+- Make encoding and decoding separate from data structures
+  * it can output any data structure
+
+- Make compatible with JAUS binary format?
+
+- Create a serialization test
+ * output every object into the stream
+ * read all the objects back and see if they are the same
+ * can be done to a file or between two computers on different networks
+
+- how to handled fixed length arrays without custom serialization?
+
+- specialized deserialization for sensor inputs
+ * create only one instance of the data for each sensor and overwrite it each time it is read
+
+- Create an editor for data sets
+ * select and remove data
+ * remove data before and after time
+ * remove data by type/sensor
+ * combine multiple data sets together
+
+- Have a class for making new instances of objects. Allow user to override and use their own data structures.
+
+- Should there be a checksum?
+ * could make recovering corrupted files faster
+ * checksum for just the header and one for the actual data
+ * add a flags byte.  have bits for checksums that might not be used yet
+
+Packet structure:
+
+[  0xE1  ][    N    ][   class name   ][   data   ]
+[ 1 byte ][ 2 bytes ][ data - N bytes ][ variable ]
+
+for each parameter in the class the following format is used during transmission:
+
+[  type  ][ parameter ]
+[ 1 byte ][ variable  ]
+
+Types
+
+value | Description
+----------------------------------------------------------------------------
+   0  | null (null pointer, no data)
+   1  | byte
+   2  | short
+   3  | int
+   4  | long
+   5  | float      IEEE 754
+   6  | double     IEEE 754
+   7  | object
+   8  | character  8-bit   UTF-8
+   9  | character 16-bit   Unicode Standard, version 3.0
+   10 | array 1-byte length
+   12 | array 4-byte length
+   13 | array 8-byte length
+
+- string = an array with characters
+- By specifying the parameter's type its size can be determined and packets of unknown packet types
+be processed.
+- First byte with a known value of 0xE1 provides an easy sanity check for bad packets.
+   * Can potentially recover from corrupted data by searching for that byte
+- flag indicates if this is the last chuck of data or not

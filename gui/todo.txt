@@ -1,0 +1,2 @@
+- Make overlay location easily configurable.
+  * adjust histogram to put them in a better location

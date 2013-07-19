@@ -1,0 +1,5 @@
+- Rawlog encoder
+- unit tests <<<<<<<<<<<<<<<<-------------------
+
+- get quaternion stuff working
+

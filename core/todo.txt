@@ -1,0 +1,11 @@
+- create map from raw odometry + range finder
+
+- speed benchmark for scan-to-scan registration
+
+- ICP do forward/backwards validation of associations
+
+----------
+native:
+- monolithic binary logs
+- directory based
+- xml
