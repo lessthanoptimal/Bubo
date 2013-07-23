@@ -18,8 +18,6 @@
 
 package bubo.gui;
 
-import boofcv.io.image.UtilImageIO;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -35,12 +33,8 @@ public class LogoComponent extends JComponent {
     private double logoTranslucent = 0.0;
     private double logoScale = 1.0;
 
-    public LogoComponent() {
-        logo = UtilImageIO.loadImage("bubo_logo.png");
-		if( logo == null )
-			logo = UtilImageIO.loadImage("../core/bubo_logo.png");
-		if( logo == null )
-			throw new RuntimeException("Can't find logo!");
+    public LogoComponent( BufferedImage logo ) {
+		this.logo = logo;
 
         Dimension d = new Dimension(logo.getWidth(),logo.getHeight());
 

@@ -156,10 +156,10 @@ public class ProcessDanielCsv implements ActionListener {
 
 
 		param.setNumberOfScans( 720 );
-		param.setSweepAngle( -Math.PI );
-		param.setStartAngle( Math.PI/2.0 );
-//		param.setSweepAngle( Math.PI );
-//		param.setStartAngle( -Math.PI/2.0 );
+//		param.setSweepAngle( -Math.PI );
+//		param.setStartAngle( Math.PI/2.0 );
+		param.setSweepAngle( Math.PI );
+		param.setStartAngle( -Math.PI/2.0 );
 		param.setMaxRange( 25 );
 
 		return param;
@@ -167,7 +167,7 @@ public class ProcessDanielCsv implements ActionListener {
 
     public static void main( String args[] ) throws IOException {
 
-        String fileName = "/home/pja/Downloads/NF_Offices_LIDARScan_8.txt";
+        String fileName = "/home/pja/Downloads/NF_Offices_LIDARScan_10.txt";
 
         Lrf2dParam param = createHokuyo();
 

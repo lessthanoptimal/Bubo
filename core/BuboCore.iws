@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ee6cefdf-4a61-4282-99ee-7ecfaf4fb57a" name="Default" comment="- starting to add stuff for SLAM&#10;- Added some Kalman filters from an old library.  need to be modified and updated">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BuboCore.ipr" afterPath="$PROJECT_DIR$/BuboCore.ipr" />
+    <list default="true" id="ee6cefdf-4a61-4282-99ee-7ecfaf4fb57a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BuboCore.iws" afterPath="$PROJECT_DIR$/BuboCore.iws" />
     </list>
     <list id="20789ada-91ff-4d9c-8541-c32626fda4ae" name="Rejected commit: Default" comment="- starting to add stuff for SLAM&#10;- Added some Kalman filters from an old library.  need to be modified and updated" />
     <list id="819ae359-4ce3-4af3-8d68-073126c5c125" name="Failed commit: Default" comment="" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="BuboCore.iws" />
-    <file path="/Dummy.txt" changelist="ee6cefdf-4a61-4282-99ee-7ecfaf4fb57a" time="1374609296542" ignored="false" />
+    <file path="/Dummy.txt" changelist="ee6cefdf-4a61-4282-99ee-7ecfaf4fb57a" time="1374609499221" ignored="false" />
     <file path="/fragment.java" changelist="ee6cefdf-4a61-4282-99ee-7ecfaf4fb57a" time="1373991051288" ignored="false" />
     <file path="/ProcessDanielCsv.java" changelist="ee6cefdf-4a61-4282-99ee-7ecfaf4fb57a" time="1373991746692" ignored="false" />
     <file path="/LadarMapPureScanUpdate.java" changelist="ee6cefdf-4a61-4282-99ee-7ecfaf4fb57a" time="1373992466376" ignored="false" />
@@ -117,7 +116,7 @@
       <file leaf-file-name="IntrinsicParameters.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/bubo/desc/IntrinsicParameters.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="17" selection-start="257" selection-end="257" vertical-scroll-proportion="0.10194175">
+            <state line="8" column="125" selection-start="285" selection-end="285" vertical-scroll-proportion="0.11673152">
               <folding />
             </state>
           </provider>
@@ -294,7 +293,7 @@
     <property name="MemberChooser.sorted" value="false" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth1" value="138" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder4" value="4" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../libs/xstream-1.4.4.jar!/" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Project BUBO.ipr" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth0" value="116" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth4" value="700" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth3" value="116" />
@@ -607,7 +606,11 @@
       <created>1340013115962</created>
       <updated>1340013115962</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="- Adding dependencies to intellij project">
+      <created>1374609500618</created>
+      <updated>1374609500618</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -632,7 +635,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1175" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3293124" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -645,20 +648,20 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27977163" sideWeight="0.23665048" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32902467" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32083791" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3288835" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28456593" sideWeight="0.83460283" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977018" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2705443" sideWeight="0.47188532" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2705443" sideWeight="0.47188532" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290398" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32524273" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32083791" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -710,7 +713,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Sketch for EKF localization algorithm" />
+    <option name="LAST_COMMIT_MESSAGE" value="- Adding dependencies to intellij project" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -744,6 +747,7 @@
     <MESSAGE value="- Updated Bubo Project to use GeoRegression and BoofCV&#10;- Removed CV reference" />
     <MESSAGE value="- starting to add stuff for SLAM&#10;- Added some Kalman filters from an old library.  need to be modified and updated" />
     <MESSAGE value="Sketch for EKF localization algorithm" />
+    <MESSAGE value="- Adding dependencies to intellij project" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -858,7 +862,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/bubo/desc/IntrinsicParameters.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="17" selection-start="257" selection-end="257" vertical-scroll-proportion="0.10194175">
+        <state line="8" column="125" selection-start="285" selection-end="285" vertical-scroll-proportion="0.11673152">
           <folding />
         </state>
       </provider>

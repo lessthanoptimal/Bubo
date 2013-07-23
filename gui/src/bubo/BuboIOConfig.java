@@ -18,8 +18,11 @@
 
 package bubo;
 
+import boofcv.io.image.UtilImageIO;
 import bubo.gui.LogoComponent;
 
+import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +40,15 @@ public class BuboIOConfig {
     public final static List<LogoComponent> DEFAULT_LOGOS = new ArrayList<LogoComponent>();
 
     static {
-        if( SHOW_BUBO_LOGO )
-            DEFAULT_LOGOS.add(new LogoComponent());
+        if( SHOW_BUBO_LOGO ) {
+            try {
+				URL url = LogoComponent.class.getResource("bubo/gui/bubo_logo.png");
+				if( url != null ) {
+					BufferedImage image = UtilImageIO.loadImage(url);
+					DEFAULT_LOGOS.add(new LogoComponent(image));
+				}
+			} catch ( Exception ignore ) {}
+		}
     }
 
 }
