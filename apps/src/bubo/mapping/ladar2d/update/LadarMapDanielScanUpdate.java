@@ -23,7 +23,7 @@ import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
 import bubo.fitting.StoppingCondition;
 import bubo.fitting.motion.Lrf2dScanToScan;
 import bubo.fitting.motion.Lrf2dScanToScan_LocalICP;
-import bubo.mapping.ladar2d.PositionRangeArrayData;
+import bubo.mapping.ladar2d.DanielRangeData;
 import bubo.maps.d2.grid.GridMapSpacialInfo;
 import bubo.maps.d2.grid.OccupancyGrid2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -34,7 +34,7 @@ import georegression.transform.se.SePointOps_F64;
  * @author Peter Abeles
  */
 // todo improve weighting mechanism.  use probability theory there too?
-public class LadarMapPureScanUpdate extends LineGridGenericUpdate {
+public class LadarMapDanielScanUpdate extends LineGridGenericUpdate {
 
 
     Lrf2dPrecomputedTrig trig;
@@ -75,7 +75,7 @@ public class LadarMapPureScanUpdate extends LineGridGenericUpdate {
     }
 
     // todo concat Se2_F64 to go from ladar -> global -> map coordinates
-    public void process( PositionRangeArrayData ranges ) {
+    public void process( DanielRangeData ranges ) {
 
         final int N = param.getNumberOfScans();
         double r[] = ranges.getRange();

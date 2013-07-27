@@ -123,9 +123,9 @@ public class LadarMappingComponent extends JComponent implements ActionListener 
         mapDisplay.mapChanged();
     }
 
-    public void updateLadar( PositionRangeArrayData data ) {
-        ladarRaw.setData(data.getRange());
-    }
+	public void updateLadar( double[] rangeData ) {
+		ladarRaw.setData(rangeData);
+	}
 
     @Override
     public void actionPerformed(ActionEvent e) {

@@ -138,7 +138,7 @@ public class ProcessPositionLadarCsv implements ActionListener {
             mapBuilder.process(data);
 
             gui.updateRobot(mapBuilder.getPosition());
-            gui.updateLadar(data);
+            gui.updateLadar(data.getRange());
             gui.updateMap();
             gui.repaint();
             

@@ -23,11 +23,12 @@ import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.gui.UtilDisplayBubo;
 import bubo.io.serialization.SerializationDefinitionManager;
 import bubo.io.text.ReadCsvObjectSmart;
-import bubo.mapping.ladar2d.update.LadarMapPureScanUpdate;
+import bubo.mapping.ladar2d.update.LadarMapDanielScanUpdate;
 import bubo.maps.d2.grid.GridMapSpacialInfo;
 import bubo.maps.d2.grid.OccupancyGrid2D_F32;
 import bubo.maps.d2.grid.impl.ArrayGrid2D_F32;
 import bubo.maps.d2.grid.impl.OccupancyGridIO;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 
@@ -56,13 +57,13 @@ public class ProcessDanielCsv implements ActionListener {
 
     LadarMappingComponent gui;
 
-	LadarMapPureScanUpdate mapBuilder;
+	LadarMapDanielScanUpdate mapBuilder;
     OccupancyGrid2D_F32 map;
     GridMapSpacialInfo mapSpacial;
 
     // todo add algorithm which can process the data
-    ReadCsvObjectSmart<PositionRangeArrayData> reader;
-	PositionRangeArrayData data;
+    ReadCsvObjectSmart<DanielRangeData> reader;
+	DanielRangeData data;
     Lrf2dParam param;
     // todo make GUI on or off configurable
 
@@ -74,12 +75,12 @@ public class ProcessDanielCsv implements ActionListener {
 
     public ProcessDanielCsv(String fileName, Lrf2dParam param) throws FileNotFoundException {
         this.param = param;
-        data = new PositionRangeArrayData(param.getNumberOfScans());
+        data = new DanielRangeData(param.getNumberOfScans());
 
 		SerializationDefinitionManager def = new SerializationDefinitionManager();
-		def.loadDefinition(PositionRangeArrayData.class,"range");
+		def.loadDefinition(DanielRangeData.class,"timeStamp" , "range");
 
-        reader = new ReadCsvObjectSmart<PositionRangeArrayData>(new FileInputStream(fileName),def,PositionRangeArrayData.class.getSimpleName());
+        reader = new ReadCsvObjectSmart<DanielRangeData>(new FileInputStream(fileName),def,DanielRangeData.class.getSimpleName());
         reader.setComment('#');
         reader.setIgnoreUnparsedData(true);  // TODO read hokuyo config and make sure this is needed
 
@@ -98,13 +99,13 @@ public class ProcessDanielCsv implements ActionListener {
 
     public void process() throws IOException {
 
-        mapBuilder = new LadarMapPureScanUpdate();
+        mapBuilder = new LadarMapDanielScanUpdate();
 
         map = null;
         mapSpacial = null;
         if( reader.nextObject(data) != null ) {
             double cellSize = 0.1;
-            map = new ArrayGrid2D_F32(500,500);
+            map = new ArrayGrid2D_F32(750,500);
 
             mapSpacial = new GridMapSpacialInfo(cellSize,new Point2D_F64(-25,-25));
 
@@ -121,7 +122,7 @@ public class ProcessDanielCsv implements ActionListener {
             mapBuilder.process(data);
 
             gui.updateRobot(mapBuilder.getPosition());
-            gui.updateLadar(data);
+            gui.updateLadar(data.getRange());
             gui.updateMap();
             gui.repaint();
             
@@ -155,11 +156,13 @@ public class ProcessDanielCsv implements ActionListener {
 		Lrf2dParam param = new Lrf2dParam();
 
 
-		param.setNumberOfScans( 720 );
+		double sweep = UtilAngle.degreeToRadian(270);
+
+		param.setNumberOfScans( 1080 );
 //		param.setSweepAngle( -Math.PI );
 //		param.setStartAngle( Math.PI/2.0 );
-		param.setSweepAngle( Math.PI );
-		param.setStartAngle( -Math.PI/2.0 );
+		param.setSweepAngle( sweep );
+		param.setStartAngle( -sweep/2.0);
 		param.setMaxRange( 25 );
 
 		return param;
@@ -167,7 +170,7 @@ public class ProcessDanielCsv implements ActionListener {
 
     public static void main( String args[] ) throws IOException {
 
-        String fileName = "/home/pja/Downloads/NF_Offices_LIDARScan_10.txt";
+        String fileName = "/home/pja/Downloads/NF1_Offices_LIDARScan_5.txt";
 
         Lrf2dParam param = createHokuyo();
 
