@@ -1,0 +1,111 @@
+<project name="ProjectBUBO" basedir="." default="main">
+
+    <property name="lib.dir"     value="${basedir}/libs"/>
+    <property name="jar.dir"     value="${basedir}/jar"/>
+    <property name="doc.dir"     value="${basedir}/api"/>
+    <property name="testreport.dir"  value="${basedir}/report"/>
+
+
+    <path id="source.classpath">
+      <pathelement path="core/src"/>
+      <pathelement path="gui/src"/>
+      <pathelement path="io/src"/>
+    </path>
+    
+
+    <target name="javadocWeb">
+        <javadoc
+                destdir="docs/api"
+                author="true"
+                version="true"
+                use="true"
+                windowtitle="BoofCV"
+	        sourcepathref="source.classpath">
+
+            <doctitle><![CDATA[<h1>Project BUBO API Specification</h1>]]></doctitle>
+	    <header><![CDATA[
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-0419821832107208";
+/* boofcv javadoc banner */
+google_ad_slot = "3257872658";
+google_ad_width = 468;
+google_ad_height = 60;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+]]>
+</header>
+            <bottom><![CDATA[<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10413214-5']);
+  _gaq.push(['_setDomainName', 'boofcv.org']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<br>
+<b>Copyright &copy; 2013 Peter Abeles</b>
+]]>
+</bottom>
+ 
+        </javadoc>
+    </target>
+
+    <target name="javadoc">
+        <javadoc
+                destdir="docs/api"
+                author="true"
+                version="true"
+                use="true"
+                windowtitle="BoofCV"
+	        sourcepathref="source.classpath" >
+
+            <doctitle><![CDATA[<h1>Project BUBO API Specification</h1>]]></doctitle>
+            <bottom><![CDATA[<b>Copyright &copy; 2013 Peter Abeles</b>]]></bottom>
+ 
+        </javadoc>
+	<jar compress="true" destfile="docs/javadoc.jar" basedir="docs/api" />
+    </target>
+
+    <target name="test">
+	<ant dir="core/" target="test"/>
+	<ant dir="io/" target="test"/>
+	<ant dir="gui/" target="test"/>
+    </target>
+
+    <target name="testreport">
+        <junitreport todir="${testreport.dir}">
+            <fileset dir="${testreport.dir}" includes="TEST-*.xml"/>
+            <report todir="${testreport.dir}"/>
+        </junitreport>
+    </target>
+
+    <target name="clean">
+        <delete dir="${jar.dir}"/>
+	<delete dir="${testreport.dir}"/>
+	<delete file="${lib.dir}/${ant.project.name}.jar"/>
+	<ant dir="core/" target="clean"/>
+	<ant dir="io/" target="clean"/>
+	<ant dir="gui/" target="clean"/>
+    </target>
+
+    <target name="jar">
+        <mkdir dir="${jar.dir}"/>
+	<ant dir="core" inheritAll="false"/>
+	<ant dir="io" inheritAll="false"/>
+	<ant dir="gui" inheritAll="false"/>
+	<jar destfile="${lib.dir}/${ant.project.name}.jar">
+	  <zipgroupfileset dir="${jar.dir}" includes="*.jar"/> 
+	</jar>
+    </target>
+
+    <target name="main" depends="clean,jar"/>
+</project>
