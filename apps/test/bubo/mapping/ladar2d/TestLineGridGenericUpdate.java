@@ -18,7 +18,6 @@
 
 package bubo.mapping.ladar2d;
 
-import bubo.mapping.ladar2d.update.LineGridGenericUpdate;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.sorting.QuickSort_F64;
 import org.junit.Test;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.mapping.ladar2d.update;
+package bubo.mapping.ladar2d;
 
 /**
  * Computes the probability that the true range of an object is at the specified value. A returned
