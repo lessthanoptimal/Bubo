@@ -10,6 +10,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="testing" level="project" />
     <orderEntry type="library" name="all_libs" level="project" />
+    <orderEntry type="module" module-name="DDogleg" />
+    <orderEntry type="module" module-name="ejml" />
+    <orderEntry type="module" module-name="GeoRegression" />
   </component>
 </module>
 

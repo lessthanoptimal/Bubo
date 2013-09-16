@@ -18,7 +18,7 @@
 
 package bubo.evaluation;
 
-import boofcv.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_F64;
 import bubo.models.kinematics.PredictorRobotVelocity2D;
 import bubo.models.sensor.ProjectorRangeBearing2D;
 import bubo.simulation.d2.SimulatedRobotTrajectory;

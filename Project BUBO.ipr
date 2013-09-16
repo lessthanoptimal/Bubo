@@ -170,22 +170,28 @@
       <module fileurl="file://$PROJECT_DIR$/core/Bubo Core.iml" filepath="$PROJECT_DIR$/core/Bubo Core.iml" />
       <module fileurl="file://$PROJECT_DIR$/gui/Bubo GUI.iml" filepath="$PROJECT_DIR$/gui/Bubo GUI.iml" />
       <module fileurl="file://$PROJECT_DIR$/io/Bubo IO.iml" filepath="$PROJECT_DIR$/io/Bubo IO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ddogleg/DDogleg.iml" filepath="$PROJECT_DIR$/../ddogleg/DDogleg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
       <module fileurl="file://$PROJECT_DIR$/Project BUBO.iml" filepath="$PROJECT_DIR$/Project BUBO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6 (64bit)" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ddogleg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ejml/trunk" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />
   </component>
   <component name="libraryTable">
     <library name="all_libs">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/libs/BoofCV.jar!/" />
-        <root url="jar://$PROJECT_DIR$/libs/DDogleg.jar!/" />
-        <root url="jar://$PROJECT_DIR$/libs/EJML.jar!/" />
-        <root url="jar://$PROJECT_DIR$/libs/GeoRegression.jar!/" />
         <root url="jar://$PROJECT_DIR$/libs/xstream-1.4.4.jar!/" />
       </CLASSES>
       <JAVADOC />
