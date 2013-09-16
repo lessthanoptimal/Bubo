@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.mapping.ladar2d.update;
+package bubo.mapping.ladar2d;
 
 /**
  * <p>
