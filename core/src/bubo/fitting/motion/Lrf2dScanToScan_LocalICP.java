@@ -37,54 +37,54 @@ import georegression.struct.se.Se2_F64;
  */
 public class Lrf2dScanToScan_LocalICP extends GeneralizedScanToScan {
 
-    // code for associating points
-    private DistanceAssociate assoc;
+	// code for associating points
+	private DistanceAssociate assoc;
 
-    /**
-     * Constructor.
-     *
-     * @param stop Optimization stopping condition.
-     * @param associationRadius How many indexes around the current
-     * @param maxSeparation Maximum distance two points can be for them to be associated.
-     */
-    public Lrf2dScanToScan_LocalICP(StoppingCondition stop, int associationRadius, double maxSeparation) {
-        super(stop);
+	/**
+	 * Constructor.
+	 *
+	 * @param stop Optimization stopping condition.
+	 * @param associationRadius How many indexes around the current
+	 * @param maxSeparation Maximum distance two points can be for them to be associated.
+	 */
+	public Lrf2dScanToScan_LocalICP(StoppingCondition stop, int associationRadius, double maxSeparation) {
+		super(stop);
 
-        assoc = new DistanceAssociate(associationRadius,maxSeparation*maxSeparation);
+		assoc = new DistanceAssociate(associationRadius,maxSeparation*maxSeparation);
 
-    }
+	}
 
-    @Override
-    public void setSensorParam(Lrf2dParam param ) {
-        super.setSensorParam(param);
-        assoc.setParam(param);
-    }
+	@Override
+	public void setSensorParam(Lrf2dParam param ) {
+		super.setSensorParam(param);
+		assoc.setParam(param);
+	}
 
-    @Override
-    protected Se2_F64 estimateMotion() {
-        return computeMotion(assoc);
-    }
+	@Override
+	protected Se2_F64 estimateMotion() {
+		return computeMotion(assoc);
+	}
 
-    /**
-     * Associates points based on cartesian distance.
-     */
-    protected class DistanceAssociate extends LocalAssociateDiscrete
-    {
-        Point2D_F64 fromPt;
+	/**
+	 * Associates points based on cartesian distance.
+	 */
+	protected class DistanceAssociate extends LocalAssociateDiscrete
+	{
+		Point2D_F64 fromPt;
 
-        protected DistanceAssociate(int searchNeighborhood, double maxSeparation) {
-            super(searchNeighborhood, maxSeparation);
-        }
+		protected DistanceAssociate(int searchNeighborhood, double maxSeparation) {
+			super(searchNeighborhood, maxSeparation);
+		}
 
-        @Override
-        public void setTarget(int indexFrom) {
-            fromPt = scanMatch.pts[indexFrom];
-        }
+		@Override
+		public void setTarget(int indexFrom) {
+			fromPt = scanMatch.pts[indexFrom];
+		}
 
-        @Override
-        public double distToTarget(int indexTo) {
-            return scanRef.pts[indexTo].distance2(fromPt);
-        }
+		@Override
+		public double distToTarget(int indexTo) {
+			return scanRef.pts[indexTo].distance2(fromPt);
+		}
 
-    }
+	}
 }

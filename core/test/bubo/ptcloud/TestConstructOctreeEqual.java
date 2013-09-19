@@ -23,6 +23,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.*;
 
 /**
@@ -30,25 +32,160 @@ import static org.junit.Assert.*;
  */
 public class TestConstructOctreeEqual {
 
+	Random rand = new Random(234);
+
+	@Test
+	public void reset() {
+		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
+		alg.initialize(new Cube3D_F64(-100,-100,-100,200,200,200));
+
+		for( int i = 0; i < 100; i++ ) {
+			Point3D_F64 a = new Point3D_F64();
+			a.x = rand.nextGaussian()*10;
+			a.y = rand.nextGaussian()*10;
+			a.z = rand.nextGaussian()*10;
+
+			alg.addPoint(a,null);
+		}
+
+		// see if it declared the expected amount of data
+		int expectedNode = countNodes(alg.getTree(),0);
+		int foundNodes = alg.storageNodes.size;
+
+		assertEquals(expectedNode,foundNodes);
+		assertEquals(100,alg.storageInfo.size());
+
+		int numLeafs = countLeafs(alg.getTree(),0);
+
+		// now reset
+		alg.reset();
+
+		// these should have a size of zero
+		assertEquals(1,alg.storageNodes.size); // root is 1
+		assertEquals(0,alg.storageInfo.size);
+		// this should have all the children arrays added to it
+		assertEquals(expectedNode-numLeafs,alg.storageChildren.size());
+
+		// check the structures to see that they have been reset correctly
+		for( Octree[] children : alg.storageChildren ) {
+			assertEquals(8,children.length);
+			for( int i = 0; i < children.length; i++ ) {
+				assertTrue(children[i]==null);
+			}
+		}
+		for( Octree n : alg.storageNodes.data ) {
+			assertTrue(n.parent==null);
+			assertTrue(n.children==null);
+			assertTrue(n.points.size()==0);
+		}
+		for( Octree.Info n : alg.storageInfo.data ) {
+			assertTrue(n.point==null);
+			assertTrue(n.data==null);
+		}
+
+	}
+
+	private static int countNodes( Octree node , int total ) {
+
+		total++;
+		if( node.isLeaf() )
+			return total;
+
+		for( int i = 0; i < node.children.length; i++ ) {
+			if( node.children[i] == null )
+				continue;
+			total = countNodes(node.children[i],total);
+		}
+		return total;
+	}
+
+	private static int countLeafs( Octree node , int total ) {
+
+		if( node.isLeaf() )
+			return total+1;
+
+		for( int i = 0; i < node.children.length; i++ ) {
+			if( node.children[i] == null )
+				continue;
+			total = countLeafs(node.children[i],total);
+		}
+		return total;
+	}
+
+	/**
+	 * Make sure the Octree.parent is correctly assigned
+	 */
+	@Test
+	public void checkParent() {
+		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
+		alg.initialize(new Cube3D_F64(-100,-100,-100,200,200,200));
+
+		for( int i = 0; i < 100; i++ ) {
+			Point3D_F64 a = new Point3D_F64();
+			a.x = rand.nextGaussian()*10;
+			a.y = rand.nextGaussian()*10;
+			a.z = rand.nextGaussian()*10;
+
+			alg.addPoint(a,null);
+		}
+
+		int numNull = 0;
+		for( int index = 0; index <  alg.storageNodes.size; index++ ) {
+			Octree n = alg.storageNodes.data[index];
+			Octree p = n.parent;
+			if( p == null ) {
+				numNull++;
+			} else {
+				boolean match = false;
+				for( int i = 0; i < p.children.length; i++ ) {
+					if( p.children[i] == n ) {
+						match = true;
+						break;
+					}
+				}
+				assertTrue(match);
+			}
+		}
+		// only the root should be null
+		assertEquals(1,numNull);
+	}
+
+	/**
+	 * Makes sure the point and data are correctly associated to each other
+	 */
+	@Test
+	public void addPoint_data() {
+		Point3D_F64 p = new Point3D_F64(1,2,3);
+		Integer d = 1;
+
+		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
+		alg.addPoint(p,d);
+
+		Octree.Info a = alg.getTree().points.get(0);
+		assertTrue(a.point==p);
+		assertTrue(a.data == d );
+	}
+
 	@Test
 	public void addPoint_singleNode() {
-		Octree tree = new Octree();
+		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
+		Octree tree = alg.getTree();
 		tree.space = new Cube3D_F64(-50,-50,-50,100,100,100);
 		tree.divider = new Point3D_F64();
 
-		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
-		alg.setTree(tree);
 
-		alg.addPoint(new Point3D_F64(1,1,1));
+		alg.addPoint(new Point3D_F64(1,1,1),null);
 
 		assertEquals(1, tree.points.size());
 	}
 
 	@Test
 	public void addPoint_multipleNodes() {
+		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
+
 		Point3D_F64 p = new Point3D_F64(1,1,1);
 
-		Octree tree = new Octree();
+		Octree tree = alg.getTree();
 		tree.space = new Cube3D_F64(-50,-50,-50,100,100,100);
 		tree.divider = new Point3D_F64();
 		tree.children = new Octree[8];
@@ -56,10 +193,7 @@ public class TestConstructOctreeEqual {
 		Octree node = new Octree();
 		tree.children[ tree.getChildIndex(p)] = node;
 
-		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
-		alg.setTree(tree);
-
-		alg.addPoint(p);
+		alg.addPoint(p,null);
 
 		assertEquals(1, tree.points.size());
 		assertEquals(1, node.points.size());
@@ -67,16 +201,15 @@ public class TestConstructOctreeEqual {
 
 	@Test
 	public void addPoint_createNode() {
-		Octree tree = new Octree();
+		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
+
+		Octree tree = alg.getTree();
 		tree.space = new Cube3D_F64(-50,-50,-50,100,100,100);
 		tree.divider = new Point3D_F64();
 
-		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
-		alg.setTree(tree);
-
 		for( int i = 0; i < 9; i++ ) {
-			alg.addPoint(new Point3D_F64(1,1,1));
-			alg.addPoint(new Point3D_F64(-1,-1,-1));
+			alg.addPoint(new Point3D_F64(1,1,1),null);
+			alg.addPoint(new Point3D_F64(-1,-1,-1),null);
 		}
 
 		assertEquals(18, tree.points.size());

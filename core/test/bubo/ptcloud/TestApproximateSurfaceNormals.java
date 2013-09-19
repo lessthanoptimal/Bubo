@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -32,6 +33,8 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestApproximateSurfaceNormals {
+
+	Random rand = new Random(234234);
 
 	/**
 	 * Give it a simple plane and see if it produces the expected results
@@ -70,6 +73,14 @@ public class TestApproximateSurfaceNormals {
 				assertTrue(d < 0.4);
 			}
 		}
+	}
+
+	/**
+	 * Makes sure the output vectors are normalized to one
+	 */
+	@Test
+	public void checkVectorNormalizedToOne() {
+
 	}
 
 }

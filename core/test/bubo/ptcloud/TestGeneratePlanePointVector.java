@@ -18,21 +18,35 @@
 
 package bubo.ptcloud;
 
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * A point, normal vector tangent to the surface, and its neighbors.
- *
  * @author Peter Abeles
  */
-public class PointVectorNN {
-	/** Reference to the point in the point cloud */
-	public Point3D_F64 p;
-	/** Normal to the surface at p.  Is normalized to one. */
-	public Vector3D_F64 normal = new Vector3D_F64();
+public class TestGeneratePlanePointVector {
 
-	/** Points which are its neighbors */
-	public FastQueue<PointVectorNN> neighbors = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+	@Test
+	public void simpleCase() {
+		fail("Implement");
+	}
+
+	@Test
+	public void checkInvarianceToVectorDirection() {
+		fail("Implement");
+	}
+
+	@Test
+	public void checkAngleTolerance() {
+		// check positive angle
+
+		// check negative angle
+
+		// check positive angle
+
+
+		fail("Implement");
+	}
+
 }

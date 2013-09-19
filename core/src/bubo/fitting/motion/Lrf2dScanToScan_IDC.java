@@ -63,145 +63,147 @@ import georegression.struct.se.Se2_F64;
  */
 public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 
-    // association by Euclidean distance.  Used when estimating translation
-    AssociateDistance assocCartesian = new AssociateDistance();
-    // association by measured Range.  Used when estimating rotation.
-    AssociateRange assocRange = new AssociateRange();
+	// association by Euclidean distance.  Used when estimating translation
+	AssociateDistance assocCartesian = new AssociateDistance();
+	// association by measured Range.  Used when estimating rotation.
+	AssociateRange assocRange = new AssociateRange();
 
-    // how many radians around the current angle will it search
-    double searchNeighborhood;
+	// how many radians around the current angle will it search
+	double searchNeighborhood;
 
-    // sets the rate of decay for neighborhood size
-    double windowDecayConstant = 0.1;
+	// sets the rate of decay for neighborhood size
+	double windowDecayConstant = 0.1;
 
-    public Lrf2dScanToScan_IDC(StoppingCondition stop, double searchNeighborhood, double maxSeparation,
-                               double radiusDecayConstant) {
-        super(stop);
-        this.searchNeighborhood = searchNeighborhood;
-        this.windowDecayConstant = radiusDecayConstant;
+	public Lrf2dScanToScan_IDC(StoppingCondition stop, double searchNeighborhood, double maxSeparation,
+							   double radiusDecayConstant) {
+		super(stop);
+		this.searchNeighborhood = searchNeighborhood;
+		this.windowDecayConstant = radiusDecayConstant;
 
-        assocCartesian.setMaxSeparation(maxSeparation);
-        assocRange.setMaxSeparation(maxSeparation);
-    }
+		assocCartesian.setMaxSeparation(maxSeparation);
+		assocRange.setMaxSeparation(maxSeparation);
+	}
 
-    @Override
-    public void setSensorParam(Lrf2dParam param ) {
-        super.setSensorParam(param);
+	@Override
+	public void setSensorParam(Lrf2dParam param ) {
+		super.setSensorParam(param);
 
-        assocCartesian.setParam(param);
-        assocRange.setParam(param);
+		assocCartesian.setParam(param);
+		assocRange.setParam(param);
 
-        double inc = Math.abs(param.getAngleIncrement());
-        assocCartesian.setSamplePeriod(inc);
-        assocRange.setSamplePeriod(inc);
-    }
+		double inc = Math.abs(param.getAngleIncrement());
+		assocCartesian.setSamplePeriod(inc);
+		assocRange.setSamplePeriod(inc);
+	}
 
-    /**
-     * <p>
-     * Estimates motion in two steps differentiated by the association technique.  First
-     * points are associated by Euclidean distance and the motion estimated.  Next the motion is estimated
-     * again by associating with measured range.  The final output found by using the estimated translation
-     * from Euclidean distance association and angular change from range association.
-     * </p>
-     *
-     * <p>
-     * Local association is performed with interpolation.  The association search window decays with each iteration.
-     * </p>
-     *
-     * @return Estimated motion.
-     */
-    @Override
-    protected Se2_F64 estimateMotion() {
-        // reduce the search window size for each iteration
-        double windowRadius = searchNeighborhood*Math.exp(-windowDecayConstant *stop.getIteration());
-        assocCartesian.setSearchNeighborhood(windowRadius);
-        assocRange.setSearchNeighborhood(windowRadius);
+	/**
+	 * <p>
+	 * Estimates motion in two steps differentiated by the association technique.  First
+	 * points are associated by Euclidean distance and the motion estimated.  Next the motion is estimated
+	 * again by associating with measured range.  The final output found by using the estimated translation
+	 * from Euclidean distance association and angular change from range association.
+	 * </p>
+	 *
+	 * <p>
+	 * Local association is performed with interpolation.  The association search window decays with each iteration.
+	 * </p>
+	 *
+	 * @return Estimated motion.
+	 */
+	@Override
+	protected Se2_F64 estimateMotion() {
+		// reduce the search window size for each iteration
+		double windowRadius = searchNeighborhood*Math.exp(-windowDecayConstant *stop.getIteration());
+		assocCartesian.setSearchNeighborhood(windowRadius);
+		assocRange.setSearchNeighborhood(windowRadius);
 
-        // find translational component
-        Se2_F64 m = computeMotion(assocCartesian);
+		// find translational component
+		Se2_F64 m = computeMotion(assocCartesian);
 //        System.out.println(m);
 
-        double dx = m.getX();
-        double dy = m.getY();
+		double dx = m.getX();
+		double dy = m.getY();
 
-        // find angular component
-        m = computeMotion(assocRange);
+		// find angular component
+		m = computeMotion(assocRange);
 //        System.out.println(m);
 
-        m.set(dx,dy,m.getYaw());
+		m.set(dx,dy,m.getYaw());
 
-        return m;
-    }
+		return m;
+	}
 
-    /**
-     * Associates using Euclidean distance between two points.  This is supposed to be better at estimating the translation.
-     */
-    protected class AssociateDistance extends LocalAssociateInterpolate
-    {
-        Point2D_F64 from;
+	/**
+	 * Associates using Euclidean distance between two points.  This is supposed to be better at estimating the translation.
+	 *
+	 * Range is set to NaN since it isn't used and should blow up if it is.
+	 */
+	protected class AssociateDistance extends LocalAssociateInterpolate
+	{
+		Point2D_F64 from;
 
-        @Override
-        public boolean interpolate(InterpolatedPoint point) {
-            final int N = param.getNumberOfScans();
+		@Override
+		public boolean interpolate(InterpolatedPoint point) {
+			final int N = param.getNumberOfScans();
 
-            int index = (int)(N*(point.angle - param.getStartAngle())/param.getSweepAngle());
+			int index = (int)(N*(point.angle - param.getStartAngle())/param.getSweepAngle());
 
-            if( index >= N-1 || index < 0 )
-                return false;
+			if( index >= N-1 || index < 0 )
+				return false;
 
-            if( scanRef.vis[index] && scanRef.vis[index+1]) {
-                double before = param.computeAngle(index);
-                double after = param.computeAngle(index+1);
+			if( scanRef.vis[index] && scanRef.vis[index+1]) {
+				double before = param.computeAngle(index);
+				double after = param.computeAngle(index+1);
 
-                Point2D_F64 b = scanRef.pts[index];
-                Point2D_F64 a = scanRef.pts[index+1];
+				Point2D_F64 b = scanRef.pts[index];
+				Point2D_F64 a = scanRef.pts[index+1];
 
-                double frac = (point.angle - before)/(after-before);
-                point.point.x = frac*(a.x-b.x)+b.x;
-                point.point.y = frac*(a.y-b.y)+b.y;
-                point.range = point.point.normSq();
+				double frac = (point.angle - before)/(after-before);
+				point.point.x = frac*(a.x-b.x)+b.x;
+				point.point.y = frac*(a.y-b.y)+b.y;
+				point.range = Double.NaN;
 
-                return true;
-            } else if( scanRef.vis[index] ) {
-                point.point.set( scanRef.pts[index]);
-                point.range = point.point.normSq();
-                return true;
-            } else if( scanRef.vis[index+1] ) {
-                point.point.set( scanRef.pts[index+1]);
-                point.range = point.point.normSq();
-                return true;
-            }
+				return true;
+			} else if( scanRef.vis[index] ) {
+				point.point.set( scanRef.pts[index]);
+				point.range = Double.NaN;
+				return true;
+			} else if( scanRef.vis[index+1] ) {
+				point.point.set( scanRef.pts[index+1]);
+				point.range = Double.NaN;
+				return true;
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        @Override
-        public void setTarget(int indexFrom) {
-            from = scanMatch.pts[indexFrom];
-        }
+		@Override
+		public void setTarget(int indexFrom) {
+			from = scanMatch.pts[indexFrom];
+		}
 
-        @Override
-        public double distToTarget(InterpolatedPoint point) {
-            return from.distance(point.point);
-        }
-    }
+		@Override
+		public double distToTarget(InterpolatedPoint point) {
+			return from.distance(point.point);
+		}
+	}
 
-    /**
-     * Associate by range.  This is supposed to be better at estimating the angular change the by Euclidean distance.
-     * However it is more prone to ambiguous associations.
-     */
-    protected class AssociateRange extends LocalAssociateInterpolate
-    {
-        double reference;
+	/**
+	 * Associate by range.  This is supposed to be better at estimating the angular change the by Euclidean distance.
+	 * However it is more prone to ambiguous associations.
+	 */
+	protected class AssociateRange extends LocalAssociateInterpolate
+	{
+		double reference;
 
-        @Override
-        public boolean interpolate(InterpolatedPoint point) {
-            final int N = param.getNumberOfScans();
+		@Override
+		public boolean interpolate(InterpolatedPoint point) {
+			final int N = param.getNumberOfScans();
 
-            int index = (int)(N*(point.angle - param.getStartAngle())/param.getSweepAngle());
+			int index = (int)(N*(point.angle - param.getStartAngle())/param.getSweepAngle());
 
-            if( index >= N || index < 0 )
-                return false;
+			if( index >= N || index < 0 )
+				return false;
 			else if( index == N-1 ) {
 				point.range = scanRef.range[index];
 			} else {
@@ -225,18 +227,18 @@ public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 			point.point.x = Math.cos(point.angle)*point.range;
 			point.point.y = Math.sin(point.angle)*point.range;
 
-            return true;
-        }
+			return true;
+		}
 
-        @Override
-        public void setTarget(int indexFrom) {
-            reference = scanMatch.range[indexFrom];
-        }
+		@Override
+		public void setTarget(int indexFrom) {
+			reference = scanMatch.range[indexFrom];
+		}
 
-        @Override
-        public double distToTarget(InterpolatedPoint point) {
-            double d = point.range-reference;
-            return d*d;
-        }
-    }
+		@Override
+		public double distToTarget(InterpolatedPoint point) {
+			double d = point.range-reference;
+			return d*d;
+		}
+	}
 }

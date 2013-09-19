@@ -50,126 +50,126 @@ import java.util.List;
 @SuppressWarnings({"unchecked"})
 public class IterativeClosestPoint<SE extends SpecialEuclidean , T extends GeoTuple_F64> {
 
-    // stopping condition
-    private StoppingCondition stop;
+	// stopping condition
+	private StoppingCondition stop;
 
-    // the mean squared error
-    private double foundError;
+	// the mean squared error
+	private double foundError;
 
-    private ClosestPointToModel<T> model;
-    private MotionTransformPoint<SE,T> motion;
+	private ClosestPointToModel<T> model;
+	private MotionTransformPoint<SE,T> motion;
 
-    // transform from the original point location to their current one
-    private SE foundMotion;
+	// transform from the original point location to their current one
+	private SE foundMotion;
 
-    public IterativeClosestPoint( StoppingCondition stop,
-                                  MotionTransformPoint<SE, T> motion) {
-        this.stop = stop.copy();
-        this.motion = motion;
-    }
+	public IterativeClosestPoint( StoppingCondition stop,
+								  MotionTransformPoint<SE, T> motion) {
+		this.stop = stop.copy();
+		this.motion = motion;
+	}
 
-    /**
-     * Mean square error between the model and the set of points after the optimal transformation has been found
-     */
-    public double getFoundError() {
-        return foundError;
-    }
+	/**
+	 * Mean square error between the model and the set of points after the optimal transformation has been found
+	 */
+	public double getFoundError() {
+		return foundError;
+	}
 
-    /**
-     * Rigid body transformation between the provided points and the model.
-     */
-    public SE getMotion() {
-        return foundMotion;
-    }
+	/**
+	 * Rigid body transformation between the provided points and the model.
+	 */
+	public SE getMotion() {
+		return foundMotion;
+	}
 
-    /**
-     * The model that the input points is being fitted against.
-     */
-    public void setModel( ClosestPointToModel model ) {
-        this.model = model;
-    }
+	/**
+	 * The model that the input points is being fitted against.
+	 */
+	public void setModel( ClosestPointToModel model ) {
+		this.model = model;
+	}
 
-    /**
-     * Computes the best fit transform
-     * @param points Points which are to matched to a model.  Their state is modified to the optimal fit location.
-     */
-    public void process( List<T> points ) {
-        foundMotion = null;
-        if( points.isEmpty() ) {
-            return;
-        }
+	/**
+	 * Computes the best fit transform
+	 * @param points Points which are to matched to a model.  Their state is modified to the optimal fit location.
+	 */
+	public void process( List<T> points ) {
+		foundMotion = null;
+		if( points.isEmpty() ) {
+			return;
+		}
 
-        int dof = points.get(0).getDimension();
+		int dof = points.get(0).getDimension();
 
-        List<T> fromPts = new ArrayList<T>();
-        List<T> toPts = new ArrayList<T>();
+		List<T> fromPts = new ArrayList<T>();
+		List<T> toPts = new ArrayList<T>();
 
-        stop.reset();
-        while( true) {
-            // find correspondences
-            fromPts.clear();
-            toPts.clear();
-            for( T p : points ) {
-                T match = model.findClosestPoint(p);
-                if( match != null ) {
-                    fromPts.add(p);
-                    toPts.add(match);
-                }
-            }
+		stop.reset();
+		while( true) {
+			// find correspondences
+			fromPts.clear();
+			toPts.clear();
+			for( T p : points ) {
+				T match = model.findClosestPoint(p);
+				if( match != null ) {
+					fromPts.add(p);
+					toPts.add(match);
+				}
+			}
 
-            // from the optimal transform
-            motion.process(fromPts,toPts);
+			// from the optimal transform
+			motion.process(fromPts,toPts);
 
-            if( dof == 2 ) {
-                transform2D( (List<Point2D_F64>)points );
-            } else if( dof == 3 ) {
-                transform3D( (List<Point3D_F64>)points );
-            } else {
-                throw new RuntimeException("Unknown dimension");
-            }
+			if( dof == 2 ) {
+				transform2D( (List<Point2D_F64>)points );
+			} else if( dof == 3 ) {
+				transform3D( (List<Point3D_F64>)points );
+			} else {
+				throw new RuntimeException("Unknown dimension");
+			}
 
-            // sum up all the transforms up to this point
-            if( foundMotion == null ) {
-                foundMotion = (SE)motion.getMotion().createInstance();
-                foundMotion.set(motion.getMotion());
-            } else {
-                // the returned transform is the result of the sequence of transforms.
-                foundMotion = (SE)motion.getMotion().concat(foundMotion,null);
-            }
+			// sum up all the transforms up to this point
+			if( foundMotion == null ) {
+				foundMotion = (SE)motion.getMotion().createInstance();
+				foundMotion.set(motion.getMotion());
+			} else {
+				// the returned transform is the result of the sequence of transforms.
+				foundMotion = (SE)motion.getMotion().concat(foundMotion,null);
+			}
 
-            // compute mean squared error
-            foundError = computeMeanSquaredError(fromPts, toPts);
+			// compute mean squared error
+			foundError = computeMeanSquaredError(fromPts, toPts);
 
-            if( stop.isFinished(foundError))
-                break;
-        }
-    }
+			if( stop.isFinished(foundError))
+				break;
+		}
+	}
 
-    private double computeMeanSquaredError(List<T> fromPts, List<T> toPts) {
-        double error = 0;
-        for( int i = 0; i < fromPts.size(); i++ ) {
-            T a = fromPts.get(i);
-            T b = toPts.get(i);
+	private double computeMeanSquaredError(List<T> fromPts, List<T> toPts) {
+		double error = 0;
+		for( int i = 0; i < fromPts.size(); i++ ) {
+			T a = fromPts.get(i);
+			T b = toPts.get(i);
 
-            error += a.distance2(b);
-        }
-        error /= fromPts.size();
-        return error;
-    }
+			error += a.distance2(b);
+		}
+		error /= fromPts.size();
+		return error;
+	}
 
-    private void transform3D( List<Point3D_F64> points ) {
-        Se3_F64 m = (Se3_F64)motion.getMotion();
+	private void transform3D( List<Point3D_F64> points ) {
+		Se3_F64 m = (Se3_F64)motion.getMotion();
 
-        for( Point3D_F64 p : points ) {
-            SePointOps_F64.transform(m,p,p);
-        }
-    }
+		for( Point3D_F64 p : points ) {
+			SePointOps_F64.transform(m,p,p);
+		}
+	}
 
-    private void transform2D( List<Point2D_F64> points ) {
-        Se2_F64 m = (Se2_F64)motion.getMotion();
+	private void transform2D( List<Point2D_F64> points ) {
+		Se2_F64 m = (Se2_F64)motion.getMotion();
 
-        for( Point2D_F64 p : points ) {
-            SePointOps_F64.transform(m,p,p);
-        }
-    }
+		for( Point2D_F64 p : points ) {
+			SePointOps_F64.transform(m,p,p);
+		}
+	}
 }

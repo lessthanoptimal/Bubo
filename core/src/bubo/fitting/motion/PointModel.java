@@ -30,44 +30,42 @@ import java.util.List;
  */
 public class PointModel<T extends GeoTuple_F64> implements ClosestPointToModel<T> {
 
-    private List<T> points;
-    // if the closest point is greater than this distance it is rejected
-    private double maxDistanceSq;
+	private List<T> points;
+	// if the closest point is greater than this distance it is rejected
+	private double maxDistanceSq;
 
-    public PointModel(List<T> points) {
-        this.points = points;
-        this.maxDistanceSq = Double.MAX_VALUE;
-    }
+	public PointModel(List<T> points) {
+		this.points = points;
+		this.maxDistanceSq = Double.MAX_VALUE;
+	}
 
-    public PointModel(List<T> points , double maxDistance ) {
-        this.points = points;
-        this.maxDistanceSq = maxDistance*maxDistance;
-    }
+	public PointModel(List<T> points , double maxDistance ) {
+		this.points = points;
+		this.maxDistanceSq = maxDistance*maxDistance;
+	}
 
-    @Override
-    public T findClosestPoint(T target) {
-        if( points.size() <= 0 )
-            return null;
+	@Override
+	public T findClosestPoint(T target) {
+		if( points.size() <= 0 )
+			return null;
 
-        T closestPoint = points.get(0);
-        double closestDist = closestPoint.distance2(target);
+		T closestPoint = points.get(0);
+		double closestDist = closestPoint.distance2(target);
 
-        for( int i = 1; i < points.size(); i++ ) {
-            T p = points.get(i);
+		for( int i = 1; i < points.size(); i++ ) {
+			T p = points.get(i);
 
-            double d = p.distance2(target);
+			double d = p.distance2(target);
 
-            if( d < closestDist ) {
-                closestDist = d;
-                closestPoint = p;
-            }
-        }
+			if( d < closestDist ) {
+				closestDist = d;
+				closestPoint = p;
+			}
+		}
 
-        if( closestDist >= maxDistanceSq )
-            return null;
+		if( closestDist >= maxDistanceSq )
+			return null;
 
-        return closestPoint;
-    }
-
-
+		return closestPoint;
+	}
 }

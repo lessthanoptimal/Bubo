@@ -28,7 +28,8 @@ import java.util.List;
 /**
  * Octree data structure which uses a point to define sub-structure inside.  Each node in the tree contains 8 children.
  * Which child a point belongs to is defined by the 'space' of the node and the 'divider' point, see below. If
- * a node is a leaf then the 'children' data structure will be null.
+ * a node is a leaf then the 'children' data structure will be null.  Each 3D point can optionally have a Object
+ * reference associated with it.  For example, color or other information.
  *
  * <p>
  * <ul>
@@ -62,10 +63,15 @@ public class Octree {
 	public Octree children[];
 
 	/**
+	 * The parent of this node
+	 */
+	public Octree parent;
+
+	/**
 	 * Points contained inside this node.  Depending on how it was constructed, all the points might be
 	 * contained in the leafs or not.  New points are not declared by the FastQueue, just the storage array
 	 */
-	public FastQueue<Point3D_F64> points = new FastQueue<Point3D_F64>(Point3D_F64.class,false);
+	public FastQueue<Info> points = new FastQueue<Info>(Info.class,false);
 
 	/**
 	 * Returns true if it is a leaf node or false if it is not
@@ -125,5 +131,11 @@ public class Octree {
 		}
 
 		return quad;
+	}
+
+	public static class Info
+	{
+		public Point3D_F64 point;
+		public Object data;
 	}
 }

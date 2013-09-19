@@ -27,14 +27,14 @@ import georegression.struct.GeoTuple;
  */
 public interface ClosestPointToModel<T extends GeoTuple> {
 
-    /**
-     * Searches the model for the closest point to 'target' and if one exists it
-     * is returned.
-     *
-     * @param target The point where the closest point on the model is being searched for
-     * @return Closest model point, if any has been found.  null otherwise.  The returned point should not
-     * be modified or saved since if the model is updated its value can change.
-     */
-    public T findClosestPoint( T target );
-    
+	/**
+	 * Searches the model for the closest point to 'target' and if one exists it
+	 * is returned.
+	 *
+	 * @param target The point where the closest point on the model is being searched for
+	 * @return Closest model point, if any has been found.  null otherwise.  The returned point should not
+	 * be modified or saved since if the model is updated its value can change.
+	 */
+	public T findClosestPoint( T target );
+
 }

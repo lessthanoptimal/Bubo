@@ -36,51 +36,54 @@ import java.util.List;
  */
 public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 
-    // description of the sensor
-    protected Lrf2dParam param;
+	// description of the sensor
+	protected Lrf2dParam param;
 
-    // list of associated points
-    private List<Point2D_F64> matchPts = new ArrayList<Point2D_F64>();
-    private List<Point2D_F64> refPts = new ArrayList<Point2D_F64>();
+	// list of associated points
+	private List<Point2D_F64> matchPts = new ArrayList<Point2D_F64>();
+	private List<Point2D_F64> refPts = new ArrayList<Point2D_F64>();
 
-    // how many radians around will it search for the best association point
-    private double searchNeighborhood;
-    // the maximum allowed distance between two associated points
-    private double maxSeparation;
-    // how many radians it will sample around the target angle
-    private double samplePeriod;
+	// how many radians around will it search for the best association point
+	private double searchNeighborhood;
+	// the maximum allowed distance between two associated points
+	private double maxSeparation;
+	// how many radians it will sample around the target angle
+	private double samplePeriod;
 
-    // information on the tow scans
-    protected ScanInfo scanMatch;
-    protected ScanInfo scanRef;
+	// information on the tow scans
+	protected ScanInfo scanMatch;
+	protected ScanInfo scanRef;
 
-    public LocalAssociateInterpolate( Lrf2dParam param,
-                                      double searchNeighborhood,
-                                      double maxSeparation,
-                                      double samplePeriod) {
+	public LocalAssociateInterpolate( Lrf2dParam param,
+									  double searchNeighborhood,
+									  double maxSeparation,
+									  double samplePeriod) {
 		if( samplePeriod > searchNeighborhood ) {
 			throw new RuntimeException("Sample Period is more than the search neighborhood.  Probably a bug");
 		}
-        this.param = param;
-        this.searchNeighborhood = searchNeighborhood;
-        this.maxSeparation = maxSeparation;
-        this.samplePeriod = samplePeriod;
-    }
+		this.param = param;
+		this.searchNeighborhood = searchNeighborhood;
+		this.maxSeparation = maxSeparation;
+		this.samplePeriod = samplePeriod;
+	}
 
-    public LocalAssociateInterpolate() {
-    }
+	public LocalAssociateInterpolate() {
+	}
 
 
-    @Override
-    public void associate(ScanInfo scanMatch, ScanInfo scanRef) {
-        if( samplePeriod == 0 )
-            throw new IllegalArgumentException("Must initialize the sampling period");
+	@Override
+	public void associate(ScanInfo scanMatch, ScanInfo scanRef) {
+		if( samplePeriod == 0 )
+			throw new IllegalArgumentException("Must initialize the sampling period");
 
-        this.scanMatch = scanMatch;
-        this.scanRef = scanRef;
+		this.scanMatch = scanMatch;
+		this.scanRef = scanRef;
 
-        matchPts.clear();
-        refPts.clear();
+		matchPts.clear();
+		refPts.clear();
+
+		Point2D_F64 best = new Point2D_F64();
+		InterpolatedPoint interp = new InterpolatedPoint();
 
 		final int N = param.getNumberOfScans();
 		for( int i = 0; i < N; i++ ) {
@@ -93,90 +96,82 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 			double maxTheta = scanMatch.theta[i]+searchNeighborhood;
 			int numSamples = (int)Math.ceil(2.0*searchNeighborhood/samplePeriod);
 
-            setTarget(i);
+			setTarget(i);
 
-            double bestDist = Double.MAX_VALUE;
-            Point2D_F64 best = new Point2D_F64();
+			double bestDist = Double.MAX_VALUE;
 
-            InterpolatedPoint interp = new InterpolatedPoint();
+			for( int j = 0; j <= numSamples; j++ ) {
+				interp.angle = minTheta + samplePeriod*j;
+				if( !interpolate(interp) )
+					continue;
 
-            for( int j = 0; j <= numSamples; j++ ) {
-                interp.angle = minTheta + samplePeriod*j;
-                if( !interpolate(interp) )
-                    continue;
+				double dist = distToTarget(interp);
+				if( dist < bestDist ) {
+					best.set( interp.point );
+					bestDist = dist;
+				}
+			}
 
-                double dist = distToTarget(interp);
+			if( bestDist < maxSeparation) {
+				matchPts.add(scanMatch.pts[i]);
+				refPts.add(best);
+			}
+		}
+	}
 
-//                System.out.println("ref angle "+scanFrom.theta[i]+"  dist "+dist+" angle "+theta);
+	public void setParam(Lrf2dParam param) {
+		this.param = param;
+	}
 
-                if( dist < bestDist ) {
-                    best.set( interp.point );
-                    bestDist = dist;
-                }
-            }
+	public void setSearchNeighborhood(double searchNeighborhood) {
+		this.searchNeighborhood = searchNeighborhood;
+	}
 
-//            System.out.println("theta offset "+(scanFrom.theta[i]-bestTheta));
+	public void setMaxSeparation(double maxSeparation) {
+		this.maxSeparation = maxSeparation;
+	}
 
-            if( bestDist < maxSeparation) {
-                matchPts.add(scanMatch.pts[i]);
-                refPts.add(best);
-            }
-        }
-    }
+	@Override
+	public List<Point2D_F64> getListMatch() {
+		return matchPts;
+	}
 
-    public void setParam(Lrf2dParam param) {
-        this.param = param;
-    }
+	@Override
+	public List<Point2D_F64> getListReference() {
+		return refPts;
+	}
 
-    public void setSearchNeighborhood(double searchNeighborhood) {
-        this.searchNeighborhood = searchNeighborhood;
-    }
+	public void setSamplePeriod(double samplePeriod) {
+		this.samplePeriod = samplePeriod;
+	}
 
-    public void setMaxSeparation(double maxSeparation) {
-        this.maxSeparation = maxSeparation;
-    }
+	public static class InterpolatedPoint
+	{
+		public Point2D_F64 point = new Point2D_F64();
+		public double range;
+		public double angle;
+	}
 
-    @Override
-    public List<Point2D_F64> getListMatch() {
-        return matchPts;
-    }
+	/**
+	 * Returns the LRF hit at the specified point.  It can be assumed that the requested angles are
+	 * mono-tonically increasing or decreasing depending on the LRF's definition.
+	 *
+	 * @param point Data structure specifying where it should interpolate and where the interpolation
+	 * is written to.
+	 * @return true if there is a point at that location
+	 */
+	public abstract boolean interpolate( InterpolatedPoint point );
 
-    @Override
-    public List<Point2D_F64> getListReference() {
-        return refPts;
-    }
+	/**
+	 * Specify which measurement in the from scan is the distance being measured against.
+	 * This function is called before interpolate() or distToReference() in each cycle.  Thus
+	 * any initialization can be done here.
 
-    public void setSamplePeriod(double samplePeriod) {
-        this.samplePeriod = samplePeriod;
-    }
+	 */
+	public abstract void setTarget( int indexMatch );
 
-    public static class InterpolatedPoint
-    {
-        public Point2D_F64 point = new Point2D_F64();
-        public double range;
-        public double angle;
-    }
-
-    /**
-     * Returns the LRF hit at the specified point.  It can be assumed that the requested angles are
-     * mono-tonically increasing or decreasing depending on the LRF's definition.
-     *
-     * @param point Data structure specifying where it should interpolate and where the interpolation
-     * is written to.
-     * @return true if there is a point at that location
-     */
-    public abstract boolean interpolate( InterpolatedPoint point );
-
-    /**
-     * Specify which measurement in the from scan is the distance being measured against.
-     * This function is called before interpolate() or distToReference() in each cycle.  Thus
-     * any initialization can be done here.
-
-     */
-    public abstract void setTarget( int indexMatch );
-
-    /**
-     * Returns the distance of the specified point from the reference.
-     */
-    public abstract double distToTarget( InterpolatedPoint point );
+	/**
+	 * Returns the distance of the specified point from the reference.
+	 */
+	public abstract double distToTarget( InterpolatedPoint point );
 }

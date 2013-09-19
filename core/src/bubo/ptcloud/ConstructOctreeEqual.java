@@ -20,12 +20,15 @@ package bubo.ptcloud;
 
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Constructs quad tree one point at a time.  The divider point is always the center of the cube and the same graph
- * will be produced independent of the order in which points are added.
+ * will be produced independent of the order in which points are added.   Data structures associated with the
+ * Octree are managed and saved by this class and recycled with {@link #reset} is called.
  *
  * @author Peter Abeles
  */
@@ -37,17 +40,61 @@ public class ConstructOctreeEqual {
 	// the Octree that it modifies
 	private Octree tree;
 
+	// save references to all data structures declared to create the tree
+	protected FastQueue<Octree.Info> storageInfo = new FastQueue<Octree.Info>(Octree.Info.class,true);
+	protected FastQueue<Octree> storageNodes = new FastQueue<Octree>(Octree.class,true);
+	protected Stack<Octree[]> storageChildren = new Stack<Octree[]>();
+
+	/**
+	 * Specifies graph construction parameters
+	 *
+	 * @param divideThreshold Create a new node with the number of points exceeds this threshold
+	 */
 	public ConstructOctreeEqual(int divideThreshold) {
 		this.divideThreshold = divideThreshold;
+		this.tree = storageNodes.grow();
 	}
 
 	/**
-	 * Sets the Octree data structure it should use
-	 *
-	 * @param tree data structure
+	 * Initializes the Octree.  The space contained by the Octree is specified by the passed in cube.
+	 * {@link #reset} is automatically called by this function
+	 * @param cube  Space which is contained by the Octree.
 	 */
-	public void setTree(Octree tree) {
-		this.tree = tree;
+	public void initialize( Cube3D_F64 cube ) {
+		reset();
+		tree.space.set(cube);
+	}
+
+	/**
+	 * Discards the existing tree structure and recycles its data.  All reference to external data not owned
+	 * by the graph is discarded
+	 */
+	public void reset() {
+		// remove references to external data
+		for( int i = 0; i < storageInfo.size; i++ ) {
+			Octree.Info info = storageInfo.data[i];
+			info.data = null;
+			info.point = null;
+		}
+		storageInfo.reset();
+
+		for( int i = 0; i < storageNodes.size; i++ ) {
+			Octree o = storageNodes.data[i];
+			if( o.children != null ) {
+				for( int j = 0; j < 8; j++ ) {
+					o.children[j] = null;
+				}
+
+				storageChildren.add(o.children);
+			}
+			o.parent = null;
+			o.children = null;
+			o.points.reset();
+		}
+		storageNodes.reset();
+
+		// add the root tree again now that everything has been cleaned up
+		this.tree = storageNodes.grow();
 	}
 
 	/**
@@ -58,7 +105,7 @@ public class ConstructOctreeEqual {
 	public void addPoints( List<Point3D_F64> points ) {
 		int N = points.size();
 		for( int i = 0; i < N; i++ ) {
-			addPoint(points.get(i));
+			addPoint(points.get(i),null);
 		}
 	}
 
@@ -66,17 +113,23 @@ public class ConstructOctreeEqual {
 	 * Adds a point to the Octree.  If needed it will grow the tree
 	 *
 	 * @param point The point which is to be added
+	 * @return The node which contains the point
 	 */
-	public void addPoint( Point3D_F64 point ) {
+	public Octree addPoint( Point3D_F64 point , Object data ) {
+		// declare the structure which stores the point and data
+		Octree.Info info = storageInfo.grow();
+		info.point = point;
+		info.data = data;
+
 		Octree node = tree;
 
-		while( node != null ) {
-			node.points.add( point );
+		while( true ) {
+			node.points.add( info );
 
 			if( node.isLeaf() ) {
 				// see if it needs to create a new node
 				if( node.points.size() > divideThreshold ) {
-					node.children = new Octree[8];
+					node.children = getChildrenArray();
 					computeDivider(node.space,node.divider);
 
 					// create a new child for point to go into
@@ -85,8 +138,8 @@ public class ConstructOctreeEqual {
 
 					// Create new children where appropriate for all points in node, but 'point'
 					for( int i = 0; i < node.points.size-1; i++ ) {
-						Point3D_F64 p = node.points.get(i);
-						int indexP = node.getChildIndex(p);
+						Octree.Info p = node.points.get(i);
+						int indexP = node.getChildIndex(p.point);
 
 						// see if the node exists
 						Octree childP = checkAddChild(node, indexP);
@@ -95,7 +148,7 @@ public class ConstructOctreeEqual {
 					}
 					node = child;
 				} else {
-					node = null;
+					return node;
 				}
 			} else {
 				int index = node.getChildIndex(point);
@@ -110,11 +163,23 @@ public class ConstructOctreeEqual {
 	private Octree checkAddChild(Octree node, int index) {
 		Octree child = node.children[index];
 		if( child == null ) {
-			child = node.children[index] = new Octree();
+			child = node.children[index] = storageNodes.grow();
+			child.parent = node;
 			setChildSpace(node.space,node.divider,index,child.space);
 			// no points to add to child since none of the previous ones belong to it
 		}
 		return child;
+	}
+
+	/**
+	 * Returns an array of Octree of length 8 with null elements.
+	 */
+	protected Octree[] getChildrenArray() {
+		if( storageChildren.isEmpty() ) {
+			return new Octree[8];
+		} else {
+			return storageChildren.pop();
+		}
 	}
 
 	/**
@@ -155,5 +220,26 @@ public class ConstructOctreeEqual {
 			childSpace.p.y = parentDivider.y;
 			childSpace.p.z = parentDivider.z;
 		}
+	}
+
+	/**
+	 * Returns the Octree it has constructed
+	 */
+	public Octree getTree() {
+		return tree;
+	}
+
+	/**
+	 * List of all nodes in use
+	 */
+	public FastQueue<Octree> getAllNodes() {
+		return storageNodes;
+	}
+
+	/**
+	 * List of all points and associated data passed to the tree
+	 */
+	public FastQueue<Octree.Info> getAllPoints() {
+		return storageInfo;
 	}
 }
