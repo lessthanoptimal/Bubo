@@ -92,19 +92,19 @@ public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,Po
 		n.set( pa.p.x - output.center.x , pa.p.y - output.center.y , pa.p.z - output.center.z );
 		n.normalize();
 
-		if( 1-Math.abs(n.dot(pa.normal)) > tolCosine)
+		if( Math.abs(n.dot(pa.normal)) < tolCosine)
 			return false;
 
 		n.set( pb.p.x - output.center.x , pb.p.y - output.center.y , pb.p.z - output.center.z );
 		n.normalize();
 
-		if( 1-Math.abs(n.dot(pb.normal)) > tolCosine)
+		if( Math.abs(n.dot(pb.normal)) < tolCosine)
 			return false;
 
 		n.set( pc.p.x - output.center.x , pc.p.y - output.center.y , pc.p.z - output.center.z );
 		n.normalize();
 
-		if( 1-Math.abs(n.dot(pc.normal)) > tolCosine)
+		if( Math.abs(n.dot(pc.normal)) < tolCosine)
 			return false;
 
 		return true;

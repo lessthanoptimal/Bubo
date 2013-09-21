@@ -35,4 +35,8 @@ public class PointVectorNN {
 
 	/** Points which are its neighbors */
 	public FastQueue<PointVectorNN> neighbors = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+
+	public String toString() {
+		return "PointVector P( "+p.x+" , "+p.y+" , "+p.z+" ) Normal( "+normal.x+" , "+normal.y+" , "+normal.z+" )";
+	}
 }

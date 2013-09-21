@@ -44,10 +44,10 @@ public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F
 	private Vector3D_F64 b = new Vector3D_F64();
 
 	// normal found from 3 points
-	private Vector3D_F64 n = new Vector3D_F64();
+	protected Vector3D_F64 n = new Vector3D_F64();
 
 	// just used for converting formats
-	private PlaneNormal3D_F64 planeNormal = new PlaneNormal3D_F64();
+	protected PlaneNormal3D_F64 planeNormal = new PlaneNormal3D_F64();
 
 	public GeneratePlanePointVector(double tolAngle) {
 		this.tolCosine = Math.cos(tolAngle);
@@ -71,7 +71,7 @@ public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F
 		GeometryMath_F64.cross(a,b,n);
 		n.normalize();
 
-		if (checkModel(pa, pb, pc))
+		if (!checkModel(pa, pb, pc))
 			return false;
 
 		planeNormal.n = n;
@@ -83,15 +83,16 @@ public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F
 	}
 
 	protected final boolean checkModel(PointVectorNN pa, PointVectorNN pb, PointVectorNN pc) {
-		if( 1.0-Math.abs(n.dot(pa.normal)) > tolCosine)
-			return true;
+		if( Math.abs(n.dot(pa.normal)) < tolCosine)
+			return false;
 
-		if( 1.0-Math.abs(n.dot(pb.normal)) > tolCosine)
-			return true;
+		if( Math.abs(n.dot(pb.normal)) < tolCosine)
+			return false;
 
-		if( 1.0-Math.abs(n.dot(pc.normal)) > tolCosine)
-			return true;
-		return false;
+		if( Math.abs(n.dot(pc.normal)) < tolCosine)
+			return false;
+
+		return true;
 	}
 
 	@Override

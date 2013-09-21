@@ -18,9 +18,21 @@
 
 package bubo.ptcloud;
 
+import georegression.geometry.GeometryMath_F64;
+import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.UtilPlane3D_F64;
+import georegression.struct.plane.PlaneGeneral3D_F64;
+import georegression.struct.plane.PlaneNormal3D_F64;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
+import georegression.struct.so.Rodrigues;
+import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -28,25 +40,169 @@ import static org.junit.Assert.fail;
 public class TestGeneratePlanePointVector {
 
 	@Test
-	public void simpleCase() {
-		fail("Implement");
+	public void simpleCase0() {
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(0,0,0,0,0,1);
+
+		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
+		pts.add(createPt(plane,1,0,1));
+		pts.add(createPt(plane,0,1,1));
+		pts.add(createPt(plane,-1,-1,1));
+
+		GeneratePlanePointVector alg = new GeneratePlanePointVector(0.1);
+		PlaneGeneral3D_F64 found = new PlaneGeneral3D_F64();
+		assertTrue(alg.generate(pts, found));
+
+		checkPlanes(plane,found);
+	}
+
+	@Test
+	public void notSoSimpleCase() {
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(-1,2,0.5,1,-0.6,-0.9);
+
+		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
+		pts.add(createPt(plane,1,0,1));
+		pts.add(createPt(plane,0,1,1));
+		pts.add(createPt(plane,-1,-1,1));
+
+		GeneratePlanePointVector alg = new GeneratePlanePointVector(0.1);
+		PlaneGeneral3D_F64 found = new PlaneGeneral3D_F64();
+		assertTrue(alg.generate(pts, found));
+
+		checkPlanes(plane,found);
 	}
 
 	@Test
 	public void checkInvarianceToVectorDirection() {
-		fail("Implement");
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(-1,2,0.5,1,-0.6,-0.9);
+
+		// same as above, but in the opposite direction
+		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
+		pts.add(createPt(plane,1,0,-1));
+		pts.add(createPt(plane,0,1,-1));
+		pts.add(createPt(plane,-1,-1,-1));
+
+		GeneratePlanePointVector alg = new GeneratePlanePointVector(0.1);
+		PlaneGeneral3D_F64 found = new PlaneGeneral3D_F64();
+		assertTrue(alg.generate(pts, found));
+
+		checkPlanes(plane, found);
+
+		// check mixed directions
+		pts = new ArrayList<PointVectorNN>();
+		pts.add(createPt(plane,1,0,1));
+		pts.add(createPt(plane,0,1,-1));
+		pts.add(createPt(plane,-1,-1,1));
+
+		assertTrue(alg.generate(pts, found));
+
+		checkPlanes(plane,found);
 	}
 
 	@Test
 	public void checkAngleTolerance() {
-		// check positive angle
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(0,0,0,0,0,1);
 
-		// check negative angle
+		GeneratePlanePointVector alg = new GeneratePlanePointVector(0.1);
+		alg.n.set(plane.n);
+		alg.n.normalize();
 
-		// check positive angle
+		// check perfect case
+		PointVectorNN pv = createPt(plane, 1, 0, 1);
+		assertTrue(alg.checkModel(pv,pv,pv));
 
+		// check positive case close to threshold, positive rotation
+		rotatePoint(plane,pv,0.099);
+		assertTrue(alg.checkModel(pv,pv,pv));
+		// check positive case close to threshold, negative rotation
+		pv = createPt(plane, 1, 0, 1);
+		rotatePoint(plane,pv,-0.099);
+		assertTrue(alg.checkModel(pv,pv,pv));
 
-		fail("Implement");
+		// negative case, positive rotation
+		PointVectorNN fail = createPt(plane, 1, 0, 1);
+		rotatePoint(plane,fail,0.1001);
+		assertFalse(alg.checkModel(fail, pv, pv));
+		assertFalse(alg.checkModel(pv, fail, pv));
+		assertFalse(alg.checkModel(pv, pv, fail));
+
+		// negative case, negative rotation
+		fail = createPt(plane, 1, 0, 1);
+		rotatePoint(plane,fail,-0.1001);
+		assertFalse(alg.checkModel(fail, pv, pv));
+		assertFalse(alg.checkModel(pv, fail, pv));
+		assertFalse(alg.checkModel(pv, pv, fail));
+	}
+
+	@Test
+	public void minimumPoints() {
+		GeneratePlanePointVector alg = new GeneratePlanePointVector(0.1);
+
+		assertEquals(3,alg.getMinimumPoints());
+	}
+
+	private void checkPlanes( PlaneNormal3D_F64 expected , PlaneGeneral3D_F64 found ) {
+		PlaneGeneral3D_F64 expectedG = new PlaneGeneral3D_F64();
+		UtilPlane3D_F64.convert(expected,expectedG);
+
+		double normE = Math.sqrt( expectedG.A*expectedG.A + expectedG.B*expectedG.B +
+				expectedG.C*expectedG.C + expectedG.D*expectedG.D );
+
+		double normF = Math.sqrt( found.A*found.A + found.B*found.B +
+				found.C*found.C + found.D*found.D );
+
+		// should be sign invariant too
+		if( Math.signum(expectedG.A) != Math.signum(found.A) )
+			normF = -normF;
+
+		assertEquals(expectedG.A/normE,found.A/normF,1e-8);
+		assertEquals(expectedG.B/normE,found.B/normF,1e-8);
+		assertEquals(expectedG.C/normE,found.C/normF,1e-8);
+		assertEquals(expectedG.D/normE,found.D/normF,1e-8);
+	}
+
+	private void rotatePoint( PlaneNormal3D_F64 plane , PointVectorNN pv , double angle ) {
+		// Find a vector perpendicular to the plane's normal
+		Vector3D_F64 v = new Vector3D_F64();
+		v.x = 20 - plane.p.x;
+		v.y = -25 - plane.p.y;
+		v.z = 16 - plane.p.z;
+
+		Vector3D_F64 rotationAxis = plane.n.cross(v);
+		rotationAxis.normalize();
+
+		Rodrigues rod = new Rodrigues(angle,rotationAxis);
+		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod,null);
+
+		GeometryMath_F64.mult(R,pv.normal,pv.normal);
+	}
+
+	private PointVectorNN createPt( PlaneNormal3D_F64 plane , double x , double y , double sign ) {
+		PointVectorNN pv = new PointVectorNN();
+		pv.p = new Point3D_F64();
+		pv.normal.set(0,0,sign);
+		pv.p.set(x,y,0);
+
+		Vector3D_F64 cross = pv.normal.cross(plane.n);
+		if( Math.abs(cross.norm()) < 1e-8  ) {
+			cross.set(0,0,1);
+		} else {
+			cross.normalize();
+		}
+
+		double angle = pv.normal.dot(plane.n);
+		angle = Math.acos( angle / (plane.n.norm()));
+
+		Rodrigues rod = new Rodrigues(angle,cross);
+		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod, null);
+
+		GeometryMath_F64.mult(R,pv.p,pv.p);
+		pv.p.x += plane.p.x;
+		pv.p.y += plane.p.y;
+		pv.p.z += plane.p.z;
+
+		GeometryMath_F64.mult(R,pv.normal,pv.normal);
+
+		return pv;
 	}
 
 }

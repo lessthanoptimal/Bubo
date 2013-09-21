@@ -22,7 +22,6 @@ import georegression.struct.shapes.Cube3D_F64;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 import org.ddogleg.struct.FastQueue;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -36,8 +35,6 @@ public class RansacMultiObjectPointCloud {
 	int numCloudSamples;
 	int maxRansacIterations;
 
-	// Number of points which are sampled by RANSAC when computing a model
-	int ransacSample;
 	// The minimum number of points it needs before running RANSAC
 	int ransacMinimumPoints;
 
@@ -46,7 +43,7 @@ public class RansacMultiObjectPointCloud {
 	ConstructOctreeEqual managerOctree;
 	Cube3D_F64 bounding = new Cube3D_F64();
 
-	List<CloudModels> models = new ArrayList<CloudModels>();
+//	List<CloudModels> models = new ArrayList<CloudModels>();
 
 	FastQueue<Octree> leafs = new FastQueue<Octree>(Octree.class,false);
 
@@ -54,15 +51,9 @@ public class RansacMultiObjectPointCloud {
 
 	RansacMulti<PointVectorNN> ransac;
 
-	public RansacMultiObjectPointCloud( List<CloudModels> models , int octreeSplit ) {
-		ransacSample = 0;
-		for( CloudModels m : models ) {
-			int n = m.generator.getMinimumPoints();
-			if( n > ransacSample )
-				ransacSample = n;
-		}
-
-		ransacMinimumPoints = ransacSample*3;
+	public RansacMultiObjectPointCloud( List<RansacMulti.ObjectType> models , int octreeSplit , int minModelAccept )
+	{
+		ransacMinimumPoints = minModelAccept;
 
 		if( octreeSplit < ransacMinimumPoints ) {
 			throw new IllegalArgumentException("octreeSplit should be at least 3 times the ransac sample size, which "+
@@ -71,11 +62,7 @@ public class RansacMultiObjectPointCloud {
 
 		managerOctree = new ConstructOctreeEqual(octreeSplit);
 
-		List<RansacMulti.ObjectType> objectTypes = new ArrayList<RansacMulti.ObjectType>();
-
-
-
-		ransac = new RansacMulti<PointVectorNN>(1234,maxRansacIterations,objectTypes,PointVectorNN.class);
+		ransac = new RansacMulti<PointVectorNN>(1234,maxRansacIterations,models,PointVectorNN.class);
 	}
 
 	public void process( FastQueue<PointVectorNN> points ) {
@@ -154,4 +141,6 @@ public class RansacMultiObjectPointCloud {
 		bounding.lengthY = minY;
 		bounding.lengthZ = minZ;
 	}
+
+
 }
