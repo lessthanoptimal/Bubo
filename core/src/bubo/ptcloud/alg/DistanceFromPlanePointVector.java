@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud;
+package bubo.ptcloud.alg;
 
 import georegression.metric.Distance3D_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
@@ -25,7 +25,7 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
 import java.util.List;
 
 /**
- * Distance from a {@link PlaneGeneral3D_F64} for use with {@link PointCloudShapeDetectionSchnabel2007}.
+ * Euclidean distance from a {@link PlaneGeneral3D_F64} for use with {@link PointCloudShapeDetectionSchnabel2007}.
  *
  * @author Peter Abeles
  */

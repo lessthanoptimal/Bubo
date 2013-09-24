@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud;
+package bubo.ptcloud.alg;
 
+import bubo.ptcloud.ConstructOctreeEqual;
+import bubo.ptcloud.Octree;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
@@ -32,7 +33,6 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -51,7 +51,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 		PointCloudShapeDetectionSchnabel2007 alg = createAlgorithm();
 
-		alg.process(list);
+		alg.process(list, new Cube3D_F64(-100,-100,-100,200,200,200));
 
 		FastQueue<FoundShape> found = alg.getFoundObjects();
 
@@ -76,7 +76,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 		PointCloudShapeDetectionSchnabel2007 alg = createAlgorithm();
 
-		alg.process(list);
+		alg.process(list, new Cube3D_F64(-100,-100,-100,200,200,200));
 
 		FastQueue<FoundShape> found = alg.getFoundObjects();
 
@@ -105,23 +105,12 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 				PlaneGeneral3D_F64 foundShape = (PlaneGeneral3D_F64)found.get(i).modelParam;
 
-				// TODO finish
+				TestGeneratePlanePointVector.checkPlanes(plane,foundShape);
 			}
 		}
 
 		assertEquals(1,numSpheres);
 		assertEquals(1,numPlanes);
-
-	}
-
-
-	@Test
-	public void selectSampleNode() {
-		// make sure its a random sampling of leafs
-
-		// check the path it searches
-
-		fail("implement");
 	}
 
 	@Test
@@ -133,9 +122,9 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 		Octree prev = tree.getTree();
 
 		for( int i = 0; i < 10; i++ ) {
-			Octree o1 = tree.storageNodes.grow();
+			Octree o1 = tree.getAllNodes().grow();
 			o1.parent = prev;
-			Octree o2 = tree.storageNodes.grow();
+			Octree o2 = tree.getAllNodes().grow();
 			o2.parent = prev;
 
 			prev.children = new Octree[8];
@@ -149,31 +138,6 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 		FastQueue<Octree> leafs = alg.getLeafs();
 		assertEquals(10+1,leafs.size);
-	}
-
-	@Test
-	public void computingBoundingCube() {
-		FastQueue<PointVectorNN> list = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
-
-		list.add(new PointVectorNN());
-		list.add(new PointVectorNN());
-		list.add(new PointVectorNN());
-
-		list.get(0).p = new Point3D_F64(1,1,1);
-		list.get(1).p = new Point3D_F64(2,3,1);
-		list.get(2).p = new Point3D_F64(1.5,2,5);
-
-
-		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007();
-
-		alg.computingBoundingCube(list);
-
-		Cube3D_F64 cube = alg.getBounding();
-
-		assertEquals(0,cube.getP().distance(list.get(0).p),1e-8);
-		assertEquals(1,cube.lengthX,1e-8);
-		assertEquals(2,cube.lengthY,1e-8);
-		assertEquals(4,cube.lengthZ,1e-8);
 	}
 
 	private void addSpherePoints(FastQueue<PointVectorNN> list, Sphere3D_F64 sphere, int N ) {

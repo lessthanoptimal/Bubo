@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud;
+package bubo.ptcloud.alg;
 
+import bubo.ptcloud.ConstructOctreeEqual;
+import bubo.ptcloud.Octree;
 import georegression.struct.shapes.Cube3D_F64;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 import org.ddogleg.struct.FastQueue;
@@ -27,8 +29,22 @@ import java.util.List;
 import java.util.Random;
 
 /**
- *
- * Output: List of found shapes and points which are inliers.  Unmatched points.
+ * Finds shapes inside a point cloud by partitioning the space using an Octree and performing a modified version
+ * of RANSAC using local points inside an Octree node.  By sampling locally, points belonging to the shape
+ * shape are more likely to be together.  Based on the Schnabel et. al. 2007 paper [1].
+ * <p></p>
+ * Input: List of 3D points, surface normal tangent vector, and nearest neighbors.  The sign of the tangent
+ * vector does not matter.<br>
+ * Output: List of found shapes and points which match them.  A list of unmatched points can also be computed.. The
+ * returned parameter for each shape is NOT the optimal set of parameters given the set of matched points.  The index
+ * of the model refers to the index of the shape description in the models list provided in the constructor.
+ * <p></p>
+ * DEVIATIONS FROM PAPER:  The most important deviation is that a bitmap image is not constructed for finding points
+ * beloning to a shape.  Instead the results from the nearest-neighbor search are used to find all points which
+ * match the shape..  Other deviations are mentioned throughout the code in comments.
+ * <p></p>
+ * [1] Schnabel, Ruwen, Roland Wahl, and Reinhard Klein. "Efficient RANSAC for Point‐Cloud Shape Detection."
+ * Computer Graphics Forum. Vol. 26. No. 2. Blackwell Publishing Ltd, 2007.
  *
  * @author Peter Abeles
  */
@@ -40,10 +56,10 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	// An object must have this many points before being accepted as valid
 	private int minModelAccept;
 
+	// constructs and maintains the octree
 	protected ConstructOctreeEqual managerOctree;
-	// optional user specified bounding code
-	private Cube3D_F64 aprioriBounding;
-	// the initial bounding cube used by the point cloud
+
+	// the initial bounding cube of the point cloud.  used when constructing the octree
 	private Cube3D_F64 bounding = new Cube3D_F64();
 
 	// list of leafs in the Octree.  Allows quick finding of the path to the base node
@@ -58,14 +74,19 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	// list of found objects
 	private FastQueue<FoundShape> foundObjects = new FastQueue<FoundShape>(FoundShape.class,true);
 
-	int maximumAllowedIterations;
+	// the maximum number of RANSAC iterations.  Can be used to control how long the process can run for
+	private int maximumAllowedIterations;
 
 	/**
-	 * TODO comment
-	 * @param models
-	 * @param octreeSplit
-	 * @param minModelAccept
-	 * @param ransacExtension
+	 * Configures the algorithm
+	 *
+	 * @param models List of shapes that it will search for.
+	 * @param octreeSplit Once a node in the octree has this many points in it, it will split up into sub-regions.
+	 * @param minModelAccept  The minim number of points which need to match a shape for it to be consider valid.
+	 * @param ransacExtension The number of iterations RANSAC will perform will increase by this amount each time a
+	 *                        new best model has been found.
+	 * @param maximumAllowedIterations  Once this many RANSAC iterations have occurred in total it will stop.
+	 * @param randomSeed Random seed used by RANSAC and to sample nodes in the Octree.
 	 */
 	public PointCloudShapeDetectionSchnabel2007(List<RansacMulti.ObjectType> models, int octreeSplit,
 												int minModelAccept, int ransacExtension ,
@@ -82,23 +103,31 @@ public class PointCloudShapeDetectionSchnabel2007 {
 
 		managerOctree = new ConstructOctreeEqual(octreeSplit);
 
-		ransac = new RansacShapeDetection(1234,ransacExtension,models);
+		ransac = new RansacShapeDetection(randomSeed,ransacExtension,models);
 	}
 
+	/**
+	 * For debugging purposes.
+	 */
 	protected PointCloudShapeDetectionSchnabel2007() {
 	}
 
 	/**
-	 * TODO comment
-	 * @param points
+	 * Searches for shapes inside the provided point cloud.  It will continue to search until the maximum
+	 * number of RANSAC iterations has been reached or all the points have been assigned ot shapes.
+	 *
+	 * @param points Points in the point cloud.  PointVectorNN.used MUST be set to false.
+	 * @param boundingBox Bonding box for use in the Octree.
 	 */
-	public void process( FastQueue<PointVectorNN> points ) {
+	public void process( FastQueue<PointVectorNN> points , Cube3D_F64 boundingBox ) {
 
+		// initialize data structures
+		this.bounding.set(boundingBox);
 		ransac.reset();
 		foundObjects.reset();
 
+		// Constructs the Octree and finds its leafs
 		constructOctree(points);
-		findLeafs();
 
 		List<PointVectorNN> sampleSet = new ArrayList<PointVectorNN>();
 
@@ -119,8 +148,17 @@ public class PointCloudShapeDetectionSchnabel2007 {
 
 			// see if its possible to find a valid model with this data
 			if( sampleSet.size() < minModelAccept ) {
-				totalIterations += 10; // TODO REMOVE THIS HACK
-				continue; // TODO exit if this happens too much, or make it impossible.
+				// Update the octree since it clearly needs to since its running into trouble here and can't
+				// run RANSAC.  Next cycle this situation will be impossible
+				// By constructing the Octree here it is only constructed as needed
+				constructOctree(points);
+
+				// give up if there are too few points left to find a shape
+				if( managerOctree.getTree().points.size <= minModelAccept ) {
+					break;
+				} else {
+					continue;
+				}
 			}
 
 			// use RANSAC to find a shape
@@ -129,9 +167,6 @@ public class PointCloudShapeDetectionSchnabel2007 {
 
 				// see if there are enough points to be a valid shape
 				if( inliers.size() >= minModelAccept ) {
-
-					// estimate shape parameters using all inlier points
-					// TODO do it
 
 					// construct the output shape
 					FoundShape shape = foundObjects.grow();
@@ -146,15 +181,11 @@ public class PointCloudShapeDetectionSchnabel2007 {
 						shape.points.add(p);
 					}
 
-					// If too many points are used then create a new octree with only the unused points
-					// todo consider doing that
 				}
 			}
 
 			// note how many iterations have been processed
 			totalIterations += ransac.getIteration();
-
-			// todo exit if X percent of points have been matched
 		}
 	}
 
@@ -185,13 +216,9 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 * Constructs an Octree for the set of points.  The initial bound box will be found from the
 	 * input points or is provided by the user.
 \	 */
+	// NOTE: Could optimize by maintaining a list of points which not used the last time it
+	// was called and only search that
 	protected void constructOctree( FastQueue<PointVectorNN> points ) {
-
-		// specify the Octree's bounding box
-		if( aprioriBounding == null )
-			computingBoundingCube(points);
-		else
-			bounding.set(aprioriBounding);
 
 		managerOctree.initialize(bounding);
 
@@ -199,8 +226,11 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		for( int i = 0; i < points.size; i++ ) {
 			PointVectorNN p = points.data[i];
 
-			managerOctree.addPoint(p.p,p);
+			if( !p.used )
+				managerOctree.addPoint(p.p,p);
 		}
+
+		findLeafs();
 	}
 
 	/**
@@ -220,36 +250,6 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	}
 
 	/**
-	 * Computes the minimal bounding box around the set of input points
-	 */
-	protected void computingBoundingCube(FastQueue<PointVectorNN> points) {
-		double minX=Double.MAX_VALUE,maxX=-Double.MAX_VALUE;
-		double minY=Double.MAX_VALUE,maxY=-Double.MAX_VALUE;
-		double minZ=Double.MAX_VALUE,maxZ=-Double.MAX_VALUE;
-
-		for( int i = 0; i < points.size; i++ ) {
-			PointVectorNN p = points.data[i];
-			if( p.p.x < minX )
-				minX = p.p.x;
-			if( p.p.x > maxX )
-				maxX = p.p.x;
-			if( p.p.y < minY )
-				minY = p.p.y;
-			if( p.p.y > maxY )
-				maxY = p.p.y;
-			if( p.p.z < minZ )
-				minZ = p.p.z;
-			if( p.p.z > maxZ )
-				maxZ = p.p.z;
-		}
-
-		bounding.p.set(minX,minY,minZ);
-		bounding.lengthX = maxX-minX;
-		bounding.lengthY = maxY-minY;
-		bounding.lengthZ = maxZ-minZ;
-	}
-
-	/**
 	 * Returns a list of all the objects that it found
 	 */
 	public FastQueue<FoundShape> getFoundObjects() {
@@ -257,13 +257,20 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	}
 
 	/**
-	 * Used to specify a bounding cube.  If not specified a bounding cube will be manually computed
-	 * each iteration.
-	 *
-	 * @param bounding
+	 * Searches through the points for any points which have yet to be used.  To save time only points
+	 * in the most recently constructed Octree are used. Point not in that Octree must have been used.
+	 * @param unmatched Output. Where the unmatched points are stored.
 	 */
-	public void setBoundingCube(Cube3D_F64 bounding ) {
-		this.aprioriBounding = new Cube3D_F64(bounding);
+	public void findUnmatchedPoints( List<PointVectorNN> unmatched ) {
+		FastQueue<Octree.Info> treePts = managerOctree.getTree().points;
+
+		for( int i = 0; i < treePts.size; i++ ) {
+			Octree.Info info = treePts.data[i];
+			PointVectorNN pv = (PointVectorNN)info.data;
+			if( !pv.used ) {
+				unmatched.add(pv);
+			}
+		}
 	}
 
 	public Cube3D_F64 getBounding() {

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud;
+package bubo.ptcloud.alg;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
@@ -140,7 +140,7 @@ public class TestGeneratePlanePointVector {
 		assertEquals(3,alg.getMinimumPoints());
 	}
 
-	private void checkPlanes( PlaneNormal3D_F64 expected , PlaneGeneral3D_F64 found ) {
+	public static void checkPlanes( PlaneNormal3D_F64 expected , PlaneGeneral3D_F64 found ) {
 		PlaneGeneral3D_F64 expectedG = new PlaneGeneral3D_F64();
 		UtilPlane3D_F64.convert(expected,expectedG);
 
@@ -151,7 +151,10 @@ public class TestGeneratePlanePointVector {
 				found.C*found.C + found.D*found.D );
 
 		// should be sign invariant too
-		if( Math.signum(expectedG.A) != Math.signum(found.A) )
+		double sumG = expectedG.A + expectedG.B + expectedG.C + expectedG.D;
+		double sumF = found.A + found.B + found.C + found.D;
+
+		if( Math.signum(sumG) != Math.signum(sumF) )
 			normF = -normF;
 
 		assertEquals(expectedG.A/normE,found.A/normF,1e-8);

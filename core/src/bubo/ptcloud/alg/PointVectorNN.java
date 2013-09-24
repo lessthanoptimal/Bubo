@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud;
+package bubo.ptcloud.alg;
 
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.FastQueue;
 
 /**
- * A point, normal vector tangent to the surface, and its neighbors.
+ * A point, normal vector tangent to the surface, and its neighbors.  Intended for use in
+ * {@link PointCloudShapeDetectionSchnabel2007}
  *
  * @author Peter Abeles
  */

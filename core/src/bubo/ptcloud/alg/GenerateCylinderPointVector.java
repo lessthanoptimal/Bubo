@@ -16,48 +16,47 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud;
+package bubo.ptcloud.alg;
 
+import georegression.geometry.GeometryMath_F64;
 import georegression.metric.ClosestPoint3D_F64;
+import georegression.metric.Distance3D_F64;
+import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric3D_F64;
-import georegression.struct.point.Vector3D_F64;
-import georegression.struct.shapes.Sphere3D_F64;
+import georegression.struct.shapes.Cylinder3D_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 
 import java.util.List;
 
 /**
- * Sphere estimation for use in {@link PointCloudShapeDetectionSchnabel2007}.  The sphere is estimated
+ * Cylinder estimation for use in {@link PointCloudShapeDetectionSchnabel2007}.  The sphere is estimated
  * using two points and their normal vectors.
  *
  * @author Peter Abeles
  */
-public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,PointVectorNN> {
+public class GenerateCylinderPointVector implements ModelGenerator<Cylinder3D_F64,PointVectorNN> {
 
-	// tolerance cos(angle) for vector normals
-	private double tolCosine;
+	// tolerance angle for vector normals
+	private double tolAngle;
 	// tolerance for each point from the sphere
 	private double tolDistance;
-
-	// storage for vector from center to a point
-	private Vector3D_F64 n = new Vector3D_F64();
 
 	// line defined by two lines.  used to find sphere center
 	private LineParametric3D_F64 lineA = new LineParametric3D_F64(false);
 	private LineParametric3D_F64 lineB = new LineParametric3D_F64(false);
 
-	public GenerateSpherePointVector(double tolAngle, double tolDistance) {
-		this.tolCosine = Math.cos(tolAngle);
+	public GenerateCylinderPointVector(double tolAngle, double tolDistance) {
+		this.tolAngle = tolAngle;
 		this.tolDistance = tolDistance;
 	}
 
 	@Override
-	public Sphere3D_F64 createModelInstance() {
-		return new Sphere3D_F64();
+	public Cylinder3D_F64 createModelInstance() {
+		return new Cylinder3D_F64();
 	}
 
 	@Override
-	public boolean generate(List<PointVectorNN> dataSet, Sphere3D_F64 output) {
+	public boolean generate(List<PointVectorNN> dataSet, Cylinder3D_F64 output) {
 
 		PointVectorNN pa = dataSet.get(0);
 		PointVectorNN pb = dataSet.get(1);
@@ -69,14 +68,20 @@ public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,Po
 		lineB.p = pb.p;
 		lineB.slope = pb.normal;
 
-		ClosestPoint3D_F64.closestPoint(lineA,lineB,output.center);
+		ClosestPoint3D_F64.closestPoint(lineA,lineB,output.line.p);
+		GeometryMath_F64.cross(pa.normal,pb.normal,output.line.slope);
+		// slope should be normalized to 1 already since pa.normal and pb.normal already are
 
-		double ra = output.center.distance(pa.p);
-		double rb = output.center.distance(pb.p);
-		double rc = output.center.distance(pc.p);
+		double ra = Distance3D_F64.distance(output.line,pa.p);
+		double rb = Distance3D_F64.distance(output.line,pb.p);
+		double rc = Distance3D_F64.distance(output.line,pc.p);
 
 		output.radius = (ra+rb)/2.0;
 
+		return checkModel(output, pc, ra, rb, rc);
+	}
+
+	protected final boolean checkModel(Cylinder3D_F64 output, PointVectorNN pc, double ra, double rb, double rc) {
 		// check the solution
 		if( Math.abs(ra-output.radius) > tolDistance )
 			return false;
@@ -85,26 +90,9 @@ public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,Po
 		if( Math.abs(rc-output.radius) > tolDistance )
 			return false;
 
-		return checkAngles(output, pa, pb, pc);
-	}
-
-	protected final boolean checkAngles(Sphere3D_F64 output, PointVectorNN pa, PointVectorNN pb, PointVectorNN pc) {
-		n.set( pa.p.x - output.center.x , pa.p.y - output.center.y , pa.p.z - output.center.z );
-		n.normalize();
-
-		if( Math.abs(n.dot(pa.normal)) < tolCosine)
-			return false;
-
-		n.set( pb.p.x - output.center.x , pb.p.y - output.center.y , pb.p.z - output.center.z );
-		n.normalize();
-
-		if( Math.abs(n.dot(pb.normal)) < tolCosine)
-			return false;
-
-		n.set( pc.p.x - output.center.x , pc.p.y - output.center.y , pc.p.z - output.center.z );
-		n.normalize();
-
-		if( Math.abs(n.dot(pc.normal)) < tolCosine)
+		// only need to check to see if one angle is off since the other two are within tolerance by definition
+		double acute = Math.acos(output.line.slope.dot(pc.normal));
+		if(UtilAngle.dist(acute, Math.PI / 2.0) > tolAngle)
 			return false;
 
 		return true;

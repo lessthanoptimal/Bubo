@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud;
+package bubo.ptcloud.alg;
 
 import georegression.fitting.plane.FitPlane3D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -33,26 +33,44 @@ import java.util.Stack;
  * Given a point cloud, estimate the tangent to the surface at each point and record the nearest neighbors.
  * At each point, there are two possible directions for the tangent and one is arbitrarily selected for each point.
  * No effort is made to make them consistent.
- *
- * TODO describe how the tangent is found.  Inspired by [1] and customized for this specific application.
- *
- * [1] TODO
+ * <p></p>
+ * The implementation below is inspired by [1], in that it approximates the normal using the nearest neighbors.
+ * Unlike in [1], the normalizes are no organized in any way so that their directions is consistent.  The data
+ * structures have also been customized to provide support for {@link PointCloudShapeDetectionSchnabel2007}.
+ * <p></p>
+ * [1] Hoppe, H., DeRose, T., Duchamp, T., McDonald, J., & Stuetzle, W. "Surface reconstruction from unorganized
+ * points" 1992, Vol. 26, No. 2, pp. 71-78. ACM.
  *
  * @author Peter Abeles
  */
 public class ApproximateSurfaceNormals {
 
+	// number of nearest-neighbors it will search for
 	private int numNeighbors;
+	// the maximum distance two points can be apart for them to be considered neighbors
 	private double maxDistanceNeighbor;
+	// The algorithm used to search for nearest neighbors
 	private NearestNeighbor<PointVectorNN> nn;
-	private List<double[]> nnPoints = new ArrayList<double[]>();
 
-	private Stack<double[]> storage = new Stack<double[]>();
+	// stores and recycles Point3D converted to double[] for use in NN
+	private Stack<double[]> unusedNnData = new Stack<double[]>();
+	private Stack<double[]> usedNnData = new Stack<double[]>();
+
+	// resuts of NN search
 	private FastQueue<NnData<PointVectorNN>> resultsNN = new FastQueue<NnData<PointVectorNN>>((Class)NnData.class,true);
 
+	// the local plane computed using neighbors
 	private FitPlane3D_F64 fitPlane = new FitPlane3D_F64();
+	// array to store points used to compute plane
 	private List<Point3D_F64> fitList = new ArrayList<Point3D_F64>();
 
+	/**
+	 * Configures approximation algorithm
+	 *
+	 * @param nn Which nearest-neighbor algorithm to use
+	 * @param numNeighbors Number of neighbors it will use to approximate normal
+	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
+	 */
 	public ApproximateSurfaceNormals( NearestNeighbor<PointVectorNN> nn , int numNeighbors , double maxDistanceNeighbor) {
 		this.numNeighbors = numNeighbors;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
@@ -61,6 +79,12 @@ public class ApproximateSurfaceNormals {
 		nn.init(3);
 	}
 
+	/**
+	 * Configures approximation algorithm and uses a K-D tree by default.
+	 *
+	 * @param numNeighbors Number of neighbors it will use to approximate normal
+	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
+	 */
 	public ApproximateSurfaceNormals(int numNeighbors, double maxDistanceNeighbor) {
 		this.numNeighbors = numNeighbors;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
@@ -68,6 +92,12 @@ public class ApproximateSurfaceNormals {
 		nn = FactoryNearestNeighbor.kdtree();
 	}
 
+	/**
+	 * Process point cloud and finds the shape's normals
+	 *
+	 * @param cloud Input: 3D point cloud
+	 * @param output Output: Storage for the point cloud with normals. Must set declareInstances to true.
+	 */
 	public void process( List<Point3D_F64> cloud , FastQueue<PointVectorNN> output ) {
 
 		// convert the point cloud into a format that the NN algorithm can recognize
@@ -81,12 +111,12 @@ public class ApproximateSurfaceNormals {
 		}
 
 		// find the nearest-neighbor for each point in the cloud
-		nn.setPoints(nnPoints,output.toList());
+		nn.setPoints(usedNnData,output.toList());
 
 		for( int i = 0; i < output.size; i++ ) {
 			// find the nearest-neighbors
 			resultsNN.reset();
-			nn.findNearest(nnPoints.get(i),maxDistanceNeighbor,numNeighbors,resultsNN);
+			nn.findNearest(usedNnData.get(i),maxDistanceNeighbor,numNeighbors,resultsNN);
 
 			PointVectorNN p = output.get(i);
 
@@ -123,21 +153,30 @@ public class ApproximateSurfaceNormals {
 	private void setupNearestNeighbor(List<Point3D_F64> cloud) {
 		nn.init(3);
 
+		// swap the two lists to recycle old data and avoid creating new memory
+		Stack<double[]> tmp = unusedNnData;
+		unusedNnData = usedNnData;
+		usedNnData = tmp;
+		// add the smaller list to the larger one
+		unusedNnData.addAll(usedNnData);
+		usedNnData.clear();
+
+		// convert the point cloud into the NN format
 		for( int i = 0; i < cloud.size(); i++ ) {
 			Point3D_F64 p = cloud.get(i);
 
 			double[] d;
-			if( storage.isEmpty() ) {
+			if( unusedNnData.isEmpty() ) {
 				d = new double[3];
 			} else {
-				d = storage.pop();
+				d = unusedNnData.pop();
 			}
 
 			d[0] = p.x;
 			d[1] = p.y;
 			d[2] = p.z;
 
-			nnPoints.add(d);
+			usedNnData.add(d);
 		}
 	}
 }

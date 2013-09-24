@@ -123,10 +123,9 @@ public class ConstructOctreeEqual {
 		info.data = data;
 
 		Octree node = tree;
+		tree.points.add( info );
 
 		while( true ) {
-			node.points.add( info );
-
 			if( node.isLeaf() ) {
 				// see if it needs to create a new node
 				if( node.points.size() > divideThreshold ) {
@@ -135,33 +134,81 @@ public class ConstructOctreeEqual {
 
 					// create a new child for point to go into
 					int index = node.getChildIndex(point);
-					Octree child = checkAddChild(node,index);
+					Octree child = checkAddChild(node,index, info);
 
 					// Create new children where appropriate for all points in node, but 'point'
 					for( int i = 0; i < node.points.size-1; i++ ) {
-						Octree.Info p = node.points.get(i);
-						int indexP = node.getChildIndex(p.point);
+						Octree.Info infoP = node.points.get(i);
+						int indexP = node.getChildIndex(infoP.point);
 
 						// see if the node exists
-						Octree childP = checkAddChild(node, indexP);
-						// add the point
-						childP.points.add(p);
+						checkAddChild(node, indexP, infoP );
 					}
-					node = child;
+
+					// check for the pathological case where all the points are identical
+					boolean pathological = checkPathological(node);
+
+					if( pathological ) {
+						// avoid infinite recursion by not splitting this node yet
+						undoSplit(node);
+						// search is done since it's at a leaf
+						return node;
+					} else {
+						node = child;
+					}
 				} else {
 					return node;
 				}
 			} else {
 				int index = node.getChildIndex(point);
-				node = checkAddChild(node, index);
+				node = checkAddChild(node, index, info );
 			}
 		}
 	}
 
 	/**
+	 * If all the points are identical it will recurse forever since it can't split them.
+	 */
+	private boolean checkPathological(Octree node) {
+
+		boolean pathological = true;
+		Point3D_F64 first = node.points.data[0].point;
+		for( int i = 1; i < node.points.size; i++ ) {
+			Point3D_F64 p = node.points.data[i].point;
+			if( first.x != p.x || first.y != p.y || first.z != p.z ) {
+				pathological = false;
+				break;
+			}
+		}
+
+		return pathological;
+	}
+
+	/**
+	 * A node was just split then it was realized that it should not have been split.  Undoes the split
+	 * and recycles the data
+	 * @param node Node which needs to become a leaf again.
+	 */
+	private void undoSplit(Octree node) {
+		for( int i = 0; i < 8; i++ ) {
+			Octree o = node.children[i];
+			if( o != null ) {
+				// the order might be different, but the N most recent will be recycled
+				storageNodes.removeTail();
+
+				o.parent = null;
+				o.points.reset();
+				node.children[i] = null;
+			}
+		}
+		storageChildren.add(node.children);
+		node.children = null;
+	}
+
+	/**
 	 * Checks to see if the child already exists.  If not it creates the child
 	 */
-	private Octree checkAddChild(Octree node, int index) {
+	private Octree checkAddChild(Octree node, int index  , Octree.Info info ) {
 		Octree child = node.children[index];
 		if( child == null ) {
 			child = node.children[index] = storageNodes.grow();
@@ -169,6 +216,7 @@ public class ConstructOctreeEqual {
 			setChildSpace(node.space,node.divider,index,child.space);
 			// no points to add to child since none of the previous ones belong to it
 		}
+		child.points.add( info );
 		return child;
 	}
 

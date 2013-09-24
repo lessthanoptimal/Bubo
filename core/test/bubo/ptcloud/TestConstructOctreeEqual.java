@@ -275,4 +275,48 @@ public class TestConstructOctreeEqual {
 		}
 	}
 
+	/**
+	 * If more points have the same value then there is no good way to split the list.  They will go into the same
+	 * bin and a naive algorithm will be stuck doing so for forever.
+	 */
+	@Test
+	public void numerousIdenticalPoints() {
+		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
+		alg.initialize(new Cube3D_F64(-100,-100,-100,200,200,200));
+
+		for( int i = 0; i < 100; i++ ) {
+			Point3D_F64 a = new Point3D_F64(1,1,1);
+
+			alg.addPoint(a,null);
+		}
+
+		// if there is no way to split the points then don't split the points
+		Octree root = alg.getTree();
+		assertTrue(root.isLeaf());
+
+		// make sure all unused data was correctly reset
+		assertEquals(1,alg.getAllNodes().size);
+		for( int i = alg.storageInfo.size; i < alg.storageInfo.data.length; i++ ) {
+			Octree.Info info = alg.storageInfo.data[i];
+
+			assertTrue(info.point==null);
+			assertTrue(info.data == null);
+		}
+		for( int i = alg.storageNodes.size; i < alg.storageNodes.data.length; i++ ) {
+			Octree o = alg.storageNodes.data[i];
+
+			assertTrue(o.children==null);
+			assertTrue(o.parent==null);
+			assertEquals(0, o.points.size());
+		}
+
+		for( int i = 0; i < alg.storageChildren.size(); i++ ) {
+			Octree[] o = alg.storageChildren.get(i);
+
+			for( int j = 0; j < o.length; j++ ) {
+				assertTrue(o[j] == null);
+			}
+		}
+	}
+
 }

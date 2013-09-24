@@ -16,18 +16,28 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud;
+package bubo.ptcloud.alg;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO comment
+ * Data structure which contains information on found shapes from {@link PointCloudShapeDetectionSchnabel2007}.
  *
  * @author Peter Abeles
  */
 public class FoundShape {
+	/**
+	 * Model parameters of the shape
+	 */
 	public Object modelParam;
+	/**
+	 * Which shape it matched.  Index in the model list provided in the constructor of
+	 * {@link PointCloudShapeDetectionSchnabel2007}
+	 */
 	public int whichShape;
+	/**
+	 * Points which matched the shape
+	 */
 	public List<PointVectorNN> points = new ArrayList<PointVectorNN>();
 }
