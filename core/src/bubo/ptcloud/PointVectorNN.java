@@ -36,7 +36,19 @@ public class PointVectorNN {
 	/** Points which are its neighbors */
 	public FastQueue<PointVectorNN> neighbors = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
+	/** Used to keep track of points which have been searched already */
+	public int matchMarker = 0;
+
+	/** If true then the point is already used by a shape */
+	public boolean used;
+
 	public String toString() {
 		return "PointVector P( "+p.x+" , "+p.y+" , "+p.z+" ) Normal( "+normal.x+" , "+normal.y+" , "+normal.z+" )";
+	}
+
+	public void reset() {
+		matchMarker = 0;
+		used = false;
+		neighbors.reset();
 	}
 }

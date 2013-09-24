@@ -76,8 +76,8 @@ public class ApproximateSurfaceNormals {
 		// declare the output data for creating the NN graph
 		for( int i = 0; i < cloud.size(); i++ ) {
 			PointVectorNN p = output.grow();
+			p.reset();
 			p.p = cloud.get(i);
-			p.neighbors.reset();
 		}
 
 		// find the nearest-neighbor for each point in the cloud

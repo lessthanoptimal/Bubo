@@ -42,6 +42,7 @@ public class ConstructOctreeEqual {
 
 	// save references to all data structures declared to create the tree
 	protected FastQueue<Octree.Info> storageInfo = new FastQueue<Octree.Info>(Octree.Info.class,true);
+	// Contains all nodes in the tree
 	protected FastQueue<Octree> storageNodes = new FastQueue<Octree>(Octree.class,true);
 	protected Stack<Octree[]> storageChildren = new Stack<Octree[]>();
 

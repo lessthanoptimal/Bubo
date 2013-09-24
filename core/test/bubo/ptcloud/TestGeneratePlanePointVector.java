@@ -176,7 +176,7 @@ public class TestGeneratePlanePointVector {
 		GeometryMath_F64.mult(R,pv.normal,pv.normal);
 	}
 
-	private PointVectorNN createPt( PlaneNormal3D_F64 plane , double x , double y , double sign ) {
+	public static PointVectorNN createPt( PlaneNormal3D_F64 plane , double x , double y , double sign ) {
 		PointVectorNN pv = new PointVectorNN();
 		pv.p = new Point3D_F64();
 		pv.normal.set(0,0,sign);

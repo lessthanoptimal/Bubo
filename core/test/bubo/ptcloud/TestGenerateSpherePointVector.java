@@ -179,7 +179,7 @@ public class TestGenerateSpherePointVector {
 		assertEquals(expected.radius,found.radius,1e-8);
 	}
 
-	private PointVectorNN createPt( Sphere3D_F64 sphere , double phi , double theta , double sign ) {
+	public static PointVectorNN createPt( Sphere3D_F64 sphere , double phi , double theta , double sign ) {
 		PointVectorNN pv = new PointVectorNN();
 		pv.p = new Point3D_F64();
 		pv.normal.set(0,0,sign);

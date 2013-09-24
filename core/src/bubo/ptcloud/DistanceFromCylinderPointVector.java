@@ -25,7 +25,7 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
 import java.util.List;
 
 /**
- * Distance from a {@link Cylinder3D_F64} for use with {@link RansacMultiObjectPointCloud}.
+ * Distance from a {@link Cylinder3D_F64} for use with {@link PointCloudShapeDetectionSchnabel2007}.
  *
  * @author Peter Abeles
  */

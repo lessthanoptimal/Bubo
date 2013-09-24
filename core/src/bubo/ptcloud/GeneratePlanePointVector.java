@@ -28,7 +28,7 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import java.util.List;
 
 /**
- * Plane estimation for use in {@link RansacMultiObjectPointCloud}.  The equation of the plane is found
+ * Plane estimation for use in {@link PointCloudShapeDetectionSchnabel2007}.  The equation of the plane is found
  * using 3 points.  It is then validated using the 3 normal vectors.  The normal vectors are accepted
  * if the angle between them and the recently found vector is less than a use specified tolerance.
  *

@@ -29,7 +29,7 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
 import java.util.List;
 
 /**
- * Cylinder estimation for use in {@link RansacMultiObjectPointCloud}.  The sphere is estimated
+ * Cylinder estimation for use in {@link PointCloudShapeDetectionSchnabel2007}.  The sphere is estimated
  * using two points and their normal vectors.
  *
  * @author Peter Abeles

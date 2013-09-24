@@ -220,7 +220,7 @@ public class TestGenerateCylinderPointVector {
 		GeometryMath_F64.mult(R,pv.normal,pv.normal);
 	}
 
-	private PointVectorNN createPt( Cylinder3D_F64 cylinder , double h , double theta , double signNorm ) {
+	public static PointVectorNN createPt( Cylinder3D_F64 cylinder , double h , double theta , double signNorm ) {
 		PointVectorNN pv = new PointVectorNN();
 		pv.p = new Point3D_F64();
 		pv.p.x = cylinder.radius*Math.cos(theta);
