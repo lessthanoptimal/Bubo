@@ -22,7 +22,7 @@ import bubo.io.LittleEndianIO;
 import bubo.io.rawlog.RawlogDecoder;
 import bubo.io.rawlog.RawlogSerializableCustom;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.so.Quaternion;
+import georegression.struct.so.Quaternion_F64;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -101,7 +101,7 @@ public class CObservationStereoImages extends CObservation implements RawlogSeri
                     rightCameraPose = (CPose3DQuat)decoder.decodeObject();
                 }
             } else {
-                rightCameraPose = new CPose3DQuat(new Point3D_F64(0.1,0,0), new Quaternion());
+                rightCameraPose = new CPose3DQuat(new Point3D_F64(0.1,0,0), new Quaternion_F64());
             }
 
             if(version >= 3 && version < 5) {

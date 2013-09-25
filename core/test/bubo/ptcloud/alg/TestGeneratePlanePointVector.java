@@ -25,7 +25,7 @@ import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import georegression.struct.so.Rodrigues;
+import georegression.struct.so.Rodrigues_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
@@ -173,7 +173,7 @@ public class TestGeneratePlanePointVector {
 		Vector3D_F64 rotationAxis = plane.n.cross(v);
 		rotationAxis.normalize();
 
-		Rodrigues rod = new Rodrigues(angle,rotationAxis);
+		Rodrigues_F64 rod = new Rodrigues_F64(angle,rotationAxis);
 		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod,null);
 
 		GeometryMath_F64.mult(R,pv.normal,pv.normal);
@@ -195,7 +195,7 @@ public class TestGeneratePlanePointVector {
 		double angle = pv.normal.dot(plane.n);
 		angle = Math.acos( angle / (plane.n.norm()));
 
-		Rodrigues rod = new Rodrigues(angle,cross);
+		Rodrigues_F64 rod = new Rodrigues_F64(angle,cross);
 		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod, null);
 
 		GeometryMath_F64.mult(R,pv.p,pv.p);

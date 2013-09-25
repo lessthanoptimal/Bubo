@@ -24,7 +24,7 @@ import georegression.metric.Distance3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.Cylinder3D_F64;
-import georegression.struct.so.Rodrigues;
+import georegression.struct.so.Rodrigues_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
@@ -214,7 +214,7 @@ public class TestGenerateCylinderPointVector {
 		Vector3D_F64 rotationAxis = v.cross(cylinder.line.slope);
 		rotationAxis.normalize();
 
-		Rodrigues rod = new Rodrigues(angle,rotationAxis);
+		Rodrigues_F64 rod = new Rodrigues_F64(angle,rotationAxis);
 		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod,null);
 
 		GeometryMath_F64.mult(R,pv.normal,pv.normal);
@@ -241,7 +241,7 @@ public class TestGenerateCylinderPointVector {
 		double angle = axisZ.dot(cylinder.line.slope);
 		angle = Math.acos( angle / (cylinder.line.slope.norm()));
 
-		Rodrigues rod = new Rodrigues(angle,cross);
+		Rodrigues_F64 rod = new Rodrigues_F64(angle,cross);
 		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod,null);
 
 		GeometryMath_F64.mult(R,pv.p,pv.p);

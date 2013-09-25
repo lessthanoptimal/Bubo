@@ -23,7 +23,7 @@ import bubo.io.rawlog.RawlogDecoder;
 import bubo.io.rawlog.RawlogSerializableCustom;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.so.Quaternion;
+import georegression.struct.so.Quaternion_F64;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,7 +36,7 @@ import java.io.OutputStream;
  */
 public class CPose3DQuat extends CPose implements RawlogSerializableCustom {
     Point3D_F64 position = new Point3D_F64();
-    Quaternion rotation = new Quaternion();
+	Quaternion_F64 rotation = new Quaternion_F64();
 
     public CPose3DQuat() {
     }
@@ -46,7 +46,7 @@ public class CPose3DQuat extends CPose implements RawlogSerializableCustom {
         RotationMatrixGenerator.matrixToQuaternion(orig.getRotation(),rotation);
     }
 
-    public CPose3DQuat(Point3D_F64 position, Quaternion rotation) {
+    public CPose3DQuat(Point3D_F64 position, Quaternion_F64 rotation) {
         this.position.set(position);
         this.rotation.set(rotation);
     }
@@ -87,11 +87,11 @@ public class CPose3DQuat extends CPose implements RawlogSerializableCustom {
         this.position.set(position);
     }
 
-    public Quaternion getRotation() {
+    public Quaternion_F64 getRotation() {
         return rotation;
     }
 
-    public void setRotation(Quaternion rotation) {
+    public void setRotation(Quaternion_F64 rotation) {
         this.rotation.set(rotation);
     }
 }

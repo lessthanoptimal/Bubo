@@ -23,7 +23,7 @@ import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
-import georegression.struct.so.Rodrigues;
+import georegression.struct.so.Rodrigues_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.junit.Test;
 
@@ -167,7 +167,7 @@ public class TestGenerateSpherePointVector {
 		Vector3D_F64 rotationAxis = pv.normal.cross(v);
 		rotationAxis.normalize();
 
-		Rodrigues rod = new Rodrigues(angle,rotationAxis);
+		Rodrigues_F64 rod = new Rodrigues_F64(angle,rotationAxis);
 		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod,null);
 
 		GeometryMath_F64.mult(R,pv.normal,pv.normal);
@@ -186,9 +186,9 @@ public class TestGenerateSpherePointVector {
 		pv.p.set(0,0,sphere.radius);
 
 
-		Rodrigues rodX = new Rodrigues(phi,new Vector3D_F64(1,0,0));
+		Rodrigues_F64 rodX = new Rodrigues_F64(phi,new Vector3D_F64(1,0,0));
 		DenseMatrix64F rotX = RotationMatrixGenerator.rodriguesToMatrix(rodX, null);
-		Rodrigues rodZ = new Rodrigues(theta,new Vector3D_F64(0,0,1));
+		Rodrigues_F64 rodZ = new Rodrigues_F64(theta,new Vector3D_F64(0,0,1));
 		DenseMatrix64F rotZ = RotationMatrixGenerator.rodriguesToMatrix(rodZ, null);
 
 		GeometryMath_F64.mult(rotX, pv.p, pv.p);
