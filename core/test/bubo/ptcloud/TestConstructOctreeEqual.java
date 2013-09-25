@@ -204,7 +204,7 @@ public class TestConstructOctreeEqual {
 		ConstructOctreeEqual alg = new ConstructOctreeEqual(10);
 
 		Octree tree = alg.getTree();
-		tree.space = new Cube3D_F64(-50,-50,-50,100,100,100);
+		tree.space = new Cube3D_F64(-50,-50,-50,50,50,50);
 		tree.divider = new Point3D_F64();
 
 		for( int i = 0; i < 9; i++ ) {
@@ -229,7 +229,7 @@ public class TestConstructOctreeEqual {
 
 	@Test
 	public void computeDivider() {
-		Cube3D_F64 cube = new Cube3D_F64(10,20,30,50,60,70);
+		Cube3D_F64 cube = new Cube3D_F64(10,20,30,60,80,100);
 		Point3D_F64 p = new Point3D_F64();
 		ConstructOctreeEqual.computeDivider(cube,p);
 
@@ -240,7 +240,7 @@ public class TestConstructOctreeEqual {
 
 	@Test
 	public void setChildSpace() {
-		Cube3D_F64 cube = new Cube3D_F64(-50,-50,-50,100,100,100);
+		Cube3D_F64 cube = new Cube3D_F64(-50,-50,-50,50,50,50);
 		Point3D_F64 divider = new Point3D_F64();
 
 		Cube3D_F64 child = new Cube3D_F64();
@@ -249,9 +249,9 @@ public class TestConstructOctreeEqual {
 
 		for( int i = 0; i < 8; i++ ) {
 			ConstructOctreeEqual.setChildSpace(cube,divider,i,child);
-			assertEquals(50,child.lengthX,1e-8);
-			assertEquals(50,child.lengthY,1e-8);
-			assertEquals(50,child.lengthZ,1e-8);
+			assertEquals(50,child.getLengthX(),1e-8);
+			assertEquals(50,child.getLengthY(),1e-8);
+			assertEquals(50,child.getLengthZ(),1e-8);
 
 			if( i == 0 ) {
 				testPt.set(-1,-1,-1);

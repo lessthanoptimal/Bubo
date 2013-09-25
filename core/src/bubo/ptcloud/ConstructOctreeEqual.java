@@ -235,40 +235,43 @@ public class ConstructOctreeEqual {
 	 * Sets the divider to the center of space
 	 */
 	public static void computeDivider( Cube3D_F64 space , Point3D_F64 divider ) {
-		divider.x = space.p.x + space.lengthX/2.0;
-		divider.y = space.p.y + space.lengthY/2.0;
-		divider.z = space.p.z + space.lengthZ/2.0;
+
+		divider.x = (space.p0.x + space.p1.x)/2.0;
+		divider.y = (space.p0.y + space.p1.y)/2.0;
+		divider.z = (space.p0.z + space.p1.z)/2.0;
 	}
 
 	public static void setChildSpace( Cube3D_F64 parentSpace , Point3D_F64 parentDivider , int index ,
 									  Cube3D_F64 childSpace ) {
 
-		childSpace.p.set( parentSpace.p );
-		childSpace.lengthX = parentSpace.lengthX/2.0;
-		childSpace.lengthY = parentSpace.lengthY/2.0;
-		childSpace.lengthZ = parentSpace.lengthZ/2.0;
+		childSpace.p0.set( parentSpace.p0 );
 
 		// no change for index 0
 		if( index == 1 ) {
-			childSpace.p.y = parentDivider.y;
+			childSpace.p0.y = parentDivider.y;
 		} else if( index == 2 ) {
-			childSpace.p.x = parentDivider.x;
+			childSpace.p0.x = parentDivider.x;
 		} else if( index == 3 ) {
-			childSpace.p.x = parentDivider.x;
-			childSpace.p.y = parentDivider.y;
+			childSpace.p0.x = parentDivider.x;
+			childSpace.p0.y = parentDivider.y;
 		} else if( index == 4 ) {
-			childSpace.p.z = parentDivider.z;
+			childSpace.p0.z = parentDivider.z;
 		} else if( index == 5 ) {
-			childSpace.p.y = parentDivider.y;
-			childSpace.p.z = parentDivider.z;
+			childSpace.p0.y = parentDivider.y;
+			childSpace.p0.z = parentDivider.z;
 		} else if( index == 6 ) {
-			childSpace.p.x = parentDivider.x;
-			childSpace.p.z = parentDivider.z;
+			childSpace.p0.x = parentDivider.x;
+			childSpace.p0.z = parentDivider.z;
 		} else if( index == 7 ) {
-			childSpace.p.x = parentDivider.x;
-			childSpace.p.y = parentDivider.y;
-			childSpace.p.z = parentDivider.z;
+			childSpace.p0.x = parentDivider.x;
+			childSpace.p0.y = parentDivider.y;
+			childSpace.p0.z = parentDivider.z;
 		}
+
+		childSpace.p1.x = childSpace.p0.x + parentSpace.getLengthX()/2.0;
+		childSpace.p1.y = childSpace.p0.y + parentSpace.getLengthY()/2.0;
+		childSpace.p1.z = childSpace.p0.z + parentSpace.getLengthZ()/2.0;
+
 	}
 
 	/**

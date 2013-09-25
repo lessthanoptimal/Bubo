@@ -89,7 +89,8 @@ public class ApproximateSurfaceNormals {
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
 	public ApproximateSurfaceNormals(int numNeighbors, double maxDistanceNeighbor) {
-		this.numNeighbors = numNeighbors;
+		// one neighbor will be the point itself when it searches, which is removed.  hence the +1
+		this.numNeighbors = numNeighbors+1;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
 
 		nn = FactoryNearestNeighbor.kdtree();
