@@ -100,8 +100,8 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 					if (distance <= threshold) {
 						open.add(nn);
 					}
+					nn.matchMarker = marker;
 				}
-				nn.matchMarker = marker;
 			}
 		}
 	}

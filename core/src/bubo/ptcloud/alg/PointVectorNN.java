@@ -48,7 +48,8 @@ public class PointVectorNN {
 	}
 
 	public void reset() {
-		matchMarker = 0;
+		p = null;
+		matchMarker = -1;
 		used = false;
 		neighbors.reset();
 	}

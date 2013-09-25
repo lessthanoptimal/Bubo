@@ -20,6 +20,7 @@ package bubo.ptcloud.alg;
 
 import bubo.ptcloud.ConstructOctreeEqual;
 import bubo.ptcloud.Octree;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 import org.ddogleg.struct.FastQueue;
@@ -74,6 +75,12 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	// list of found objects
 	private FastQueue<FoundShape> foundObjects = new FastQueue<FoundShape>(FoundShape.class,true);
 
+	// points with normal vectors
+	private FastQueue<PointVectorNN> pointsNormal = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+	// points without normal vectors
+	private FastQueue<PointVectorNN> pointsNoNormal = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+
+
 	// the maximum number of RANSAC iterations.  Can be used to control how long the process can run for
 	private int maximumAllowedIterations;
 
@@ -125,14 +132,29 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		this.bounding.set(boundingBox);
 		ransac.reset();
 		foundObjects.reset();
+		pointsNoNormal.reset();
+		pointsNormal.reset();
+
+		// split input points into a list with and without normal vectors
+		for( int i = 0; i < points.size; i++ ) {
+			PointVectorNN pv = points.data[i];
+			Vector3D_F64 v = pv.normal;
+			if( v.x == 0 && v.y == 0 && v.z == 0 ) {
+				pointsNoNormal.add(pv);
+			} else {
+				pointsNormal.add(pv);
+			}
+		}
 
 		// Constructs the Octree and finds its leafs
-		constructOctree(points);
+		constructOctree(pointsNormal);
 
 		List<PointVectorNN> sampleSet = new ArrayList<PointVectorNN>();
 
+		// run untill there are no more iterations or that there are not enough points left to fit an object
 		int totalIterations = 0;
-		while( totalIterations < maximumAllowedIterations  ) {
+		while( totalIterations < maximumAllowedIterations &&
+				managerOctree.getTree().points.size > minModelAccept ) {
 			// select region to search for a shape inside
 			Octree sampleNode = selectSampleNode();
 
@@ -147,18 +169,12 @@ public class PointCloudShapeDetectionSchnabel2007 {
 			}
 
 			// see if its possible to find a valid model with this data
-			if( sampleSet.size() < minModelAccept ) {
+			if( sampleSet.size() < minModelAccept && sampleNode.points.size != sampleSet.size()) {
 				// Update the octree since it clearly needs to since its running into trouble here and can't
 				// run RANSAC.  Next cycle this situation will be impossible
 				// By constructing the Octree here it is only constructed as needed
-				constructOctree(points);
-
-				// give up if there are too few points left to find a shape
-				if( managerOctree.getTree().points.size <= minModelAccept ) {
-					break;
-				} else {
-					continue;
-				}
+				constructOctree(pointsNormal);
+				continue;
 			}
 
 			// use RANSAC to find a shape
@@ -167,6 +183,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 
 				// see if there are enough points to be a valid shape
 				if( inliers.size() >= minModelAccept ) {
+					// TODO iteratively until converge, batch estimate parameters and then find inlier set
 
 					// construct the output shape
 					FoundShape shape = foundObjects.grow();
@@ -180,7 +197,6 @@ public class PointCloudShapeDetectionSchnabel2007 {
 						p.used = true;
 						shape.points.add(p);
 					}
-
 				}
 			}
 
@@ -227,7 +243,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 			PointVectorNN p = points.data[i];
 
 			if( !p.used )
-				managerOctree.addPoint(p.p,p);
+				managerOctree.addPoint(p.p, p);
 		}
 
 		findLeafs();
@@ -267,6 +283,13 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		for( int i = 0; i < treePts.size; i++ ) {
 			Octree.Info info = treePts.data[i];
 			PointVectorNN pv = (PointVectorNN)info.data;
+			if( !pv.used ) {
+				unmatched.add(pv);
+			}
+		}
+		// go through list of points with no normal and see if they are matched or not
+		for( int i = 0; i < pointsNoNormal.size; i++ ) {
+			PointVectorNN pv = pointsNoNormal.data[i];
 			if( !pv.used ) {
 				unmatched.add(pv);
 			}

@@ -26,8 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -50,7 +49,7 @@ public class TestApproximateSurfaceNormals {
 			}
 		}
 
-		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,true);
+		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
 		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(5,1.0);
 
@@ -72,6 +71,8 @@ public class TestApproximateSurfaceNormals {
 				double d = pv.neighbors.get(j).p.distance(pv.p);
 				assertTrue(d < 0.4);
 			}
+
+			// TODO the point itself should not be in the neighbor list
 		}
 	}
 
@@ -80,7 +81,12 @@ public class TestApproximateSurfaceNormals {
 	 */
 	@Test
 	public void checkVectorNormalizedToOne() {
+		fail("Implement");
+	}
 
+	@Test
+	public void checkNoNormalIsZero() {
+		fail("Implement");
 	}
 
 }

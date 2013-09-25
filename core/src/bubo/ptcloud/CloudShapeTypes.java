@@ -23,7 +23,7 @@ package bubo.ptcloud;
  *
  * @author Peter Abeles
  */
-public enum CloudShapes {
+public enum CloudShapeTypes {
 	/**
 	 * Plane described by {@link georegression.struct.plane.PlaneGeneral3D_F64}.
 	 */

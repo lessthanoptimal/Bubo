@@ -182,7 +182,7 @@ public class TestGenerateCylinderPointVector {
 		assertEquals(3,alg.getMinimumPoints());
 	}
 
-	private void checkEquivalent( Cylinder3D_F64 a , Cylinder3D_F64 b ) {
+	public static void checkEquivalent( Cylinder3D_F64 a , Cylinder3D_F64 b ) {
 		assertEquals(a.radius,b.radius,1e-8);
 
 		// the points should be on the other line

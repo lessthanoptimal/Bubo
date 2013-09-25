@@ -18,18 +18,53 @@
 
 package bubo.ptcloud.wrapper;
 
-import org.junit.Test;
+import bubo.ptcloud.CloudShapeTypes;
+import bubo.ptcloud.PointCloudShapeFinder;
+import bubo.ptcloud.alg.*;
+import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public class TestSchnable2007_to_PointCloudShapeFinder {
+public class TestSchnable2007_to_PointCloudShapeFinder extends GeneralChecksPointCloudShapeFinder {
 
-	@Test
-	public void stuff() {
-		fail("Implement");
+	@Override
+	public PointCloudShapeFinder createAlgorithm() {
+
+		List<RansacMulti.ObjectType> objects = new ArrayList<RansacMulti.ObjectType>();
+
+		RansacMulti.ObjectType sphere = new RansacMulti.ObjectType();
+		sphere.modelDistance = new DistanceFromSpherePointVector();
+		sphere.modelGenerator = new GenerateSpherePointVector(0.3,0.3);
+		sphere.thresholdFit = 0.3;
+
+		RansacMulti.ObjectType plane = new RansacMulti.ObjectType();
+		plane.modelDistance = new DistanceFromPlanePointVector();
+		plane.modelGenerator = new GeneratePlanePointVector(0.3);
+		plane.thresholdFit = 0.3;
+
+		RansacMulti.ObjectType cylinder = new RansacMulti.ObjectType();
+		cylinder.modelDistance = new DistanceFromCylinderPointVector();
+		cylinder.modelGenerator = new GenerateCylinderPointVector(0.3,0.3);
+		cylinder.thresholdFit = 0.3;
+
+		objects.add(sphere);
+		objects.add(plane);
+		objects.add(cylinder);
+
+		PointCloudShapeDetectionSchnabel2007 alg =
+				new PointCloudShapeDetectionSchnabel2007(objects,20,10,10,1000,0xBEEF);
+
+		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(6,1);
+
+		List<CloudShapeTypes> shapeList = new ArrayList<CloudShapeTypes>();
+		shapeList.add(CloudShapeTypes.SPHERE);
+		shapeList.add(CloudShapeTypes.PLANE);
+		shapeList.add(CloudShapeTypes.CYLINDER);
+
+		return new Schnable2007_to_PointCloudShapeFinder(surface,alg,shapeList);
 	}
-
 }

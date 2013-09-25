@@ -173,7 +173,7 @@ public class TestGenerateSpherePointVector {
 		GeometryMath_F64.mult(R,pv.normal,pv.normal);
 	}
 
-	private void checkSpheres(Sphere3D_F64 expected, Sphere3D_F64 found) {
+	public static void checkSpheres(Sphere3D_F64 expected, Sphere3D_F64 found) {
 
 		assertEquals(0,expected.center.distance(found.center),1e-8);
 		assertEquals(expected.radius,found.radius,1e-8);

@@ -18,7 +18,7 @@
 
 package bubo.ptcloud.wrapper;
 
-import bubo.ptcloud.CloudShapes;
+import bubo.ptcloud.CloudShapeTypes;
 import bubo.ptcloud.PointCloudShapeFinder;
 import bubo.ptcloud.alg.ApproximateSurfaceNormals;
 import bubo.ptcloud.alg.FoundShape;
@@ -38,13 +38,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO least squares fitting of each shape
 public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFinder {
 
 	ApproximateSurfaceNormals surfaceNormals;
 	PointCloudShapeDetectionSchnabel2007 shapeDetector;
-	List<CloudShapes> shapeList;
+	List<CloudShapeTypes> shapeList;
 
-	FastQueue<PointVectorNN> pointNormList = new FastQueue<PointVectorNN>(PointVectorNN.class,true);
+	FastQueue<PointVectorNN> pointNormList = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
 	FastQueue<Shape> output = new FastQueue<Shape>(Shape.class,true);
 
@@ -54,7 +55,7 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 
 	public Schnable2007_to_PointCloudShapeFinder(ApproximateSurfaceNormals surfaceNormals,
 												 PointCloudShapeDetectionSchnabel2007 shapeDetector,
-												 List<CloudShapes> shapeList ) {
+												 List<CloudShapeTypes> shapeList ) {
 		this.surfaceNormals = surfaceNormals;
 		this.shapeDetector = shapeDetector;
 		this.shapeList = shapeList;
@@ -116,7 +117,7 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 	}
 
 	@Override
-	public List<CloudShapes> getShapesList() {
+	public List<CloudShapeTypes> getShapesList() {
 		return shapeList;
 	}
 }

@@ -56,6 +56,9 @@ public class ApproximateSurfaceNormals {
 	private Stack<double[]> unusedNnData = new Stack<double[]>();
 	private Stack<double[]> usedNnData = new Stack<double[]>();
 
+	// point normal data which is stored in the graph
+	private FastQueue<PointVectorNN> listPointVector = new FastQueue<PointVectorNN>(PointVectorNN.class,true);
+
 	// resuts of NN search
 	private FastQueue<NnData<PointVectorNN>> resultsNN = new FastQueue<NnData<PointVectorNN>>((Class)NnData.class,true);
 
@@ -93,41 +96,50 @@ public class ApproximateSurfaceNormals {
 	}
 
 	/**
-	 * Process point cloud and finds the shape's normals
+	 * Process point cloud and finds the shape's normals.  If a normal could not be estimated for the point
+	 * its vector is set to (0,0,0).  A normal cannot be found for points with 1 or less neighbors.
 	 *
 	 * @param cloud Input: 3D point cloud
-	 * @param output Output: Storage for the point cloud with normals. Must set declareInstances to true.
+	 * @param output Output: Storage for the point cloud with normals. Must set declareInstances to false.
 	 */
-	public void process( List<Point3D_F64> cloud , FastQueue<PointVectorNN> output ) {
+	public void process( List<Point3D_F64> cloud , FastQueue<PointVectorNN> output  ) {
 
 		// convert the point cloud into a format that the NN algorithm can recognize
 		setupNearestNeighbor(cloud);
 
 		// declare the output data for creating the NN graph
+		listPointVector.reset();
 		for( int i = 0; i < cloud.size(); i++ ) {
-			PointVectorNN p = output.grow();
+			PointVectorNN p = listPointVector.grow();
 			p.reset();
 			p.p = cloud.get(i);
 		}
 
 		// find the nearest-neighbor for each point in the cloud
-		nn.setPoints(usedNnData,output.toList());
+		nn.setPoints(usedNnData, listPointVector.toList());
 
-		for( int i = 0; i < output.size; i++ ) {
+		for( int i = 0; i < listPointVector.size; i++ ) {
 			// find the nearest-neighbors
 			resultsNN.reset();
-			nn.findNearest(usedNnData.get(i),maxDistanceNeighbor,numNeighbors,resultsNN);
 
-			PointVectorNN p = output.get(i);
+			double[] targetPt = usedNnData.get(i);
+			nn.findNearest(targetPt,maxDistanceNeighbor,numNeighbors,resultsNN);
+
+			PointVectorNN p = listPointVector.get(i);
 
 			// save the results
 			p.neighbors.reset();
 			for( int j = 0; j < resultsNN.size; j++ ) {
 				NnData<PointVectorNN> n = resultsNN.get(j);
-				p.neighbors.add(n.data);
+
+				// don't add the point to its own list of neighbors list
+				if( n.point != targetPt)
+					p.neighbors.add(n.data);
 			}
 
+			// try to compute the normal and add it to the output list if one could be fond
 			computeSurfaceNormal(p);
+			output.add(p);
 		}
 
 	}
@@ -136,14 +148,16 @@ public class ApproximateSurfaceNormals {
 	 * Fits a plane to the nearest neighbors around the point and sets point.normal.
 	 */
 	protected void computeSurfaceNormal(PointVectorNN point) {
-		if( point.neighbors.size < 2 ) {
-			point.normal.set(0,0,0);
-		} else {
+		// need 3 points to compute a plane.  which means you need two neighbors and 'point'
+		if( point.neighbors.size >= 2 ) {
 			fitList.clear();
+			fitList.add(point.p);
 			for( int i = 0; i < point.neighbors.size; i++ ) {
 				fitList.add( point.neighbors.data[i].p);
 			}
 			fitPlane.svdPoint(fitList,point.p,point.normal);
+		} else {
+			point.normal.set(0,0,0);
 		}
 	}
 

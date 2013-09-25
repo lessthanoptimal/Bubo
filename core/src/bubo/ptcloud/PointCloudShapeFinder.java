@@ -24,7 +24,10 @@ import georegression.struct.shapes.Cube3D_F64;
 import java.util.List;
 
 /**
- * High level interface for finding different primitive shapes inside a point cloud.
+ * High level interface for finding different primitive shapes inside a point cloud. A list of found shapes is returned
+ * and points which were not assigned to any shapes.  For each shape the following information is returned, the
+ * shape type, shape parameters,and set of points belonging to the shape.  Depending on the implementations
+ * a single point can belong to one or more shapes.
  *
  * @author Peter Abeles
  */
@@ -43,7 +46,7 @@ public interface PointCloudShapeFinder {
 	public void process( List<Point3D_F64> cloud , Cube3D_F64 boundingBox );
 
 	/**
-	 * List of shapes that were found in the point cloud
+	 * List of shapes that were found in the point cloud.
 	 *
 	 * WARNING: All data structures returned are owned by this class.  They are subject to being modified
 	 * the next time process is called.  The points might also be references to the input point cloud.
@@ -67,7 +70,7 @@ public interface PointCloudShapeFinder {
 	 *
 	 * @return List of shape types
 	 */
-	public List<CloudShapes> getShapesList();
+	public List<CloudShapeTypes> getShapesList();
 
 	/**
 	 * Storage for output
@@ -75,8 +78,8 @@ public interface PointCloudShapeFinder {
 	public static class Shape
 	{
 		/** The type of shape */
-		public CloudShapes type;
-		/** Parameters for the shape.  See {@link CloudShapes} for data structute type. */
+		public CloudShapeTypes type;
+		/** Parameters for the shape.  See {@link CloudShapeTypes} for data structute type. */
 		public Object parameters;
 		/** List of points that matched this shape */
 		public List<Point3D_F64> points;
