@@ -21,15 +21,13 @@ package bubo.ptcloud.alg;
 import georegression.geometry.UtilPlane3D_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
-import georegression.struct.point.Point3D_F64;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
-import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -39,74 +37,51 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestRansacShapeDetection {
 
+	/**
+	 * Checks to see if it uses the {@link FindMatchSetPointVectorNN} correctly.
+	 */
 	@Test
 	public void selectMatchSet() {
 		RansacMulti.ObjectType o = new RansacMulti.ObjectType();
-		o.modelDistance = new DistanceFromPlanePointVector();
+		o.modelDistance = new DistanceFromModel_P_to_PVNN(new DistancePlaneToPoint3D());
 		o.modelGenerator = new GeneratePlanePointVector(0.1);
 		o.thresholdFit = 0.5;
 
 		List<RansacMulti.ObjectType> objects = new ArrayList<RansacMulti.ObjectType>();
 		objects.add(o);
 
-		RansacShapeDetection alg = new RansacShapeDetection(123213,100,objects);
+		DummyFindMatch dummy = new DummyFindMatch();
+		RansacShapeDetection alg = new RansacShapeDetection(123213,100,dummy,objects);
 
+		// make it so the candidate list is not zero
 		PlaneNormal3D_F64 planeNorm = new PlaneNormal3D_F64(0,0,0,0,0,1);
 		PlaneGeneral3D_F64 plane = UtilPlane3D_F64.convert(planeNorm,null);
 
-		createGraph(alg.getInitialSample());
 		alg.selectMatchSet(o.modelDistance, o.thresholdFit, plane);
 
-		List<PointVectorNN> candidates = alg.getCandidatePoints();
-
-		// see if there is the expected number
-		assertEquals(10,candidates.size());
-
-		// they should all be on the plane within tolerance
-		for( PointVectorNN pv : candidates ) {
-			assertTrue(o.modelDistance.computeDistance(pv) <= 1 );
-		}
+		// ,make sure it called the functions
+		assertTrue(dummy.modelDistance);
+		assertTrue(dummy.modelSet);
 	}
 
-	/**
-	 * Create a graph with cycles and 1/2 the nodes match the model and 1/2 don't
-	 */
-	private List<PointVectorNN> createGraph( FastQueue<PointVectorNN> initialSample ) {
-		List<PointVectorNN> list = new ArrayList<PointVectorNN>();
+	protected class DummyFindMatch extends FindMatchSetPointVectorNN<PlaneGeneral3D_F64> {
 
-		PointVectorNN prev = new PointVectorNN();
-		prev.p = new Point3D_F64(0,0,0);
+		boolean modelDistance = false;
+		boolean modelSet = false;
 
-		list.add(prev);
-
-		for( int i = 1; i < 10; i++ ) {
-			PointVectorNN n = new PointVectorNN();
-			n.p = new Point3D_F64(i,i,0);
-			n.neighbors.add(prev);
-			prev.neighbors.add(n);
-
-			PointVectorNN o = new PointVectorNN();
-			o.p = new Point3D_F64(i,i+1,10);
-			o.neighbors.add(prev);
-			prev.neighbors.add(o);
-
-			o.neighbors.add(n);
-			n.neighbors.add(o);
-
-			list.add(n);
-			list.add(o);
-
-			prev = n;
+		@Override
+		protected void selectMatchSet(List<PointVectorNN> initialMatch,
+									  PlaneGeneral3D_F64 param, double threshold,
+									  List<PointVectorNN> outputMatch) {
+			assertTrue(outputMatch.size()==0);
+			assertTrue(modelDistance);
+			modelSet = true;
 		}
 
-		// give it a set of points on the feature
-		initialSample.add(list.get(0));
-		initialSample.add(list.get(1));
-		initialSample.add(list.get(3));
-
-		return list;
+		@Override
+		public void setModelDistance(DistanceFromModel modelDistance) {
+			this.modelDistance = true;
+		}
 	}
-
-
 
 }

@@ -52,7 +52,7 @@ public class TestGeneratePlanePointVector {
 		PlaneGeneral3D_F64 found = new PlaneGeneral3D_F64();
 		assertTrue(alg.generate(pts, found));
 
-		checkPlanes(plane,found);
+		checkPlanes(plane,found, 1e-8);
 	}
 
 	@Test
@@ -68,7 +68,7 @@ public class TestGeneratePlanePointVector {
 		PlaneGeneral3D_F64 found = new PlaneGeneral3D_F64();
 		assertTrue(alg.generate(pts, found));
 
-		checkPlanes(plane,found);
+		checkPlanes(plane,found, 1e-8);
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class TestGeneratePlanePointVector {
 		PlaneGeneral3D_F64 found = new PlaneGeneral3D_F64();
 		assertTrue(alg.generate(pts, found));
 
-		checkPlanes(plane, found);
+		checkPlanes(plane, found, 1e-8);
 
 		// check mixed directions
 		pts = new ArrayList<PointVectorNN>();
@@ -95,7 +95,7 @@ public class TestGeneratePlanePointVector {
 
 		assertTrue(alg.generate(pts, found));
 
-		checkPlanes(plane,found);
+		checkPlanes(plane,found, 1e-8);
 	}
 
 	@Test
@@ -140,7 +140,7 @@ public class TestGeneratePlanePointVector {
 		assertEquals(3,alg.getMinimumPoints());
 	}
 
-	public static void checkPlanes( PlaneNormal3D_F64 expected , PlaneGeneral3D_F64 found ) {
+	public static void checkPlanes(PlaneNormal3D_F64 expected, PlaneGeneral3D_F64 found, double tol) {
 		PlaneGeneral3D_F64 expectedG = new PlaneGeneral3D_F64();
 		UtilPlane3D_F64.convert(expected,expectedG);
 
@@ -157,10 +157,10 @@ public class TestGeneratePlanePointVector {
 		if( Math.signum(sumG) != Math.signum(sumF) )
 			normF = -normF;
 
-		assertEquals(expectedG.A/normE,found.A/normF,1e-8);
-		assertEquals(expectedG.B/normE,found.B/normF,1e-8);
-		assertEquals(expectedG.C/normE,found.C/normF,1e-8);
-		assertEquals(expectedG.D/normE,found.D/normF,1e-8);
+		assertEquals(expectedG.A/normE,found.A/normF,tol);
+		assertEquals(expectedG.B/normE,found.B/normF,tol);
+		assertEquals(expectedG.C/normE,found.C/normF,tol);
+		assertEquals(expectedG.D/normE,found.D/normF,tol);
 	}
 
 	private void rotatePoint( PlaneNormal3D_F64 plane , PointVectorNN pv , double angle ) {

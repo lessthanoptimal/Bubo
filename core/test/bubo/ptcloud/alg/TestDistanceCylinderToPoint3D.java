@@ -32,33 +32,30 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDistanceFromCylinderPointVector {
+public class TestDistanceCylinderToPoint3D {
 
 	@Test
 	public void computeDistance() {
 
-		DistanceFromCylinderPointVector alg = new DistanceFromCylinderPointVector();
+		DistanceCylinderToPoint3D alg = new DistanceCylinderToPoint3D();
 
 		Cylinder3D_F64 model = new Cylinder3D_F64(1,-2,3,-0.5,0.2,2,3);
 		Point3D_F64 point = new Point3D_F64(3.4,5.6,7.8);
 
-		PointVectorNN pointNN = new PointVectorNN();
-		pointNN.p = point;
-
 		alg.setModel(model);
 
 		double expected = Math.abs(Distance3D_F64.distance(model, point));
-		double found = alg.computeDistance(pointNN);
+		double found = alg.computeDistance(point);
 
 		assertTrue(found>0);
 		assertEquals(expected,found,1e-8);
 
 		// now try a point inside the cylinder
-		pointNN.p.set(1,-2,3.5);
+		point.set(1,-2,3.5);
 		alg.setModel(model);
 
 		expected = Math.abs(Distance3D_F64.distance(model, point));
-		found = alg.computeDistance(pointNN);
+		found = alg.computeDistance(point);
 
 		assertTrue(found>0);
 		assertEquals(expected,found,1e-8);
@@ -66,16 +63,14 @@ public class TestDistanceFromCylinderPointVector {
 
 	@Test
 	public void computeDistance_array() {
-		DistanceFromCylinderPointVector alg = new DistanceFromCylinderPointVector();
+		DistanceCylinderToPoint3D alg = new DistanceCylinderToPoint3D();
 
 		Cylinder3D_F64 model = new Cylinder3D_F64(1,-2,3,-0.5,0.2,2,3);
-		PointVectorNN pointA = new PointVectorNN();
-		PointVectorNN pointB = new PointVectorNN();
 
-		pointA.p = new Point3D_F64(3.4,5.6,7.8);
-		pointB.p = new Point3D_F64(1,-2,3.5);
+		Point3D_F64 pointA = new Point3D_F64(3.4,5.6,7.8);
+		Point3D_F64 pointB = new Point3D_F64(1,-2,3.5);
 
-		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
+		List<Point3D_F64> pts = new ArrayList<Point3D_F64>();
 		pts.add(pointA);
 		pts.add(pointB);
 

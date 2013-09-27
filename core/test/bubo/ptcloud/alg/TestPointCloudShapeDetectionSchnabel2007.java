@@ -24,12 +24,9 @@ import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
-import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -105,7 +102,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 				PlaneGeneral3D_F64 foundShape = (PlaneGeneral3D_F64)found.get(i).modelParam;
 
-				TestGeneratePlanePointVector.checkPlanes(plane,foundShape);
+				TestGeneratePlanePointVector.checkPlanes(plane,foundShape, 1e-8);
 			}
 		}
 
@@ -177,27 +174,11 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 	private PointCloudShapeDetectionSchnabel2007 createAlgorithm() {
 
-		List<RansacMulti.ObjectType> objects = new ArrayList<RansacMulti.ObjectType>();
+		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.2,0.3);
 
-		RansacMulti.ObjectType sphere = new RansacMulti.ObjectType();
-		sphere.modelDistance = new DistanceFromSpherePointVector();
-		sphere.modelGenerator = new GenerateSpherePointVector(0.3,0.3);
-		sphere.thresholdFit = 0.3;
+		config.minModelAccept = 10;
+		config.octreeSplit = 20;
 
-		RansacMulti.ObjectType plane = new RansacMulti.ObjectType();
-		plane.modelDistance = new DistanceFromPlanePointVector();
-		plane.modelGenerator = new GeneratePlanePointVector(0.3);
-		plane.thresholdFit = 0.3;
-
-		RansacMulti.ObjectType cylinder = new RansacMulti.ObjectType();
-		cylinder.modelDistance = new DistanceFromCylinderPointVector();
-		cylinder.modelGenerator = new GenerateCylinderPointVector(0.3,0.3);
-		cylinder.thresholdFit = 0.3;
-
-		objects.add(sphere);
-		objects.add(plane);
-		objects.add(cylinder);
-
-		return new PointCloudShapeDetectionSchnabel2007(objects,20,10,10,1000,0xBEEF);
+		return new PointCloudShapeDetectionSchnabel2007(config);
 	}
 }

@@ -18,8 +18,10 @@
 
 package bubo.ptcloud.alg;
 
+import georegression.geometry.UtilPlane3D_F64;
+import georegression.struct.plane.PlaneGeneral3D_F64;
+import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Sphere3D_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -30,41 +32,40 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestDistanceFromSpherePointVector {
+public class TestDistancePlaneToPoint3D {
 
 	@Test
 	public void computeDistance() {
-		Sphere3D_F64 model = new Sphere3D_F64(1,1,1,3);
-		PointVectorNN point = new PointVectorNN();
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,1,1,0,0,1);
+		PlaneGeneral3D_F64 model = UtilPlane3D_F64.convert(plane,null);
+		Point3D_F64 point;
 
-		DistanceFromSpherePointVector alg = new DistanceFromSpherePointVector();
+		DistancePlaneToPoint3D alg = new DistancePlaneToPoint3D();
 		alg.setModel(model);
 
-		// test outside the sphere
-		point.p = new Point3D_F64(1,1,1+4);
+		// test above the plane
+		point = new Point3D_F64(1,1,2);
 
 		assertEquals(1, alg.computeDistance(point), 1e-8);
 
-		// test inside the sphere
-		point.p = new Point3D_F64(1,1,1+2);
+		// test below the plane
+		point = new Point3D_F64(1,1,0);
 
 		assertEquals(1,alg.computeDistance(point),1e-8);
 	}
 
 	@Test
 	public void computeDistance_list() {
-		Sphere3D_F64 model = new Sphere3D_F64(1,1,1,3);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,1,1,0,0,1);
+		PlaneGeneral3D_F64 model = UtilPlane3D_F64.convert(plane,null);
 
-		DistanceFromSpherePointVector alg = new DistanceFromSpherePointVector();
+		DistancePlaneToPoint3D alg = new DistancePlaneToPoint3D();
 		alg.setModel(model);
 
-		PointVectorNN pointA = new PointVectorNN();
-		PointVectorNN pointB = new PointVectorNN();
+		Point3D_F64 pointA = new Point3D_F64(1,1,2);
+		Point3D_F64 pointB = new Point3D_F64(1,1,0);
 
-		pointA.p = new Point3D_F64(1,1,1+4);
-		pointB.p = new Point3D_F64(1,1,1+2);
-
-		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
+		List<Point3D_F64> pts = new ArrayList<Point3D_F64>();
 		pts.add(pointA);
 		pts.add(pointB);
 

@@ -32,11 +32,11 @@ import georegression.struct.shapes.Sphere3D_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * General tests for implementations of {@link bubo.ptcloud.PointCloudShapeFinder}
@@ -49,6 +49,15 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 	public abstract PointCloudShapeFinder createAlgorithm();
 
+	// how close to the expected set size does it need to be
+	int tolSetSize = 2;
+
+	double tolModelparam = 1e-6;
+
+	protected GeneralChecksPointCloudShapeFinder(int tolSetSize, double tolModelparam) {
+		this.tolSetSize = tolSetSize;
+		this.tolModelparam = tolModelparam;
+	}
 
 	/**
 	 * Goes through each supported shape and sees if it can detect it by itsself with perfect data
@@ -74,22 +83,19 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 			switch( shape ) {
 				case CYLINDER:
-					for( int i = 0; i < N; i++ )
-						cloud.add(PointCloudShapeTools.createPt(cylinder, rand.nextDouble() * 2, rand.nextDouble() * 2 * Math.PI));
+					addShapeToCloud(cylinder,N,cloud);
 					break;
 
 				case PLANE:
-					for( int i = 0; i < N; i++ )
-						cloud.add(PointCloudShapeTools.createPt(plane, 3 * (rand.nextDouble() - 0.5), 3 * (rand.nextDouble() - 0.5)));
+					addShapeToCloud(plane,N,cloud);
 					break;
 
 				case SPHERE:
-					for( int i = 0; i < N; i++ )
-						cloud.add(PointCloudShapeTools.createPt(sphere, rand.nextDouble() * 2 * Math.PI, rand.nextDouble() * 2 * Math.PI));
+					addShapeToCloud(sphere,N,cloud);
 					break;
 
 				default:
-					throw new RuntimeException("Unknown type");
+					throw new RuntimeException("Unknown type "+shape);
 			}
 
 			alg.process(cloud,null);
@@ -98,58 +104,128 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 			alg.getUnmatched(unmatched);
 
 			List<PointCloudShapeFinder.Shape> found = alg.getFound();
-//			assertEquals(1,found.size());
+			assertEquals(1,found.size());
 			PointCloudShapeFinder.Shape s = found.get(0);
 
 
-			assertEquals(200,unmatched.size()+findUsedCount(cloud,found));
-			assertEquals(0,unmatched.size());
-			assertEquals(200,s.points.size());
+			assertEquals(N,unmatched.size()+findUsedCount(cloud,found));
+			assertTrue(unmatched.size() <= tolSetSize);
+			assertTrue(Math.abs(N - s.points.size()) <= tolSetSize);
 
 			switch( shape ) {
 				case CYLINDER:
-					TestGenerateCylinderPointVector.checkEquivalent(cylinder,(Cylinder3D_F64)s.parameters);
+					TestGenerateCylinderPointVector.checkEquivalent(cylinder,(Cylinder3D_F64)s.parameters, tolModelparam);
 					break;
 
 				case PLANE:
-					TestGeneratePlanePointVector.checkPlanes(plane, (PlaneGeneral3D_F64) s.parameters);
+					TestGeneratePlanePointVector.checkPlanes(plane, (PlaneGeneral3D_F64) s.parameters, tolModelparam);
 					break;
 
 				case SPHERE:
-					TestGenerateSpherePointVector.checkSpheres(sphere, (Sphere3D_F64) s.parameters);
+					TestGenerateSpherePointVector.checkSpheres(sphere, (Sphere3D_F64) s.parameters, tolModelparam);
 					break;
 
+				default:
+					throw new RuntimeException("Unknown type "+shape);
 			}
 		}
 	}
 
-	/**
-	 * Have two shapes overlap each other and see if everything is handled correctly
-	 */
 	@Test
-	public void planeThroughSphere() {
-		// first see if the detector supports plane and spheres
+	public void detectShapesMultiple() {
+		PointCloudShapeFinder alg = createAlgorithm();
 
-//		fail("implement");
+		List<CloudShapeTypes> shapes = alg.getShapesList();
+		List<CloudShapeTypes> shapesSelect = new ArrayList<CloudShapeTypes>();
+		shapesSelect.addAll(shapes);
+
+		assertTrue(shapes.size()>2);
+
+		int N = 400;
+
+		// shapes should be far away from each other
+		Cylinder3D_F64 cylinder = new Cylinder3D_F64(1,2,3,0.5,-0.25,0.1,3);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,10,0,0,1);
+		Sphere3D_F64 sphere = new Sphere3D_F64(-5,-6,-3,2.5);
+
+		for( int i = 0; i < 10; i++ ) {
+			// construct the cloud from two random shapes
+			List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
+
+			Collections.shuffle(shapesSelect,rand);
+
+			for( int j = 0; j < 2; j++ ) {
+				switch( shapesSelect.get(j) ) {
+					case CYLINDER:
+						addShapeToCloud(cylinder,N,cloud);
+						break;
+
+					case PLANE:
+						addShapeToCloud(plane,N,cloud);
+						break;
+
+					case SPHERE:
+						addShapeToCloud(sphere,N,cloud);
+						break;
+				}
+			}
+			alg.process(cloud,null);
+
+			List<Point3D_F64> unmatched = new ArrayList<Point3D_F64>();
+			alg.getUnmatched(unmatched);
+
+			List<PointCloudShapeFinder.Shape> found = alg.getFound();
+			assertEquals(2, found.size());
+
+			assertEquals(N*2,unmatched.size()+findUsedCount(cloud,found));
+			assertTrue(unmatched.size() <= tolSetSize*N);
+
+
+			for( int j = 0; j < found.size(); j++ ) {
+				PointCloudShapeFinder.Shape s = found.get(j);
+
+				assertTrue(Math.abs(N - s.points.size()) <= tolSetSize);
+
+				switch( s.type ) {
+					case CYLINDER:
+						TestGenerateCylinderPointVector.checkEquivalent(cylinder,(Cylinder3D_F64)s.parameters, tolModelparam);
+						break;
+
+					case PLANE:
+						TestGeneratePlanePointVector.checkPlanes(plane, (PlaneGeneral3D_F64) s.parameters, tolModelparam);
+						break;
+
+					case SPHERE:
+						TestGenerateSpherePointVector.checkSpheres(sphere, (Sphere3D_F64) s.parameters, tolModelparam);
+						break;
+				}
+			}
+		}
+
 	}
 
-//	@Test
-//	public void detectShapesMultiple() {
-//		fail("Implement");
-//	}
-//
-//	@Test
-//	public void detectShapesNoise() {
-//		fail("Implement");
-//	}
-//
-//	/**
-//	 * Make sure it handle the case with and without the bounding cube being specified
-//	 */
-//	@Test
-//	public void checkBoundingCube() {
-//		fail("Implement");
-//	}
+	/**
+	 * Make sure it handle the case with and without the bounding cube being specified
+	 */
+	@Test
+	public void checkBoundingCube() {
+		fail("Implement");
+	}
+
+	private void addShapeToCloud( Object shapeParam , int N , List<Point3D_F64> cloud ) {
+		if( shapeParam instanceof Cylinder3D_F64 ) {
+			for( int i = 0; i < N; i++ )
+				cloud.add(PointCloudShapeTools.createPt((Cylinder3D_F64)shapeParam, rand.nextDouble() * 2, rand.nextDouble() * 2 * Math.PI));
+		} else if( shapeParam instanceof PlaneNormal3D_F64 ) {
+			for( int i = 0; i < N; i++ )
+				cloud.add(PointCloudShapeTools.createPt((PlaneNormal3D_F64)shapeParam, 3 * (rand.nextDouble() - 0.5), 3 * (rand.nextDouble() - 0.5)));
+		} else if( shapeParam instanceof Sphere3D_F64 ) {
+			for( int i = 0; i < N; i++ )
+				cloud.add(PointCloudShapeTools.createPt((Sphere3D_F64)shapeParam, rand.nextDouble() * 2 * Math.PI, rand.nextDouble() * 2 * Math.PI));
+		} else {
+			throw new IllegalArgumentException("Unknown shape");
+		}
+	}
 
 	/**
 	 * Find the total number of points in the cloud that are used.  The same point can be matched to multiple shapes

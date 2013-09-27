@@ -69,8 +69,17 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	// found path from leaf to base
 	private FastQueue<Octree> path = new FastQueue<Octree>(Octree.class,false);
 
+	// searches the NN graph to find points which match the model.
+	// need to use the same instance for all searches since it modified the points by marking them.
+	private FindMatchSetPointVectorNN matchFinder = new FindMatchSetPointVectorNN();
+
 	// robust model estimation
 	private RansacShapeDetection ransac;
+
+	// refines the estimate provided by RANSAC
+	private LocalFitShapeNN refineShape;
+	private List<PointVectorNN> refinedPoints = new ArrayList<PointVectorNN>();
+	private List<Object> refinedParams = new ArrayList<Object>();
 
 	// list of found objects
 	private FastQueue<FoundShape> foundObjects = new FastQueue<FoundShape>(FoundShape.class,true);
@@ -80,6 +89,8 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	// points without normal vectors
 	private FastQueue<PointVectorNN> pointsNoNormal = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
+	// list of shapes which can be fit
+	private List<ShapeDescription> models;
 
 	// the maximum number of RANSAC iterations.  Can be used to control how long the process can run for
 	private int maximumAllowedIterations;
@@ -87,30 +98,39 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	/**
 	 * Configures the algorithm
 	 *
-	 * @param models List of shapes that it will search for.
-	 * @param octreeSplit Once a node in the octree has this many points in it, it will split up into sub-regions.
-	 * @param minModelAccept  The minim number of points which need to match a shape for it to be consider valid.
-	 * @param ransacExtension The number of iterations RANSAC will perform will increase by this amount each time a
-	 *                        new best model has been found.
-	 * @param maximumAllowedIterations  Once this many RANSAC iterations have occurred in total it will stop.
-	 * @param randomSeed Random seed used by RANSAC and to sample nodes in the Octree.
+	 * @param config Specified tuning parameters
 	 */
-	public PointCloudShapeDetectionSchnabel2007(List<RansacMulti.ObjectType> models, int octreeSplit,
-												int minModelAccept, int ransacExtension ,
-												int maximumAllowedIterations ,long randomSeed  )
+	public PointCloudShapeDetectionSchnabel2007( ConfigSchnabel2007 config )
 	{
-		this.minModelAccept = minModelAccept;
-		this.rand = new Random(randomSeed);
-		this.maximumAllowedIterations = maximumAllowedIterations;
+		config.checkConfig();
 
-		if( octreeSplit < this.minModelAccept) {
+		this.models = config.models;
+		this.refineShape = new LocalFitShapeNN(config.localFitMaxIterations,config.localFitChangeThreshold,matchFinder);
+		this.minModelAccept = config.minModelAccept;
+		this.rand = new Random(config.randomSeed);
+		this.maximumAllowedIterations = config.maximumAllowedIterations;
+
+		if( config.octreeSplit < this.minModelAccept) {
 			throw new IllegalArgumentException("octreeSplit should be at least 3 times the ransac sample size, which "+
 			"is "+ this.minModelAccept);
 		}
 
-		managerOctree = new ConstructOctreeEqual(octreeSplit);
+		managerOctree = new ConstructOctreeEqual(config.octreeSplit);
 
-		ransac = new RansacShapeDetection(randomSeed,ransacExtension,models);
+		// convert it into a description that RANSAC understands
+		List<RansacMulti.ObjectType> modelsRansac = new ArrayList<RansacMulti.ObjectType>();
+		for( int i = 0; i < models.size(); i++ ) {
+			ShapeDescription s = models.get(i);
+			RansacMulti.ObjectType o = new RansacMulti.ObjectType();
+
+			o.thresholdFit = s.thresholdFit;
+			o.modelDistance = s.modelDistance;
+			o.modelGenerator = s.modelGenerator;
+
+			modelsRansac.add(o);
+		}
+
+		ransac = new RansacShapeDetection(config.randomSeed,config.ransacExtension,matchFinder,modelsRansac);
 	}
 
 	/**
@@ -134,6 +154,10 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		foundObjects.reset();
 		pointsNoNormal.reset();
 		pointsNormal.reset();
+		matchFinder.reset();
+		for( int i = 0; i < models.size(); i++ ) {
+			models.get(i).reset();
+		}
 
 		// split input points into a list with and without normal vectors
 		for( int i = 0; i < points.size; i++ ) {
@@ -183,25 +207,40 @@ public class PointCloudShapeDetectionSchnabel2007 {
 
 				// see if there are enough points to be a valid shape
 				if( inliers.size() >= minModelAccept ) {
-					// TODO iteratively until converge, batch estimate parameters and then find inlier set
-
-					// construct the output shape
-					FoundShape shape = foundObjects.grow();
-					shape.points.clear();
-					shape.modelParam = ransac.getModelParameters();
-					shape.whichShape = ransac.getModelIndex();
-
-					// mark points as being used and add to the output shape
-					for( int i = 0; i < inliers.size(); i++ ) {
-						PointVectorNN p = inliers.get(i);
-						p.used = true;
-						shape.points.add(p);
-					}
+					refineRansacShape();
 				}
 			}
 
 			// note how many iterations have been processed
 			totalIterations += ransac.getIteration();
+		}
+	}
+
+	/**
+	 * Searches for a locally optimal set of model parameters and inlier points.  Save results to
+	 * a new shape for output
+	 */
+	protected void refineRansacShape() {
+		Object modelParam = ransac.getModelParameters();
+		int whichShape = ransac.getModelIndex();
+		List<PointVectorNN> inliers = ransac.getMatchSet();
+
+		ShapeDescription shapeDesc = models.get( whichShape );
+
+		// create a new shape for output
+		FoundShape output = foundObjects.grow();
+		output.points.clear();
+		output.modelParam =  shapeDesc.createModel();
+		output.whichShape = ransac.getModelIndex();
+
+		// refine the model
+		refineShape.configure(shapeDesc.modelFitter,shapeDesc.modelDistance,shapeDesc.codec,shapeDesc.thresholdFit);
+		refineShape.refine(inliers,modelParam,true,output.points,output.modelParam);
+
+		// mark shape points as being used
+		for( int i = 0; i < output.points.size(); i++ ) {
+			PointVectorNN p = output.points.get(i);
+			p.used = true;
 		}
 	}
 

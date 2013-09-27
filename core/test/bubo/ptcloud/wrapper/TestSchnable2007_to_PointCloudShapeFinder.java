@@ -20,8 +20,9 @@ package bubo.ptcloud.wrapper;
 
 import bubo.ptcloud.CloudShapeTypes;
 import bubo.ptcloud.PointCloudShapeFinder;
-import bubo.ptcloud.alg.*;
-import org.ddogleg.fitting.modelset.ransac.RansacMulti;
+import bubo.ptcloud.alg.ApproximateSurfaceNormals;
+import bubo.ptcloud.alg.ConfigSchnabel2007;
+import bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,34 +32,20 @@ import java.util.List;
  */
 public class TestSchnable2007_to_PointCloudShapeFinder extends GeneralChecksPointCloudShapeFinder {
 
+	public TestSchnable2007_to_PointCloudShapeFinder() {
+		super(10,1e-6);
+	}
+
 	@Override
 	public PointCloudShapeFinder createAlgorithm() {
 
-		List<RansacMulti.ObjectType> objects = new ArrayList<RansacMulti.ObjectType>();
+		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.1,0.1);
+		config.minModelAccept = 10;
+		config.octreeSplit = 20;
 
-		RansacMulti.ObjectType sphere = new RansacMulti.ObjectType();
-		sphere.modelDistance = new DistanceFromSpherePointVector();
-		sphere.modelGenerator = new GenerateSpherePointVector(0.3,0.3);
-		sphere.thresholdFit = 0.3;
+		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007(config);
 
-		RansacMulti.ObjectType plane = new RansacMulti.ObjectType();
-		plane.modelDistance = new DistanceFromPlanePointVector();
-		plane.modelGenerator = new GeneratePlanePointVector(0.3);
-		plane.thresholdFit = 0.3;
-
-		RansacMulti.ObjectType cylinder = new RansacMulti.ObjectType();
-		cylinder.modelDistance = new DistanceFromCylinderPointVector();
-		cylinder.modelGenerator = new GenerateCylinderPointVector(0.3,0.3);
-		cylinder.thresholdFit = 0.3;
-
-		objects.add(sphere);
-		objects.add(plane);
-		objects.add(cylinder);
-
-		PointCloudShapeDetectionSchnabel2007 alg =
-				new PointCloudShapeDetectionSchnabel2007(objects,20,10,10,1000,0xBEEF);
-
-		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(6,1);
+		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(6,3);
 
 		List<CloudShapeTypes> shapeList = new ArrayList<CloudShapeTypes>();
 		shapeList.add(CloudShapeTypes.SPHERE);

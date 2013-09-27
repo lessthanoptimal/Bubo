@@ -50,7 +50,7 @@ public class TestGenerateSpherePointVector {
 		Sphere3D_F64 found = new Sphere3D_F64();
 		assertTrue(alg.generate(pts, found));
 
-		checkSpheres(sphere, found);
+		checkSpheres(sphere, found, 1e-8);
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class TestGenerateSpherePointVector {
 		Sphere3D_F64 found = new Sphere3D_F64();
 		assertTrue(alg.generate(pts, found));
 
-		checkSpheres(sphere, found);
+		checkSpheres(sphere, found, 1e-8);
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class TestGenerateSpherePointVector {
 		Sphere3D_F64 found = new Sphere3D_F64();
 		assertTrue(alg.generate(pts, found));
 
-		checkSpheres(sphere, found);
+		checkSpheres(sphere, found, 1e-8);
 
 		// mixed directions
 		pts = new ArrayList<PointVectorNN>();
@@ -93,7 +93,7 @@ public class TestGenerateSpherePointVector {
 
 		assertTrue(alg.generate(pts, found));
 
-		checkSpheres(sphere, found);
+		checkSpheres(sphere, found, 1e-8);
 	}
 
 	@Test
@@ -173,10 +173,10 @@ public class TestGenerateSpherePointVector {
 		GeometryMath_F64.mult(R,pv.normal,pv.normal);
 	}
 
-	public static void checkSpheres(Sphere3D_F64 expected, Sphere3D_F64 found) {
+	public static void checkSpheres(Sphere3D_F64 expected, Sphere3D_F64 found, double tol) {
 
-		assertEquals(0,expected.center.distance(found.center),1e-8);
-		assertEquals(expected.radius,found.radius,1e-8);
+		assertEquals(0,expected.center.distance(found.center),tol);
+		assertEquals(expected.radius,found.radius,tol);
 	}
 
 	public static PointVectorNN createPt( Sphere3D_F64 sphere , double phi , double theta , double sign ) {

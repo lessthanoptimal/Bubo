@@ -53,7 +53,7 @@ public class TestGenerateCylinderPointVector {
 
 		assertTrue(alg.generate(pts, found));
 
-		checkEquivalent(c,found);
+		checkEquivalent(c,found, 1e-8);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class TestGenerateCylinderPointVector {
 
 		assertTrue(alg.generate(pts, found));
 
-		checkEquivalent(c,found);
+		checkEquivalent(c,found, 1e-8);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class TestGenerateCylinderPointVector {
 
 		alg.generate(pts,found);
 
-		checkEquivalent(c,found);
+		checkEquivalent(c,found, 1e-8);
 	}
 
 	@Test
@@ -114,7 +114,7 @@ public class TestGenerateCylinderPointVector {
 
 		assertTrue(alg.generate(pts, found));
 
-		checkEquivalent(c,found);
+		checkEquivalent(c,found, 1e-8);
 
 		// mixed direction norms
 		pts.add(createPt(c,0,0,1));
@@ -123,7 +123,7 @@ public class TestGenerateCylinderPointVector {
 
 		assertTrue(alg.generate(pts, found));
 
-		checkEquivalent(c, found);
+		checkEquivalent(c, found, 1e-8);
 	}
 
 	@Test
@@ -182,12 +182,12 @@ public class TestGenerateCylinderPointVector {
 		assertEquals(3,alg.getMinimumPoints());
 	}
 
-	public static void checkEquivalent( Cylinder3D_F64 a , Cylinder3D_F64 b ) {
+	public static void checkEquivalent(Cylinder3D_F64 a, Cylinder3D_F64 b, double tol) {
 		assertEquals(a.radius,b.radius,1e-8);
 
 		// the points should be on the other line
-		assertEquals(0, Distance3D_F64.distance(a.line,b.line.p),1e-8);
-		assertEquals(0, Distance3D_F64.distance(b.line,a.line.p),1e-8);
+		assertEquals(0, Distance3D_F64.distance(a.line,b.line.p),tol);
+		assertEquals(0, Distance3D_F64.distance(b.line,a.line.p),tol);
 
 		// slopes should be the same
 		double dot = a.line.slope.dot(b.line.slope);
@@ -199,7 +199,7 @@ public class TestGenerateCylinderPointVector {
 			angle = Math.PI;
 		else
 			angle = Math.acos( tmp );
-		assertTrue( Math.abs(angle) < 1e-8 || Math.abs(angle-Math.PI) < 1e-8);
+		assertTrue( Math.abs(angle) < tol || Math.abs(angle-Math.PI) < tol);
 	}
 
 	/**

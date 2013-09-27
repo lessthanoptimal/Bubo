@@ -67,6 +67,9 @@ public class ApproximateSurfaceNormals {
 	// array to store points used to compute plane
 	private List<Point3D_F64> fitList = new ArrayList<Point3D_F64>();
 
+	// storage for the center point when computing the local surface normal
+	private Point3D_F64 center = new Point3D_F64();
+
 	/**
 	 * Configures approximation algorithm
 	 *
@@ -114,6 +117,7 @@ public class ApproximateSurfaceNormals {
 			PointVectorNN p = listPointVector.grow();
 			p.reset();
 			p.p = cloud.get(i);
+			p.index = i;
 		}
 
 		// find the nearest-neighbor for each point in the cloud
@@ -156,7 +160,7 @@ public class ApproximateSurfaceNormals {
 			for( int i = 0; i < point.neighbors.size; i++ ) {
 				fitList.add( point.neighbors.data[i].p);
 			}
-			fitPlane.svdPoint(fitList,point.p,point.normal);
+			fitPlane.svd(fitList, center, point.normal);
 		} else {
 			point.normal.set(0,0,0);
 		}

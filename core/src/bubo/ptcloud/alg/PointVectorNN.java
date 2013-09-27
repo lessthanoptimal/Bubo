@@ -37,6 +37,11 @@ public class PointVectorNN {
 	/** Points which are its neighbors */
 	public FastQueue<PointVectorNN> neighbors = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
+	/**
+	 * Unique ID assigned to the point when it is constructed.  The 'index' in the same as the index in the list.
+	 */
+	public int index;
+
 	/** Used to keep track of points which have been searched already */
 	public int matchMarker = 0;
 
@@ -51,6 +56,7 @@ public class PointVectorNN {
 		p = null;
 		matchMarker = -1;
 		used = false;
+		index = -1;
 		neighbors.reset();
 	}
 }

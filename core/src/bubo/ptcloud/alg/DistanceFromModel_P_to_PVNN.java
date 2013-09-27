@@ -18,35 +18,46 @@
 
 package bubo.ptcloud.alg;
 
-import georegression.metric.Distance3D_F64;
-import georegression.struct.plane.PlaneGeneral3D_F64;
+import georegression.struct.point.Point3D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Euclidean distance from a {@link PlaneGeneral3D_F64} for use with {@link PointCloudShapeDetectionSchnabel2007}.
+ * Converts point from {@link PointVectorNN} into {@link Point3D_F64} for distance calculations.
  *
  * @author Peter Abeles
  */
-public class DistanceFromPlanePointVector implements DistanceFromModel<PlaneGeneral3D_F64,PointVectorNN> {
+public class DistanceFromModel_P_to_PVNN<Model> implements DistanceFromModel<Model,PointVectorNN> {
 
-	PlaneGeneral3D_F64 model;
+	DistanceFromModel<Model,Point3D_F64> alg;
+
+	List<Point3D_F64> points = new ArrayList<Point3D_F64>();
+
+	public DistanceFromModel_P_to_PVNN(DistanceFromModel<Model, Point3D_F64> alg) {
+		this.alg = alg;
+	}
 
 	@Override
-	public void setModel(PlaneGeneral3D_F64 model) {
-		this.model = model;
+	public void setModel(Model model) {
+		alg.setModel(model);
 	}
 
 	@Override
 	public double computeDistance(PointVectorNN pt) {
-		return Math.abs(Distance3D_F64.distance(model, pt.p));
+		return alg.computeDistance(pt.p);
 	}
 
 	@Override
-	public void computeDistance(List<PointVectorNN> points, double[] distance) {
-		for( int i = 0; i < points.size(); i++ ) {
-			distance[i] = Math.abs(Distance3D_F64.distance(model, points.get(i).p));
+	public void computeDistance(List<PointVectorNN> pointVectors, double[] distance) {
+
+		points.clear();
+		for( int i = 0; i < pointVectors.size(); i++ ) {
+			PointVectorNN p = pointVectors.get(i);
+			points.add(p.p);
 		}
+
+		alg.computeDistance(points,distance);
 	}
 }

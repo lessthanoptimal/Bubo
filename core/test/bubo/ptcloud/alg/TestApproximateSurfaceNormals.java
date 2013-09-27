@@ -82,10 +82,12 @@ public class TestApproximateSurfaceNormals {
 	}
 
 	/**
-	 * Makes sure the output vectors are normalized to one.  If no normal was found then it should be set to all zeros
+	 * Makes sure the output vectors are normalized to one.  If no normal was found then it should be set to all zeros.
+	 *
+	 * Also checks to see that the index is correctly setup
 	 */
 	@Test
-	public void checkVectorNormalizedToOne() {
+	public void checkVectorNormalizedToOne_index() {
 		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
 
 		for( int i = 0; i < 200; i++ ) {
@@ -109,6 +111,10 @@ public class TestApproximateSurfaceNormals {
 		for( int i = 0; i < cloud.size(); i++ ) {
 			PointVectorNN pv = output.get(i);
 
+			// check index
+			assertEquals(i,pv.index);
+
+			// check normal
 			double n = pv.normal.norm();
 
 			if( n == 0 ) {

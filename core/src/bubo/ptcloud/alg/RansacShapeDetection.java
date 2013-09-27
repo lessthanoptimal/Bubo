@@ -23,7 +23,6 @@ import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Customized version of {@link RansacMulti}.  Instead of finding the inlier set using the sampling set it uses the
@@ -39,8 +38,8 @@ import java.util.Stack;
  */
 public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 
-	// list of points which need to be searched
-	private Stack<PointVectorNN> open = new Stack<PointVectorNN>();
+	// finds the set of points which match the model
+	private FindMatchSetPointVectorNN matchFinder;
 
 	// Marked used to mark which points have been searched before
 	private int marker;
@@ -50,9 +49,11 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 	private int maxExtension;
 
 	public RansacShapeDetection(long randSeed, int maxExtension,
+								FindMatchSetPointVectorNN matchFinder,
 								List<ObjectType> objectTypes ) {
 		super(randSeed, -1, objectTypes, PointVectorNN.class);
 		this.maxExtension = maxExtension;
+		this.matchFinder = matchFinder;
 	}
 
 	public void reset() {
@@ -72,38 +73,9 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 	@Override
 	protected <Model>void selectMatchSet( DistanceFromModel<Model,PointVectorNN> modelDistance ,
 										  double threshold, Model param) {
-		// initialize data structures
 		candidatePoints.clear();
-		modelDistance.setModel(param);
-		marker++;
-
-		// use the initial set of samples as the seed
-		for( int i = 0; i < initialSample.size(); i++ ) {
-			PointVectorNN nn = initialSample.get(i);
-			nn.matchMarker = marker;
-			open.add(nn);
-		}
-
-		// examine each point until all neighbors which match the model have been found
-		while( !open.isEmpty() )  {
-			PointVectorNN n = open.pop();
-			candidatePoints.add(n);
-
-			for( int i = 0; i < n.neighbors.size(); i++ ) {
-				PointVectorNN nn = n.neighbors.get(i);
-
-				// see if it has been traversed already
-				if( nn.matchMarker != marker ) {
-
-					// see if it's in the inlier set
-					double distance = modelDistance.computeDistance(nn);
-					if (distance <= threshold) {
-						open.add(nn);
-					}
-					nn.matchMarker = marker;
-				}
-			}
-		}
+		matchFinder.setModelDistance(modelDistance);
+		matchFinder.selectMatchSet(initialSample.toList(),param,threshold , candidatePoints);
 	}
 
 	@Override
