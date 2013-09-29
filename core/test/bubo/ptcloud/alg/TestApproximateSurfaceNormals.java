@@ -26,8 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -55,7 +54,7 @@ public class TestApproximateSurfaceNormals {
 
 		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(numNeighbors,maxDistance);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(numNeighbors,numNeighbors,maxDistance);
 
 		alg.process(cloud,output);
 
@@ -100,7 +99,7 @@ public class TestApproximateSurfaceNormals {
 
 		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,0.4);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,8,0.4);
 
 		alg.process(cloud,output);
 
@@ -130,6 +129,58 @@ public class TestApproximateSurfaceNormals {
 	}
 
 	/**
+	 * If more neighbors are requested than points for use in plane estimation, then make sure only
+	 * the closest ones are used.
+	 */
+	@Test
+	public void useClosestNeighborsForPlane() {
+		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
+
+		// give it points on the plane
+		cloud.add(new Point3D_F64(0,0,0));
+		cloud.add(new Point3D_F64(1,0,0));
+		cloud.add(new Point3D_F64(0,1,0));
+		cloud.add(new Point3D_F64(-1,-1,0));
+
+		// now give it some points way off the plane
+		cloud.add(new Point3D_F64(0,0,100));
+		cloud.add(new Point3D_F64(1,0,-100));
+
+		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(4,8,10000);
+
+		alg.process(cloud,output);
+
+		assertEquals(6,output.size);
+
+
+		// on the first pass the first for should have good normals
+		for( int i = 0; i < 4; i++ ) {
+			PointVectorNN pv = output.data[i];
+			assertEquals(5,pv.neighbors.size);
+			assertEquals(0,pv.normal.x,1e-8);
+			assertEquals(0,pv.normal.y,1e-8);
+			assertEquals(1,Math.abs(pv.normal.z),1e-8);
+		}
+
+		output.reset();
+		alg = new ApproximateSurfaceNormals(8,8,10000);
+
+		alg.process(cloud,output);
+		assertEquals(6,output.size);
+
+		// the second pass they should be messed up
+		for( int i = 0; i < 4; i++ ) {
+			PointVectorNN pv = output.data[i];
+			assertEquals(5,pv.neighbors.size);
+			assertFalse(Math.abs(pv.normal.x) < 1e-8);
+			assertFalse(Math.abs(pv.normal.y) < 1e-8);
+			assertFalse(Math.abs(Math.abs(pv.normal.z)-1) < 1e-8);
+		}
+	}
+
+	/**
 	 * Make sure everything works when it is called multiple times
 	 */
 	@Test
@@ -146,7 +197,7 @@ public class TestApproximateSurfaceNormals {
 
 		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,0.4);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,8,0.4);
 
 		alg.process(cloud,output);
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud;
+package bubo.ptcloud.tools;
 
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
@@ -35,6 +35,14 @@ import org.ejml.data.DenseMatrix64F;
  */
 public class PointCloudShapeTools {
 
+	/**
+	 * Creates a 3D point on the surface of the provided sphere at the specified coordinate
+	 *
+	 * @param sphere Description of the sphere
+	 * @param phi angular coordinate in radians
+	 * @param theta angular coordinate in radians
+	 * @return Point on the sphere
+	 */
 	public static Point3D_F64 createPt( Sphere3D_F64 sphere , double phi , double theta ) {
 		Point3D_F64 p = new Point3D_F64();
 		p.set(0,0,sphere.radius);
@@ -54,6 +62,15 @@ public class PointCloudShapeTools {
 		return p;
 	}
 
+	/**
+	 * Creates a 3D point on the surface of the provided plane at the specified coordinate.  The
+	 * 2D coordinate on the plane is arbitrarily selected.
+	 *
+	 * @param plane Description of the plane
+	 * @param x 2D coordinate on the plane, x-axis
+	 * @param y 2D coordinate on the plane, y-axis
+	 * @return Point on the plane
+	 */
 	public static Point3D_F64 createPt( PlaneNormal3D_F64 plane , double x , double y ) {
 		Point3D_F64 p = new Point3D_F64();
 		p.set(x,y,0);
@@ -80,11 +97,19 @@ public class PointCloudShapeTools {
 		return p;
 	}
 
-	public static Point3D_F64 createPt( Cylinder3D_F64 cylinder , double h , double theta ) {
+	/**
+	 * Creates a 3D point on the surface of the provided cylinder at the specified coordinate
+	 *
+	 * @param cylinder Description of the cylinder
+	 * @param z z-coordinate along cylinder's axis
+	 * @param theta angular coordinate in radians
+	 * @return Point on the sphere
+	 */
+	public static Point3D_F64 createPt( Cylinder3D_F64 cylinder , double z , double theta ) {
 		Point3D_F64 p = new Point3D_F64();
 		p.x = cylinder.radius*Math.cos(theta);
 		p.y = cylinder.radius*Math.sin(theta);
-		p.z = h;
+		p.z = z;
 
 		Vector3D_F64 axisZ = new Vector3D_F64(0,0,1);
 		Vector3D_F64 cross = axisZ.cross(cylinder.line.slope);

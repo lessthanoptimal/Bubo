@@ -20,15 +20,15 @@ package bubo.ptcloud.wrapper;
 
 import bubo.ptcloud.CloudShapeTypes;
 import bubo.ptcloud.PointCloudShapeFinder;
-import bubo.ptcloud.PointCloudShapeTools;
-import bubo.ptcloud.alg.TestGenerateCylinderPointVector;
-import bubo.ptcloud.alg.TestGeneratePlanePointVector;
-import bubo.ptcloud.alg.TestGenerateSpherePointVector;
+import bubo.ptcloud.alg.*;
+import bubo.ptcloud.tools.PointCloudShapeTools;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.shapes.Cube3D_F64;
 import georegression.struct.shapes.Cylinder3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -36,7 +36,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * General tests for implementations of {@link bubo.ptcloud.PointCloudShapeFinder}
@@ -104,6 +105,12 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 			alg.getUnmatched(unmatched);
 
 			List<PointCloudShapeFinder.Shape> found = alg.getFound();
+
+			for( PointCloudShapeFinder.Shape s : found ) {
+				double error = averageError(s);
+				assertEquals(0,error,0.1);
+			}
+
 			assertEquals(1,found.size());
 			PointCloudShapeFinder.Shape s = found.get(0);
 
@@ -148,7 +155,7 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,10,0,0,1);
 		Sphere3D_F64 sphere = new Sphere3D_F64(-5,-6,-3,2.5);
 
-		for( int i = 0; i < 10; i++ ) {
+		for( int i = 0; i < 20; i++ ) {
 			// construct the cloud from two random shapes
 			List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
 
@@ -175,6 +182,12 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 			alg.getUnmatched(unmatched);
 
 			List<PointCloudShapeFinder.Shape> found = alg.getFound();
+
+			for( PointCloudShapeFinder.Shape s : found ) {
+				double error = averageError(s);
+				assertEquals(0,error,0.1);
+			}
+
 			assertEquals(2, found.size());
 
 			assertEquals(N*2,unmatched.size()+findUsedCount(cloud,found));
@@ -205,11 +218,42 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 	}
 
 	/**
-	 * Make sure it handle the case with and without the bounding cube being specified
+	 * Very basic test for the bounding cube.  basically sees if it blows up or not
 	 */
 	@Test
 	public void checkBoundingCube() {
-		fail("Implement");
+		PointCloudShapeFinder alg = createAlgorithm();
+
+		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
+
+		int N = 200;
+
+		Cylinder3D_F64 cylinder = new Cylinder3D_F64(1,2,3,0.5,-0.25,0.1,3);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,3,-0.5,0.25,1);
+		Sphere3D_F64 sphere = new Sphere3D_F64(-1,-2,-3,2.5);
+		switch( alg.getShapesList().get(0) ) {
+			case CYLINDER:
+				addShapeToCloud(cylinder,N,cloud);
+				break;
+
+			case PLANE:
+				addShapeToCloud(plane,N,cloud);
+				break;
+
+			case SPHERE:
+				addShapeToCloud(sphere,N,cloud);
+				break;
+		}
+
+		// check with a bounding box
+		alg.process(cloud,new Cube3D_F64(-10,-10,-10,10,10,10));
+		assertEquals(1,alg.getFound().size());
+		assertTrue(alg.getFound().get(0).type == alg.getShapesList().get(0));
+
+	    // let it select the bounding box
+		alg.process(cloud,null);
+		assertEquals(1,alg.getFound().size());
+		assertTrue(alg.getFound().get(0).type == alg.getShapesList().get(0));
 	}
 
 	private void addShapeToCloud( Object shapeParam , int N , List<Point3D_F64> cloud ) {
@@ -248,6 +292,32 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 		}
 
 		return total;
+	}
+
+	private double averageError( PointCloudShapeFinder.Shape shape ) {
+		DistanceFromModel function;
+		switch( shape.type ) {
+			case CYLINDER:
+				function = new DistanceCylinderToPoint3D();
+				break;
+
+			case PLANE:
+				function = new DistancePlaneToPoint3D();
+				break;
+
+			case SPHERE:
+				function = new DistanceSphereToPoint3D();
+				break;
+			default:
+				throw new RuntimeException("Unknown shape");
+		}
+
+		function.setModel(shape.parameters);
+		double total = 0;
+		for( int i = 0; i < shape.points.size(); i++ ) {
+			total += function.computeDistance(shape.points.get(i));
+		}
+		return total/shape.points.size();
 	}
 
 }

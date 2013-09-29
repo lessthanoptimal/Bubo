@@ -45,7 +45,7 @@ public class TestSchnable2007_to_PointCloudShapeFinder extends GeneralChecksPoin
 
 		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007(config);
 
-		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(6,3);
+		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(6,20,3);
 
 		List<CloudShapeTypes> shapeList = new ArrayList<CloudShapeTypes>();
 		shapeList.add(CloudShapeTypes.SPHERE);

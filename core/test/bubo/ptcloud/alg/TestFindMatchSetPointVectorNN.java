@@ -52,7 +52,7 @@ public class TestFindMatchSetPointVectorNN {
 
 		FindMatchSetPointVectorNN<PlaneGeneral3D_F64> alg = new FindMatchSetPointVectorNN<PlaneGeneral3D_F64>();
 		alg.setModelDistance(new DistanceFromModel_P_to_PVNN(modelDistance));
-		alg.selectMatchSet(initialSample,plane,0.5,found);
+		alg.selectMatchSet(initialSample,plane,0.5,false,found);
 
 		// see if there is the expected number
 		assertEquals(10,found.size());
@@ -62,6 +62,40 @@ public class TestFindMatchSetPointVectorNN {
 		for( PointVectorNN pv : found ) {
 			assertTrue(modelDistance.computeDistance(pv.p) <= 1 );
 		}
+	}
+
+	/**
+	 * Makes sure the flag to check the initial distance of the seed list is being obeyed.
+	 */
+	@Test
+	public void checkInitialDistance() {
+		DistancePlaneToPoint3D modelDistance = new DistancePlaneToPoint3D();
+
+		PlaneNormal3D_F64 planeNorm = new PlaneNormal3D_F64(0,0,0,0,0,1);
+		PlaneGeneral3D_F64 plane = UtilPlane3D_F64.convert(planeNorm, null);
+
+		// create points far away from the plane
+		List<PointVectorNN> initialSample = new ArrayList<PointVectorNN>();
+		initialSample.add( pv(100,200,300,0,0,1));
+		initialSample.add( pv(0,0,400,0,0,1));
+		initialSample.add( pv(1, 2, 500, 0, 0, 1));
+
+		List<PointVectorNN> found = new ArrayList<PointVectorNN>();
+
+		FindMatchSetPointVectorNN matchFinder = new FindMatchSetPointVectorNN();
+		matchFinder.reset();
+
+		FindMatchSetPointVectorNN<PlaneGeneral3D_F64> alg = new FindMatchSetPointVectorNN<PlaneGeneral3D_F64>();
+		alg.setModelDistance(new DistanceFromModel_P_to_PVNN(modelDistance));
+		alg.selectMatchSet(initialSample,plane,0.5,false,found);
+
+		// the initial is never sanity checked and should include all the points
+		assertEquals(3,found.size());
+
+		// sanity check it now and the output should be empty
+		found.clear();
+		alg.selectMatchSet(initialSample,plane,0.5,true,found);
+		assertEquals(0,found.size());
 	}
 
 	/**
@@ -101,6 +135,13 @@ public class TestFindMatchSetPointVectorNN {
 		initialSample.add(list.get(3));
 
 		return list;
+	}
+
+	private static PointVectorNN pv( double x, double y, double z , double nx , double ny , double nz ) {
+		PointVectorNN p = new PointVectorNN();
+		p.p = new Point3D_F64(x,y,z);
+		p.normal.set(nx,ny,nz);
+		return p;
 	}
 
 }

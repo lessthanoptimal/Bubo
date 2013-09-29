@@ -57,9 +57,11 @@ public class FindMatchSetPointVectorNN<Model> {
 	 * @param initialMatch (Input) Set of points which is known to match the given model parameters.
 	 * @param param (Input) Model parameters which describe the shape.
 	 * @param threshold (Input) Distance threshold for determining inliers.
+	 * @param checkInitialDistance (Input) Should it check the distance of the initial set of points?
 	 * @param outputMatch (Output) the found set of points which match the shape.
 	 */
 	protected void selectMatchSet( List<PointVectorNN> initialMatch , Model param , double threshold,
+								   boolean checkInitialDistance ,
 								   List<PointVectorNN> outputMatch ) {
 		// initialize data structures
 		if( !open.isEmpty())
@@ -68,10 +70,24 @@ public class FindMatchSetPointVectorNN<Model> {
 		marker++;
 
 		// use the initial set of samples as the seed
-		for( int i = 0; i < initialMatch.size(); i++ ) {
-			PointVectorNN nn = initialMatch.get(i);
-			nn.matchMarker = marker;
-			open.add(nn);
+		if( checkInitialDistance ) {
+			// make sure they actually match the model
+			for( int i = 0; i < initialMatch.size(); i++ ) {
+				PointVectorNN nn = initialMatch.get(i);
+				double distance = modelDistance.computeDistance(nn);
+
+				if (distance <= threshold) {
+					nn.matchMarker = marker;
+					open.push(nn);
+				}
+			}
+		} else {
+			// trust the initial set to match the model
+			for( int i = 0; i < initialMatch.size(); i++ ) {
+				PointVectorNN nn = initialMatch.get(i);
+				nn.matchMarker = marker;
+				open.push(nn);
+			}
 		}
 
 		// examine each point until all neighbors which match the model have been found
@@ -88,7 +104,7 @@ public class FindMatchSetPointVectorNN<Model> {
 					// see if it's in the inlier set
 					double distance = modelDistance.computeDistance(nn);
 					if (distance <= threshold) {
-						open.add(nn);
+						open.push(nn);
 					}
 					nn.matchMarker = marker;
 				}
@@ -98,8 +114,6 @@ public class FindMatchSetPointVectorNN<Model> {
 
 	/**
 	 * Specifies which model is used to compute the distance a point is from the model
-	 *
-	 * @param modelDistance
 	 */
 	public void setModelDistance(DistanceFromModel<Model, PointVectorNN> modelDistance) {
 		this.modelDistance = modelDistance;

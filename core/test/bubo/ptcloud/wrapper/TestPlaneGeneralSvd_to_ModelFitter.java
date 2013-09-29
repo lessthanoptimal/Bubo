@@ -18,8 +18,8 @@
 
 package bubo.ptcloud.wrapper;
 
-import bubo.ptcloud.PointCloudShapeTools;
 import bubo.ptcloud.alg.TestGeneratePlanePointVector;
+import bubo.ptcloud.tools.PointCloudShapeTools;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;

@@ -23,6 +23,7 @@ import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.sorting.QuickSelectArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -38,6 +39,10 @@ import java.util.Stack;
  * Unlike in [1], the normalizes are no organized in any way so that their directions is consistent.  The data
  * structures have also been customized to provide support for {@link PointCloudShapeDetectionSchnabel2007}.
  * <p></p>
+ * The number of nearest-neighbors found and the number of which are used to compute the plane can be different.
+ * The number of NN used to compute the plane must be more than 2 and the number computed total must be >=
+ * the number used to compute the plane.  The points used to compute the plane are the ones closest to the point.
+ * <p></p>
  * [1] Hoppe, H., DeRose, T., Duchamp, T., McDonald, J., & Stuetzle, W. "Surface reconstruction from unorganized
  * points" 1992, Vol. 26, No. 2, pp. 71-78. ACM.
  *
@@ -45,6 +50,8 @@ import java.util.Stack;
  */
 public class ApproximateSurfaceNormals {
 
+	// number of nearest-neighbors it will use to compute the plane
+	private int numPlane;
 	// number of nearest-neighbors it will search for
 	private int numNeighbors;
 	// the maximum distance two points can be apart for them to be considered neighbors
@@ -59,8 +66,11 @@ public class ApproximateSurfaceNormals {
 	// point normal data which is stored in the graph
 	private FastQueue<PointVectorNN> listPointVector = new FastQueue<PointVectorNN>(PointVectorNN.class,true);
 
-	// resuts of NN search
+	// results of NN search
 	private FastQueue<NnData<PointVectorNN>> resultsNN = new FastQueue<NnData<PointVectorNN>>((Class)NnData.class,true);
+
+	// storage for distances the neighbors are.  Used to select the closest ones
+	private double[] distance;
 
 	// the local plane computed using neighbors
 	private FitPlane3D_F64 fitPlane = new FitPlane3D_F64();
@@ -74,27 +84,37 @@ public class ApproximateSurfaceNormals {
 	 * Configures approximation algorithm
 	 *
 	 * @param nn Which nearest-neighbor algorithm to use
-	 * @param numNeighbors Number of neighbors it will use to approximate normal
+	 * @param numPlane Number of closest neighbors it will use to estimate the plane
+	 * @param numNeighbors Number of neighbors it will find
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
-	public ApproximateSurfaceNormals( NearestNeighbor<PointVectorNN> nn , int numNeighbors , double maxDistanceNeighbor) {
+	public ApproximateSurfaceNormals( NearestNeighbor<PointVectorNN> nn , int numPlane,
+									  int numNeighbors , double maxDistanceNeighbor) {
+		if( numPlane <= 2 )
+			throw new IllegalArgumentException("Can't compute the plane from less than 2 points");
+		if( numNeighbors < numPlane )
+			throw new IllegalArgumentException("The number of neighbors found must be at least the number used to" +
+					"compute the plane");
+
+		this.numPlane = numPlane;
 		this.numNeighbors = numNeighbors;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
 		this.nn = nn;
-
-		nn.init(3);
+		this.distance = new double[ numNeighbors+1 ];
 	}
 
 	/**
 	 * Configures approximation algorithm and uses a K-D tree by default.
 	 *
+	 * @param numPlane Number of closest neighbors it will use to estimate the plane
 	 * @param numNeighbors Number of neighbors it will use to approximate normal
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
-	public ApproximateSurfaceNormals(int numNeighbors, double maxDistanceNeighbor) {
-		// one neighbor will be the point itself when it searches, which is removed.  hence the +1
-		this.numNeighbors = numNeighbors+1;
+	public ApproximateSurfaceNormals(int numPlane, int numNeighbors, double maxDistanceNeighbor) {
+		this.numPlane = numPlane;
+		this.numNeighbors = numNeighbors;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
+		this.distance = new double[ numNeighbors+1 ];
 
 		nn = FactoryNearestNeighbor.kdtree();
 	}
@@ -128,7 +148,8 @@ public class ApproximateSurfaceNormals {
 			resultsNN.reset();
 
 			double[] targetPt = usedNnData.get(i);
-			nn.findNearest(targetPt,maxDistanceNeighbor,numNeighbors,resultsNN);
+			// numNeighbors+1 since the target node will also be returned and is removed
+			nn.findNearest(targetPt,maxDistanceNeighbor,numNeighbors+1,resultsNN);
 
 			PointVectorNN p = listPointVector.get(i);
 
@@ -138,8 +159,9 @@ public class ApproximateSurfaceNormals {
 				NnData<PointVectorNN> n = resultsNN.get(j);
 
 				// don't add the point to its own list of neighbors list
-				if( n.point != targetPt)
+				if( n.point != targetPt) {
 					p.neighbors.add(n.data);
+				}
 			}
 
 			// try to compute the normal and add it to the output list if one could be fond
@@ -156,13 +178,28 @@ public class ApproximateSurfaceNormals {
 		// need 3 points to compute a plane.  which means you need two neighbors and 'point'
 		if( point.neighbors.size >= 2 ) {
 			fitList.clear();
-			fitList.add(point.p);
-			for( int i = 0; i < point.neighbors.size; i++ ) {
-				fitList.add( point.neighbors.data[i].p);
+
+			if(  point.neighbors.size-1 < numPlane ) {
+				fitList.add(point.p);
+				for( int i = 0; i < point.neighbors.size; i++ ) {
+					fitList.add( point.neighbors.data[i].p);
+				}
+			} else {
+				// the NN algorithm's neighbor list includes the targeted point
+				for( int i = 0; i < resultsNN.size; i++ ) {
+					NnData<PointVectorNN> n = resultsNN.get(i);
+					distance[i] = n.distance;
+				}
+				double threshold = QuickSelectArray.select(distance, numPlane - 1, resultsNN.size);
+				for( int i = 0; i < resultsNN.size; i++ ) {
+					NnData<PointVectorNN> n = resultsNN.get(i);
+					if( n.distance <= threshold )
+						fitList.add( n.data.p );
+				}
 			}
 			fitPlane.svd(fitList, center, point.normal);
 		} else {
-			point.normal.set(0,0,0);
+			point.normal.set(0, 0, 0);
 		}
 	}
 

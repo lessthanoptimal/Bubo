@@ -25,10 +25,56 @@ import static org.junit.Assert.fail;
 /**
  * @author Peter Abeles
  */
-public class TestMergePointVectorShapes {
+public class TestMergeShapesPointVectorNN {
+
 
 	@Test
-	public void stuff() {
+	public void merge_one() {
+		fail("Implement");
+	}
+
+	@Test
+	public void merge_N_identical() {
+		for( int numShapes = 2; numShapes <= 5; numShapes++ ) {
+			fail("Implement");
+		}
+	}
+
+	/**
+	 * There are shapes which represent the same shape, but contain a different subset of points
+	 */
+	@Test
+	public void merge_sameObject_differentPoints() {
+		fail("Implement");
+	}
+
+	@Test
+	public void merge_threshold_commonPoints() {
+		fail("Implement");
+	}
+
+	@Test
+	public void merge_threshold_distance() {
+		fail("Implement");
+	}
+
+	@Test
+	public void merge_two_notSimilarAtAll() {
+		fail("Implement");
+	}
+
+	@Test
+	public void merge_differentShapes() {
+		fail("Implement");
+	}
+
+	@Test
+	public void findMembersRigorous() {
+		fail("Implement");
+	}
+
+	@Test
+	public void mergeShape() {
 		fail("Implement");
 	}
 

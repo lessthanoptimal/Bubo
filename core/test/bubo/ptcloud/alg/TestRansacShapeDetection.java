@@ -72,6 +72,7 @@ public class TestRansacShapeDetection {
 		@Override
 		protected void selectMatchSet(List<PointVectorNN> initialMatch,
 									  PlaneGeneral3D_F64 param, double threshold,
+									  boolean checkInitial,
 									  List<PointVectorNN> outputMatch) {
 			assertTrue(outputMatch.size()==0);
 			assertTrue(modelDistance);

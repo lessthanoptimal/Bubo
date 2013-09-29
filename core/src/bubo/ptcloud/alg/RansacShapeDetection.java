@@ -75,7 +75,7 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 										  double threshold, Model param) {
 		candidatePoints.clear();
 		matchFinder.setModelDistance(modelDistance);
-		matchFinder.selectMatchSet(initialSample.toList(),param,threshold , candidatePoints);
+		matchFinder.selectMatchSet(initialSample.toList(),param,threshold ,false, candidatePoints);
 	}
 
 	@Override

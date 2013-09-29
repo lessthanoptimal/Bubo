@@ -119,7 +119,6 @@ public class LocalFitShapeNN <Model> {
 		if( initialFitToPoints )
 			fitter.fitModel(initialMatch, initialParam, outputParam);
 
-
 		codec.encode(initialParam, paramPrev);
 		listTempA.clear();
 		listTempA.addAll(initialMatch);
@@ -128,7 +127,7 @@ public class LocalFitShapeNN <Model> {
 			// find list of points which match the model
 			listTempB.clear();
 			// find the points which match the model
-			findMatchSet.selectMatchSet(listTempA,outputParam,distanceThreshold,listTempB);
+			findMatchSet.selectMatchSet(listTempA,outputParam,distanceThreshold,true,listTempB);
 			// use the points which match the model to estimate the parameters.
 			fitter.fitModel(listTempB,outputParam,initialParam);
 
