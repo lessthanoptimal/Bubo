@@ -37,47 +37,59 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO add iterative refinement to merged shape?
 public class MergeShapesPointVectorNN
 {
 	// contains functions used to describe each type of possible shape
-	List<ShapeDescription> models;
+	private List<ShapeDescription> models;
 
 	// storage for the final output shapes after merging
-	List<FoundShape> output = new ArrayList<FoundShape>();
+	private List<FoundShape> output = new ArrayList<FoundShape>();
 
 	// one boolean for each shape in the cloud.  true if member of the targeted shape
-	GrowQueue_B member = new GrowQueue_B();
+	protected GrowQueue_B member = new GrowQueue_B();
 	// contains the index of shapes which might be mergable with the current target
-	GrowQueue_I32 qualified = new GrowQueue_I32();
+	protected GrowQueue_I32 qualified = new GrowQueue_I32();
 
 	// used when determining if two shape should be merged.  mutual memberships
-	List<PointVectorNN> membersAinB = new ArrayList<PointVectorNN>();
-	List<PointVectorNN> membersBinA = new ArrayList<PointVectorNN>();
+	private List<PointVectorNN> membersAinB = new ArrayList<PointVectorNN>();
+	private List<PointVectorNN> membersBinA = new ArrayList<PointVectorNN>();
+
+	// was the points list in the dominant shape modified
+	private boolean modifiedDominant;
+
+	// improves members list and shape parameters
+	private LocalFitShapeNN refine;
 
 	// minimum overlap to consider merging the shapes
-	double minimumOverlap;
+	private double commonPointsFraction;
 
 	// if a shape shares this function of points after the more rigorous test
-	double fractionMerge;
+	private double commonMembershipFraction;
 
 	/**
-	 * TODO Comment
+	 * Configures the class
 	 *
-	 * @param models
-	 * @param minimumOverlap
-	 * @param fractionMerge
+	 * @param models Describe of the different shapes that it can merge
+	 * @param commonPointsFraction Minimum fraction of points in common that two objects have for them to
+	 *                       be considered for merging.  Try 0.6
+	 * @param commonMembershipFraction Minimum fraction of points which belong to another the other shape for them to be merged.
+	 *                      Try 0.9
+	 * @param refine Used to improve the shape parameters and list of member points after merging.
+	 *               If null then no refinement is done.
 	 */
-	public MergeShapesPointVectorNN(List<ShapeDescription> models, double minimumOverlap, double fractionMerge) {
+	public MergeShapesPointVectorNN(List<ShapeDescription> models,
+									double commonPointsFraction, double commonMembershipFraction ,
+									LocalFitShapeNN refine ) {
 		this.models = models;
-		this.minimumOverlap = minimumOverlap;
-		this.fractionMerge = fractionMerge;
+		this.commonPointsFraction = commonPointsFraction;
+		this.commonMembershipFraction = commonMembershipFraction;
+		this.refine = refine;
 	}
 
 	/**
 	 * Searches for point which can be merged.  Results are returned by calling output.
 	 *
-	 * @param input Input list.  MODIFIED.
+	 * @param input Input list.  Is modified..
 	 * @param cloudSize Number of points in the original point cloud.
 	 */
 	public void merge( List<FoundShape> input , int cloudSize ) {
@@ -85,10 +97,11 @@ public class MergeShapesPointVectorNN
 		// set to false again before this function exits
 		member.resize(cloudSize);
 
+		output.clear();
 		output.addAll(input);
 
 		// find which shapes have which points as members
-		for( int i = 0; i < output.size(); i++ ) {
+		for( int i = 0; i < output.size() && output.size() > 1; ) {
 			FoundShape shapeA = output.get(i);
 
 			// mark which points belong ot this shape
@@ -96,7 +109,9 @@ public class MergeShapesPointVectorNN
 
 			// search for shapes which pass the first test for merging
 			qualified.reset();
-			for( int j = i+1; j < output.size(); j++ ) {
+			for( int j = 0; j < output.size(); j++ ) {
+				if( i == j )
+					continue;
 				FoundShape shapeB = output.get(j);
 				int count = 0;
 				for( int k = 0; k < shapeB.points.size(); k++ ) {
@@ -107,7 +122,7 @@ public class MergeShapesPointVectorNN
 				}
 				// compute the fractional overlap in each shape
 				double overlap = Math.max(count/(double)shapeB.points.size() , count/(double)shapeA.points.size());
-				if( overlap > minimumOverlap ) {
+				if( overlap >= commonPointsFraction) {
 					qualified.add(j);
 				}
 			}
@@ -116,21 +131,45 @@ public class MergeShapesPointVectorNN
 			markPoints(shapeA.points,false);
 
 			// go through the qualified list and see if it can merge with any of them
+			boolean anyMerges = false;
 			for( int j = 0; j < qualified.size; j++ ) {
 				int indexB = qualified.get(j);
 				int mergeAction = checkMergeShapes(shapeA,output.get(indexB));
 
 				if( mergeAction == 1 ) {
+					if( modifiedDominant && refine != null )
+						refineShape(output.get(i));
+
+					anyMerges = true;
 					output.remove(indexB);
-					i++;
+					i = Math.min(i,indexB);
 					break;
 				} else if( mergeAction == 2 ) {
+					if( modifiedDominant && refine != null )
+						refineShape(output.get(indexB));
+
+					anyMerges = true;
 					output.remove(i);
-					// no need to increment
+					i = Math.min(i,indexB);
 					break;
 				}
 			}
+			if( !anyMerges ) {
+				i++;
+			}
 		}
+	}
+
+	/**
+	 * Recomputes the shape parameters and neighbor list after merging
+	 * @param shape
+	 */
+	protected void refineShape( FoundShape shape ) {
+
+		ShapeDescription shapeDesc = models.get(shape.whichShape);
+
+		refine.configure(shapeDesc.modelFitter,shapeDesc.modelDistance,shapeDesc.codec,shapeDesc.thresholdFit);
+		refine.refine(shape.points,shape.modelParam,true);
 	}
 
 	/**
@@ -151,17 +190,17 @@ public class MergeShapesPointVectorNN
 		double fracAinB = membersAinB.size()/(double)shapeA.points.size();
 		double fracBinA = membersBinA.size()/(double)shapeB.points.size();
 
-		if( Math.max(fracAinB,fracBinA) < fractionMerge ) {
+		if( Math.max(fracAinB,fracBinA) <= commonMembershipFraction) {
 			return 0;
 		}
 
 		if( fracAinB > fracBinA ) {
 			// B is the dominant one
-			mergeShape(shapeB,shapeA.points);
+			modifiedDominant = mergeShape(shapeB,shapeA.points);
 			return 2;
 		} else {
 			// A is the dominant one
-			mergeShape(shapeA,shapeB.points);
+			modifiedDominant = mergeShape(shapeA,shapeB.points);
 			return 1;
 		}
 	}
@@ -187,19 +226,26 @@ public class MergeShapesPointVectorNN
 
 	/**
 	 * Adds points in 'points' which are not already members of 'dominant'.
+	 *
+	 * @return true if points are added to the dominate shape
 	 */
-	protected void mergeShape( FoundShape dominant , List<PointVectorNN> points ) {
+	protected boolean mergeShape( FoundShape dominant , List<PointVectorNN> points ) {
 		markPoints(dominant.points,true);
+
+		boolean changed = false;
 
 		// add points which are not already a member of dominant
 		for( int i = 0; i < points.size(); i++) {
 			PointVectorNN pv = points.get(i);
 			if( !member.data[pv.index] ) {
 				dominant.points.add(pv);
+				changed = true;
 			}
 		}
 
 		markPoints(dominant.points,false);
+
+		return changed;
 	}
 
 	protected void markPoints( List<PointVectorNN> points , boolean value ) {

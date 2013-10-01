@@ -36,13 +36,6 @@ import static org.junit.Assert.assertTrue;
 public class TestPlaneGeneralSvd_to_ModelFitter {
 
 	@Test
-	public void createModelInstance() {
-		PlaneGeneralSvd_to_ModelFitter alg = new PlaneGeneralSvd_to_ModelFitter();
-
-		assertTrue( alg.createModelInstance() instanceof PlaneGeneral3D_F64 );
-	}
-
-	@Test
 	public void fitModel() {
 		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(0,0,0,0,0,1);
 

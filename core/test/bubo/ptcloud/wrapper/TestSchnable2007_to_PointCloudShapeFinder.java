@@ -18,14 +18,9 @@
 
 package bubo.ptcloud.wrapper;
 
-import bubo.ptcloud.CloudShapeTypes;
+import bubo.ptcloud.FactoryPointCloudShape;
 import bubo.ptcloud.PointCloudShapeFinder;
-import bubo.ptcloud.alg.ApproximateSurfaceNormals;
 import bubo.ptcloud.alg.ConfigSchnabel2007;
-import bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -39,19 +34,12 @@ public class TestSchnable2007_to_PointCloudShapeFinder extends GeneralChecksPoin
 	@Override
 	public PointCloudShapeFinder createAlgorithm() {
 
-		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.1,0.1);
-		config.minModelAccept = 10;
-		config.octreeSplit = 20;
+		ConfigSchnabel2007 configRansac = ConfigSchnabel2007.createDefault(100,0.2,0.1,0.03);
+		configRansac.minModelAccept = 50;
+		configRansac.octreeSplit = 60;
 
-		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007(config);
+		ConfigSurfaceNormals configSurface = new ConfigSurfaceNormals(6,20,3);
 
-		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(6,20,3);
-
-		List<CloudShapeTypes> shapeList = new ArrayList<CloudShapeTypes>();
-		shapeList.add(CloudShapeTypes.SPHERE);
-		shapeList.add(CloudShapeTypes.PLANE);
-		shapeList.add(CloudShapeTypes.CYLINDER);
-
-		return new Schnable2007_to_PointCloudShapeFinder(surface,alg,shapeList);
+		return FactoryPointCloudShape.ransacOctree(configSurface,configRansac);
 	}
 }

@@ -34,15 +34,6 @@ import static org.junit.Assert.assertTrue;
 public class TestModelFitter_P_to_PVNN {
 
 	@Test
-	public void createModelInstance() {
-		Dummy dummy = new Dummy();
-
-		ModelFitter_P_to_PVNN <Object> alg = new ModelFitter_P_to_PVNN <Object>(dummy);
-
-		assertTrue(alg.createModelInstance() != null);
-	}
-
-	@Test
 	public void fitModel() {
 		Dummy dummy = new Dummy();
 
@@ -69,11 +60,6 @@ public class TestModelFitter_P_to_PVNN {
 
 		boolean calledFit = false;
 		List<Point3D_F64> list;
-
-		@Override
-		public Object createModelInstance() {
-			return 1;
-		}
 
 		@Override
 		public boolean fitModel(List<Point3D_F64> dataSet, Object initial, Object found) {

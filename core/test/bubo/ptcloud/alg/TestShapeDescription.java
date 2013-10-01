@@ -18,10 +18,12 @@
 
 package bubo.ptcloud.alg;
 
+import georegression.fitting.plane.ModelManagerPlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -31,6 +33,7 @@ public class TestShapeDescription {
 	@Test
 	public void modelStuff() {
 		ShapeDescription<PlaneGeneral3D_F64> desc = new ShapeDescription<PlaneGeneral3D_F64>();
+		desc.modelManager = new ModelManagerPlaneGeneral3D_F64();
 		desc.modelGenerator = new GeneratePlanePointVector(0.1);
 
 		desc.createModel();
@@ -52,6 +55,11 @@ public class TestShapeDescription {
 
 		assertEquals(0,desc.unused.size());
 		assertEquals(4,desc.used.size());
+	}
+
+	@Test
+	public void recycleTail() {
+		fail("Implement");
 	}
 
 }

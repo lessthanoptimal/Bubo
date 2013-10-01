@@ -18,12 +18,16 @@
 
 package bubo.ptcloud.alg;
 
+import bubo.ptcloud.CloudShapeTypes;
 import bubo.ptcloud.wrapper.PlaneGeneralSvd_to_ModelFitter;
 import georegression.fitting.cylinder.CodecCylinder3D_F64;
 import georegression.fitting.cylinder.FitCylinderToPoints_F64;
+import georegression.fitting.cylinder.ModelManagerCylinder3D_F64;
 import georegression.fitting.plane.CodecPlaneGeneral3D_F64;
+import georegression.fitting.plane.ModelManagerPlaneGeneral3D_F64;
 import georegression.fitting.sphere.CodecSphere3D_F64;
 import georegression.fitting.sphere.FitSphereToPoints_F64;
+import georegression.fitting.sphere.ModelManagerSphere3D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,40 +90,61 @@ public class ConfigSchnabel2007 {
 	 * @param angleTolerance Tolerance in radians to reject a model from an initial sample set
 	 * @param distanceTolerance Tolerance in distance used to reject model from an initial sample set
 	 * @param ransacDistanceThreshold Euclidean distance that RANSAC considers a point an inlier
+	 * @param shapes A list of shape you wish to detect.  If empty then all possible shapes will be detected.
 	 *
 	 * @return ConfigSchnabel2007
 	 */
 	public static ConfigSchnabel2007 createDefault( int fitIterations ,
 													double angleTolerance ,
 													double distanceTolerance ,
-													double ransacDistanceThreshold )
+													double ransacDistanceThreshold ,
+													CloudShapeTypes ...shapes )
 	{
 		List<ShapeDescription> objects = new ArrayList<ShapeDescription>();
 
-		ShapeDescription sphere = new ShapeDescription();
-		sphere.modelDistance = new DistanceFromModel_P_to_PVNN(new DistanceSphereToPoint3D());
-		sphere.modelGenerator = new GenerateSpherePointVector(angleTolerance,distanceTolerance);
-		sphere.modelFitter = new ModelFitter_P_to_PVNN(new FitSphereToPoints_F64(fitIterations));
-		sphere.codec = new CodecSphere3D_F64();
-		sphere.thresholdFit = ransacDistanceThreshold;
+		if( shapes.length == 0 ) {
+			shapes = CloudShapeTypes.values();
+		}
 
-		ShapeDescription plane = new ShapeDescription();
-		plane.modelDistance = new DistanceFromModel_P_to_PVNN(new DistancePlaneToPoint3D());
-		plane.modelGenerator = new GeneratePlanePointVector(angleTolerance);
-		plane.modelFitter = new ModelFitter_P_to_PVNN(new PlaneGeneralSvd_to_ModelFitter());
-		plane.codec = new CodecPlaneGeneral3D_F64();
-		plane.thresholdFit = ransacDistanceThreshold;
+		for( CloudShapeTypes shape : shapes ) {
+			switch( shape ) {
+				case SPHERE: {
+					ShapeDescription sphere = new ShapeDescription();
+					sphere.modelManager = new ModelManagerSphere3D_F64();
+					sphere.modelDistance = new DistanceFromModel_P_to_PVNN(new DistanceSphereToPoint3D());
+					sphere.modelGenerator = new GenerateSpherePointVector(angleTolerance,distanceTolerance);
+					sphere.modelFitter = new ModelFitter_P_to_PVNN(new FitSphereToPoints_F64(fitIterations));
+					sphere.codec = new CodecSphere3D_F64();
+					sphere.thresholdFit = ransacDistanceThreshold;
+					objects.add(sphere);
+				} break;
 
-		ShapeDescription cylinder = new ShapeDescription();
-		cylinder.modelDistance = new DistanceFromModel_P_to_PVNN(new DistanceCylinderToPoint3D());
-		cylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance,distanceTolerance);
-		cylinder.modelFitter = new ModelFitter_P_to_PVNN(new FitCylinderToPoints_F64(fitIterations));
-		cylinder.codec = new CodecCylinder3D_F64();
-		cylinder.thresholdFit = ransacDistanceThreshold;
+				case CYLINDER: {
+					ShapeDescription cylinder = new ShapeDescription();
+					cylinder.modelManager = new ModelManagerCylinder3D_F64();
+					cylinder.modelDistance = new DistanceFromModel_P_to_PVNN(new DistanceCylinderToPoint3D());
+					cylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance,distanceTolerance);
+					cylinder.modelFitter = new ModelFitter_P_to_PVNN(new FitCylinderToPoints_F64(fitIterations));
+					cylinder.codec = new CodecCylinder3D_F64();
+					cylinder.thresholdFit = ransacDistanceThreshold;
+					objects.add(cylinder);
+				} break;
 
-		objects.add(sphere);
-		objects.add(plane);
-		objects.add(cylinder);
+				case PLANE: {
+					ShapeDescription plane = new ShapeDescription();
+					plane.modelManager = new ModelManagerPlaneGeneral3D_F64();
+					plane.modelDistance = new DistanceFromModel_P_to_PVNN(new DistancePlaneToPoint3D());
+					plane.modelGenerator = new GeneratePlanePointVector(angleTolerance);
+					plane.modelFitter = new ModelFitter_P_to_PVNN(new PlaneGeneralSvd_to_ModelFitter());
+					plane.codec = new CodecPlaneGeneral3D_F64();
+					plane.thresholdFit = ransacDistanceThreshold;
+					objects.add(plane);
+				} break;
+
+				default:
+					throw new IllegalArgumentException("Unsupported shape: "+shape);
+			}
+		}
 
 		ConfigSchnabel2007 config = new ConfigSchnabel2007();
 		config.models = objects;

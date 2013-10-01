@@ -18,6 +18,7 @@
 
 package bubo.ptcloud.alg;
 
+import georegression.fitting.plane.ModelManagerPlaneGeneral3D_F64;
 import georegression.geometry.UtilPlane3D_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
@@ -43,6 +44,7 @@ public class TestRansacShapeDetection {
 	@Test
 	public void selectMatchSet() {
 		RansacMulti.ObjectType o = new RansacMulti.ObjectType();
+		o.modelManager = new ModelManagerPlaneGeneral3D_F64();
 		o.modelDistance = new DistanceFromModel_P_to_PVNN(new DistancePlaneToPoint3D());
 		o.modelGenerator = new GeneratePlanePointVector(0.1);
 		o.thresholdFit = 0.5;

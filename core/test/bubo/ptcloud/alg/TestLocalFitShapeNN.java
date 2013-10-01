@@ -77,21 +77,22 @@ public class TestLocalFitShapeNN {
 
 		alg.configure(modelFitter,modelDistance,modelCodec,0.3);
 
-		List<PointVectorNN> outputMatch = new ArrayList<PointVectorNN>();
-		PlaneGeneral3D_F64 outputParam = new PlaneGeneral3D_F64();
-		alg.refine(pts,inputPlane,true,outputMatch,outputParam);
+		alg.refine(pts,inputPlane,true);
 
-		assertEquals(pts.size(),outputMatch.size());
-		TestGeneratePlanePointVector.checkPlanes(plane, outputParam, 1e-8);
+		assertEquals(100,pts.size());
+		TestGeneratePlanePointVector.checkPlanes(plane, inputPlane, 1e-8);
 	}
 
 	/**
-	 * The initial estimate includes noise and the parameters are not perfect
+	 * The initial estimate includes random points that aren't members. Also make sure that the
+	 * input can be passed in as storage for the output without changing the results
 	 */
 	@Test
-	public void noisyAndSlightlyOffGuess() {
+	public void withRandomPoints_sameInstance() {
 		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,3,-0.5,0.25,1);
-		PlaneGeneral3D_F64 planeGeneral = UtilPlane3D_F64.convert(plane,null);
+		PlaneGeneral3D_F64 planeFound = UtilPlane3D_F64.convert(plane,null);
+		// make the initial estimate slightly off
+		planeFound.A = 1.01;
 
 		// create a mixture of perfect and noisy points
 		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
@@ -125,13 +126,11 @@ public class TestLocalFitShapeNN {
 
 		alg.configure(modelFitter,modelDistance,modelCodec,0.3);
 
-		List<PointVectorNN> outputMatch = new ArrayList<PointVectorNN>();
-		PlaneGeneral3D_F64 outputParam = new PlaneGeneral3D_F64();
-		alg.refine(guessPts,planeGeneral,true,outputMatch,outputParam);
+		alg.refine(guessPts,planeFound,true);
 
 		// should be an easy enough case that it filters out all the bad points
-		assertEquals(100, outputMatch.size());
-		TestGeneratePlanePointVector.checkPlanes(plane, outputParam, 1e-8);
+		assertEquals(100, guessPts.size());
+		TestGeneratePlanePointVector.checkPlanes(plane, planeFound, 1e-8);
 	}
 
 	/**

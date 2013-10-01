@@ -18,6 +18,7 @@
 
 package bubo.ptcloud.alg;
 
+import bubo.ptcloud.CloudShapeTypes;
 import bubo.ptcloud.ConstructOctreeEqual;
 import bubo.ptcloud.Octree;
 import georegression.struct.plane.PlaneGeneral3D_F64;
@@ -37,6 +38,10 @@ import static org.junit.Assert.assertEquals;
 public class TestPointCloudShapeDetectionSchnabel2007 {
 
 	Random rand = new Random(234234);
+
+	// make sure the order is known
+	CloudShapeTypes shapeDetect[]=
+			new CloudShapeTypes[]{CloudShapeTypes.SPHERE,CloudShapeTypes.PLANE,CloudShapeTypes.CYLINDER};
 
 	@Test
 	public void perfectDataNoNoise_singleShape() {
@@ -174,7 +179,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 	private PointCloudShapeDetectionSchnabel2007 createAlgorithm() {
 
-		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.2,0.3);
+		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.2,0.3,shapeDetect);
 
 		config.minModelAccept = 10;
 		config.octreeSplit = 20;

@@ -104,35 +104,33 @@ public class LocalFitShapeNN <Model> {
 	/**
 	 * Refines the set of points which belong to the shape and the model parameters which define the shape
 	 *
-	 * NOTE: The initialParam is used inside this function to store intermediate results
+	 * NOTE: The initialParam is used inside this function to store intermediate results<br>
 	 *
-	 * @param initialMatch (input) Initial set of points which belong to the shape
-	 * @param initialParam (input) Initial description of the shape. THIS IS MODIFIED.
+	 * @param matches (input) Initial set of points which belong to the shape.  (output) Set of points which match the new shape.
+	 * @param model (input) Initial description of the shape. (output) The newly estimated shape description.
 	 * @param initialFitToPoints (input) If true it will fit the model parameters to the initial points.  If false
 	 *                           it will start by selecting points which match the initial model.
-	 * @param outputMatch (Output) Refined set of points which belong to the shape.
-	 * @param outputParam (Output) Refined description of the shape.
 	 */
-	public void refine( List<PointVectorNN> initialMatch , Model initialParam , boolean initialFitToPoints,
-						List<PointVectorNN> outputMatch , Model outputParam )
+	public void refine( List<PointVectorNN> matches , Model model , boolean initialFitToPoints )
 	{
+		codec.encode(model, paramPrev);
 		if( initialFitToPoints )
-			fitter.fitModel(initialMatch, initialParam, outputParam);
+			fitter.fitModel(matches, model, model);
 
-		codec.encode(initialParam, paramPrev);
 		listTempA.clear();
-		listTempA.addAll(initialMatch);
+		listTempA.addAll(matches);
 
-		for( int iter = 0; iter < maxIterations; iter++ ) {
+		int iter = 0;
+		while( true ) {
 			// find list of points which match the model
 			listTempB.clear();
 			// find the points which match the model
-			findMatchSet.selectMatchSet(listTempA,outputParam,distanceThreshold,true,listTempB);
+			findMatchSet.selectMatchSet(listTempA,model,distanceThreshold,true,listTempB);
 			// use the points which match the model to estimate the parameters.
-			fitter.fitModel(listTempB,outputParam,initialParam);
+			fitter.fitModel(listTempB,model,model);
 
 			// Compute the change in parameters
-			codec.encode(initialParam, paramCurr);
+			codec.encode(model, paramCurr);
 		
 			double change = 0;
 			for( int i = 0; i < codec.getParamLength(); i++ ) {
@@ -141,25 +139,24 @@ public class LocalFitShapeNN <Model> {
 			}
 			change /= codec.getParamLength();
 
-			// Set the output parameters to the most recently computed parameters
-			codec.decode(paramCurr,outputParam);
-
 			// check to see if it has converged
-			if( change <= minimumChangeThreshold ) {
+			iter++;
+			if( change <= minimumChangeThreshold || iter >= maxIterations ) {
 				break;
+			} else {
+				// swap current and previous
+				List<PointVectorNN> tempL = listTempB;
+				listTempB = listTempA;
+				listTempA = tempL;
+
+				double tempD[] = paramCurr;
+				paramCurr = paramPrev;
+				paramPrev = tempD;
 			}
-
-			// swap current and previous
-			List<PointVectorNN> tempL = listTempB;
-			listTempB = listTempA;
-			listTempA = tempL;
-
-			double tempD[] = paramCurr;
-			paramCurr = paramPrev;
-			paramPrev = tempD;
 		}
 
-		outputMatch.addAll(listTempB);
+		matches.clear();
+		matches.addAll(listTempB);
 	}
 
 }

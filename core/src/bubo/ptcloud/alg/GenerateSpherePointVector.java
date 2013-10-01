@@ -52,11 +52,6 @@ public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,Po
 	}
 
 	@Override
-	public Sphere3D_F64 createModelInstance() {
-		return new Sphere3D_F64();
-	}
-
-	@Override
 	public boolean generate(List<PointVectorNN> dataSet, Sphere3D_F64 output) {
 
 		PointVectorNN pa = dataSet.get(0);

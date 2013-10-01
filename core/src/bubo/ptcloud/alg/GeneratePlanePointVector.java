@@ -54,11 +54,6 @@ public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F
 	}
 
 	@Override
-	public PlaneGeneral3D_F64 createModelInstance() {
-		return new PlaneGeneral3D_F64();
-	}
-
-	@Override
 	public boolean generate(List<PointVectorNN> dataSet, PlaneGeneral3D_F64 output) {
 
 		PointVectorNN pa = dataSet.get(0);

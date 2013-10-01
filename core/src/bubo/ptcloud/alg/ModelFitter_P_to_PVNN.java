@@ -40,11 +40,6 @@ public class ModelFitter_P_to_PVNN<Model> implements ModelFitter<Model,PointVect
 	}
 
 	@Override
-	public Model createModelInstance() {
-		return model.createModelInstance();
-	}
-
-	@Override
 	public boolean fitModel(List<PointVectorNN> dataSet, Model initial, Model found) {
 		points.clear();
 		for( int i = 0; i < dataSet.size(); i++ ) {

@@ -40,11 +40,6 @@ public class PlaneGeneralSvd_to_ModelFitter implements ModelFitter<PlaneGeneral3
 	PlaneNormal3D_F64 planeNorm = new PlaneNormal3D_F64();
 
 	@Override
-	public PlaneGeneral3D_F64 createModelInstance() {
-		return new PlaneGeneral3D_F64();
-	}
-
-	@Override
 	public boolean fitModel(List<Point3D_F64> dataSet, PlaneGeneral3D_F64 initial, PlaneGeneral3D_F64 found) {
 
 		if( !alg.svd(dataSet,planeNorm.p,planeNorm.n) )

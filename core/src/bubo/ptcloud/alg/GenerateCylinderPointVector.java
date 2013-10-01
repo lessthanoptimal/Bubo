@@ -51,11 +51,6 @@ public class GenerateCylinderPointVector implements ModelGenerator<Cylinder3D_F6
 	}
 
 	@Override
-	public Cylinder3D_F64 createModelInstance() {
-		return new Cylinder3D_F64();
-	}
-
-	@Override
 	public boolean generate(List<PointVectorNN> dataSet, Cylinder3D_F64 output) {
 
 		PointVectorNN pa = dataSet.get(0);

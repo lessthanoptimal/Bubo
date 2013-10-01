@@ -18,10 +18,7 @@
 
 package bubo.ptcloud.alg;
 
-import org.ddogleg.fitting.modelset.DistanceFromModel;
-import org.ddogleg.fitting.modelset.ModelCodec;
-import org.ddogleg.fitting.modelset.ModelFitter;
-import org.ddogleg.fitting.modelset.ModelGenerator;
+import org.ddogleg.fitting.modelset.*;
 
 import java.util.Stack;
 
@@ -35,6 +32,8 @@ public class ShapeDescription<Model> {
 
 	/** how close a point needs to be considered part of the model */
 	public double thresholdFit;
+	/** Creates new instances and copies */
+	public ModelManager<Model> modelManager;
 	/** generates an initial model given a set of points */
 	public ModelGenerator<Model,PointVectorNN> modelGenerator;
 	/** Used to refine an initial model estimate when given an initial estimate */
@@ -53,10 +52,18 @@ public class ShapeDescription<Model> {
 		used.clear();
 	}
 
+	/**
+	 * Takes the most recently created model and removes it from the used list and puts it into the unused list
+	 */
+	public void recycleTail() {
+		Model m = used.remove( used.size()-1 );
+		unused.add(m);
+	}
+
 	public Model createModel() {
 		Model m;
 		if( unused.isEmpty() ) {
-			m = modelGenerator.createModelInstance();
+			m = modelManager.createModelInstance();
 		} else {
 			m = unused.pop();
 		}

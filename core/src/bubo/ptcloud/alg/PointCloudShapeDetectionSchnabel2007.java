@@ -78,8 +78,6 @@ public class PointCloudShapeDetectionSchnabel2007 {
 
 	// refines the estimate provided by RANSAC
 	private LocalFitShapeNN refineShape;
-	private List<PointVectorNN> refinedPoints = new ArrayList<PointVectorNN>();
-	private List<Object> refinedParams = new ArrayList<Object>();
 
 	// list of found objects
 	private FastQueue<FoundShape> foundObjects = new FastQueue<FoundShape>(FoundShape.class,true);
@@ -123,6 +121,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 			ShapeDescription s = models.get(i);
 			RansacMulti.ObjectType o = new RansacMulti.ObjectType();
 
+			o.modelManager = s.modelManager;
 			o.thresholdFit = s.thresholdFit;
 			o.modelDistance = s.modelDistance;
 			o.modelGenerator = s.modelGenerator;
@@ -221,9 +220,9 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 * a new shape for output
 	 */
 	protected void refineRansacShape() {
-		Object modelParam = ransac.getModelParameters();
+		Object ransacParam = ransac.getModelParameters();
 		int whichShape = ransac.getModelIndex();
-		List<PointVectorNN> inliers = ransac.getMatchSet();
+		List<PointVectorNN> ransacInliers = ransac.getMatchSet();
 
 		ShapeDescription shapeDesc = models.get( whichShape );
 
@@ -234,13 +233,22 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		output.whichShape = ransac.getModelIndex();
 
 		// refine the model
+		shapeDesc.modelManager.copyModel(ransacParam,output.modelParam);
+		output.points.addAll(ransacInliers);
 		refineShape.configure(shapeDesc.modelFitter,shapeDesc.modelDistance,shapeDesc.codec,shapeDesc.thresholdFit);
-		refineShape.refine(inliers,modelParam,true,output.points,output.modelParam);
+		refineShape.refine(output.points,output.modelParam,true);
 
-		// mark shape points as being used
-		for( int i = 0; i < output.points.size(); i++ ) {
-			PointVectorNN p = output.points.get(i);
-			p.used = true;
+		// see if the shape still has enough points to be accepted.  if the total number of matching points dropped
+		// it is highly likely to be a poor fit to the shape anyways
+		if( output.points.size() < minModelAccept ) {
+			// discard the shape
+			foundObjects.removeTail();
+		} else {
+			// mark shape points as being used
+			for( int i = 0; i < output.points.size(); i++ ) {
+				PointVectorNN p = output.points.get(i);
+				p.used = true;
+			}
 		}
 	}
 
@@ -333,6 +341,10 @@ public class PointCloudShapeDetectionSchnabel2007 {
 				unmatched.add(pv);
 			}
 		}
+	}
+
+	public LocalFitShapeNN getRefineShape() {
+		return refineShape;
 	}
 
 	public Cube3D_F64 getBounding() {
