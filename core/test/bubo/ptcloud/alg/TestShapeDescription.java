@@ -23,7 +23,6 @@ import georegression.struct.plane.PlaneGeneral3D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -34,7 +33,6 @@ public class TestShapeDescription {
 	public void modelStuff() {
 		ShapeDescription<PlaneGeneral3D_F64> desc = new ShapeDescription<PlaneGeneral3D_F64>();
 		desc.modelManager = new ModelManagerPlaneGeneral3D_F64();
-		desc.modelGenerator = new GeneratePlanePointVector(0.1);
 
 		desc.createModel();
 		desc.createModel();
@@ -59,7 +57,20 @@ public class TestShapeDescription {
 
 	@Test
 	public void recycleTail() {
-		fail("Implement");
+		ShapeDescription<PlaneGeneral3D_F64> desc = new ShapeDescription<PlaneGeneral3D_F64>();
+		desc.modelManager = new ModelManagerPlaneGeneral3D_F64();
+
+		desc.createModel();
+		desc.createModel();
+		desc.createModel();
+
+		assertEquals(0,desc.unused.size());
+		assertEquals(3,desc.used.size());
+
+		desc.recycleTail();
+
+		assertEquals(1,desc.unused.size());
+		assertEquals(2,desc.used.size());
 	}
 
 }

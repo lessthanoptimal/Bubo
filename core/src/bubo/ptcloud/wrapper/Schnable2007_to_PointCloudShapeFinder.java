@@ -20,10 +20,7 @@ package bubo.ptcloud.wrapper;
 
 import bubo.ptcloud.CloudShapeTypes;
 import bubo.ptcloud.PointCloudShapeFinder;
-import bubo.ptcloud.alg.ApproximateSurfaceNormals;
-import bubo.ptcloud.alg.FoundShape;
-import bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007;
-import bubo.ptcloud.alg.PointVectorNN;
+import bubo.ptcloud.alg.*;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
@@ -38,12 +35,16 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO least squares fitting of each shape
 public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFinder {
 
 	ApproximateSurfaceNormals surfaceNormals;
 	PointCloudShapeDetectionSchnabel2007 shapeDetector;
 	List<CloudShapeTypes> shapeList;
+
+	// Searches for duplicate shapes which describe the same set of points and merges them together
+	MergeShapesPointVectorNN merge;
+
+	List<FoundShape> mergeList = new ArrayList<FoundShape>();
 
 	FastQueue<PointVectorNN> pointNormList = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
@@ -55,9 +56,11 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 
 	public Schnable2007_to_PointCloudShapeFinder(ApproximateSurfaceNormals surfaceNormals,
 												 PointCloudShapeDetectionSchnabel2007 shapeDetector,
+												 MergeShapesPointVectorNN merge,
 												 List<CloudShapeTypes> shapeList ) {
 		this.surfaceNormals = surfaceNormals;
 		this.shapeDetector = shapeDetector;
+		this.merge = merge;
 		this.shapeList = shapeList;
 	}
 
@@ -74,15 +77,20 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 
 		shapeDetector.process(pointNormList,this.boundingBox);
 
-		convertIntoOuput(shapeDetector.getFoundObjects());
+		mergeList.clear();
+		mergeList.addAll(shapeDetector.getFoundObjects().toList());
+
+		merge.merge(mergeList,cloud.size());
+
+		convertIntoOuput(merge.getOutput());
 	}
 
 	/**
 	 * Converts the list of shapes into the output format
 	 */
-	private void convertIntoOuput(FastQueue<FoundShape> schnabelShapes) {
+	private void convertIntoOuput(List<FoundShape> schnabelShapes) {
 		output.reset();
-		for( int i = 0; i < schnabelShapes.size; i++ ) {
+		for( int i = 0; i < schnabelShapes.size(); i++ ) {
 			FoundShape fs = schnabelShapes.get(i);
 			Shape os = output.grow();
 			os.parameters = fs.modelParam;

@@ -18,10 +18,8 @@
 
 package bubo.ptcloud;
 
-import bubo.ptcloud.alg.ApproximateSurfaceNormals;
-import bubo.ptcloud.alg.ConfigSchnabel2007;
-import bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007;
-import bubo.ptcloud.alg.ShapeDescription;
+import bubo.ptcloud.alg.*;
+import bubo.ptcloud.wrapper.ConfigMergeShapes;
 import bubo.ptcloud.wrapper.ConfigSurfaceNormals;
 import bubo.ptcloud.wrapper.Schnable2007_to_PointCloudShapeFinder;
 import georegression.fitting.cylinder.CodecCylinder3D_F64;
@@ -52,16 +50,21 @@ public class FactoryPointCloudShape {
 	 *
 	 * @param configNormal Configuration for approximation of surface normals.
 	 * @param configRansac Configuration for {@link PointCloudShapeDetectionSchnabel2007}.
-	 * @return
+	 * @param configMerge Configuration for {@link MergeShapesPointVectorNN}.
+	 * @return Implementation of {@link PointCloudShapeFinder}.
 	 */
 	public static PointCloudShapeFinder ransacOctree( ConfigSurfaceNormals configNormal ,
-													  ConfigSchnabel2007 configRansac ) {
+													  ConfigSchnabel2007 configRansac ,
+													  ConfigMergeShapes configMerge ) {
 		configNormal.checkConfig();
 
 		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007(configRansac);
 
 		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
 				configNormal.numPlane,configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
+
+		MergeShapesPointVectorNN merge = new MergeShapesPointVectorNN(
+				configRansac.models,configMerge.commonMembershipFraction,configMerge.commonMembershipFraction,alg.getRefineShape());
 
 		List<CloudShapeTypes> shapeList = new ArrayList<CloudShapeTypes>();
 
@@ -77,6 +80,6 @@ public class FactoryPointCloudShape {
 			}
 		}
 
-		return new Schnable2007_to_PointCloudShapeFinder(surface,alg,shapeList);
+		return new Schnable2007_to_PointCloudShapeFinder(surface,alg,merge,shapeList);
 	}
 }

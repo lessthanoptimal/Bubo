@@ -399,7 +399,44 @@ public class TestMergeShapesPointVectorNN {
 	 */
 	@Test
 	public void refine() {
-		fail("implement");
+		FindMatchSetPointVectorNN findMatchSet = new FindMatchSetPointVectorNN();
+		LocalFitShapeNN refine = new LocalFitShapeNN(100,1e-8,findMatchSet);
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.01,0.9,refine);
+
+		// create points from two slightly different shapes
+		List<PointVectorNN> cloud = new ArrayList<PointVectorNN>();
+		addPoints(new Sphere3D_F64(1, 2, 3, 4), 100, cloud);
+		addPoints(new Sphere3D_F64(1.05, 2, 3, 4), 100, cloud);
+
+		FoundShape s0 = new FoundShape();
+		s0.whichShape = 0;
+		s0.modelParam = new Sphere3D_F64(1,2,3,4);
+		for( int i = 0; i < 100; i++ ) {
+			s0.points.add( cloud.get(i) );
+		}
+
+		FoundShape s1 = new FoundShape();
+		s1.whichShape = 0;
+		s1.modelParam = new Sphere3D_F64(1,2,3,4);
+		for( int i = 0; i < 120; i++ ) {
+			s1.points.add( cloud.get(i+80) );
+		}
+
+		List<FoundShape> shapes = new ArrayList<FoundShape>();
+		shapes.add(s0);
+		shapes.add(s1);
+
+		// after merging there should be one shape and its parameters should be a bit off
+		alg.merge(shapes,cloud.size());
+
+		List<FoundShape> found = alg.getOutput();
+
+		assertEquals(1, found.size());
+		Sphere3D_F64 foundModel = (Sphere3D_F64)found.get(0).modelParam;
+
+		// shouldn't match either model
+		assertTrue(Math.abs(foundModel.center.x-1)>1e-8);
+		assertTrue(Math.abs(foundModel.center.x-1.05)>1e-8);
 	}
 
 	public void addPointsRandom( double scale , int total , List<PointVectorNN> cloud ) {
