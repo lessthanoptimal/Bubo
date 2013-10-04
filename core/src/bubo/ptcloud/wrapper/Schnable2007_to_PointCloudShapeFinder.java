@@ -95,16 +95,14 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 			Shape os = output.grow();
 			os.parameters = fs.modelParam;
 			os.type = shapeList.get( fs.whichShape );
-			// make sure the list has been declared if it has not
-			if( os.points == null ){
-				os.points = new ArrayList<Point3D_F64>();
-			} else {
-				os.points.clear();
-			}
+			os.points.clear();
+			os.indexes.reset();
+
 			// add the points to it
 			for( int j = 0; j < fs.points.size(); j++ ) {
 				PointVectorNN pv = fs.points.get(j);
 				os.points.add(pv.p);
+				os.indexes.add(pv.index);
 			}
 		}
 	}

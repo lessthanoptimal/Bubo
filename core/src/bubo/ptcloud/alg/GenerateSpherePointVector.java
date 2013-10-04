@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * Sphere estimation for use in {@link PointCloudShapeDetectionSchnabel2007}.  The sphere is estimated
- * using two points and their normal vectors.
+ * using two points and their normal vectors. Third point is used to check the solution.
  *
  * @author Peter Abeles
  */
@@ -64,12 +64,14 @@ public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,Po
 		lineB.p = pb.p;
 		lineB.slope = pb.normal;
 
+		// All points and their normal pass through the sphere's center
 		ClosestPoint3D_F64.closestPoint(lineA,lineB,output.center);
 
 		double ra = output.center.distance(pa.p);
 		double rb = output.center.distance(pb.p);
 		double rc = output.center.distance(pc.p);
 
+		// radius is set to average distance
 		output.radius = (ra+rb)/2.0;
 
 		// check the solution

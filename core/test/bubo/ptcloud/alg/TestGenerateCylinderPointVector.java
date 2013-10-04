@@ -53,6 +53,7 @@ public class TestGenerateCylinderPointVector {
 
 		assertTrue(alg.generate(pts, found));
 
+		assertEquals(1,found.line.slope.norm(),1e-8);
 		checkEquivalent(c,found, 1e-8);
 	}
 
@@ -74,6 +75,7 @@ public class TestGenerateCylinderPointVector {
 
 		assertTrue(alg.generate(pts, found));
 
+		assertEquals(1,found.line.slope.norm(),1e-8);
 		checkEquivalent(c,found, 1e-8);
 	}
 
@@ -95,6 +97,7 @@ public class TestGenerateCylinderPointVector {
 
 		alg.generate(pts,found);
 
+		assertEquals(1,found.line.slope.norm(),1e-8);
 		checkEquivalent(c,found, 1e-8);
 	}
 
@@ -114,6 +117,7 @@ public class TestGenerateCylinderPointVector {
 
 		assertTrue(alg.generate(pts, found));
 
+		assertEquals(1,found.line.slope.norm(),1e-8);
 		checkEquivalent(c,found, 1e-8);
 
 		// mixed direction norms
@@ -123,6 +127,7 @@ public class TestGenerateCylinderPointVector {
 
 		assertTrue(alg.generate(pts, found));
 
+		assertEquals(1,found.line.slope.norm(),1e-8);
 		checkEquivalent(c, found, 1e-8);
 	}
 

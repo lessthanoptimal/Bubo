@@ -60,9 +60,9 @@ public class FindMatchSetPointVectorNN<Model> {
 	 * @param checkInitialDistance (Input) Should it check the distance of the initial set of points?
 	 * @param outputMatch (Output) the found set of points which match the shape.
 	 */
-	protected void selectMatchSet( List<PointVectorNN> initialMatch , Model param , double threshold,
-								   boolean checkInitialDistance ,
-								   List<PointVectorNN> outputMatch ) {
+	public void selectMatchSet( List<PointVectorNN> initialMatch , Model param , double threshold,
+								boolean checkInitialDistance ,
+								List<PointVectorNN> outputMatch ) {
 		// initialize data structures
 		if( !open.isEmpty())
 			throw new IllegalArgumentException("BUG!");

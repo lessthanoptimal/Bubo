@@ -29,6 +29,7 @@ import georegression.struct.shapes.Cube3D_F64;
 import georegression.struct.shapes.Cylinder3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -106,7 +107,10 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 			List<PointCloudShapeFinder.Shape> found = alg.getFound();
 
+			// see if the error of the matched shape is reasonable and that the
+			// point indexes are correctly set
 			for( PointCloudShapeFinder.Shape s : found ) {
+				checkIndexes(s,cloud);
 				double error = averageError(s);
 				assertEquals(0,error,0.1);
 			}
@@ -183,7 +187,10 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 			List<PointCloudShapeFinder.Shape> found = alg.getFound();
 
+			// see if the error of the matched shape is reasonable and that the
+			// point indexes are correctly set
 			for( PointCloudShapeFinder.Shape s : found ) {
+				checkIndexes(s,cloud);
 				double error = averageError(s);
 				assertEquals(0,error,0.1);
 			}
@@ -254,6 +261,17 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 		alg.process(cloud,null);
 		assertEquals(1,alg.getFound().size());
 		assertTrue(alg.getFound().get(0).type == alg.getShapesList().get(0));
+	}
+
+	private void checkIndexes( PointCloudShapeFinder.Shape shape , List<Point3D_F64> cloud ) {
+		assertEquals(shape.indexes.size,shape.points.size());
+		GrowQueue_I32 indexes = shape.indexes;
+
+		for( int i = 0; i < indexes.size; i++ ) {
+			int found = indexes.get(i);
+			int expected = cloud.indexOf(shape.points.get(i));
+			assertEquals(found,expected);
+		}
 	}
 
 	private void addShapeToCloud( Object shapeParam , int N , List<Point3D_F64> cloud ) {

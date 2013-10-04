@@ -20,7 +20,9 @@ package bubo.ptcloud;
 
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -82,6 +84,8 @@ public interface PointCloudShapeFinder {
 		/** Parameters for the shape.  See {@link CloudShapeTypes} for data structute type. */
 		public Object parameters;
 		/** List of points that matched this shape */
-		public List<Point3D_F64> points;
+		public List<Point3D_F64> points = new ArrayList<Point3D_F64>();
+		/** Index of the point in the original cloud */
+		public GrowQueue_I32 indexes = new GrowQueue_I32();
 	}
 }

@@ -111,7 +111,7 @@ public class ConfigSchnabel2007 {
 				case SPHERE: {
 					ShapeDescription sphere = new ShapeDescription();
 					sphere.modelManager = new ModelManagerSphere3D_F64();
-					sphere.modelDistance = new DistanceFromModel_P_to_PVNN(new DistanceSphereToPoint3D());
+					sphere.modelDistance = new DistanceSphereToPointVectorNN(angleTolerance);
 					sphere.modelGenerator = new GenerateSpherePointVector(angleTolerance,distanceTolerance);
 					sphere.modelFitter = new ModelFitter_P_to_PVNN(new FitSphereToPoints_F64(fitIterations));
 					sphere.codec = new CodecSphere3D_F64();
@@ -122,7 +122,7 @@ public class ConfigSchnabel2007 {
 				case CYLINDER: {
 					ShapeDescription cylinder = new ShapeDescription();
 					cylinder.modelManager = new ModelManagerCylinder3D_F64();
-					cylinder.modelDistance = new DistanceFromModel_P_to_PVNN(new DistanceCylinderToPoint3D());
+					cylinder.modelDistance = new DistanceCylinderToPointVectorNN(angleTolerance);
 					cylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance,distanceTolerance);
 					cylinder.modelFitter = new ModelFitter_P_to_PVNN(new FitCylinderToPoints_F64(fitIterations));
 					cylinder.codec = new CodecCylinder3D_F64();
@@ -133,7 +133,7 @@ public class ConfigSchnabel2007 {
 				case PLANE: {
 					ShapeDescription plane = new ShapeDescription();
 					plane.modelManager = new ModelManagerPlaneGeneral3D_F64();
-					plane.modelDistance = new DistanceFromModel_P_to_PVNN(new DistancePlaneToPoint3D());
+					plane.modelDistance = new DistancePlaneToPointVectorNN(angleTolerance);
 					plane.modelGenerator = new GeneratePlanePointVector(angleTolerance);
 					plane.modelFitter = new ModelFitter_P_to_PVNN(new PlaneGeneralSvd_to_ModelFitter());
 					plane.codec = new CodecPlaneGeneral3D_F64();

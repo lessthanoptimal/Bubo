@@ -60,6 +60,7 @@ public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F
 		PointVectorNN pb = dataSet.get(1);
 		PointVectorNN pc = dataSet.get(2);
 
+		// find the plane's normal vector
 		GeometryMath_F64.sub(pa.p,pb.p,a);
 		GeometryMath_F64.sub(pa.p,pc.p,b);
 
@@ -69,6 +70,7 @@ public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F
 		if (!checkModel(pa, pb, pc))
 			return false;
 
+		// asume the first point is one the plane
 		planeNormal.n = n;
 		planeNormal.p = pa.p;
 

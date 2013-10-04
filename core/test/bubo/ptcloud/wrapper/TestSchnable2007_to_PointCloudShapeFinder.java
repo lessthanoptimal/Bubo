@@ -34,7 +34,7 @@ public class TestSchnable2007_to_PointCloudShapeFinder extends GeneralChecksPoin
 	@Override
 	public PointCloudShapeFinder createAlgorithm() {
 
-		ConfigSchnabel2007 configRansac = ConfigSchnabel2007.createDefault(100,0.2,0.1,0.03);
+		ConfigSchnabel2007 configRansac = ConfigSchnabel2007.createDefault(100,0.5,0.1,0.03);
 		configRansac.minModelAccept = 50;
 		configRansac.octreeSplit = 60;
 

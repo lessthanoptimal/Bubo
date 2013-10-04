@@ -48,6 +48,14 @@ public class PointVectorNN {
 	/** If true then the point is already used by a shape */
 	public boolean used;
 
+	public PointVectorNN( double x , double y , double z , double nx , double ny, double nz) {
+		p = new Point3D_F64(x,y,z);
+		normal.set(nx,ny,nz);
+	}
+
+	public PointVectorNN() {
+	}
+
 	public String toString() {
 		return "PointVector P( "+p.x+" , "+p.y+" , "+p.z+" ) Normal( "+normal.x+" , "+normal.y+" , "+normal.z+" )";
 	}
