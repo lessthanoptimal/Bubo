@@ -140,6 +140,14 @@ public class TestGeneratePlanePointVector {
 		assertEquals(3,alg.getMinimumPoints());
 	}
 
+	/**
+	 * Does it correctly run the parameter check?
+	 */
+	@Test
+	public void doesItPerformCheck() {
+		fail("Implement");
+	}
+
 	public static void checkPlanes(PlaneNormal3D_F64 expected, PlaneGeneral3D_F64 found, double tol) {
 		PlaneGeneral3D_F64 expectedG = new PlaneGeneral3D_F64();
 		UtilPlane3D_F64.convert(expected,expectedG);

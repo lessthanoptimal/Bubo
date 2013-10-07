@@ -187,6 +187,14 @@ public class TestGenerateCylinderPointVector {
 		assertEquals(3,alg.getMinimumPoints());
 	}
 
+	/**
+	 * Does it correctly run the parameter check?
+	 */
+	@Test
+	public void doesItPerformCheck() {
+		fail("Implement");
+	}
+
 	public static void checkEquivalent(Cylinder3D_F64 a, Cylinder3D_F64 b, double tol) {
 		assertEquals(a.radius,b.radius,1e-8);
 
@@ -204,7 +212,7 @@ public class TestGenerateCylinderPointVector {
 			angle = Math.PI;
 		else
 			angle = Math.acos( tmp );
-		assertTrue( Math.abs(angle) < tol || Math.abs(angle-Math.PI) < tol);
+		assertTrue(Math.abs(angle) < tol || Math.abs(angle - Math.PI) < tol);
 	}
 
 	/**

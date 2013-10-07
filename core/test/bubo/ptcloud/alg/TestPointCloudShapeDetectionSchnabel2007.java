@@ -179,7 +179,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 	private PointCloudShapeDetectionSchnabel2007 createAlgorithm() {
 
-		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.2,0.3,shapeDetect);
+		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.2,0.3,null,shapeDetect);
 
 		config.minModelAccept = 10;
 		config.octreeSplit = 20;

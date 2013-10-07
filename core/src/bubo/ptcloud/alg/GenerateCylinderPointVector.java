@@ -43,13 +43,20 @@ public class GenerateCylinderPointVector implements ModelGenerator<Cylinder3D_F6
 	// tolerance for each point from the sphere
 	private double tolDistance;
 
+	// used to accept or reject a model
+	private CheckShapeParameters<Cylinder3D_F64> check = new CheckShapeAcceptAll<Cylinder3D_F64>();
+
 	// line defined by two lines.  used to find sphere center
 	private LineParametric3D_F64 lineA = new LineParametric3D_F64(false);
 	private LineParametric3D_F64 lineB = new LineParametric3D_F64(false);
 
-	public GenerateCylinderPointVector(double tolAngle, double tolDistance) {
+	public GenerateCylinderPointVector(double tolAngle, double tolDistance ) {
 		this.tolAngleCosine = Math.cos(Math.PI/2.0-tolAngle);
 		this.tolDistance = tolDistance;
+	}
+
+	public void setCheck(CheckShapeParameters<Cylinder3D_F64> check) {
+		this.check = check;
 	}
 
 	@Override
@@ -88,7 +95,11 @@ public class GenerateCylinderPointVector implements ModelGenerator<Cylinder3D_F6
 
 		output.radius = (ra+rb)/2.0;
 
-		// sanity check the model
+		// sanity check using the model parameters
+		if( !check.valid(output) )
+			return false;
+
+		// sanity check the model using points
 		return checkModel(output, pc, ra, rb, rc);
 	}
 

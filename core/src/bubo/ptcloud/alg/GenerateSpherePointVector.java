@@ -46,9 +46,16 @@ public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,Po
 	private LineParametric3D_F64 lineA = new LineParametric3D_F64(false);
 	private LineParametric3D_F64 lineB = new LineParametric3D_F64(false);
 
+	// used to accept or reject a model
+	private CheckShapeParameters<Sphere3D_F64> check = new CheckShapeAcceptAll<Sphere3D_F64>();
+
 	public GenerateSpherePointVector(double tolAngle, double tolDistance) {
 		this.tolCosine = Math.cos(tolAngle);
 		this.tolDistance = tolDistance;
+	}
+
+	public void setCheck(CheckShapeParameters<Sphere3D_F64> check) {
+		this.check = check;
 	}
 
 	@Override
@@ -73,6 +80,9 @@ public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,Po
 
 		// radius is set to average distance
 		output.radius = (ra+rb)/2.0;
+
+		if( !check.valid(output) )
+			return false;
 
 		// check the solution
 		if( Math.abs(ra-output.radius) > tolDistance )

@@ -49,8 +49,15 @@ public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F
 	// just used for converting formats
 	protected PlaneNormal3D_F64 planeNormal = new PlaneNormal3D_F64();
 
+	// used to accept or reject a model
+	private CheckShapeParameters<PlaneGeneral3D_F64> check = new CheckShapeAcceptAll<PlaneGeneral3D_F64>();
+
 	public GeneratePlanePointVector(double tolAngle) {
 		this.tolCosine = Math.cos(tolAngle);
+	}
+
+	public void setCheck(CheckShapeParameters<PlaneGeneral3D_F64> check) {
+		this.check = check;
 	}
 
 	@Override
@@ -76,7 +83,7 @@ public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F
 
 		UtilPlane3D_F64.convert(planeNormal,output);
 
-		return true;
+		return check.valid(output);
 	}
 
 	protected final boolean checkModel(PointVectorNN pa, PointVectorNN pb, PointVectorNN pc) {

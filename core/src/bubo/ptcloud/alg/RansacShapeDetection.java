@@ -41,9 +41,6 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 	// finds the set of points which match the model
 	private FindMatchSetPointVectorNN matchFinder;
 
-	// Marked used to mark which points have been searched before
-	private int marker;
-
 	// The maximum number of iterations is set to the current number of iterations plus this number when
 	// a better model is found
 	private int maxExtension;
@@ -57,7 +54,6 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 	}
 
 	public void reset() {
-		marker = 0;
 	}
 
 	@Override

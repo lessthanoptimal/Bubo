@@ -151,6 +151,14 @@ public class TestGenerateSpherePointVector {
 		assertFalse(alg.generate(pts, found));
 	}
 
+	/**
+	 * Does it correctly run the parameter check?
+	 */
+	@Test
+	public void doesItPerformCheck() {
+		fail("Implement");
+	}
+
 	private void pushPoint( PointVectorNN pv , double distance ) {
 		pv.p.x += pv.normal.x*distance;
 		pv.p.y += pv.normal.y*distance;
