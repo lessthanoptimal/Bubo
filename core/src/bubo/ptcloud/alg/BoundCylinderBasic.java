@@ -32,6 +32,10 @@ import java.util.List;
  */
 public class BoundCylinderBasic {
 
+	// two end points of the cylinder
+	Point3D_F64 pointA = new Point3D_F64();
+	Point3D_F64 pointB = new Point3D_F64();
+
 	// the upper and lower bounds on the cylinder
 	double upper;
 	double lower;
@@ -62,6 +66,23 @@ public class BoundCylinderBasic {
 			upper = Math.max(d,upper);
 			lower = Math.min(d,lower);
 		}
+
+		pointA.x = origin.x + nx*upper;
+		pointA.y = origin.y + ny*upper;
+		pointA.z = origin.z + nz*upper;
+
+		pointB.x = origin.x + nx*lower;
+		pointB.y = origin.y + ny*lower;
+		pointB.z = origin.z + nz*lower;
+
+	}
+
+	public Point3D_F64 getPointA() {
+		return pointA;
+	}
+
+	public Point3D_F64 getPointB() {
+		return pointB;
 	}
 
 	public double getUpper() {
