@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.junit.Test;

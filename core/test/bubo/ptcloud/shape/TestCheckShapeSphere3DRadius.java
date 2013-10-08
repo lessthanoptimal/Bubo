@@ -16,20 +16,30 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
+
+import georegression.struct.shapes.Sphere3D_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Can be used to accept or reject estimated shape parameters. Can be used to reject excessively large shapes.
- *
  * @author Peter Abeles
  */
-public interface CheckShapeParameters<Model> {
+public class TestCheckShapeSphere3DRadius {
 
-	/**
-	 * Checks to see if the following parameters are valid
-	 *
-	 * @param param Model parameters for a shape
-	 * @return true if valid or false if not
-	 */
-	public boolean valid( Model param );
+	@Test
+	public void basic() {
+		double threshold = 12.5;
+		CheckShapeSphere3DRadius alg = new CheckShapeSphere3DRadius(threshold);
+
+		Sphere3D_F64 param = new Sphere3D_F64(0,0,0,threshold);
+
+		assertTrue(alg.valid(param));
+		param.radius = threshold + 1e-5;
+		assertFalse(alg.valid(param));
+		param.radius = threshold - 1e-5;
+		assertTrue(alg.valid(param));
+	}
 }

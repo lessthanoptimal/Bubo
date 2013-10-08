@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -28,7 +28,9 @@ import static org.junit.Assert.fail;
 public class TestCheckShapeAcceptAll {
 
 	@Test
-	public void stuff() {
-		fail("implement");
+	public void basic() {
+		CheckShapeAcceptAll alg = new CheckShapeAcceptAll();
+
+		assertTrue(alg.valid(null));
 	}
 }

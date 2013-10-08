@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
-import georegression.geometry.UtilPlane3D_F64;
-import georegression.struct.plane.PlaneGeneral3D_F64;
-import georegression.struct.plane.PlaneNormal3D_F64;
+import bubo.ptcloud.alg.PointVectorNN;
+import georegression.struct.shapes.Sphere3D_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -32,62 +31,65 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDistancePlaneToPointVectorNN {
+public class TestDistanceSphereToPointVectorNN {
 
 	@Test
 	public void computeDistance() {
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,1,1,0,0,1);
-		PlaneGeneral3D_F64 model = UtilPlane3D_F64.convert(plane, null);
-		PointVectorNN point;
+		Sphere3D_F64 model = new Sphere3D_F64(1,1,1,3);
 
-		DistancePlaneToPointVectorNN alg = new DistancePlaneToPointVectorNN(0.2);
+		DistanceSphereToPointVectorNN alg = new DistanceSphereToPointVectorNN(0.2);
 		alg.setModel(model);
 
-		// test above the plane
-		point = new PointVectorNN(1,1,2,0,0,1);
+		// test outside the sphere
+		PointVectorNN point = new PointVectorNN(1,1,1+4,0,0,-1);
 
 		assertEquals(1, alg.computeDistance(point), 1e-8);
 
-		// test below the plane
-		point = new PointVectorNN(1,1,0,0,0,-1);
+		// test inside the sphere
+		point = new PointVectorNN(1,1,1+2,0,0,1);
 
 		assertEquals(1,alg.computeDistance(point),1e-8);
 	}
 
 	@Test
 	public void computeDistance_angleCheck() {
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,1,1,0,0,1);
-		PlaneGeneral3D_F64 model = UtilPlane3D_F64.convert(plane, null);
-		PointVectorNN point;
+		Sphere3D_F64 model = new Sphere3D_F64(1,1,1,3);
 
 		double angleTol = 0.2;
 
-		DistancePlaneToPointVectorNN alg = new DistancePlaneToPointVectorNN(angleTol);
+		DistanceSphereToPointVectorNN alg = new DistanceSphereToPointVectorNN(angleTol);
 		alg.setModel(model);
 
 		// have it just inside the tolerance
 		double angle = angleTol-0.01;
+		double x = model.center.x;
+		double y = model.center.y + Math.sin(angle)*4;
+		double z = model.center.z + Math.cos(angle)*4;
 
-		point = new PointVectorNN(1,1,2,0,Math.sin(angle),Math.cos(angle));
+		PointVectorNN point = new PointVectorNN(x,y,z,0,0,1);
+
 		assertEquals(1, alg.computeDistance(point), 1e-8);
 
-		// have it outside the tolerance
+		// now outside
 		angle = angleTol+0.01;
+		x = model.center.x;
+		y = model.center.y + Math.sin(angle)*4;
+		z = model.center.z + Math.cos(angle)*4;
 
-		point = new PointVectorNN(1,1,2,0,Math.sin(angle),Math.cos(angle));
+		point = new PointVectorNN(x,y,z,0,0,1);
+
 		assertTrue(Double.MAX_VALUE == alg.computeDistance(point));
 	}
 
 	@Test
 	public void computeDistance_list() {
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,1,1,0,0,1);
-		PlaneGeneral3D_F64 model = UtilPlane3D_F64.convert(plane,null);
+		Sphere3D_F64 model = new Sphere3D_F64(1,1,1,3);
 
-		DistancePlaneToPointVectorNN alg = new DistancePlaneToPointVectorNN(0.2);
+		DistanceSphereToPointVectorNN alg = new DistanceSphereToPointVectorNN(0.2);
 		alg.setModel(model);
 
-		PointVectorNN pointA = new PointVectorNN(1,1,2,0,0,1);
-		PointVectorNN pointB = new PointVectorNN(1,1,0,0,0,-1);
+		PointVectorNN pointA = new PointVectorNN(1,1,1+4,0,0,1);
+		PointVectorNN pointB = new PointVectorNN(1,1,1+2,0,0,-1);
 
 		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
 		pts.add(pointA);
@@ -102,4 +104,5 @@ public class TestDistancePlaneToPointVectorNN {
 			assertEquals(expected,scores[i],1e-8);
 		}
 	}
+
 }

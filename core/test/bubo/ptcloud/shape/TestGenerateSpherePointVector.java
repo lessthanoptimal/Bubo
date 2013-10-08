@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
@@ -156,7 +157,21 @@ public class TestGenerateSpherePointVector {
 	 */
 	@Test
 	public void doesItPerformCheck() {
-		fail("Implement");
+		Sphere3D_F64 sphere = new Sphere3D_F64(0,0,0,2);
+
+		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
+		pts.add(createPt(sphere,0,0,1));
+		pts.add(createPt(sphere,0.5,0,1));
+		pts.add(createPt(sphere,1,1,1));
+
+		GenerateSpherePointVector alg = new GenerateSpherePointVector(0.1,0.2);
+		Sphere3D_F64 found = new Sphere3D_F64();
+
+		// give it a positive example and its return value should depend on the value of the CheckShape
+		alg.setCheck(new CheckShapeDummy<Sphere3D_F64>(true));
+		assertTrue(alg.generate(pts, found));
+		alg.setCheck(new CheckShapeDummy<Sphere3D_F64>(false));
+		assertFalse(alg.generate(pts, found));
 	}
 
 	private void pushPoint( PointVectorNN pv , double distance ) {

@@ -18,7 +18,11 @@
 
 package bubo.ptcloud.alg;
 
-import org.ddogleg.fitting.modelset.*;
+import bubo.ptcloud.shape.CheckShapeParameters;
+import org.ddogleg.fitting.modelset.DistanceFromModel;
+import org.ddogleg.fitting.modelset.ModelCodec;
+import org.ddogleg.fitting.modelset.ModelFitter;
+import org.ddogleg.fitting.modelset.ModelManager;
 
 import java.util.Stack;
 
@@ -35,11 +39,15 @@ public class ShapeDescription<Model> {
 	/** Creates new instances and copies */
 	public ModelManager<Model> modelManager;
 	/** generates an initial model given a set of points */
-	public ModelGenerator<Model,PointVectorNN> modelGenerator;
+	public ModelGeneratorCheck<Model,PointVectorNN> modelGenerator;
 	/** Used to refine an initial model estimate when given an initial estimate */
 	public ModelFitter<Model,PointVectorNN> modelFitter;
 	/** computes the distance a point is from the model */
 	public DistanceFromModel<Model,PointVectorNN> modelDistance;
+	/** Specifies an optional check which can be used to remove physically impossible shapes.  If null then
+	 * no check will be performed
+	 **/
+	public CheckShapeParameters<Model> modelCheck;
 	/** Converts the model parameter into double[] */
 	public ModelCodec<Model> codec;
 

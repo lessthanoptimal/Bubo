@@ -16,19 +16,20 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
-
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+package bubo.ptcloud.shape;
 
 /**
+ * Can be used to accept or reject estimated shape parameters. Can be used to reject excessively large shapes.
+ *
  * @author Peter Abeles
  */
-public class TestCheckShapeSphere3DRadius {
+public interface CheckShapeParameters<Model> {
 
-	@Test
-	public void stuff() {
-		fail("implement");
-	}
+	/**
+	 * Checks to see if the following parameters are valid
+	 *
+	 * @param param Model parameters for a shape
+	 * @return true if valid or false if not
+	 */
+	public boolean valid( Model param );
 }

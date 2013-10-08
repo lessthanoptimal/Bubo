@@ -18,6 +18,7 @@
 
 package bubo.ptcloud.alg;
 
+import bubo.ptcloud.shape.*;
 import bubo.ptcloud.wrapper.PlaneGeneralSvd_to_ModelFitter;
 import georegression.fitting.plane.CodecPlaneGeneral3D_F64;
 import georegression.geometry.UtilPlane3D_F64;
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -52,13 +53,14 @@ public class TestLocalFitShapeNN {
 	DistanceFromModel<PlaneGeneral3D_F64,PointVectorNN> modelDistance =
 			new DistanceFromModel_P_to_PVNN(new DistancePlaneToPoint3D());
 	ModelCodec<PlaneGeneral3D_F64> modelCodec = new CodecPlaneGeneral3D_F64();
-
+	CheckShapeParameters<PlaneGeneral3D_F64> modelCheck = new CheckShapeAcceptAll<PlaneGeneral3D_F64>();
 
 	/**
-	 * Its already in the optimal location and model parameters
+	 * Its already in the optimal location and model parameters.  Then see if it fails when the model
+	 * check failed
 	 */
 	@Test
-	public void perfectInitial() {
+	public void perfectInitial_modelCheck() {
 
 		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,3,-0.5,0.25,1);
 		PlaneGeneral3D_F64 inputPlane = UtilPlane3D_F64.convert(plane,null);
@@ -67,7 +69,7 @@ public class TestLocalFitShapeNN {
 		for( int i = 0; i < 100; i++ ) {
 			double x = (rand.nextDouble()-0.5)*5;
 			double y = (rand.nextDouble()-0.5)*5;
-			pts.add(TestGeneratePlanePointVector.createPt(plane,x,y,1));
+			pts.add(TestGeneratePlanePointVector.createPt(plane, x, y, 1));
 		}
 
 		createGraph(pts);
@@ -75,12 +77,18 @@ public class TestLocalFitShapeNN {
 		findMatch.reset();
 		LocalFitShapeNN<PlaneGeneral3D_F64> alg = new LocalFitShapeNN<PlaneGeneral3D_F64>(100,1e-8,findMatch);
 
-		alg.configure(modelFitter,modelDistance,modelCodec,0.3);
+		alg.configure(modelFitter,modelDistance,modelCheck,modelCodec,0.3);
 
-		alg.refine(pts,inputPlane,true);
+		assertTrue(alg.refine(pts, inputPlane, true));
 
 		assertEquals(100,pts.size());
 		TestGeneratePlanePointVector.checkPlanes(plane, inputPlane, 1e-8);
+
+		// now give it a model check which will always fail and see if it fails
+		alg.configure(modelFitter, modelDistance, new CheckShapeDummy(false), modelCodec, 0.3);
+
+		assertFalse(alg.refine(pts, inputPlane, true));
+
 	}
 
 	/**
@@ -124,9 +132,9 @@ public class TestLocalFitShapeNN {
 		findMatch.reset();
 		LocalFitShapeNN<PlaneGeneral3D_F64> alg = new LocalFitShapeNN<PlaneGeneral3D_F64>(100,1e-8,findMatch);
 
-		alg.configure(modelFitter,modelDistance,modelCodec,0.3);
+		alg.configure(modelFitter,modelDistance,modelCheck, modelCodec,0.3);
 
-		alg.refine(guessPts,planeFound,true);
+		assertTrue(alg.refine(guessPts, planeFound, true));
 
 		// should be an easy enough case that it filters out all the bad points
 		assertEquals(100, guessPts.size());

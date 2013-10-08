@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.metric.Distance3D_F64;
 import georegression.struct.shapes.Cylinder3D_F64;
 import org.junit.Test;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
 import georegression.metric.Distance3D_F64;
 import georegression.struct.point.Point3D_F64;

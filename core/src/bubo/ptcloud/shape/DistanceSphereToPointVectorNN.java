@@ -16,43 +16,48 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.metric.Distance3D_F64;
-import georegression.struct.shapes.Cylinder3D_F64;
+import georegression.struct.point.Vector3D_F64;
+import georegression.struct.shapes.Sphere3D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
 
 /**
- * Euclidean distance from a {@link georegression.struct.shapes.Cylinder3D_F64} for use with {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.
+ * Euclidean distance from a {@link georegression.struct.plane.PlaneGeneral3D_F64} for use with {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.
  *
- * TODO comment
+ * todo comment
  *
  * @author Peter Abeles
  */
-public class DistanceCylinderToPointVectorNN implements DistanceFromModel<Cylinder3D_F64,PointVectorNN> {
+public class DistanceSphereToPointVectorNN implements DistanceFromModel<Sphere3D_F64,PointVectorNN> {
 
 	// tolerance cos(angle) for vector normals
 	private double tolAngleCosine;
 
-	Cylinder3D_F64 model;
+	Sphere3D_F64 model;
 
-	public DistanceCylinderToPointVectorNN(double tolAngle) {
-		this.tolAngleCosine = Math.cos(Math.PI/2.0 - tolAngle);
+	// storage for vector from center to a point
+	private Vector3D_F64 n = new Vector3D_F64();
+
+	public DistanceSphereToPointVectorNN(double tolAngle) {
+		this.tolAngleCosine = Math.cos(tolAngle);
 	}
 
 	@Override
-	public void setModel(Cylinder3D_F64 model) {
+	public void setModel(Sphere3D_F64 model) {
 		this.model = model;
 	}
 
 	@Override
 	public double computeDistance(PointVectorNN pv) {
+		n.set( pv.p.x - model.center.x , pv.p.y - model.center.y , pv.p.z - model.center.z );
+		n.normalize();
 
-		double acute = model.line.slope.dot(pv.normal);
-
-		if( Math.abs(acute) > tolAngleCosine)
+		if( Math.abs(n.dot(pv.normal)) < tolAngleCosine)
 			return Double.MAX_VALUE;
 
 		return Math.abs(Distance3D_F64.distance(model, pv.p));

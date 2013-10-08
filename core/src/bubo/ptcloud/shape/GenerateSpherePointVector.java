@@ -16,23 +16,24 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.ModelGeneratorCheck;
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.metric.ClosestPoint3D_F64;
 import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
-import org.ddogleg.fitting.modelset.ModelGenerator;
 
 import java.util.List;
 
 /**
- * Sphere estimation for use in {@link PointCloudShapeDetectionSchnabel2007}.  The sphere is estimated
+ * Sphere estimation for use in {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.  The sphere is estimated
  * using two points and their normal vectors. Third point is used to check the solution.
  *
  * @author Peter Abeles
  */
-public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,PointVectorNN> {
+public class GenerateSpherePointVector implements ModelGeneratorCheck<Sphere3D_F64,PointVectorNN> {
 
 	// tolerance cos(angle) for vector normals
 	private double tolCosine;
@@ -54,6 +55,7 @@ public class GenerateSpherePointVector implements ModelGenerator<Sphere3D_F64,Po
 		this.tolDistance = tolDistance;
 	}
 
+	@Override
 	public void setCheck(CheckShapeParameters<Sphere3D_F64> check) {
 		this.check = check;
 	}

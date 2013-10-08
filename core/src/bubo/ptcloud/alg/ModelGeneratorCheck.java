@@ -18,23 +18,18 @@
 
 package bubo.ptcloud.alg;
 
-import georegression.struct.shapes.Cylinder3D_F64;
+import bubo.ptcloud.shape.CheckShapeParameters;
+import org.ddogleg.fitting.modelset.ModelGenerator;
 
 /**
- * Limits how large of a radius it will accept for a cylinder.
+ * Model generator which allows an optional check to be added to the parameters.
  *
  * @author Peter Abeles
  */
-public class CheckShapeCylinderRadius implements CheckShapeParameters<Cylinder3D_F64> {
+public interface ModelGeneratorCheck<Model,Point> extends ModelGenerator<Model,Point> {
 
-	double maxRadius;
-
-	public CheckShapeCylinderRadius(double maxRadius) {
-		this.maxRadius = maxRadius;
-	}
-
-	@Override
-	public boolean valid(Cylinder3D_F64 param) {
-		return param.radius <= maxRadius;
-	}
+	/**
+	 * Specify a check that it should perform on the shape after parameters have been set
+	 */
+	public void setCheck( CheckShapeParameters<Model> check );
 }

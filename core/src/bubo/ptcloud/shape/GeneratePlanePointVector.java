@@ -16,25 +16,26 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.ModelGeneratorCheck;
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.UtilPlane3D_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import org.ddogleg.fitting.modelset.ModelGenerator;
 
 import java.util.List;
 
 /**
- * Plane estimation for use in {@link PointCloudShapeDetectionSchnabel2007}.  The equation of the plane is found
+ * Plane estimation for use in {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.  The equation of the plane is found
  * using 3 points.  It is then validated using the 3 normal vectors.  The normal vectors are accepted
  * if the angle between them and the recently found vector is less than a use specified tolerance.
  *
  * @author Peter Abeles
  */
-public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F64,PointVectorNN> {
+public class GeneratePlanePointVector implements ModelGeneratorCheck<PlaneGeneral3D_F64,PointVectorNN> {
 
 	// tolerance cos(angle) for vector normals
 	private double tolCosine;
@@ -56,6 +57,7 @@ public class GeneratePlanePointVector implements ModelGenerator<PlaneGeneral3D_F
 		this.tolCosine = Math.cos(tolAngle);
 	}
 
+	@Override
 	public void setCheck(CheckShapeParameters<PlaneGeneral3D_F64> check) {
 		this.check = check;
 	}

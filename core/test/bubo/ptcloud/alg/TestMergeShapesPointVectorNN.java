@@ -18,6 +18,7 @@
 
 package bubo.ptcloud.alg;
 
+import bubo.ptcloud.shape.*;
 import georegression.fitting.cylinder.CodecCylinder3D_F64;
 import georegression.fitting.cylinder.FitCylinderToPoints_F64;
 import georegression.fitting.sphere.CodecSphere3D_F64;
@@ -60,6 +61,7 @@ public class TestMergeShapesPointVectorNN {
 		descSphere.modelDistance = new DistanceFromModel_P_to_PVNN(new DistanceSphereToPoint3D());
 		descSphere.modelGenerator = new GenerateSpherePointVector(angleTolerance,distanceTolerance);
 		descSphere.modelFitter = new ModelFitter_P_to_PVNN(new FitSphereToPoints_F64(fitIterations));
+		descSphere.modelCheck = new CheckShapeAcceptAll();
 		descSphere.codec = new CodecSphere3D_F64();
 		descSphere.thresholdFit = ransacDistanceThreshold;
 
@@ -67,6 +69,7 @@ public class TestMergeShapesPointVectorNN {
 		descCylinder.modelDistance = new DistanceFromModel_P_to_PVNN(new DistanceCylinderToPoint3D());
 		descCylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance,distanceTolerance);
 		descCylinder.modelFitter = new ModelFitter_P_to_PVNN(new FitCylinderToPoints_F64(fitIterations));
+		descCylinder.modelCheck = new CheckShapeAcceptAll();
 		descCylinder.codec = new CodecCylinder3D_F64();
 		descCylinder.thresholdFit = ransacDistanceThreshold;
 
@@ -458,7 +461,7 @@ public class TestMergeShapesPointVectorNN {
 			double phi = 2*Math.PI*rand.nextDouble();
 			double theta = 2*Math.PI*rand.nextDouble();
 
-			PointVectorNN pv = TestGenerateSpherePointVector.createPt(sphere,phi,theta,1);
+			PointVectorNN pv = TestGenerateSpherePointVector.createPt(sphere, phi, theta, 1);
 
 			pv.index = pointIndex++;
 
@@ -472,7 +475,7 @@ public class TestMergeShapesPointVectorNN {
 			double h = 2*(rand.nextDouble()-0.5);
 			double theta = 2*Math.PI*rand.nextDouble();
 
-			PointVectorNN pv = TestGenerateCylinderPointVector.createPt(cylinder,h,theta,1);
+			PointVectorNN pv = TestGenerateCylinderPointVector.createPt(cylinder, h, theta, 1);
 
 			pv.index = pointIndex++;
 

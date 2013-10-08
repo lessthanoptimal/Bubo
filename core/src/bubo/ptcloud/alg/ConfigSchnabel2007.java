@@ -19,6 +19,7 @@
 package bubo.ptcloud.alg;
 
 import bubo.ptcloud.CloudShapeTypes;
+import bubo.ptcloud.shape.*;
 import bubo.ptcloud.wrapper.PlaneGeneralSvd_to_ModelFitter;
 import georegression.fitting.cylinder.CodecCylinder3D_F64;
 import georegression.fitting.cylinder.FitCylinderToPoints_F64;
@@ -88,33 +89,19 @@ public class ConfigSchnabel2007 {
 	 *
 	 * @param fitIterations Number of iterations when refining a shape
 	 * @param angleTolerance Tolerance in radians to reject a model from an initial sample set
-	 * @param distanceTolerance Tolerance in distance used to reject model from an initial sample set
 	 * @param ransacDistanceThreshold Euclidean distance that RANSAC considers a point an inlier
-	 * @param checks Optional checks on the shape parameters.  Each index is matched to the specified element in
-	 *               'shapes'.  If null then no checks are performed.  If not null then each non-null element
-	 *               will be used as a check.
-	 * @param shapes A list of shape you wish to detect.  If null then all possible shapes will be detected.
+	 * @param shapes A list of shape you wish to detect.  If empty or null then all possible shapes will be detected.
 	 *
 	 * @return ConfigSchnabel2007
 	 */
 	public static ConfigSchnabel2007 createDefault( int fitIterations ,
 													double angleTolerance ,
-													double distanceTolerance ,
 													double ransacDistanceThreshold ,
-													CheckShapeParameters []checks ,
-													CloudShapeTypes []shapes )
+													CloudShapeTypes ...shapes )
 	{
-		if( shapes == null && checks != null )
-			throw new IllegalArgumentException("If shapes is set too null (use default) then checks cannot no" +
-					"non-null");
 		if( shapes == null || shapes.length == 0 ) {
 			shapes = CloudShapeTypes.values();
 		}
-
-		if( checks == null )
-			checks = new CheckShapeParameters[shapes.length];
-		if( checks.length != shapes.length )
-			throw new IllegalArgumentException("checks need to be null or the same length as shapes");
 		List<ShapeDescription> objects = new ArrayList<ShapeDescription>();
 
 		int index = 0;
@@ -124,13 +111,10 @@ public class ConfigSchnabel2007 {
 					ShapeDescription sphere = new ShapeDescription();
 					sphere.modelManager = new ModelManagerSphere3D_F64();
 					sphere.modelDistance = new DistanceSphereToPointVectorNN(angleTolerance);
-					sphere.modelGenerator = new GenerateSpherePointVector(angleTolerance,distanceTolerance);
+					sphere.modelGenerator = new GenerateSpherePointVector(angleTolerance,ransacDistanceThreshold);
 					sphere.modelFitter = new ModelFitter_P_to_PVNN(new FitSphereToPoints_F64(fitIterations));
 					sphere.codec = new CodecSphere3D_F64();
 					sphere.thresholdFit = ransacDistanceThreshold;
-					if( checks[index] != null ) {
-						((GenerateSpherePointVector)sphere.modelGenerator).setCheck(checks[index]);
-					}
 					objects.add(sphere);
 				} break;
 
@@ -138,13 +122,10 @@ public class ConfigSchnabel2007 {
 					ShapeDescription cylinder = new ShapeDescription();
 					cylinder.modelManager = new ModelManagerCylinder3D_F64();
 					cylinder.modelDistance = new DistanceCylinderToPointVectorNN(angleTolerance);
-					cylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance,distanceTolerance);
+					cylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance,ransacDistanceThreshold);
 					cylinder.modelFitter = new ModelFitter_P_to_PVNN(new FitCylinderToPoints_F64(fitIterations));
 					cylinder.codec = new CodecCylinder3D_F64();
 					cylinder.thresholdFit = ransacDistanceThreshold;
-					if( checks[index] != null ) {
-						((GenerateCylinderPointVector)cylinder.modelGenerator).setCheck(checks[index]);
-					}
 					objects.add(cylinder);
 				} break;
 
@@ -156,9 +137,6 @@ public class ConfigSchnabel2007 {
 					plane.modelFitter = new ModelFitter_P_to_PVNN(new PlaneGeneralSvd_to_ModelFitter());
 					plane.codec = new CodecPlaneGeneral3D_F64();
 					plane.thresholdFit = ransacDistanceThreshold;
-					if( checks[index] != null ) {
-						((GeneratePlanePointVector)plane.modelGenerator).setCheck(checks[index]);
-					}
 					objects.add(plane);
 				} break;
 

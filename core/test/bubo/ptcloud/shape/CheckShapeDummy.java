@@ -16,19 +16,18 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
-import org.junit.Test;
+public class CheckShapeDummy<Model> implements CheckShapeParameters<Model> {
 
-import static org.junit.Assert.fail;
+	boolean value;
 
-/**
- * @author Peter Abeles
- */
-public class TestCheckShapeCylinderRadius {
+	public CheckShapeDummy(boolean value) {
+		this.value = value;
+	}
 
-	@Test
-	public void stuff() {
-		fail("implement");
+	@Override
+	public boolean valid(Model param) {
+		return value;
 	}
 }

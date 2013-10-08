@@ -18,6 +18,8 @@
 
 package bubo.ptcloud.alg;
 
+import bubo.ptcloud.shape.DistanceFromModel_P_to_PVNN;
+import bubo.ptcloud.shape.DistancePlaneToPoint3D;
 import georegression.geometry.UtilPlane3D_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;

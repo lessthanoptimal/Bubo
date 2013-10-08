@@ -16,45 +16,44 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.metric.Distance3D_F64;
-import georegression.struct.plane.PlaneGeneral3D_F64;
-import georegression.struct.point.Vector3D_F64;
+import georegression.struct.shapes.Cylinder3D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
 
 /**
- * Euclidean distance from a {@link georegression.struct.plane.PlaneGeneral3D_F64} for use with {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.
+ * Euclidean distance from a {@link georegression.struct.shapes.Cylinder3D_F64} for use with {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.
+ *
+ * TODO comment
  *
  * @author Peter Abeles
  */
-public class DistancePlaneToPointVectorNN implements DistanceFromModel<PlaneGeneral3D_F64,PointVectorNN> {
+public class DistanceCylinderToPointVectorNN implements DistanceFromModel<Cylinder3D_F64,PointVectorNN> {
 
 	// tolerance cos(angle) for vector normals
 	private double tolAngleCosine;
 
-	PlaneGeneral3D_F64 model;
+	Cylinder3D_F64 model;
 
-	Vector3D_F64 n = new Vector3D_F64();
-
-	public DistancePlaneToPointVectorNN(double tolAngle) {
-		this.tolAngleCosine = Math.cos(tolAngle);
+	public DistanceCylinderToPointVectorNN(double tolAngle) {
+		this.tolAngleCosine = Math.cos(Math.PI/2.0 - tolAngle);
 	}
 
 	@Override
-	public void setModel(PlaneGeneral3D_F64 model) {
+	public void setModel(Cylinder3D_F64 model) {
 		this.model = model;
-		n.set(model.A,model.B,model.C);
-		n.normalize();
 	}
 
 	@Override
 	public double computeDistance(PointVectorNN pv) {
 
+		double acute = model.line.slope.dot(pv.normal);
 
-		if( Math.abs(n.dot(pv.normal)) < tolAngleCosine)
+		if( Math.abs(acute) > tolAngleCosine)
 			return Double.MAX_VALUE;
 
 		return Math.abs(Distance3D_F64.distance(model, pv.p));
@@ -63,7 +62,7 @@ public class DistancePlaneToPointVectorNN implements DistanceFromModel<PlaneGene
 	@Override
 	public void computeDistance(List<PointVectorNN> points, double[] distance) {
 		for( int i = 0; i < points.size(); i++ ) {
-			distance[i] = computeDistance( points.get(i) );
+			distance[i] = computeDistance(points.get(i));
 		}
 	}
 }

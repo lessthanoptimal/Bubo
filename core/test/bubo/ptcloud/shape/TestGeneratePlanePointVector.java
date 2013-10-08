@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.geometry.UtilPlane3D_F64;
@@ -145,7 +146,21 @@ public class TestGeneratePlanePointVector {
 	 */
 	@Test
 	public void doesItPerformCheck() {
-		fail("Implement");
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(0,0,0,0,0,1);
+
+		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
+		pts.add(createPt(plane,1,0,1));
+		pts.add(createPt(plane,0,1,1));
+		pts.add(createPt(plane,-1,-1,1));
+
+		GeneratePlanePointVector alg = new GeneratePlanePointVector(0.1);
+		PlaneGeneral3D_F64 found = new PlaneGeneral3D_F64();
+
+		// give it a positive example and its return value should depend on the value of the CheckShape
+		alg.setCheck(new CheckShapeDummy<PlaneGeneral3D_F64>(true));
+		assertTrue(alg.generate(pts, found));
+		alg.setCheck(new CheckShapeDummy<PlaneGeneral3D_F64>(false));
+		assertFalse(alg.generate(pts, found));
 	}
 
 	public static void checkPlanes(PlaneNormal3D_F64 expected, PlaneGeneral3D_F64 found, double tol) {

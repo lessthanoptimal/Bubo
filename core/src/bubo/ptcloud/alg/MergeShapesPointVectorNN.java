@@ -168,8 +168,9 @@ public class MergeShapesPointVectorNN
 
 		ShapeDescription shapeDesc = models.get(shape.whichShape);
 
-		refine.configure(shapeDesc.modelFitter,shapeDesc.modelDistance,shapeDesc.codec,shapeDesc.thresholdFit);
+		refine.configure(shapeDesc.modelFitter,shapeDesc.modelDistance,shapeDesc.modelCheck,shapeDesc.codec,shapeDesc.thresholdFit);
 		refine.refine(shape.points,shape.modelParam,true);
+		// todo handle if refine is false
 	}
 
 	/**

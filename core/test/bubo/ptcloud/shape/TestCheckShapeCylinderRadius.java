@@ -16,15 +16,30 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
+
+import georegression.struct.shapes.Cylinder3D_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Accepts all shapes
  * @author Peter Abeles
  */
-public class CheckShapeAcceptAll<Model> implements CheckShapeParameters<Model> {
-	@Override
-	public boolean valid(Model param) {
-		return true;
+public class TestCheckShapeCylinderRadius {
+
+	@Test
+	public void basic() {
+		double threshold = 12.5;
+		CheckShapeCylinderRadius alg = new CheckShapeCylinderRadius(threshold);
+
+		Cylinder3D_F64 param = new Cylinder3D_F64(0,0,0,1,1,1,threshold);
+
+		assertTrue(alg.valid(param));
+		param.radius = threshold + 1e-5;
+		assertFalse(alg.valid(param));
+		param.radius = threshold - 1e-5;
+		assertTrue(alg.valid(param));
 	}
 }

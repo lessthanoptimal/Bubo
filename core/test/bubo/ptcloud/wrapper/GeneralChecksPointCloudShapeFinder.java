@@ -20,7 +20,7 @@ package bubo.ptcloud.wrapper;
 
 import bubo.ptcloud.CloudShapeTypes;
 import bubo.ptcloud.PointCloudShapeFinder;
-import bubo.ptcloud.alg.*;
+import bubo.ptcloud.shape.*;
 import bubo.ptcloud.tools.PointCloudShapeTools;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
@@ -125,7 +125,7 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 			switch( shape ) {
 				case CYLINDER:
-					TestGenerateCylinderPointVector.checkEquivalent(cylinder,(Cylinder3D_F64)s.parameters, tolModelparam);
+					TestGenerateCylinderPointVector.checkEquivalent(cylinder, (Cylinder3D_F64) s.parameters, tolModelparam);
 					break;
 
 				case PLANE:

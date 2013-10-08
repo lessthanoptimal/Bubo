@@ -16,19 +16,20 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.ModelGeneratorCheck;
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.geometry.GeometryMath_F64;
 import georegression.metric.ClosestPoint3D_F64;
 import georegression.metric.Distance3D_F64;
 import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.shapes.Cylinder3D_F64;
-import org.ddogleg.fitting.modelset.ModelGenerator;
 
 import java.util.List;
 
 /**
- * Cylinder estimation for use in {@link PointCloudShapeDetectionSchnabel2007}.  The sphere is estimated
+ * Cylinder estimation for use in {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.  The sphere is estimated
  * using two points and their normal vectors.  A point in the sphere's axis is found by finding the closest
  * point between the lines defined by the two points + vectors.  The axis is found by taking the cross
  * product of the two normals.  Radius is distance from cylinder's axis.  An extra point is used to validate
@@ -36,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GenerateCylinderPointVector implements ModelGenerator<Cylinder3D_F64,PointVectorNN> {
+public class GenerateCylinderPointVector implements ModelGeneratorCheck<Cylinder3D_F64,PointVectorNN> {
 
 	// tolerance cos(angle) for vector normals
 	private double tolAngleCosine;
@@ -55,6 +56,7 @@ public class GenerateCylinderPointVector implements ModelGenerator<Cylinder3D_F6
 		this.tolDistance = tolDistance;
 	}
 
+	@Override
 	public void setCheck(CheckShapeParameters<Cylinder3D_F64> check) {
 		this.check = check;
 	}

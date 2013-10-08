@@ -16,26 +16,26 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
 import georegression.metric.Distance3D_F64;
+import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Sphere3D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
 
 /**
- * Euclidean distance from a {@link georegression.struct.plane.PlaneGeneral3D_F64} for use with {@link PointCloudShapeDetectionSchnabel2007}.
+ * Euclidean distance from a {@link PlaneGeneral3D_F64} for use with {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.
  *
  * @author Peter Abeles
  */
-public class DistanceSphereToPoint3D implements DistanceFromModel<Sphere3D_F64,Point3D_F64> {
+public class DistancePlaneToPoint3D implements DistanceFromModel<PlaneGeneral3D_F64,Point3D_F64> {
 
-	Sphere3D_F64 model;
+	PlaneGeneral3D_F64 model;
 
 	@Override
-	public void setModel(Sphere3D_F64 model) {
+	public void setModel(PlaneGeneral3D_F64 model) {
 		this.model = model;
 	}
 
@@ -47,7 +47,7 @@ public class DistanceSphereToPoint3D implements DistanceFromModel<Sphere3D_F64,P
 	@Override
 	public void computeDistance(List<Point3D_F64> points, double[] distance) {
 		for( int i = 0; i < points.size(); i++ ) {
-			distance[i] = Math.abs(Distance3D_F64.distance(model, points.get(i) ));
+			distance[i] = Math.abs(Distance3D_F64.distance(model, points.get(i)));
 		}
 	}
 }

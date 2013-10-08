@@ -21,6 +21,8 @@ package bubo.ptcloud.alg;
 import bubo.ptcloud.CloudShapeTypes;
 import bubo.ptcloud.ConstructOctreeEqual;
 import bubo.ptcloud.Octree;
+import bubo.ptcloud.shape.TestGeneratePlanePointVector;
+import bubo.ptcloud.shape.TestGenerateSpherePointVector;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
@@ -107,7 +109,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 				PlaneGeneral3D_F64 foundShape = (PlaneGeneral3D_F64)found.get(i).modelParam;
 
-				TestGeneratePlanePointVector.checkPlanes(plane,foundShape, 1e-8);
+				TestGeneratePlanePointVector.checkPlanes(plane, foundShape, 1e-8);
 			}
 		}
 
@@ -179,7 +181,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 	private PointCloudShapeDetectionSchnabel2007 createAlgorithm() {
 
-		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.2,0.3,null,shapeDetect);
+		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.2,shapeDetect);
 
 		config.minModelAccept = 10;
 		config.octreeSplit = 20;

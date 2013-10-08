@@ -20,6 +20,7 @@ package bubo.ptcloud.alg;
 
 import bubo.ptcloud.ConstructOctreeEqual;
 import bubo.ptcloud.Octree;
+import bubo.ptcloud.shape.CheckShapeAcceptAll;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
@@ -127,6 +128,12 @@ public class PointCloudShapeDetectionSchnabel2007 {
 			o.modelGenerator = s.modelGenerator;
 
 			modelsRansac.add(o);
+
+			// if a check is specified, pass it along
+			if( s.modelCheck == null ) {
+				s.modelCheck = new CheckShapeAcceptAll();
+			}
+			s.modelGenerator.setCheck(s.modelCheck);
 		}
 
 		ransac = new RansacShapeDetection(config.randomSeed,config.ransacExtension,matchFinder,modelsRansac);
@@ -235,13 +242,14 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		// refine the model
 		shapeDesc.modelManager.copyModel(ransacParam,output.modelParam);
 		output.points.addAll(ransacInliers);
-		refineShape.configure(shapeDesc.modelFitter,shapeDesc.modelDistance,shapeDesc.codec,shapeDesc.thresholdFit);
-		refineShape.refine(output.points,output.modelParam,true);
-
-		// see if the shape still has enough points to be accepted.  if the total number of matching points dropped
-		// it is highly likely to be a poor fit to the shape anyways
-		if( output.points.size() < minModelAccept ) {
-			// discard the shape
+		refineShape.configure(shapeDesc.modelFitter,shapeDesc.modelDistance,
+				shapeDesc.modelCheck,shapeDesc.codec,shapeDesc.thresholdFit);
+		if( !refineShape.refine(output.points,output.modelParam,true) ) {
+			// the shape became invalid
+			foundObjects.removeTail();
+		} else if( output.points.size() < minModelAccept ) {
+			// see if the shape still has enough points to be accepted.  if the total number of matching points dropped
+			// it is highly likely to be a poor fit to the shape anyways
 			foundObjects.removeTail();
 		} else {
 			// mark shape points as being used

@@ -18,9 +18,9 @@
 
 package bubo.ptcloud.tools;
 
-import bubo.ptcloud.alg.DistanceCylinderToPoint3D;
-import bubo.ptcloud.alg.DistancePlaneToPoint3D;
-import bubo.ptcloud.alg.DistanceSphereToPoint3D;
+import bubo.ptcloud.shape.DistanceCylinderToPoint3D;
+import bubo.ptcloud.shape.DistancePlaneToPoint3D;
+import bubo.ptcloud.shape.DistanceSphereToPoint3D;
 import georegression.geometry.UtilPlane3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;

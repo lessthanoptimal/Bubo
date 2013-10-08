@@ -18,6 +18,7 @@
 
 package bubo.ptcloud.alg;
 
+import bubo.ptcloud.shape.CheckShapeParameters;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelCodec;
 import org.ddogleg.fitting.modelset.ModelFitter;
@@ -60,6 +61,9 @@ public class LocalFitShapeNN <Model> {
 	private List<PointVectorNN> listTempA = new ArrayList<PointVectorNN>();
 	private List<PointVectorNN> listTempB = new ArrayList<PointVectorNN>();
 
+	// used to see if the parameters are valid
+	private CheckShapeParameters<Model> checkParam;
+
 	/**
 	 * Configures the search and fit algorithm
 	 *
@@ -87,9 +91,11 @@ public class LocalFitShapeNN <Model> {
 	 */
 	public void configure( ModelFitter<Model,PointVectorNN> fitter,
 						   DistanceFromModel<Model,PointVectorNN> distance ,
+						   CheckShapeParameters<Model> checkParam ,
 						   ModelCodec<Model> codec ,
 						   double threshold ) {
 		this.fitter = fitter;
+		this.checkParam = checkParam;
 		this.codec = codec;
 		this.distanceThreshold = threshold;
 
@@ -111,7 +117,7 @@ public class LocalFitShapeNN <Model> {
 	 * @param initialFitToPoints (input) If true it will fit the model parameters to the initial points.  If false
 	 *                           it will start by selecting points which match the initial model.
 	 */
-	public void refine( List<PointVectorNN> matches , Model model , boolean initialFitToPoints )
+	public boolean refine( List<PointVectorNN> matches , Model model , boolean initialFitToPoints )
 	{
 		codec.encode(model, paramPrev);
 		if( initialFitToPoints )
@@ -128,6 +134,10 @@ public class LocalFitShapeNN <Model> {
 			findMatchSet.selectMatchSet(listTempA,model,distanceThreshold,true,listTempB);
 			// use the points which match the model to estimate the parameters.
 			fitter.fitModel(listTempB,model,model);
+
+			// if the model has drifted into the invalid range, stop processing
+			if( !checkParam.valid(model) )
+				return false;
 
 			// Compute the change in parameters
 			codec.encode(model, paramCurr);
@@ -157,6 +167,8 @@ public class LocalFitShapeNN <Model> {
 
 		matches.clear();
 		matches.addAll(listTempB);
+
+		return true;
 	}
 
 }

@@ -16,38 +16,55 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.metric.Distance3D_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
-import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 
 import java.util.List;
 
 /**
- * Euclidean distance from a {@link PlaneGeneral3D_F64} for use with {@link PointCloudShapeDetectionSchnabel2007}.
+ * Euclidean distance from a {@link PlaneGeneral3D_F64} for use with {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.
  *
  * @author Peter Abeles
  */
-public class DistancePlaneToPoint3D implements DistanceFromModel<PlaneGeneral3D_F64,Point3D_F64> {
+public class DistancePlaneToPointVectorNN implements DistanceFromModel<PlaneGeneral3D_F64,PointVectorNN> {
+
+	// tolerance cos(angle) for vector normals
+	private double tolAngleCosine;
 
 	PlaneGeneral3D_F64 model;
+
+	Vector3D_F64 n = new Vector3D_F64();
+
+	public DistancePlaneToPointVectorNN(double tolAngle) {
+		this.tolAngleCosine = Math.cos(tolAngle);
+	}
 
 	@Override
 	public void setModel(PlaneGeneral3D_F64 model) {
 		this.model = model;
+		n.set(model.A,model.B,model.C);
+		n.normalize();
 	}
 
 	@Override
-	public double computeDistance(Point3D_F64 pt) {
-		return Math.abs(Distance3D_F64.distance(model, pt));
+	public double computeDistance(PointVectorNN pv) {
+
+
+		if( Math.abs(n.dot(pv.normal)) < tolAngleCosine)
+			return Double.MAX_VALUE;
+
+		return Math.abs(Distance3D_F64.distance(model, pv.p));
 	}
 
 	@Override
-	public void computeDistance(List<Point3D_F64> points, double[] distance) {
+	public void computeDistance(List<PointVectorNN> points, double[] distance) {
 		for( int i = 0; i < points.size(); i++ ) {
-			distance[i] = Math.abs(Distance3D_F64.distance(model, points.get(i)));
+			distance[i] = computeDistance( points.get(i) );
 		}
 	}
 }

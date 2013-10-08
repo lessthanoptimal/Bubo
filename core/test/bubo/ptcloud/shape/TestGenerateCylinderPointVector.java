@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
+import bubo.ptcloud.alg.PointVectorNN;
 import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.metric.Distance3D_F64;
@@ -192,7 +193,22 @@ public class TestGenerateCylinderPointVector {
 	 */
 	@Test
 	public void doesItPerformCheck() {
-		fail("Implement");
+		Cylinder3D_F64 c = new Cylinder3D_F64(0,0,0,0,0,1,2);
+
+		GenerateCylinderPointVector alg = new GenerateCylinderPointVector(0.1,0.1);
+
+		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
+		pts.add(createPt(c, 0, 0, 1));
+		pts.add(createPt(c, 0.5, Math.PI / 2.0, 1));
+		pts.add(createPt(c, 1, 0.5, 1));
+
+		Cylinder3D_F64 found = new Cylinder3D_F64();
+
+		// give it a positive example and its return value should depend on the value of the CheckShape
+		alg.setCheck(new CheckShapeDummy<Cylinder3D_F64>(true));
+		assertTrue(alg.generate(pts, found));
+		alg.setCheck(new CheckShapeDummy<Cylinder3D_F64>(false));
+		assertFalse(alg.generate(pts, found));
 	}
 
 	public static void checkEquivalent(Cylinder3D_F64 a, Cylinder3D_F64 b, double tol) {

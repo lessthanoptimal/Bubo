@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package bubo.ptcloud.alg;
+package bubo.ptcloud.shape;
 
 import georegression.struct.shapes.Sphere3D_F64;
 
 /**
- * Limits how large of a radius it will accept for a cylinder.
+ * Limits how large of a radius it will accept for a sphere. Returns true if radius <= maxRadius.
  *
  * @author Peter Abeles
  */
