@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class MergeShapesPointVectorNN
+public class MergeShapesPointVectorNN implements PostProcessShapes
 {
 	// contains functions used to describe each type of possible shape
 	private List<ShapeDescription> models;
@@ -69,20 +69,27 @@ public class MergeShapesPointVectorNN
 	/**
 	 * Configures the class
 	 *
-	 * @param models Describe of the different shapes that it can merge
 	 * @param commonPointsFraction Minimum fraction of points in common that two objects have for them to
 	 *                       be considered for merging.  Try 0.6
 	 * @param commonMembershipFraction Minimum fraction of points which belong to another the other shape for them to be merged.
 	 *                      Try 0.9
-	 * @param refine Used to improve the shape parameters and list of member points after merging.
-	 *               If null then no refinement is done.
 	 */
-	public MergeShapesPointVectorNN(List<ShapeDescription> models,
-									double commonPointsFraction, double commonMembershipFraction ,
-									LocalFitShapeNN refine ) {
+	public MergeShapesPointVectorNN(double commonPointsFraction, double commonMembershipFraction ) {
 		this.models = models;
 		this.commonPointsFraction = commonPointsFraction;
 		this.commonMembershipFraction = commonMembershipFraction;
+		this.refine = refine;
+	}
+
+	/**
+	 *
+	 * @param models Describe of the different shapes that it can merge
+	 * @param refine Used to improve the shape parameters and list of member points after merging.
+	 *               If null then no refinement is done.
+	 */
+	@Override
+	public void setup(List<ShapeDescription> models, LocalFitShapeNN refine) {
+		this.models = models;
 		this.refine = refine;
 	}
 
@@ -92,7 +99,8 @@ public class MergeShapesPointVectorNN
 	 * @param input Input list.  Is modified..
 	 * @param cloudSize Number of points in the original point cloud.
 	 */
-	public void merge( List<FoundShape> input , int cloudSize ) {
+	@Override
+	public void process( List<FoundShape> input , int cloudSize ) {
 		// can assume it is already all false.  boolean initializes to false and it should be cleaned up and
 		// set to false again before this function exits
 		member.resize(cloudSize);
@@ -256,6 +264,7 @@ public class MergeShapesPointVectorNN
 		}
 	}
 
+	@Override
 	public List<FoundShape> getOutput() {
 		return output;
 	}

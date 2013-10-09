@@ -78,10 +78,7 @@ public class ConfigSchnabel2007 {
 	 * Checks to see if the specified parameters are internally consistent
 	 */
 	public void checkConfig() {
-		if( octreeSplit < minModelAccept) {
-			throw new IllegalArgumentException("octreeSplit should be at least 3 times the ransac sample size, which "+
-					"is "+ minModelAccept);
-		}
+
 	}
 
 	/**

@@ -42,7 +42,7 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 	List<CloudShapeTypes> shapeList;
 
 	// Searches for duplicate shapes which describe the same set of points and merges them together
-	MergeShapesPointVectorNN merge;
+	PostProcessShapes postProcess;
 
 	List<FoundShape> mergeList = new ArrayList<FoundShape>();
 
@@ -56,11 +56,11 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 
 	public Schnable2007_to_PointCloudShapeFinder(ApproximateSurfaceNormals surfaceNormals,
 												 PointCloudShapeDetectionSchnabel2007 shapeDetector,
-												 MergeShapesPointVectorNN merge,
+												 PostProcessShapes postProcess,
 												 List<CloudShapeTypes> shapeList ) {
 		this.surfaceNormals = surfaceNormals;
 		this.shapeDetector = shapeDetector;
-		this.merge = merge;
+		this.postProcess = postProcess;
 		this.shapeList = shapeList;
 	}
 
@@ -80,9 +80,9 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 		mergeList.clear();
 		mergeList.addAll(shapeDetector.getFoundObjects().toList());
 
-		merge.merge(mergeList,cloud.size());
+		postProcess.process(mergeList, cloud.size());
 
-		convertIntoOuput(merge.getOutput());
+		convertIntoOuput(postProcess.getOutput());
 	}
 
 	/**

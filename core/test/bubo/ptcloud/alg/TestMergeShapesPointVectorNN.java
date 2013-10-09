@@ -88,7 +88,8 @@ public class TestMergeShapesPointVectorNN {
 	@Test
 	public void merge_one() {
 
-		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.6,0.9,null);
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(0.6,0.9);
+		alg.setup(objects,null);
 
 		List<PointVectorNN> cloud = new ArrayList<PointVectorNN>();
 		addPoints(new Sphere3D_F64(1,2,3,4),200,cloud);
@@ -102,7 +103,7 @@ public class TestMergeShapesPointVectorNN {
 		}
 		shapes.add(s);
 
-		alg.merge(shapes,cloud.size());
+		alg.process(shapes, cloud.size());
 
 		List<FoundShape> found = alg.getOutput();
 
@@ -119,7 +120,8 @@ public class TestMergeShapesPointVectorNN {
 	public void merge_N_identical() {
 
 		// set the commonPointsFraction really slow so that it will consider matches to all the points
-		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.01,0.9,null);
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(0.01,0.9);
+		alg.setup(objects,null);
 
 		List<PointVectorNN> cloud = new ArrayList<PointVectorNN>();
 		addPoints(new Sphere3D_F64(1,2,3,4),300,cloud);
@@ -150,7 +152,7 @@ public class TestMergeShapesPointVectorNN {
 				Collections.shuffle(shapes,rand);
 
 				// run the algoritm
-				alg.merge(shapes,cloud.size());
+				alg.process(shapes, cloud.size());
 
 				List<FoundShape> found = alg.getOutput();
 
@@ -170,7 +172,8 @@ public class TestMergeShapesPointVectorNN {
 	@Test
 	public void merge_better_model() {
 		// set the commonPointsFraction really slow so that it will consider matches to all the points
-		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.01,0.9,null);
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(0.01,0.9);
+		alg.setup(objects,null);
 
 		List<PointVectorNN> cloud = new ArrayList<PointVectorNN>();
 		addPoints(new Sphere3D_F64(1,2,3,4),300,cloud);
@@ -205,7 +208,7 @@ public class TestMergeShapesPointVectorNN {
 				Collections.shuffle(shapes,rand);
 
 				// run the algorithm
-				alg.merge(shapes,cloud.size());
+				alg.process(shapes, cloud.size());
 
 				List<FoundShape> found = alg.getOutput();
 
@@ -250,13 +253,15 @@ public class TestMergeShapesPointVectorNN {
 		shapes.add(s1);
 
 		// no merging should happen since they don't pass the first test
-		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.6,0.9,null);
-		alg.merge(shapes,cloud.size());
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(0.6,0.9);
+		alg.setup(objects,null);
+		alg.process(shapes, cloud.size());
 		assertEquals(2, alg.getOutput().size());
 
 		// now they should path both tests
-		alg = new MergeShapesPointVectorNN(objects,0.58,0.9,null);
-		alg.merge(shapes,cloud.size());
+		alg = new MergeShapesPointVectorNN(0.58,0.9);
+		alg.setup(objects,null);
+		alg.process(shapes, cloud.size());
 		assertEquals(1,alg.getOutput().size());
 	}
 
@@ -288,13 +293,15 @@ public class TestMergeShapesPointVectorNN {
 		shapes.add(s1);
 
 		// no merging should happen since they don't pass the second test
-		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.0,0.9,null);
-		alg.merge(shapes,cloud.size());
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(0.0,0.9);
+		alg.setup(objects,null);
+		alg.process(shapes, cloud.size());
 		assertEquals(2,alg.getOutput().size());
 
 		// now they should path both tests
-		alg = new MergeShapesPointVectorNN(objects,0.0,0.1,null);
-		alg.merge(shapes,cloud.size());
+		alg = new MergeShapesPointVectorNN(0.0,0.1);
+		alg.setup(objects,null);
+		alg.process(shapes, cloud.size());
 		assertEquals(1,alg.getOutput().size());
 	}
 
@@ -325,14 +332,16 @@ public class TestMergeShapesPointVectorNN {
 		shapes.add(s0);
 		shapes.add(s1);
 
-		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.6,0.9,null);
-		alg.merge(shapes,cloud.size());
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(0.6,0.9);
+		alg.setup(objects,null);
+		alg.process(shapes, cloud.size());
 		assertEquals(2,alg.getOutput().size());
 	}
 
 	@Test
 	public void findMembersRigorous() {
-		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.01,0.9,null);
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(0.01,0.9);
+		alg.setup(objects,null);
 
 		List<PointVectorNN> cloud = new ArrayList<PointVectorNN>();
 		addPoints(new Sphere3D_F64(1, 2, 3, 4), 300, cloud);
@@ -365,7 +374,8 @@ public class TestMergeShapesPointVectorNN {
 
 	@Test
 	public void mergeShape() {
-		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.01,0.9,null);
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(0.01,0.9);
+		alg.setup(objects,null);
 
 		List<PointVectorNN> cloud = new ArrayList<PointVectorNN>();
 		addPoints(new Sphere3D_F64(1, 2, 3, 4), 300, cloud);
@@ -404,7 +414,8 @@ public class TestMergeShapesPointVectorNN {
 	public void refine() {
 		FindMatchSetPointVectorNN findMatchSet = new FindMatchSetPointVectorNN();
 		LocalFitShapeNN refine = new LocalFitShapeNN(100,1e-8,findMatchSet);
-		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(objects,0.01,0.9,refine);
+		MergeShapesPointVectorNN alg = new MergeShapesPointVectorNN(0.01,0.9);
+		alg.setup(objects,refine);
 
 		// create points from two slightly different shapes
 		List<PointVectorNN> cloud = new ArrayList<PointVectorNN>();
@@ -430,7 +441,7 @@ public class TestMergeShapesPointVectorNN {
 		shapes.add(s1);
 
 		// after merging there should be one shape and its parameters should be a bit off
-		alg.merge(shapes,cloud.size());
+		alg.process(shapes, cloud.size());
 
 		List<FoundShape> found = alg.getOutput();
 

@@ -63,8 +63,11 @@ public class FactoryPointCloudShape {
 		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
 				configNormal.numPlane,configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
 
-		MergeShapesPointVectorNN merge = new MergeShapesPointVectorNN(
-				configRansac.models,configMerge.commonMembershipFraction,configMerge.commonMembershipFraction,alg.getRefineShape());
+//		PostProcessShapes postProcess = new MergeShapesPointVectorNN(
+//				configMerge.commonMembershipFraction,configMerge.commonMembershipFraction);
+		PostProcessShapes postProcess = new RemoveFalseShapes(0.8);
+
+		postProcess.setup(configRansac.models, alg.getRefineShape());
 
 		List<CloudShapeTypes> shapeList = new ArrayList<CloudShapeTypes>();
 
@@ -80,6 +83,6 @@ public class FactoryPointCloudShape {
 			}
 		}
 
-		return new Schnable2007_to_PointCloudShapeFinder(surface,alg,merge,shapeList);
+		return new Schnable2007_to_PointCloudShapeFinder(surface,alg,postProcess,shapeList);
 	}
 }
