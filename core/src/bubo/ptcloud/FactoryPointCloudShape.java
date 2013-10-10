@@ -19,12 +19,11 @@
 package bubo.ptcloud;
 
 import bubo.ptcloud.alg.*;
-import bubo.ptcloud.wrapper.ConfigMergeShapes;
-import bubo.ptcloud.wrapper.ConfigSurfaceNormals;
-import bubo.ptcloud.wrapper.Schnable2007_to_PointCloudShapeFinder;
+import bubo.ptcloud.wrapper.*;
 import georegression.fitting.cylinder.CodecCylinder3D_F64;
 import georegression.fitting.plane.CodecPlaneGeneral3D_F64;
 import georegression.fitting.sphere.CodecSphere3D_F64;
+import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,12 +49,12 @@ public class FactoryPointCloudShape {
 	 *
 	 * @param configNormal Configuration for approximation of surface normals.
 	 * @param configRansac Configuration for {@link PointCloudShapeDetectionSchnabel2007}.
-	 * @param configMerge Configuration for {@link MergeShapesPointVectorNN}.
+	 * @param configPost Configuration for {@link RemoveFalseShapes}.
 	 * @return Implementation of {@link PointCloudShapeFinder}.
 	 */
 	public static PointCloudShapeFinder ransacOctree( ConfigSurfaceNormals configNormal ,
 													  ConfigSchnabel2007 configRansac ,
-													  ConfigMergeShapes configMerge ) {
+													  ConfigRemoveFalseShapes configPost ) {
 		configNormal.checkConfig();
 
 		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007(configRansac);
@@ -65,7 +64,7 @@ public class FactoryPointCloudShape {
 
 //		PostProcessShapes postProcess = new MergeShapesPointVectorNN(
 //				configMerge.commonMembershipFraction,configMerge.commonMembershipFraction);
-		PostProcessShapes postProcess = new RemoveFalseShapes(0.8);
+		PostProcessShapes postProcess = new RemoveFalseShapes(configPost.ratio);
 
 		postProcess.setup(configRansac.models, alg.getRefineShape());
 
@@ -84,5 +83,28 @@ public class FactoryPointCloudShape {
 		}
 
 		return new Schnable2007_to_PointCloudShapeFinder(surface,alg,postProcess,shapeList);
+	}
+
+	/**
+	 * Uses RANSAC to robustly find a single shape in the point cloud when given a set of shape types.
+	 *
+	 * @param configNormal Configuration for computing the shape's normal
+	 * @param configRansac Configuration for RANSAC
+	 * @return PointCloudShapeFinder
+	 */
+	public static PointCloudShapeFinder ransacSingle( ConfigSurfaceNormals configNormal ,
+													  ConfigMultiShapeRansac configRansac ) {
+
+		configNormal.checkConfig();
+
+		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
+				configNormal.numPlane,configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
+
+		RansacMulti<PointVectorNN> ransac = new RansacMulti<PointVectorNN>(
+				configRansac.randSeed,configRansac.maxIterations,configRansac.models,PointVectorNN.class);
+
+		return new Ransac_to_PointCloudShapeFinder(surface,ransac,
+				configRansac.modelManagers,configRansac.fitters,configRansac.minimumPoints,
+				configRansac.types);
 	}
 }

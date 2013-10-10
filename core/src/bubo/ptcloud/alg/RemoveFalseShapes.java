@@ -25,8 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * todo comment
+ *
  * @author Peter Abeles
  */
+// TODO add shape merging
 public class RemoveFalseShapes implements PostProcessShapes {
 
 	List<ShapeDescription> models;
@@ -34,7 +37,7 @@ public class RemoveFalseShapes implements PostProcessShapes {
 	GrowQueue_I32 cloudToShape = new GrowQueue_I32();
 	FastQueue<PixelInfo> shapePixels = new FastQueue<PixelInfo>(PixelInfo.class,true);
 
-	List<FoundShape> output = new ArrayList<FoundShape>();
+	List<FoundShape> goodShapes = new ArrayList<FoundShape>();
 
 	double thresholdDiscard;
 
@@ -49,14 +52,38 @@ public class RemoveFalseShapes implements PostProcessShapes {
 
 	@Override
 	public void process(List<FoundShape> input, int cloudSize) {
-		cloudToShape.resize(cloudSize);
-		output.clear();
+		goodShapes.clear();
 
+		cloudToShape.resize(cloudSize);
+		for( int i = 0; i < cloudToShape.size; i++ ) {
+			cloudToShape.data[i] = -1;
+		}
+
+		pruneFalseShapes(input,goodShapes);
+
+	}
+
+	private void mergeSimilarShapes( List<FoundShape> input , List<FoundShape> output) {
+		for( int i = 0; i < input.size(); i++ ) {
+			FoundShape shape = input.get(i);
+
+			// mark all the points which belong to this shape
+			markPointsMember(shape,1);
+
+			// iterate through all the other shapes and see which ones match it and have a high ratio
+		   //TODO finish merge code
+
+			// clean up
+			markPointsMember(shape,-1);
+		}
+	}
+
+	private void pruneFalseShapes(List<FoundShape> input, List<FoundShape> output) {
 		// find the fraction of points for each shape in which another point has less error
 		for( int i = 0; i < input.size(); i++ ) {
 			FoundShape shape = input.get(i);
 
-			setupShape(shape);
+			setupShapeForFalse(shape);
 
 			for( int j = 0; j < input.size(); j++ ) {
 				if( i == j )
@@ -65,6 +92,7 @@ public class RemoveFalseShapes implements PostProcessShapes {
 				compareToShape( input.get(j) );
 			}
 
+			// compute how many points are better describe by other shapes and decide if the shape should be kept
 			int totalSuck = 0;
 			for( int j = 0; j < shapePixels.size; j++ ) {
 				PixelInfo info = shapePixels.get(j);
@@ -73,15 +101,21 @@ public class RemoveFalseShapes implements PostProcessShapes {
 					totalSuck++;
 			}
 			double suckRatio = totalSuck/(double)shapePixels.size;
+			System.out.println("  suck ratio = "+suckRatio);
 			if( suckRatio < thresholdDiscard ) {
 				output.add(shape);
+			} else {
+				System.out.println("Discarding shape");
 			}
-		}
 
+			// clean up
+			markPointsMember(shape,-1);
+		}
 	}
 
 	private void compareToShape( FoundShape shape ) {
 		ShapeDescription desc = models.get( shape.whichShape );
+		desc.modelDistance.setModel(shape.modelParam);
 
 		for( int i = 0; i < shape.points.size(); i++ ) {
 			PointVectorNN pv = shape.points.get(i);
@@ -92,21 +126,19 @@ public class RemoveFalseShapes implements PostProcessShapes {
 
 			PixelInfo info = shapePixels.get(which);
 
-			double d = desc.modelDistance.computeDistance(shape.points.get(i));
+			info.matched = true;
+
+			double d = desc.modelDistance.computeDistance(pv);
 			info.external = Math.min(d,info.external);
 		}
 	}
 
-	private void setupShape( FoundShape shape ) {
+	private void setupShapeForFalse(FoundShape shape) {
 		ShapeDescription desc = models.get( shape.whichShape );
 
 		shapePixels.reset();
 
 		desc.modelDistance.setModel(shape.modelParam);
-
-		for( int i = 0; i < cloudToShape.size; i++ ) {
-			cloudToShape.data[i] = -1;
-		}
 
 		for( int i = 0; i < shape.points.size(); i++ ) {
 			PointVectorNN pv = shape.points.get(i);
@@ -116,16 +148,26 @@ public class RemoveFalseShapes implements PostProcessShapes {
 			PixelInfo info = shapePixels.grow();
 			info.internal = desc.modelDistance.computeDistance(shape.points.get(i));
 			info.external = Double.MAX_VALUE;
+			info.matched = false;
+		}
+	}
+
+	private void markPointsMember( FoundShape shape , int value ) {
+		for( int i = 0; i < shape.points.size(); i++ ) {
+			PointVectorNN pv = shape.points.get(i);
+
+			cloudToShape.data[pv.index] = value;
 		}
 	}
 
 	@Override
 	public List<FoundShape> getOutput() {
-		return output;
+		return goodShapes;
 	}
 
 	public static class PixelInfo {
 		double external;
 		double internal;
+		boolean matched;
 	}
 }

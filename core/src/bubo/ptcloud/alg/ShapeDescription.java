@@ -44,7 +44,8 @@ public class ShapeDescription<Model> {
 	public ModelFitter<Model,PointVectorNN> modelFitter;
 	/** computes the distance a point is from the model */
 	public DistanceFromModel<Model,PointVectorNN> modelDistance;
-	/** Specifies an optional check which can be used to remove physically impossible shapes.  If null then
+	/**
+	 * Specifies an optional check which can be used to remove physically impossible shapes.  If null then
 	 * no check will be performed
 	 **/
 	public CheckShapeParameters<Model> modelCheck;

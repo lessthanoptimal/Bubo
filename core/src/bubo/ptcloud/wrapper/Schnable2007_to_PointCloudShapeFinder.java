@@ -126,4 +126,9 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 	public List<CloudShapeTypes> getShapesList() {
 		return shapeList;
 	}
+
+	@Override
+	public boolean isSupportMultipleObjects() {
+		return true;
+	}
 }

@@ -36,10 +36,13 @@ import java.util.List;
 public interface PointCloudShapeFinder {
 
 	/**
+	 * <p>
 	 * Searches the point cloud for primitive shapes.
-	 *
+	 * </p>
+	 * <p>
 	 * WARNING: To reduce memory overhead, object which are passed have there reference saved.  This means you
-	 * shouldn't modify the input if you care about the points returned with the outptu shape.
+	 * shouldn't modify the input if you care about the points returned with the output shape.
+	 * </p>
 	 *
 	 * @param cloud The point cloud which is to be searched
 	 * @param boundingBox Optional bounding box which is known to contain all the points.
@@ -48,20 +51,29 @@ public interface PointCloudShapeFinder {
 	public void process( List<Point3D_F64> cloud , Cube3D_F64 boundingBox );
 
 	/**
+	 * <p>
 	 * List of shapes that were found in the point cloud.
-	 *
+	 * </p>
+	 * <p>
 	 * WARNING: All data structures returned are owned by this class.  They are subject to being modified
 	 * the next time process is called.  The points might also be references to the input point cloud.
+	 * </p>
 	 *
 	 * @return List of shapes
 	 */
 	public List<Shape> getFound();
 
 	/**
-	 * A list of points which were not matched to any shape
+	 * <p>
+	 * A list of points which were not matched to any shape.  Calling this function can result in additional
+	 * computations and should only be called once for each call to
+	 * {@link #process(java.util.List, georegression.struct.shapes.Cube3D_F64)};
+	 * </p>
 	 *
+	 * <p>
 	 * WARNING: All data structures returned are owned by this class.  They are subject to being modified
 	 * the next time process is called.  The points might also be references to the input point cloud.
+	 * </p>
 	 *
 	 * @param unmatched Storage for Point3D_F64 which matched the shape.
 	 */
@@ -73,6 +85,13 @@ public interface PointCloudShapeFinder {
 	 * @return List of shape types
 	 */
 	public List<CloudShapeTypes> getShapesList();
+
+	/**
+	 * Can it detect multiple objects in the point cloud or does it just search for a single object?
+	 *
+	 * @return If true it supports finding multiple object.  If false then it will only search for a single object.
+	 */
+	public boolean isSupportMultipleObjects();
 
 	/**
 	 * Storage for output

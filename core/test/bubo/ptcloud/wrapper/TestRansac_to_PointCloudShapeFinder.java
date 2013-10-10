@@ -20,27 +20,26 @@ package bubo.ptcloud.wrapper;
 
 import bubo.ptcloud.FactoryPointCloudShape;
 import bubo.ptcloud.PointCloudShapeFinder;
-import bubo.ptcloud.alg.ConfigSchnabel2007;
 
 /**
  * @author Peter Abeles
  */
-public class TestSchnable2007_to_PointCloudShapeFinder extends GeneralChecksPointCloudShapeFinder {
-
-	public TestSchnable2007_to_PointCloudShapeFinder() {
+public class TestRansac_to_PointCloudShapeFinder extends GeneralChecksPointCloudShapeFinder
+{
+	public TestRansac_to_PointCloudShapeFinder() {
 		super(10,1e-6);
 	}
 
 	@Override
 	public PointCloudShapeFinder createAlgorithm() {
 
-		ConfigSchnabel2007 configRansac = ConfigSchnabel2007.createDefault(100,0.5,0.1);
-		configRansac.minModelAccept = 50;
-		configRansac.octreeSplit = 60;
+		ConfigMultiShapeRansac configRansac = ConfigMultiShapeRansac.createDefault(100,0.6,0.1);
 
-		ConfigSurfaceNormals configSurface = new ConfigSurfaceNormals(6,20,3);
-		ConfigRemoveFalseShapes configMerge = new ConfigRemoveFalseShapes(0.7);
+		configRansac.minimumPoints = 20;
 
-		return FactoryPointCloudShape.ransacOctree(configSurface,configRansac,configMerge);
+		ConfigSurfaceNormals configSurface = new ConfigSurfaceNormals(6,6,3);
+
+		return FactoryPointCloudShape.ransacSingle(configSurface, configRansac);
 	}
+
 }

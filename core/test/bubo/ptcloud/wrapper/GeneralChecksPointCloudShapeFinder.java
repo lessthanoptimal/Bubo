@@ -146,6 +146,10 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 	public void detectShapesMultiple() {
 		PointCloudShapeFinder alg = createAlgorithm();
 
+		// see if the algorithm can find multiple shapes
+		if( !alg.isSupportMultipleObjects() )
+		    return;
+
 		List<CloudShapeTypes> shapes = alg.getShapesList();
 		List<CloudShapeTypes> shapesSelect = new ArrayList<CloudShapeTypes>();
 		shapesSelect.addAll(shapes);

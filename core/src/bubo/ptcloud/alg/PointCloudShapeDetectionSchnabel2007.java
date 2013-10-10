@@ -109,11 +109,6 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		this.rand = new Random(config.randomSeed);
 		this.maximumAllowedIterations = config.maximumAllowedIterations;
 
-		if( config.octreeSplit < this.minModelAccept) {
-			throw new IllegalArgumentException("octreeSplit should be at least 3 times the ransac sample size, which "+
-			"is "+ this.minModelAccept);
-		}
-
 		managerOctree = new ConstructOctreeEqual(config.octreeSplit);
 
 		// convert it into a description that RANSAC understands
@@ -136,7 +131,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 			s.modelGenerator.setCheck(s.modelCheck);
 		}
 
-		ransac = new RansacShapeDetection(config.randomSeed,config.ransacExtension,matchFinder,modelsRansac);
+		ransac = new RansacShapeDetection(config.randomSeed,config.ransacExtension*2,matchFinder,modelsRansac);
 	}
 
 	/**
