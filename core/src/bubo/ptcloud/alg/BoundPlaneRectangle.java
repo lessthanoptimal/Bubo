@@ -44,7 +44,7 @@ public class BoundPlaneRectangle {
 
 	FastQueue<Point2D_F64> points2D = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
-	Point3D_F64 center = new Point3D_F64();
+	Point3D_F64 origin = new Point3D_F64();
 	Vector3D_F64 norm = new Vector3D_F64();
 	Vector3D_F64 axisX = new Vector3D_F64();
 	Vector3D_F64 axisY = new Vector3D_F64();
@@ -74,7 +74,7 @@ public class BoundPlaneRectangle {
 		points2D.reset();
 
 		// pick a point and find the closest point to the plane from it
-		ClosestPoint3D_F64.closestPoint(plane,points.get(0),center);
+		ClosestPoint3D_F64.closestPoint(plane,points.get(0), origin);
 
 		// pick two arbitrary vectors to be the axis of the plane's 2D coordinate system
 		norm.set(plane.A,plane.B,plane.C);
@@ -90,9 +90,9 @@ public class BoundPlaneRectangle {
 		for( int i = 0; i < points.size(); i++ ) {
 			Point3D_F64 p = points.get(i);
 
-			double dx = p.x - center.x;
-			double dy = p.y - center.y;
-			double dz = p.z - center.z;
+			double dx = p.x - origin.x;
+			double dy = p.y - origin.y;
+			double dz = p.z - origin.z;
 
 			double X = axisX.x*dx + axisX.y*dy + axisX.z*dz;
 			double Y = axisY.x*dx + axisY.y*dy + axisY.z*dz;
@@ -153,10 +153,10 @@ public class BoundPlaneRectangle {
 				maxY = Y;
 		}
 
-		convertTo3D( minX,  minY , center , rect[0] );
-		convertTo3D( maxX , minY , center , rect[1] );
-		convertTo3D( maxX , maxY , center , rect[2] );
-		convertTo3D( minX , maxY , center , rect[3] );
+		convertTo3D( minX,  minY , origin, rect[0] );
+		convertTo3D( maxX , minY , origin, rect[1] );
+		convertTo3D( maxX , maxY , origin, rect[2] );
+		convertTo3D( minX , maxY , origin, rect[3] );
 
 		return true;
 	}
@@ -178,15 +178,15 @@ public class BoundPlaneRectangle {
 		return true;
 	}
 
-	private void convertTo3D( double x , double y , Point3D_F64 center , Point3D_F64 p3 ) {
+	private void convertTo3D( double x , double y , Point3D_F64 origin , Point3D_F64 p3 ) {
 		// rotated to standard 2D
 		double X2 = x*axis2X.x + y*axis2Y.x + meanX;
 		double Y2 = x*axis2X.y + y*axis2Y.y + meanY;
 
 		// convert into 3D point
-		p3.x = X2*axisX.x + Y2*axisY.x + center.x;
-		p3.y = X2*axisX.y + Y2*axisY.y + center.y;
-		p3.z = X2*axisX.z + Y2*axisY.z + center.z;
+		p3.x = X2*axisX.x + Y2*axisY.x + origin.x;
+		p3.y = X2*axisX.y + Y2*axisY.y + origin.y;
+		p3.z = X2*axisX.z + Y2*axisY.z + origin.z;
 	}
 
 	/**

@@ -79,37 +79,55 @@ public class RemoveFalseShapes implements PostProcessShapes {
 	}
 
 	private void pruneFalseShapes(List<FoundShape> input, List<FoundShape> output) {
+
+		output.addAll(input);
+
 		// find the fraction of points for each shape in which another point has less error
-		for( int i = 0; i < input.size(); i++ ) {
-			FoundShape shape = input.get(i);
+		double suckRatios[] = new double[ input.size() ];
 
-			setupShapeForFalse(shape);
+		for( int iter = 0; iter < 100; iter++ ) {
+			System.out.println("Prune iteration "+iter);
+			for( int i = 0; i < output.size(); i++ ) {
+				FoundShape shape = output.get(i);
 
-			for( int j = 0; j < input.size(); j++ ) {
-				if( i == j )
-					continue;
+				setupShapeForFalse(shape);
 
-				compareToShape( input.get(j) );
+				for( int j = 0; j < output.size(); j++ ) {
+					if( i == j )
+						continue;
+
+					compareToShape( output.get(j) );
+				}
+
+				// compute how many points are better describe by other shapes and decide if the shape should be kept
+				int totalSuck = 0;
+				for( int j = 0; j < shapePixels.size; j++ ) {
+					PixelInfo info = shapePixels.get(j);
+
+					if( info.matched ) //info.internal > info.external )
+						totalSuck++;
+				}
+				suckRatios[i] = totalSuck/(double)shapePixels.size;
+				System.out.println("  suck ratio = "+suckRatios[i]);
+				// clean up
+				markPointsMember(shape,-1);
 			}
 
-			// compute how many points are better describe by other shapes and decide if the shape should be kept
-			int totalSuck = 0;
-			for( int j = 0; j < shapePixels.size; j++ ) {
-				PixelInfo info = shapePixels.get(j);
-
-				if( info.internal > info.external )
-					totalSuck++;
+			// select the worst one
+			double worstRatio = 0;
+			int worstIndex = 0;
+			for( int i = 0; i < output.size(); i++ ) {
+				if( suckRatios[i] > worstRatio ) {
+					worstRatio = suckRatios[i];
+					worstIndex = i;
+				}
 			}
-			double suckRatio = totalSuck/(double)shapePixels.size;
-			System.out.println("  suck ratio = "+suckRatio);
-			if( suckRatio < thresholdDiscard ) {
-				output.add(shape);
+
+			if( worstRatio > thresholdDiscard ) {
+				output.remove(worstIndex);
 			} else {
-				System.out.println("Discarding shape");
+				break;
 			}
-
-			// clean up
-			markPointsMember(shape,-1);
 		}
 	}
 
@@ -133,6 +151,10 @@ public class RemoveFalseShapes implements PostProcessShapes {
 		}
 	}
 
+	/**
+	 * Marks points in the point cloud as belonging to this shape for false shape detection
+	 * @param shape
+	 */
 	private void setupShapeForFalse(FoundShape shape) {
 		ShapeDescription desc = models.get( shape.whichShape );
 
