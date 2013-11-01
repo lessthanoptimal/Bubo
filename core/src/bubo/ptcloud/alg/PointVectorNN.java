@@ -34,7 +34,7 @@ public class PointVectorNN {
 	/** Normal to the surface at p.  Is normalized to one. */
 	public Vector3D_F64 normal = new Vector3D_F64();
 
-	/** Points which are its neighbors */
+	/** Points which are its neighbors.  Does not include this point. */
 	public FastQueue<PointVectorNN> neighbors = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
 	/**

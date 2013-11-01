@@ -194,7 +194,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 			}
 
 			// see if its possible to find a valid model with this data
-			if( sampleSet.size() < minModelAccept && sampleNode.points.size != sampleSet.size()) {
+			if( sampleNode.points.size != sampleSet.size()) {
 				// Update the octree since it clearly needs to since its running into trouble here and can't
 				// run RANSAC.  Next cycle this situation will be impossible
 				// By constructing the Octree here it is only constructed as needed

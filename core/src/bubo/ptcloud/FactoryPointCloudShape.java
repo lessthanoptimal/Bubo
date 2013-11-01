@@ -60,7 +60,7 @@ public class FactoryPointCloudShape {
 		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007(configRansac);
 
 		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
-				configNormal.numPlane,configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
+				configNormal.numPlane,configNormal.maxDistancePlane,configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
 
 //		PostProcessShapes postProcess = new MergeShapesPointVectorNN(
 //				configMerge.commonMembershipFraction,configMerge.commonMembershipFraction);
@@ -98,7 +98,7 @@ public class FactoryPointCloudShape {
 		configNormal.checkConfig();
 
 		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
-				configNormal.numPlane,configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
+				configNormal.numPlane,configNormal.maxDistancePlane,configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
 
 		RansacMulti<PointVectorNN> ransac = new RansacMulti<PointVectorNN>(
 				configRansac.randSeed,configRansac.maxIterations,configRansac.models,PointVectorNN.class);

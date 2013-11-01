@@ -54,7 +54,7 @@ public class TestApproximateSurfaceNormals {
 
 		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(numNeighbors,numNeighbors,maxDistance);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(numNeighbors,maxDistance,numNeighbors,maxDistance);
 
 		alg.process(cloud,output);
 
@@ -99,7 +99,7 @@ public class TestApproximateSurfaceNormals {
 
 		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,8,0.4);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,0.4,8,0.4);
 
 		alg.process(cloud,output);
 
@@ -148,12 +148,11 @@ public class TestApproximateSurfaceNormals {
 
 		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(4,8,10000);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(4,10000,8,10000);
 
 		alg.process(cloud,output);
 
 		assertEquals(6,output.size);
-
 
 		// on the first pass the first for should have good normals
 		for( int i = 0; i < 4; i++ ) {
@@ -165,7 +164,7 @@ public class TestApproximateSurfaceNormals {
 		}
 
 		output.reset();
-		alg = new ApproximateSurfaceNormals(8,8,10000);
+		alg = new ApproximateSurfaceNormals(8,10000,8,10000);
 
 		alg.process(cloud,output);
 		assertEquals(6,output.size);
@@ -177,6 +176,44 @@ public class TestApproximateSurfaceNormals {
 			assertFalse(Math.abs(pv.normal.x) < 1e-8);
 			assertFalse(Math.abs(pv.normal.y) < 1e-8);
 			assertFalse(Math.abs(Math.abs(pv.normal.z)-1) < 1e-8);
+		}
+	}
+
+	/**
+	 * Makes sure that the plane specific maximum distance is being honored
+	 */
+	@Test
+	public void checkPlaneMaximumDistance() {
+		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
+
+		// give it points on the plane
+		cloud.add(new Point3D_F64(0,0,0));
+		cloud.add(new Point3D_F64(1,0,0));
+		cloud.add(new Point3D_F64(0,1,0));
+		cloud.add(new Point3D_F64(-1,-1,0));
+
+		// now give it some points way off the plane
+		cloud.add(new Point3D_F64(0,0,100));
+		cloud.add(new Point3D_F64(1,0,-100));
+
+		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,5,8,10000);
+
+		alg.process(cloud,output);
+
+		assertEquals(6,output.size);
+
+		// on the first pass the first for should have good normals
+		for( int i = 0; i < 4; i++ ) {
+			PointVectorNN pv = output.data[i];
+			// all the points should be in the neighbor list
+			assertEquals(5,pv.neighbors.size);
+			// however, only a subset of the points will be used to compute the normal.  If that is the case
+			// then the normal will be pointed upwards
+			assertEquals(0,pv.normal.x,1e-8);
+			assertEquals(0,pv.normal.y,1e-8);
+			assertEquals(1,Math.abs(pv.normal.z),1e-8);
 		}
 	}
 
@@ -197,7 +234,7 @@ public class TestApproximateSurfaceNormals {
 
 		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,8,0.4);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,0.4,8,0.4);
 
 		alg.process(cloud,output);
 

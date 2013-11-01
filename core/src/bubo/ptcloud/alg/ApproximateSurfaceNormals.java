@@ -54,7 +54,9 @@ public class ApproximateSurfaceNormals {
 	private int numPlane;
 	// number of nearest-neighbors it will search for
 	private int numNeighbors;
-	// the maximum distance two points can be apart for them to be considered neighbors
+	// the maximum distance a neighbor can be when computing the surface normal
+	private double maxDistancePlane;
+	// the maximum distance a neighbor can be
 	private double maxDistanceNeighbor;
 	// The algorithm used to search for nearest neighbors
 	private NearestNeighbor<PointVectorNN> nn;
@@ -85,18 +87,23 @@ public class ApproximateSurfaceNormals {
 	 *
 	 * @param nn Which nearest-neighbor algorithm to use
 	 * @param numPlane Number of closest neighbors it will use to estimate the plane
+	 * @param maxDistancePlane The maximum distance a point can be from the focus to be included in the plane calculation
 	 * @param numNeighbors Number of neighbors it will find
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
-	public ApproximateSurfaceNormals( NearestNeighbor<PointVectorNN> nn , int numPlane,
+	public ApproximateSurfaceNormals( NearestNeighbor<PointVectorNN> nn ,
+									  int numPlane, double maxDistancePlane,
 									  int numNeighbors , double maxDistanceNeighbor) {
 		if( numPlane <= 2 )
 			throw new IllegalArgumentException("Can't compute the plane from less than 2 points");
 		if( numNeighbors < numPlane )
 			throw new IllegalArgumentException("The number of neighbors found must be at least the number used to" +
 					"compute the plane");
+		if( maxDistanceNeighbor < maxDistancePlane )
+			throw new IllegalArgumentException("Maximum distance for the plane needs to be less than maxDistanceNeighbor");
 
 		this.numPlane = numPlane;
+		this.maxDistancePlane = maxDistancePlane;
 		this.numNeighbors = numNeighbors;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
 		this.nn = nn;
@@ -107,11 +114,13 @@ public class ApproximateSurfaceNormals {
 	 * Configures approximation algorithm and uses a K-D tree by default.
 	 *
 	 * @param numPlane Number of closest neighbors it will use to estimate the plane
+	 * @param maxDistancePlane The maximum distance a point can be from the focus to be included in the plane calculation
 	 * @param numNeighbors Number of neighbors it will use to approximate normal
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
-	public ApproximateSurfaceNormals(int numPlane, int numNeighbors, double maxDistanceNeighbor) {
+	public ApproximateSurfaceNormals(int numPlane, double maxDistancePlane, int numNeighbors, double maxDistanceNeighbor) {
 		this.numPlane = numPlane;
+		this.maxDistancePlane = maxDistancePlane;
 		this.numNeighbors = numNeighbors;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
 		this.distance = new double[ numNeighbors+1 ];
@@ -168,7 +177,6 @@ public class ApproximateSurfaceNormals {
 			computeSurfaceNormal(p);
 			output.add(p);
 		}
-
 	}
 
 	/**
@@ -179,18 +187,21 @@ public class ApproximateSurfaceNormals {
 		if( point.neighbors.size >= 2 ) {
 			fitList.clear();
 
-			if(  point.neighbors.size-1 < numPlane ) {
-				fitList.add(point.p);
-				for( int i = 0; i < point.neighbors.size; i++ ) {
-					fitList.add( point.neighbors.data[i].p);
+			// the NN algorithm's neighbor list includes the targeted point
+			if(  resultsNN.size <= numPlane ) {
+				for( int i = 0; i < resultsNN.size; i++ ) {
+					NnData<PointVectorNN> n = resultsNN.get(i);
+					if( n.distance < maxDistanceNeighbor ) {
+						fitList.add( n.data.p );
+					}
 				}
 			} else {
-				// the NN algorithm's neighbor list includes the targeted point
 				for( int i = 0; i < resultsNN.size; i++ ) {
 					NnData<PointVectorNN> n = resultsNN.get(i);
 					distance[i] = n.distance;
 				}
 				double threshold = QuickSelectArray.select(distance, numPlane - 1, resultsNN.size);
+				threshold = Math.min(threshold,maxDistanceNeighbor);
 				for( int i = 0; i < resultsNN.size; i++ ) {
 					NnData<PointVectorNN> n = resultsNN.get(i);
 					if( n.distance <= threshold )
