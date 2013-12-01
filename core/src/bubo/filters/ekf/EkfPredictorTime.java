@@ -29,7 +29,7 @@ public interface EkfPredictorTime extends EkfPredictor {
 	 * It tells the propagator to compute matrices for a time step
 	 *
 	 * @param mean The initial system state. Not modified.
-	 * @param T elapsed time since the previous measurement
+	 * @param T    elapsed time since the previous measurement
 	 */
 	public void compute(DenseMatrix64F mean, double T);
 }

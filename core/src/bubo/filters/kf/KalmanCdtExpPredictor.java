@@ -18,24 +18,16 @@
 
 package bubo.filters.kf;
 
-import org.ejml.data.DenseMatrix64F;
-
-
 /**
- * An implementation of the KalmanProjector with a fixed matrix.
+ * A predictor for the continuous-discrete time Kalman filter when there is an
+ * explicit solution to the prediction equations.  This means
  */
-public class FixedKalmanProjector implements KalmanProjector {
-	private DenseMatrix64F H;
-
-	public FixedKalmanProjector(DenseMatrix64F H) {
-		this.H = H;
-	}
-
-	public int getNumStates() {
-		return H.numRows;
-	}
-
-	public DenseMatrix64F getProjectionMatrix() {
-		return H;
-	}
+public interface KalmanCdtExpPredictor extends KalmanPredictor {
+	/**
+	 * Before any of the other functions are called this needs to be called first.
+	 * It tells the propagator to compute matrices for a time step of the specified length
+	 *
+	 * @param deltaTime The elapsed time since the previous measurement.
+	 */
+	public void compute(double deltaTime);
 }

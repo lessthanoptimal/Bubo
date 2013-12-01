@@ -18,24 +18,15 @@
 
 package bubo.filters.kf;
 
-import org.ejml.data.DenseMatrix64F;
 
+import bubo.filters.MultivariateGaussianDM;
 
 /**
- * An implementation of the KalmanProjector with a fixed matrix.
+ * An interface for the continuous discrete time Kalman filter.
  */
-public class FixedKalmanProjector implements KalmanProjector {
-	private DenseMatrix64F H;
+public interface KalmanCdtFilterInterface {
 
-	public FixedKalmanProjector(DenseMatrix64F H) {
-		this.H = H;
-	}
+	public void predict(MultivariateGaussianDM state, double T);
 
-	public int getNumStates() {
-		return H.numRows;
-	}
-
-	public DenseMatrix64F getProjectionMatrix() {
-		return H;
-	}
+	public void update(MultivariateGaussianDM state, MultivariateGaussianDM meas);
 }

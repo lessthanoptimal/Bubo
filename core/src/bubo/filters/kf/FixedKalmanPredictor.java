@@ -29,8 +29,7 @@ public class FixedKalmanPredictor implements KalmanPredictor {
 	private DenseMatrix64F G;
 	private DenseMatrix64F Q;
 
-	public FixedKalmanPredictor( DenseMatrix64F F , DenseMatrix64F G , DenseMatrix64F Q )
-	{
+	public FixedKalmanPredictor(DenseMatrix64F F, DenseMatrix64F G, DenseMatrix64F Q) {
 		this.F = F;
 		this.Q = Q;
 		this.G = G;
@@ -62,7 +61,7 @@ public class FixedKalmanPredictor implements KalmanPredictor {
 
 	@Override
 	public int getNumControl() {
-		if( G == null )
+		if (G == null)
 			return 0;
 		else
 			return G.numCols;

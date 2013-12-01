@@ -16,26 +16,33 @@
  * limitations under the License.
  */
 
-package bubo.filters.kf;
+package bubo.filters.imm.inhomo;
 
 import org.ejml.data.DenseMatrix64F;
 
-
 /**
- * An implementation of the KalmanProjector with a fixed matrix.
+ * Just returns the same state as the one that was passed in to it.
  */
-public class FixedKalmanProjector implements KalmanProjector {
-	private DenseMatrix64F H;
+public class TrivialInternalStateConverter implements InternalStateConverter {
 
-	public FixedKalmanProjector(DenseMatrix64F H) {
-		this.H = H;
+	private int outputDOF;
+
+	public TrivialInternalStateConverter(int outputDOF) {
+		this.outputDOF = outputDOF;
 	}
 
-	public int getNumStates() {
-		return H.numRows;
+	@Override
+	public DenseMatrix64F convertMergeFrom(boolean isMean, DenseMatrix64F fromState, int fromID, int target) {
+		return fromState;
 	}
 
-	public DenseMatrix64F getProjectionMatrix() {
-		return H;
+	@Override
+	public DenseMatrix64F convertOutput(boolean isMean, DenseMatrix64F input, int type) {
+		return input;
+	}
+
+	@Override
+	public int getOutputDimen() {
+		return outputDOF;
 	}
 }

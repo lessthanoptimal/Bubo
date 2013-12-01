@@ -16,19 +16,24 @@
  * limitations under the License.
  */
 
-package bubo.filters.kf;
+package bubo.filters.specific.kf;
 
+import bubo.filters.kf.KalmanProjector;
 import org.ejml.data.DenseMatrix64F;
 
-
 /**
- * An implementation of the KalmanProjector with a fixed matrix.
+ * This projector just reads the first few states
  */
-public class FixedKalmanProjector implements KalmanProjector {
+public class FirstFewProjector implements KalmanProjector {
+
 	private DenseMatrix64F H;
 
-	public FixedKalmanProjector(DenseMatrix64F H) {
-		this.H = H;
+	public FirstFewProjector(int readNum, int stateDOF) {
+		H = new DenseMatrix64F(readNum, stateDOF);
+
+		for (int i = 0; i < readNum; i++) {
+			H.set(i, i, 1.0);
+		}
 	}
 
 	public int getNumStates() {

@@ -38,7 +38,7 @@ public class TimeToDiscrete implements EkfPredictorDiscrete {
 
 	@Override
 	public void compute(DenseMatrix64F mean) {
-		predictor.compute(mean,T);
+		predictor.compute(mean, T);
 	}
 
 	@Override

@@ -16,26 +16,25 @@
  * limitations under the License.
  */
 
-package bubo.filters.kf;
+package bubo.filters.specific.ekf;
 
-import org.ejml.data.DenseMatrix64F;
+import bubo.filters.GenericKalmanFilterTests;
+import bubo.filters.MultivariateGaussianDM;
+import bubo.filters.ekf.EkfPredictorTime;
+import org.junit.Test;
 
-
-/**
- * An implementation of the KalmanProjector with a fixed matrix.
- */
-public class FixedKalmanProjector implements KalmanProjector {
-	private DenseMatrix64F H;
-
-	public FixedKalmanProjector(DenseMatrix64F H) {
-		this.H = H;
+public class TestOscillatingConstMotion
+		extends GenericEkfPredictorTimeTests {
+	@Test
+	public void doGenericTests() {
+		allGenericTests();
 	}
 
-	public int getNumStates() {
-		return H.numRows;
+	public EkfPredictorTime createPredictor() {
+		return new OscillatingConstMotion(1);
 	}
 
-	public DenseMatrix64F getProjectionMatrix() {
-		return H;
+	public MultivariateGaussianDM createInitState() {
+		return GenericKalmanFilterTests.createState(1, 1, 1, 0.1);
 	}
 }

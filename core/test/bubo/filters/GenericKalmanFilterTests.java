@@ -43,8 +43,7 @@ public abstract class GenericKalmanFilterTests {
 	 * Propagate the createInitialState() forward in time and compare it against
 	 * an expected value with the specified tolerance.
 	 */
-	public void checkPropagation( DenseMatrix64F expected , double tol )
-	{
+	public void checkPropagation(DenseMatrix64F expected, double tol) {
 		KalmanFilterInterface filter = createFilter();
 
 		MultivariateGaussianDM x = createInitialState();
@@ -52,8 +51,8 @@ public abstract class GenericKalmanFilterTests {
 		filter.predict(x);
 
 		// see if the mean is correct
-		for( int i = 0; i < x.getDimension(); i++ ) {
-			assertEquals(expected.get(i,0),x.getMean().get(i,0),tol);
+		for (int i = 0; i < x.getDimension(); i++) {
+			assertEquals(expected.get(i, 0), x.getMean().get(i, 0), tol);
 		}
 	}
 
@@ -67,15 +66,15 @@ public abstract class GenericKalmanFilterTests {
 
 		double prev = NormOps.normF(x.getCovariance());
 
-		for( int i = 0; i < 5; i++ ) {
+		for (int i = 0; i < 5; i++) {
 			filter.predict(x);
 
-			assertTrue(!MatrixFeatures.hasUncountable(x.getMean()) );
-			assertTrue(!MatrixFeatures.hasUncountable(x.getCovariance()) );
+			assertTrue(!MatrixFeatures.hasUncountable(x.getMean()));
+			assertTrue(!MatrixFeatures.hasUncountable(x.getCovariance()));
 
 			double after = NormOps.normF(x.getCovariance());
 
-			assertTrue( after > prev);
+			assertTrue(after > prev);
 			prev = after;
 		}
 	}
@@ -91,22 +90,22 @@ public abstract class GenericKalmanFilterTests {
 		DenseMatrix64F x_tgt = createTargetState();
 
 		double prevCov = NormOps.normF(x.getCovariance());
-		double prevState = SpecializedOps.diffNormF(x.getMean(),x_tgt);
+		double prevState = SpecializedOps.diffNormF(x.getMean(), x_tgt);
 
-		MultivariateGaussianDM z = createPerfectMeas(filter,x_tgt);
+		MultivariateGaussianDM z = createPerfectMeas(filter, x_tgt);
 
-		for( int i = 0; i < 5; i++ ) {
-			filter.update(x,z);
+		for (int i = 0; i < 5; i++) {
+			filter.update(x, z);
 
-			assertTrue(!MatrixFeatures.hasUncountable(x.getMean()) );
-			assertTrue(!MatrixFeatures.hasUncountable(x.getCovariance()) );
+			assertTrue(!MatrixFeatures.hasUncountable(x.getMean()));
+			assertTrue(!MatrixFeatures.hasUncountable(x.getCovariance()));
 
 			// error after update
 			double afterCov = NormOps.normF(x.getCovariance());
-			double afterState = SpecializedOps.diffNormF(x.getMean(),x_tgt);
+			double afterState = SpecializedOps.diffNormF(x.getMean(), x_tgt);
 
-			assertTrue( afterCov < prevCov);
-			assertTrue( afterState < prevState);
+			assertTrue(afterCov < prevCov);
+			assertTrue(afterState < prevState);
 			prevCov = afterCov;
 			prevState = afterState;
 		}
@@ -128,25 +127,24 @@ public abstract class GenericKalmanFilterTests {
 	 * Given the target's state, create a perfect measurement.
 	 *
 	 * @param filter Used to extract a projector for the measurement
-	 * @param state The target's state
+	 * @param state  The target's state
 	 */
-	protected abstract MultivariateGaussianDM createPerfectMeas( KalmanFilterInterface filter,
-																 DenseMatrix64F state );
+	protected abstract MultivariateGaussianDM createPerfectMeas(KalmanFilterInterface filter,
+																DenseMatrix64F state);
 
 	/**
 	 * Creates a Gaussian distribution with a covariance matrix and the specified state.
 	 */
-	public static MultivariateGaussianDM createState( double cov , double ...x )
-	{
-		DenseMatrix64F X = new DenseMatrix64F(x.length,1);
-		DenseMatrix64F P = new DenseMatrix64F(x.length,x.length);
+	public static MultivariateGaussianDM createState(double cov, double... x) {
+		DenseMatrix64F X = new DenseMatrix64F(x.length, 1);
+		DenseMatrix64F P = new DenseMatrix64F(x.length, x.length);
 
-		for( int i = 0; i < x.length; i++ ) {
-			X.set(i,0,x[i]);
-			P.set(i,i,cov);
+		for (int i = 0; i < x.length; i++) {
+			X.set(i, 0, x[i]);
+			P.set(i, i, cov);
 		}
 		MultivariateGaussianDM ret = new MultivariateGaussianDM();
-		ret.assignRef(X,P);
+		ret.assignRef(X, P);
 
 		return ret;
 	}

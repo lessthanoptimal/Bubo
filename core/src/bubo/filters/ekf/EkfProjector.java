@@ -42,7 +42,7 @@ public interface EkfProjector {
 	 *
 	 * @param systemState The state of the system making the observation.
 	 */
-	public void compute(DenseMatrix64F systemState );
+	public void compute(DenseMatrix64F systemState);
 
 	/**
 	 * <p>
@@ -53,7 +53,7 @@ public interface EkfProjector {
 	 * </p>
 	 *
 	 * @return Observation Jacobian matrix. WARNING DO NOT MODIFY!
-	 * DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
+	 *         DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
 	 */
 	public DenseMatrix64F getJacobianH();
 
@@ -61,7 +61,7 @@ public interface EkfProjector {
 	 * Returns the estimated measurement, given the current state estimate.
 	 *
 	 * @return Estimated measurement column vector.
-	 * WARNING DO NOT MODIFY!  DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
+	 *         WARNING DO NOT MODIFY!  DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
 	 */
 	public DenseMatrix64F getProjected();
 }

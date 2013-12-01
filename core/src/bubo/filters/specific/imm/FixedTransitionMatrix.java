@@ -16,26 +16,34 @@
  * limitations under the License.
  */
 
-package bubo.filters.kf;
+package jtarget.tracking.specific.filter.imm;
 
+import bubo.filters.imm.InteractionMatrixInterface;
 import org.ejml.data.DenseMatrix64F;
 
-
 /**
- * An implementation of the KalmanProjector with a fixed matrix.
+ * This transition matrix is independent of the observation sojourn time.
  */
-public class FixedKalmanProjector implements KalmanProjector {
-	private DenseMatrix64F H;
+public class FixedTransitionMatrix
+		implements InteractionMatrixInterface {
+	private DenseMatrix64F pi;
 
-	public FixedKalmanProjector(DenseMatrix64F H) {
-		this.H = H;
+	public FixedTransitionMatrix(DenseMatrix64F pi) {
+		this.pi = pi;
+
+		// make sure its a valid matrix
+		for (int i = 0; i < pi.numRows; i++) {
+			double total = 0;
+			for (int j = 0; j < pi.numCols; j++) {
+				total += pi.get(i, j);
+			}
+			if (Math.abs(total - 1) > 1e-5)
+				throw new IllegalArgumentException("Bad matrix");
+		}
 	}
 
-	public int getNumStates() {
-		return H.numRows;
-	}
-
-	public DenseMatrix64F getProjectionMatrix() {
-		return H;
+	@Override
+	public DenseMatrix64F computeMatrix(double deltaTime) {
+		return pi;
 	}
 }

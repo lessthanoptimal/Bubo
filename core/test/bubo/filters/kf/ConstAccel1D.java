@@ -37,25 +37,38 @@ public class ConstAccel1D implements KalmanPredictor {
 	DenseMatrix64F G;
 	double T;
 
-	public ConstAccel1D(double q , double T ) {
+	public ConstAccel1D(double q, double T) {
 		this.T = T;
-		F = new DenseMatrix64F(3,3);
-		Q = new DenseMatrix64F(3,3);
+		F = new DenseMatrix64F(3, 3);
+		Q = new DenseMatrix64F(3, 3);
 		this.q = q;
 
-		F.set(0,0,1);
-		F.set(0,1,T);
-		F.set(0,2,0.5*T*T);
-		F.set(1,1,1);
-		F.set(1,2,T);
-		F.set(2,2,1);
+		setT(T);
+	}
 
-		DenseMatrix64F L = new DenseMatrix64F(3,1);
-		L.set(0,0,0.5*T*T);
-		L.set(1,0,T);
-		L.set(2,0,1);
+	public ConstAccel1D(DenseMatrix64F G, double q) {
+		F = new DenseMatrix64F(3, 3);
+		Q = new DenseMatrix64F(3, 3);
+		this.q = q;
+		this.G = new DenseMatrix64F(G);
 
-		multTransB(q,L,L,Q);
+		setT(T);
+	}
+
+	private void setT(double T) {
+		F.set(0, 0, 1);
+		F.set(0, 1, T);
+		F.set(0, 2, 0.5 * T * T);
+		F.set(1, 1, 1);
+		F.set(1, 2, T);
+		F.set(2, 2, 1);
+
+		DenseMatrix64F L = new DenseMatrix64F(3, 1);
+		L.set(0, 0, 0.5 * T * T);
+		L.set(1, 0, T);
+		L.set(2, 0, 1);
+
+		multTransB(q, L, L, Q);
 	}
 
 	@Override
@@ -80,7 +93,7 @@ public class ConstAccel1D implements KalmanPredictor {
 
 	@Override
 	public int getNumControl() {
-		if( G == null )
+		if (G == null)
 			return 0;
 		else
 			return G.numCols;

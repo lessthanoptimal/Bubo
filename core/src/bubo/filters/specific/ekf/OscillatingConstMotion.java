@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-package bubo.filters.ekf;
+package bubo.filters.specific.ekf;
 
+
+import bubo.filters.ekf.EkfPredictor;
+import bubo.filters.ekf.EkfPredictorTime;
 import org.ejml.data.DenseMatrix64F;
 
 import static java.lang.Math.*;
-
 
 /**
  * This is a non-linear motion problem.  The center of the system moves at a constant motion,
@@ -37,7 +39,7 @@ import static java.lang.Math.*;
  * [ v                 ]
  * [ cos( acos(x3) + T ]
  */
-public class OscillatingConstMotion implements EkfPredictorDiscrete, EkfPredictorTime {
+public class OscillatingConstMotion implements EkfPredictor, EkfPredictorTime {
 
 	DenseMatrix64F x;
 	DenseMatrix64F F;
@@ -57,11 +59,6 @@ public class OscillatingConstMotion implements EkfPredictorDiscrete, EkfPredicto
 		Q = new DenseMatrix64F(3, 3);
 
 		T = Double.NaN;
-	}
-
-	@Override
-	public void compute(DenseMatrix64F mean) {
-		compute(mean, T);
 	}
 
 	@Override

@@ -34,16 +34,16 @@ public class TestTimeToDiscrete {
 		double T = 2.0;
 
 		OscillatingConstMotion time = new OscillatingConstMotion();
-		TimeToDiscrete discrete = new TimeToDiscrete(new OscillatingConstMotion(),T);
+		TimeToDiscrete discrete = new TimeToDiscrete(new OscillatingConstMotion(), T);
 
-		DenseMatrix64F x = new DenseMatrix64F(3,1,true,0.1,0.2,-0.01);
+		DenseMatrix64F x = new DenseMatrix64F(3, 1, true, 0.1, 0.2, -0.01);
 
-		time.compute(x,T);
+		time.compute(x, T);
 		discrete.compute(x);
 
-		assertTrue(MatrixFeatures.isEquals(discrete.getPredictedState(),time.getPredictedState(),1e-8));
-		assertTrue(MatrixFeatures.isEquals(discrete.getJacobianF(),time.getJacobianF(),1e-8));
-		assertTrue(MatrixFeatures.isEquals(discrete.getPlantNoise(),time.getPlantNoise(),1e-8));
-		assertEquals(discrete.getSystemSize(),time.getSystemSize());
+		assertTrue(MatrixFeatures.isEquals(discrete.getPredictedState(), time.getPredictedState(), 1e-8));
+		assertTrue(MatrixFeatures.isEquals(discrete.getJacobianF(), time.getJacobianF(), 1e-8));
+		assertTrue(MatrixFeatures.isEquals(discrete.getPlantNoise(), time.getPlantNoise(), 1e-8));
+		assertEquals(discrete.getSystemSize(), time.getSystemSize());
 	}
 }

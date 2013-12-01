@@ -43,16 +43,16 @@ public class TestDiscreteKalmanFilter extends GenericKalmanFilterTests {
 	 */
 	@Test
 	public void checkPropagationValues() {
-		DiscreteKalmanFilter filter = (DiscreteKalmanFilter)createFilter();
+		DiscreteKalmanFilter filter = (DiscreteKalmanFilter) createFilter();
 
-		MultivariateGaussianDM x = createState(9.0,0,1,2);
+		MultivariateGaussianDM x = createState(9.0, 0, 1, 2);
 
 		filter.predict(x);
 
 		// see if the mean is correct
-		assertEquals(2.0,x.getMean().get(0,0),1e-6);
-		assertEquals(3.0,x.getMean().get(1,0),1e-6);
-		assertEquals(2.0,x.getMean().get(2,0),1e-6);
+		assertEquals(2.0, x.getMean().get(0, 0), 1e-6);
+		assertEquals(3.0, x.getMean().get(1, 0), 1e-6);
+		assertEquals(2.0, x.getMean().get(2, 0), 1e-6);
 	}
 
 	/**
@@ -62,27 +62,27 @@ public class TestDiscreteKalmanFilter extends GenericKalmanFilterTests {
 	public void checkControlUse() {
 		DenseMatrix64F F = CommonOps.identity(3);
 		DenseMatrix64F Q = CommonOps.identity(3);
-		DenseMatrix64F G = new DenseMatrix64F(3,2);
-		DenseMatrix64F u = new DenseMatrix64F(2,1);
+		DenseMatrix64F G = new DenseMatrix64F(3, 2);
+		DenseMatrix64F u = new DenseMatrix64F(2, 1);
 
 		CommonOps.fill(G, 1.0);
 		CommonOps.fill(u, 2.0);
 
-		FixedKalmanPredictor prop = new FixedKalmanPredictor(F,G,Q);
+		FixedKalmanPredictor prop = new FixedKalmanPredictor(F, G, Q);
 
-		DenseMatrix64F H = new DenseMatrix64F( new double[][]{{1,1,1},{0,1,2}});
+		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
 
 		KalmanProjector projector = new FixedKalmanProjector(H);
 
 		// see how it works with the control
-		DiscreteKalmanFilter kf = new DiscreteKalmanFilter(prop,projector);
+		DiscreteKalmanFilter kf = new DiscreteKalmanFilter(prop, projector);
 		kf.setControlInput(u);
 
 		MultivariateGaussianDM x = new MultivariateGaussianDM(3);
 		kf.predict(x);
 
-		for( int i = 0; i < 3; i++ ) {
-			assertTrue(x.getMean().get(i,0) > 0);
+		for (int i = 0; i < 3; i++) {
+			assertTrue(x.getMean().get(i, 0) > 0);
 		}
 
 		// now do it without the control
@@ -91,43 +91,43 @@ public class TestDiscreteKalmanFilter extends GenericKalmanFilterTests {
 		x = new MultivariateGaussianDM(3);
 		kf.predict(x);
 
-		for( int i = 0; i < 3; i++ ) {
-			assertTrue(x.getMean().get(i,0) == 0);
+		for (int i = 0; i < 3; i++) {
+			assertTrue(x.getMean().get(i, 0) == 0);
 		}
 	}
 
 	@Override
 	protected KalmanFilterInterface createFilter() {
-		ConstAccel1D constAccelProp = new ConstAccel1D(1.0,1);
+		ConstAccel1D constAccelProp = new ConstAccel1D(1.0, 1);
 
-		DenseMatrix64F H = new DenseMatrix64F( new double[][]{{1,1,1},{0,1,2}});
+		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
 
 		FixedKalmanProjector projector = new FixedKalmanProjector(H);
 
-		return new DiscreteKalmanFilter(constAccelProp,projector);
+		return new DiscreteKalmanFilter(constAccelProp, projector);
 	}
 
 	@Override
 	protected MultivariateGaussianDM createInitialState() {
-		return createState(9.0,2,3,4);
+		return createState(9.0, 2, 3, 4);
 	}
 
 	@Override
 	protected DenseMatrix64F createTargetState() {
-		return createState(9.0,1,1,1).getMean();
+		return createState(9.0, 1, 1, 1).getMean();
 	}
 
 	@Override
-	protected MultivariateGaussianDM createPerfectMeas(KalmanFilterInterface f ,
+	protected MultivariateGaussianDM createPerfectMeas(KalmanFilterInterface f,
 													   DenseMatrix64F state) {
-		DiscreteKalmanFilter filter = (DiscreteKalmanFilter)f;
+		DiscreteKalmanFilter filter = (DiscreteKalmanFilter) f;
 		DenseMatrix64F H = filter.getProjector().getProjectionMatrix();
 		DenseMatrix64F X = state;
 
-		DenseMatrix64F z = new DenseMatrix64F(2,1);
+		DenseMatrix64F z = new DenseMatrix64F(2, 1);
 
-		CommonOps.mult(H,X,z);
+		CommonOps.mult(H, X, z);
 
-		return createState(2.0,z.get(0,0),z.get(1,0));
+		return createState(2.0, z.get(0, 0), z.get(1, 0));
 	}
 }

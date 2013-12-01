@@ -69,7 +69,7 @@ public class CPose3D extends CPose implements RawlogSerializableStandard {
     public String toReadableText() {
         String ret = "";
 
-        double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rotation);
+        double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rotation,null);
 
         ret += "Position = ( "+position.getX()+" , "+position.getY()+" , "+position.getZ()+" )\n";
         ret += String.format("Rotation = ( rotX = %5.2f | rotY = %5.2f | rotZ = %5.2f )\n",euler[0],euler[1],euler[2]);

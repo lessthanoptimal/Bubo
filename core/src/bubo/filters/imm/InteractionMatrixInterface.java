@@ -16,26 +16,19 @@
  * limitations under the License.
  */
 
-package bubo.filters.kf;
+package bubo.filters.imm;
 
 import org.ejml.data.DenseMatrix64F;
 
-
 /**
- * An implementation of the KalmanProjector with a fixed matrix.
+ * Computes an interaction matrix for the IMM filter.  The values in the interaction matrix depend on
+ * the time since the last observation.
  */
-public class FixedKalmanProjector implements KalmanProjector {
-	private DenseMatrix64F H;
-
-	public FixedKalmanProjector(DenseMatrix64F H) {
-		this.H = H;
-	}
-
-	public int getNumStates() {
-		return H.numRows;
-	}
-
-	public DenseMatrix64F getProjectionMatrix() {
-		return H;
-	}
+public interface InteractionMatrixInterface {
+	/**
+	 * Computes the interaction matrix.
+	 *
+	 * @param deltaTime The time since the previous observation.
+	 */
+	public DenseMatrix64F computeMatrix(double deltaTime);
 }

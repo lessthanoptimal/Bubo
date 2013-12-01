@@ -92,8 +92,8 @@ public class ExtendedKalmanFilter extends DKFCommon implements KalmanFilterInter
 		this.projector = projector;
 	}
 
-	public <T extends EkfPredictor>T getPredictor() {
-		return (T)predictor;
+	public <T extends EkfPredictor> T getPredictor() {
+		return (T) predictor;
 	}
 
 	public EkfProjector getProjector() {
