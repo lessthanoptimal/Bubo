@@ -101,7 +101,7 @@ public class ImmState {
 		// compute the mean
 		for (ImmHypothesis h : hypotheses) {
 //            System.out.println("  model prob = "+h.getProbability());
-			CommonOps.add(x_ret, h.getProbability(), h.getState().getMean());
+			CommonOps.add(x_ret, h.getProbability(), h.getState().getMean(), x_ret);
 		}
 
 		// compute the covariance
@@ -112,7 +112,7 @@ public class ImmState {
 			CommonOps.multTransB(d, d, outer);
 			CommonOps.add(outer, h.getState().getCovariance(), outer);
 
-			CommonOps.add(P_ret, h.getProbability(), outer);
+			CommonOps.add(P_ret, h.getProbability(), outer, P_ret);
 		}
 
 		return stateMOG;

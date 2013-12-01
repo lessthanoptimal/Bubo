@@ -108,17 +108,33 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 
 		if (targetDimen <= fromDimen) {
 			int maxX = isMean ? 1 : targetDimen;
-			CommonOps.insert(fromState, a, targetDimen, maxX);
+			CommonOps.extract(fromState, 0, targetDimen, 0, maxX, a, 0, 0);
 //            UtilMtjMatrix.copySubMatrix(fromState,a,maxX,targetDimen);
 		} else {
 			int maxX = isMean ? 1 : fromDimen;
 			DenseMatrix64F def = isMean ? this.def.getMean() : this.def.getCovariance();
-			CommonOps.insert(fromState, a, fromDimen, maxX);
-			throw new RuntimeException("Need to implement copyExcludeStill");
-//            UtilMtjMatrix.copySubMatrix(fromState,a,maxX,fromDimen);
-//            UtilMtjMatrix.copyExcludeSubMatrix(def,a,maxX,fromDimen);
+			CommonOps.extract(fromState, 0, fromDimen, 0, maxX, a, 0, 0);
+			copyExcludeSubMatrix(def,a,maxX,fromDimen);
 		}
 
 		return a;
+	}
+
+	/**
+	 * Copies all but a top left portion of one matrix into another one.
+	 *
+	 * The matrices must be the same size.
+	 *
+	 * An element will be copied if its x index is >= minX OR y index is >= minY
+	 */
+	public static void copyExcludeSubMatrix( DenseMatrix64F src , DenseMatrix64F dest ,
+											 int minX , int minY )
+	{
+		for( int i = 0; i < dest.numRows ; i++ ) {
+			for( int j = 0; j < dest.numCols; j++ ) {
+				if( i >= minY || j >= minX )
+					dest.unsafe_set(i, j, src.get(i, j));
+			}
+		}
 	}
 }

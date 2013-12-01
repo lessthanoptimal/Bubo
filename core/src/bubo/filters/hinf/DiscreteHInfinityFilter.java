@@ -181,7 +181,7 @@ public class DiscreteHInfinityFilter implements KalmanFilterInterface {
 
 		// innovation
 		innovation.set(y);
-		CommonOps.mult(-1, H, x, innovation);
+		CommonOps.multAdd(-1, H, x, innovation);
 
 		// update the state
 		CommonOps.mult(K, innovation, temp0_m_1);

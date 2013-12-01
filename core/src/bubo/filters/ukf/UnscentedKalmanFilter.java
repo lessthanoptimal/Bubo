@@ -258,7 +258,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 			predictor.compute(p);
 			p.set(predictor.getPredictedState());
 
-			CommonOps.add(x, weights[i], p);
+			CommonOps.add(x, weights[i], p, x);
 		}
 
 		// compute the covariance with plant noise
@@ -268,7 +268,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 		for (int i = firstCovIndex; i < points.length; i++) {
 			DenseMatrix64F p = points[i];
 
-			CommonOps.add(p, -1, x);
+			CommonOps.add(p, -1, x, p);
 			CommonOps.multAddTransB(weights[i], p, p, P);
 		}
 
@@ -305,7 +305,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 
 		// x = x + K*(z-\hat{z})
 		temp1_Nx1.set(z);
-		CommonOps.add(temp1_Nx1, -1, z_hat);
+		CommonOps.add(temp1_Nx1, -1, z_hat, temp1_Nx1);
 		CommonOps.multAdd(K, temp1_Nx1, x);
 
 		// P = P - K*PzK'
@@ -320,7 +320,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 		for (int i = firstCovIndex; i < measPoints.length; i++) {
 			//
 			DenseMatrix64F pX = points[i];
-			CommonOps.add(pX, -1, x);
+			CommonOps.add(pX, -1, x, pX);
 			DenseMatrix64F pZ = measPoints[i];
 
 			CommonOps.multAddTransB(weights[i], pX, pZ, Pxz);
@@ -335,7 +335,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 		// Pz = sum(i=0:2n+1) ( w_i (z_ihat - z_hat)(...)' )
 		for (int i = firstCovIndex; i < measPoints.length; i++) {
 			DenseMatrix64F z_ihat = measPoints[i];
-			CommonOps.add(z_ihat, -1, z_hat);
+			CommonOps.add(z_ihat, -1, z_hat, z_ihat);
 
 			CommonOps.multAddTransB(weights[i], z_ihat, z_ihat, Pz);
 		}
@@ -351,7 +351,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 			projector.compute(p);
 			DenseMatrix64F z_ihat = projector.getProjected();
 			measPoints[i].set(z_ihat);
-			CommonOps.add(z_hat, weights[i], z_ihat);
+			CommonOps.add(z_hat, weights[i], z_ihat, z_hat);
 		}
 		return z_hat;
 	}

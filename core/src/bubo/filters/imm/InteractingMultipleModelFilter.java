@@ -202,7 +202,7 @@ public class InteractingMultipleModelFilter {
 			for (int j = 0; j < hypotheses.length; j++) {
 				DenseMatrix64F x_j = hypotheses[j].getState().getMean();
 
-				CommonOps.add(mix, c.get(i, j), x_j);
+				CommonOps.add(mix, c.get(i, j), x_j, mix);
 			}
 		}
 	}
@@ -219,12 +219,12 @@ public class InteractingMultipleModelFilter {
 			for (int j = 0; j < hypotheses.length; j++) {
 				ImmHypothesis m_j = hypotheses[j];
 				d.set(mixMean);
-				CommonOps.add(d, -1, m_j.getMix().getMean());
+				CommonOps.add(d, -1, m_j.getMix().getMean(), d);
 				CommonOps.multTransB(d, d, outer);
 
 				CommonOps.add(outer, m_j.getState().getCovariance(), outer);
 
-				CommonOps.add(mixCov, c.get(i, j), outer);
+				CommonOps.add(mixCov, c.get(i, j), outer, mixCov);
 			}
 		}
 	}

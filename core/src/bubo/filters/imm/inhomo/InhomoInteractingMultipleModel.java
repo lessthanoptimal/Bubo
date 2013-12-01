@@ -212,7 +212,7 @@ public class InhomoInteractingMultipleModel {
 				DenseMatrix64F x_j_orig = hypotheses[j].getState().getMean();
 				DenseMatrix64F x_j = converter.convertMergeFrom(true, x_j_orig, j, i);
 
-				CommonOps.add(mix, c.get(i, j), x_j);
+				CommonOps.add(mix, c.get(i, j), x_j, mix);
 			}
 		}
 	}

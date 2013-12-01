@@ -87,7 +87,7 @@ public class IhImmState {
 //            System.out.println("  model prob = "+h.getProbability());
 			DenseMatrix64F x_j_orig = h.getState().getMean();
 			DenseMatrix64F x_j = converter.convertOutput(true, x_j_orig, i);
-			CommonOps.add(x_ret, h.getProbability(), x_j);
+			CommonOps.add(x_ret, h.getProbability(), x_j, x_ret);
 		}
 
 		// compute the covariance
@@ -98,7 +98,7 @@ public class IhImmState {
 			DenseMatrix64F x_j = converter.convertOutput(true, x_j_orig, i);
 
 			d.set(x_j);
-			CommonOps.add(d, -1, x_ret);
+			CommonOps.add(d, -1, x_ret, d);
 
 			CommonOps.multTransB(d, d, outer);
 

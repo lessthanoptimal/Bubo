@@ -94,7 +94,7 @@ public class ImmCheckingFilter extends InteractingMultipleModelFilter {
 				throw new SanityCheck("Bad model state");
 			}
 
-			if (CovarianceOps.isValidFast(s.getCovariance())) {
+			if (!CovarianceOps.isValidFast(s.getCovariance())) {
 				throw new SanityCheck("Bad model covariance");
 			}
 		}
