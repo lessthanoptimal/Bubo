@@ -56,12 +56,12 @@ public class StandardProjectorTests {
 	private class ProjectorFunction implements FunctionNtoM {
 
 		@Override
-		public int getN() {
+		public int getInputsN() {
 			return projector.getSystemSize();
 		}
 
 		@Override
-		public int getM() {
+		public int getOutputsM() {
 			return projector.getMeasurementSize();
 		}
 
@@ -82,12 +82,12 @@ public class StandardProjectorTests {
 	{
 
 		@Override
-		public int getN() {
+		public int getInputsN() {
 			return projector.getSystemSize();
 		}
 
 		@Override
-		public int getM() {
+		public int getOutputsM() {
 			return projector.getMeasurementSize();
 		}
 

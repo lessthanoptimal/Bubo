@@ -60,10 +60,10 @@ public class CPose3DQuat extends CPose implements RawlogSerializableCustom {
             position.x = LittleEndianIO.readDouble(decoder.getInput());
             position.y = LittleEndianIO.readDouble(decoder.getInput());
             position.z = LittleEndianIO.readDouble(decoder.getInput());
-            rotation.q1 = LittleEndianIO.readDouble(decoder.getInput());
-            rotation.q2 = LittleEndianIO.readDouble(decoder.getInput());
-            rotation.q3 = LittleEndianIO.readDouble(decoder.getInput());
-            rotation.q4 = LittleEndianIO.readDouble(decoder.getInput());
+            rotation.x = LittleEndianIO.readDouble(decoder.getInput());
+            rotation.y = LittleEndianIO.readDouble(decoder.getInput());
+            rotation.z = LittleEndianIO.readDouble(decoder.getInput());
+            rotation.w = LittleEndianIO.readDouble(decoder.getInput());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
