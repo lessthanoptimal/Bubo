@@ -95,12 +95,12 @@ public class StandardPredictorTests {
 	private class PredictorFunction implements FunctionNtoM {
 
 		@Override
-		public int getInputsN() {
+		public int getNumOfInputsN() {
 			return projector.getSystemSize();
 		}
 
 		@Override
-		public int getOutputsM() {
+		public int getNumOfOutputsM() {
 			return projector.getSystemSize();
 		}
 
@@ -121,12 +121,12 @@ public class StandardPredictorTests {
 	{
 
 		@Override
-		public int getInputsN() {
+		public int getNumOfInputsN() {
 			return projector.getSystemSize();
 		}
 
 		@Override
-		public int getOutputsM() {
+		public int getNumOfOutputsM() {
 			return projector.getSystemSize();
 		}
 
