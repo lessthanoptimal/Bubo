@@ -25,8 +25,8 @@ import bubo.filters.ekf.EkfPredictorDiscrete;
 import bubo.filters.ekf.EkfProjector;
 import bubo.filters.ekf.ExtendedKalmanFilter;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.CholeskyDecomposition;
 import org.ejml.factory.DecompositionFactory;
+import org.ejml.interfaces.decomposition.CholeskyDecomposition;
 import org.ejml.ops.CommonOps;
 
 /**
