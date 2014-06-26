@@ -1,0 +1,11 @@
+dependencies {
+    compile project(':core')
+    compile project(':io')
+    compile project(':gui')
+}
+
+idea {
+    module {
+        name = "BUBO Apps"
+    }
+}

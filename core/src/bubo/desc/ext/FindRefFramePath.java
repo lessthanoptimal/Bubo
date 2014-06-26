@@ -20,7 +20,7 @@ package bubo.desc.ext;
 
 import bubo.desc.ExtrinsicParameters;
 import bubo.desc.RobotComponent;
-import georegression.struct.se.InvertibleTransformSequence;
+import georegression.transform.InvertibleTransformSequence;
 
 import java.util.ArrayList;
 import java.util.List;

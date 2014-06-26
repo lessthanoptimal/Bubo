@@ -1,0 +1,195 @@
+// TODO insert analytics and adsense into javadoc
+
+ext.libpath = file('./').absolutePath
+
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+
+    group = 'org.projectbubo'
+    version = '1-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'osgi'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+
+    sourceCompatibility = 1.6
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+
+        maven {
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDir 'src'
+            }
+            resources {
+                srcDir 'resources/src'
+            }
+        }
+
+        test {
+            java {
+                srcDir 'test'
+                srcDir 'generate'
+                srcDir 'benchmark'
+            }
+            resources {
+                srcDir 'resources/test'
+            }
+        }
+    }
+
+    dependencies {
+        compile group: 'com.googlecode.efficient-java-matrix-library', name: 'ejml', version: '0.25'
+        compile group: 'org.ddogleg', name: 'ddogleg', version: '0.5'
+        compile group: 'org.georegression', name: 'georegression', version: '0.6'
+        compile group: 'org.boofcv', name: 'ip', version: '0.17'
+        compile group: 'org.boofcv', name: 'io', version: '0.17'
+        compile group: 'org.boofcv', name: 'geo', version: '0.17'
+        compile group: 'org.boofcv', name: 'feature', version: '0.17'
+        compile group: 'org.boofcv', name: 'sfm', version: '0.17'
+        compile group: 'org.boofcv', name: 'visualize', version: '0.17'
+        compile group: 'org.boofcv', name: 'WebcamCapture', version: '0.17'
+
+        testCompile group: 'junit', name: 'junit', version: '4.11'
+    }
+
+    jar {
+        manifest { // the manifest of the default jar is of type OsgiManifest
+            instruction 'Bundle-Vendor', 'Project BUBO'
+//            instruction 'Bundle-Description', 'BoofCV'
+            instruction 'Bundle-DocURL', 'http://projectbubo.org'
+        }
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    // if Maven central isn't setup in gradle.properties skip all of this
+    if( project.hasProperty('ossrhUsername') ) {
+        signing {
+            sign configurations.archives
+        }
+
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
+                    }
+
+                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
+                    }
+
+                    pom.project {
+                        name 'BoofCV'
+                        packaging 'pom'
+                        // optionally artifactId can be defined here
+                        description 'Project BUBO is a library for robotic localization and mapping'
+                        url 'http://projectbubo.org'
+
+                        scm {
+                            connection 'scm:git:git@github.com:lessthanoptimal/Bubo.git'
+                            developerConnection 'scm:git:git@github.com:lessthanoptimal/Bubo.git'
+                            url 'https://github.com/lessthanoptimal/Bubo'
+                        }
+
+                        licenses {
+                            license {
+                                name 'The Apache Software License, Version 2.0'
+                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id 'pabeles'
+                                name 'Peter Abeles'
+                                email 'peter.abeles@gmail.com'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// list of projects for creating javadoc and jars
+def mainProjects = [
+        ':apps',
+        ':core',
+        ':gui',
+        ':io'
+]
+
+// Creates a directory with all the compiled BoofCV jars and the dependencies for main
+task createLibraryDirectory( dependsOn: mainProjects.collect{ it+":jar"}+mainProjects.collect{ it+":sourcesJar"} ) << {
+
+    // dependencies for main and their own jars
+    ext.list = files(mainProjects.collect{ project(it).tasks.jar.archivePath })
+
+    file('libraries').deleteDir()
+    file('libraries').mkdir()
+
+
+    copy {
+        from ext.list
+        into 'libraries'
+
+        // append on BoofCV so it's clear which jars are part of BoofCV and which are not
+        rename { String fileName ->
+            "BUBO-" + fileName
+        }
+    }
+}
+
+task alljavadoc(type: Javadoc) {
+    // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
+    source = mainProjects.collect { project(it).fileTree('src').include('**/*.java') }
+//    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
+    classpath = files(mainProjects.collect { project(it).sourceSets.main.compileClasspath })
+
+    destinationDir = file("${buildDir}/docs/javadoc")
+    configure(options) {
+        docTitle = "BoofCV JavaDoc ($project.version)"
+        links = [ 'http://docs.oracle.com/javase/7/docs/api/',
+                  'http://ejml.org/javadoc/',
+                  'http://georegression.org/javadoc/',
+                  'http://ddogleg.org/javadoc/']
+//        header = file('misc/header.txt').text.replace("\n", "")
+//        bottom = file('misc/bottom.txt').text.replace("\n", "")
+    }
+}
+
+idea {
+    project {
+        jdkName = '1.6 (64bit)'
+        languageLevel = '1.6'
+    }
+}
+

@@ -26,19 +26,15 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Constructs quad tree one point at a time.  The divider point is always the center of the cube and the same graph
- * will be produced independent of the order in which points are added.   Data structures associated with the
- * Octree are managed and saved by this class and recycled with {@link #reset} is called.
+ * Base class for constructing octrees.  Contains internal functions for managing data structures.  All data
+ * structures are managed by this tree and can be reclaimed by calling {@link #reset}.
  *
  * @author Peter Abeles
  */
-public class ConstructOctreeEqual {
-
-	// create a new node in the graph when the number of points exceeds
-	private int divideThreshold;
+public abstract class ConstructOctree {
 
 	// the Octree that it modifies
-	private Octree tree;
+	protected Octree tree;
 
 	// save references to all data structures declared to create the tree
 	protected FastQueue<Octree.Info> storageInfo = new FastQueue<Octree.Info>(Octree.Info.class,true);
@@ -49,10 +45,8 @@ public class ConstructOctreeEqual {
 	/**
 	 * Specifies graph construction parameters
 	 *
-	 * @param divideThreshold Create a new node with the number of points exceeds this threshold
 	 */
-	public ConstructOctreeEqual(int divideThreshold) {
-		this.divideThreshold = divideThreshold;
+	public ConstructOctree() {
 		this.tree = storageNodes.grow();
 	}
 
@@ -116,80 +110,14 @@ public class ConstructOctreeEqual {
 	 * @param point The point which is to be added
 	 * @return The node which contains the point
 	 */
-	public Octree addPoint( Point3D_F64 point , Object data ) {
-		// declare the structure which stores the point and data
-		Octree.Info info = storageInfo.grow();
-		info.point = point;
-		info.data = data;
-
-		Octree node = tree;
-		tree.points.add( info );
-
-		while( true ) {
-			if( node.isLeaf() ) {
-				// see if it needs to create a new node
-				if( node.points.size() > divideThreshold ) {
-					node.children = getChildrenArray();
-					computeDivider(node.space,node.divider);
-
-					// create a new child for point to go into
-					int index = node.getChildIndex(point);
-					Octree child = checkAddChild(node,index, info);
-
-					// Create new children where appropriate for all points in node, but 'point'
-					for( int i = 0; i < node.points.size-1; i++ ) {
-						Octree.Info infoP = node.points.get(i);
-						int indexP = node.getChildIndex(infoP.point);
-
-						// see if the node exists
-						checkAddChild(node, indexP, infoP );
-					}
-
-					// check for the pathological case where all the points are identical
-					boolean pathological = checkPathological(node);
-
-					if( pathological ) {
-						// avoid infinite recursion by not splitting this node yet
-						undoSplit(node);
-						// search is done since it's at a leaf
-						return node;
-					} else {
-						node = child;
-					}
-				} else {
-					return node;
-				}
-			} else {
-				int index = node.getChildIndex(point);
-				node = checkAddChild(node, index, info );
-			}
-		}
-	}
-
-	/**
-	 * If all the points are identical it will recurse forever since it can't split them.
-	 */
-	private boolean checkPathological(Octree node) {
-
-		boolean pathological = true;
-		Point3D_F64 first = node.points.data[0].point;
-		for( int i = 1; i < node.points.size; i++ ) {
-			Point3D_F64 p = node.points.data[i].point;
-			if( first.x != p.x || first.y != p.y || first.z != p.z ) {
-				pathological = false;
-				break;
-			}
-		}
-
-		return pathological;
-	}
+	public abstract Octree addPoint( Point3D_F64 point , Object data );
 
 	/**
 	 * A node was just split then it was realized that it should not have been split.  Undoes the split
 	 * and recycles the data
 	 * @param node Node which needs to become a leaf again.
 	 */
-	private void undoSplit(Octree node) {
+	protected void undoSplit(Octree node) {
 		for( int i = 0; i < 8; i++ ) {
 			Octree o = node.children[i];
 			if( o != null ) {
@@ -206,9 +134,10 @@ public class ConstructOctreeEqual {
 	}
 
 	/**
-	 * Checks to see if the child already exists.  If not it creates the child
+	 * Checks to see if the child already exists.  If not it creates the child.  Info is added to
+	 * the child's points.
 	 */
-	private Octree checkAddChild(Octree node, int index  , Octree.Info info ) {
+	protected Octree checkAddChild(Octree node, int index  , Octree.Info info ) {
 		Octree child = node.children[index];
 		if( child == null ) {
 			child = node.children[index] = storageNodes.grow();
@@ -217,6 +146,20 @@ public class ConstructOctreeEqual {
 			// no points to add to child since none of the previous ones belong to it
 		}
 		child.points.add( info );
+		return child;
+	}
+
+	/**
+	 * Checks to see if the child already exists.  If not it creates the child
+	 */
+	protected Octree checkAddChild(Octree node, int index ) {
+		Octree child = node.children[index];
+		if( child == null ) {
+			child = node.children[index] = storageNodes.grow();
+			child.parent = node;
+			setChildSpace(node.space,node.divider,index,child.space);
+			// no points to add to child since none of the previous ones belong to it
+		}
 		return child;
 	}
 

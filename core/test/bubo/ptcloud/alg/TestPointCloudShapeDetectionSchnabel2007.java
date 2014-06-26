@@ -19,7 +19,7 @@
 package bubo.ptcloud.alg;
 
 import bubo.ptcloud.CloudShapeTypes;
-import bubo.ptcloud.ConstructOctreeEqual;
+import bubo.ptcloud.ConstructOctreeNumPoints;
 import bubo.ptcloud.Octree;
 import bubo.ptcloud.shape.TestGeneratePlanePointVector;
 import bubo.ptcloud.shape.TestGenerateSpherePointVector;
@@ -121,7 +121,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 	public void findLeafs() {
 		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007();
 
-		ConstructOctreeEqual tree = alg.managerOctree = new ConstructOctreeEqual(10);
+		ConstructOctreeNumPoints tree = alg.managerOctree = new ConstructOctreeNumPoints(10);
 
 		Octree prev = tree.getTree();
 

@@ -19,9 +19,9 @@
 package bubo.desc.ext;
 
 import bubo.desc.RobotComponent;
-import georegression.struct.se.InvertibleTransformSequence;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.SpecialEuclidean;
+import georegression.transform.InvertibleTransformSequence;
 import org.junit.Test;
 
 import java.util.List;

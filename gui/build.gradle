@@ -1,0 +1,9 @@
+dependencies {
+    compile project(':core')
+}
+
+idea {
+    module {
+        name = "BUBO GUI"
+    }
+}

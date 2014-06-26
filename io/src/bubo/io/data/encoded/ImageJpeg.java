@@ -37,7 +37,7 @@ import java.io.IOException;
  */
 public class ImageJpeg implements ImageEncoded {
 
-	Class imageType = ImageUInt8.class;
+    Class imageType = ImageUInt8.class;
     byte[] data;
     int length;
 
@@ -64,7 +64,7 @@ public class ImageJpeg implements ImageEncoded {
     @Override
     public <T extends boofcv.struct.image.ImageBase>T convertToImage() {
         BufferedImage buffImg = convertToBuffered();
-		return (T) ConvertBufferedImage.convertFromSingle(buffImg,null,imageType);
+        return (T) ConvertBufferedImage.convertFromSingle(buffImg,null,imageType);
     }
 
     @Override

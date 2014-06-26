@@ -18,7 +18,7 @@
 
 package bubo.ptcloud.alg;
 
-import bubo.ptcloud.ConstructOctreeEqual;
+import bubo.ptcloud.ConstructOctreeNumPoints;
 import bubo.ptcloud.Octree;
 import bubo.ptcloud.shape.CheckShapeAcceptAll;
 import georegression.struct.point.Vector3D_F64;
@@ -59,7 +59,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	private int minModelAccept;
 
 	// constructs and maintains the octree
-	protected ConstructOctreeEqual managerOctree;
+	protected ConstructOctreeNumPoints managerOctree;
 
 	// the initial bounding cube of the point cloud.  used when constructing the octree
 	private Cube3D_F64 bounding = new Cube3D_F64();
@@ -109,7 +109,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		this.rand = new Random(config.randomSeed);
 		this.maximumAllowedIterations = config.maximumAllowedIterations;
 
-		managerOctree = new ConstructOctreeEqual(config.octreeSplit);
+		managerOctree = new ConstructOctreeNumPoints(config.octreeSplit);
 
 		// convert it into a description that RANSAC understands
 		List<RansacMulti.ObjectType> modelsRansac = new ArrayList<RansacMulti.ObjectType>();
@@ -358,7 +358,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		return leafs;
 	}
 
-	public ConstructOctreeEqual getManagerOctree() {
+	public ConstructOctreeNumPoints getManagerOctree() {
 		return managerOctree;
 	}
 }
