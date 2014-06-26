@@ -68,6 +68,11 @@ public class Octree {
 	public Octree parent;
 
 	/**
+	 * Can be used as a reference to user provided data;
+	 */
+	public Object userData;
+
+	/**
 	 * Points contained inside this node.  Depending on how it was constructed, all the points might be
 	 * contained in the leafs or not.  New points are not declared by the FastQueue, just the storage array
 	 */
@@ -105,6 +110,33 @@ public class Octree {
 	}
 
 	/**
+	 * Traverses down the octree and searches for the deepest node which contains the point
+	 *
+	 * @param point Point in which the leaf is contained.
+	 * @return  The deepest node which contains the point.  null if it's not bounded by the Octree.
+	 */
+	public Octree findDeepest( Point3D_F64 point ) {
+		// see if it is inside this space
+		if( !Intersection3D_F64.contained(space,point) )
+			return null;
+
+		Octree node = this;
+
+		while( true ) {
+			if( node.isLeaf() ) {
+					return node;
+			} else {
+				int index = node.getChildIndex(point);
+				Octree next = node.children[index];
+				if( next == null )
+					return node;
+				else
+					node = next;
+			}
+		}
+	}
+
+	/**
 	 * Given a point inside the cube, return which child it belongs in.
 	 *
 	 * @param point A Point in space
@@ -131,6 +163,14 @@ public class Octree {
 		}
 
 		return quad;
+	}
+
+	public <T> T getUserData() {
+		return (T)userData;
+	}
+
+	public void setUserData(Object userData) {
+		this.userData = userData;
 	}
 
 	public static class Info

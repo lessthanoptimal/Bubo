@@ -63,6 +63,30 @@ public class TestOctree {
 	}
 
 	@Test
+	public void findDeepest() {
+		Point3D_F64 target = new Point3D_F64(21,22,27);
+
+		Octree tree = new Octree();
+		tree.divider = new Point3D_F64(20,30,40);
+		tree.space = new Cube3D_F64(-100,-100,-100,200,200,200);
+
+		Octree node0 = new Octree();
+		tree.divider = new Point3D_F64(5,-10,50);
+
+		Octree node1 = new Octree();
+
+		tree.children = new Octree[8];
+		node0.children = new Octree[8];
+
+		tree.children[tree.getChildIndex(target)] = node0;
+		node0.children[node0.getChildIndex(target)] = node1;
+
+		assertTrue( null == tree.findDeepest(new Point3D_F64(10000,0,0)));
+		assertTrue( node1 == tree.findDeepest(target));
+		assertTrue( tree == tree.findDeepest(new Point3D_F64(-99,-99,-99)));
+	}
+
+	@Test
 	public void getChildIndex() {
 		Octree tree = new Octree();
 		tree.divider = new Point3D_F64(20,30,40);

@@ -42,7 +42,7 @@ import java.util.Random;
  * of the model refers to the index of the shape description in the models list provided in the constructor.
  * <p></p>
  * DEVIATIONS FROM PAPER:  The most important deviation is that a bitmap image is not constructed for finding points
- * beloning to a shape.  Instead the results from the nearest-neighbor search are used to find all points which
+ * belonging to a shape.  Instead the results from the nearest-neighbor search are used to find all points which
  * match the shape..  Other deviations are mentioned throughout the code in comments.
  * <p></p>
  * [1] Schnabel, Ruwen, Roland Wahl, and Reinhard Klein. "Efficient RANSAC for Point‐Cloud Shape Detection."

@@ -138,14 +138,8 @@ public abstract class ConstructOctree {
 	 * the child's points.
 	 */
 	protected Octree checkAddChild(Octree node, int index  , Octree.Info info ) {
-		Octree child = node.children[index];
-		if( child == null ) {
-			child = node.children[index] = storageNodes.grow();
-			child.parent = node;
-			setChildSpace(node.space,node.divider,index,child.space);
-			// no points to add to child since none of the previous ones belong to it
-		}
-		child.points.add( info );
+		Octree child = checkAddChild(node,index);
+		child.points.add(info);
 		return child;
 	}
 

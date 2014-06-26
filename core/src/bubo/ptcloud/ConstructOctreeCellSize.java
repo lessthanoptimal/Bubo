@@ -22,7 +22,7 @@ import georegression.struct.point.Point3D_F64;
 
 /**
  * Constructs an octree by adding a point and creating new cells until a cell which is smaller than the maximum cell
- * size is created.  Points are only added to leaf cells.
+ * size (size as in length) is created.  Points are only added to leaf cells which meet the size criteria.
  *
  * @author Peter Abeles
  */
@@ -53,8 +53,40 @@ public class ConstructOctreeCellSize extends ConstructOctree {
 		info.point = point;
 		info.data = data;
 
+		return traverseToLeaf(point, info);
+	}
+
+	/**
+	 * Traverses down the octree and makes sure there is a leaf at the specified point.  New nodes are created as
+	 * needed. However the point is not added to the Octree.
+	 * @param point Point in which the leaf is contained.
+	 * @return The lead which has the point
+	 */
+	public Octree addLeaf( Point3D_F64 point ) {
+		return traverseToLeaf(point,null);
+	}
+
+	/**
+	 * Traverses down the octree and searches for a leaf which contains the point and is <= the maximumCellSize.
+	 * If none exist then null is returned.
+	 * @param point Point in which the leaf is contained.
+	 * @return The lead which has the point
+	 */
+	public Octree findLeaf( Point3D_F64 point ) {
+		Octree node = tree.findDeepest(point);
+
+		if( node != null ) {
+			if( node.space.getLengthX() <= maximumCellSize )
+				return node;
+		}
+		return null;
+	}
+
+	/**
+	 * Traverses down to the leaf while creating new nodes.  Adds info to the leaf node if not null
+	 */
+	private Octree traverseToLeaf(Point3D_F64 point, Octree.Info info) {
 		Octree node = tree;
-		tree.points.add( info );
 
 		while( true ) {
 			if( node.isLeaf() ) {
@@ -68,10 +100,10 @@ public class ConstructOctreeCellSize extends ConstructOctree {
 					int index = node.getChildIndex(point);
 					node = checkAddChild(node,index);
 				} else {
-					// it is small enough
-					node.points.add(info);
+					// it's small enough to be a leaf
+					if( info != null)
+						node.points.add(info);
 					return node;
-
 				}
 			} else {
 				int index = node.getChildIndex(point);
@@ -79,5 +111,4 @@ public class ConstructOctreeCellSize extends ConstructOctree {
 			}
 		}
 	}
-
 }

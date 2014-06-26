@@ -9,3 +9,12 @@ native:
 - monolithic binary logs
 - directory based
 - xml
+
+
+
+point cloud
+- fit
+- detect
+- struct
+
+some structures used for detection are also should be in fitting?
