@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,53 +29,53 @@ import javax.swing.*;
  */
 public class VisualizeCObservationIMU implements LogDataVisualization {
 
-    JTextArea textArea = new JTextArea();
+	JTextArea textArea = new JTextArea();
 
-    /**
-     * Creates a text area for displaying position information and raw data.
-     */
-    @Override
-    public void setData(Object data) {
-        CObservationIMU o = (CObservationIMU)data;
+	/**
+	 * Creates a text area for displaying position information and raw data.
+	 */
+	@Override
+	public void setData(Object data) {
+		CObservationIMU o = (CObservationIMU) data;
 
-        String text = VisualizeCObservationImage.basicObservationText(o);
+		String text = VisualizeCObservationImage.basicObservationText(o);
 
-        text += "Sensor Position:\n";
-        text += o.getSensorPose().toReadableText();
-        text += "\n";
+		text += "Sensor Position:\n";
+		text += o.getSensorPose().toReadableText();
+		text += "\n";
 
-        text += "Data Present: [ ";
-        for( boolean b : o.getDataIsPresent() ) {
-            text += b+" ";
-        }
-        text += "]\n";
-        text += "\n";
-        text += "Raw Data: [ ";
-        for( double b : o.getRawMeasurements() ) {
-            text += String.format("%1.3e ",b);
-        }
-        text += "]\n";
+		text += "Data Present: [ ";
+		for (boolean b : o.getDataIsPresent()) {
+			text += b + " ";
+		}
+		text += "]\n";
+		text += "\n";
+		text += "Raw Data: [ ";
+		for (double b : o.getRawMeasurements()) {
+			text += String.format("%1.3e ", b);
+		}
+		text += "]\n";
 
-        textArea.setText(text);
-    }
+		textArea.setText(text);
+	}
 
-    @Override
-    public Class<?> getType() {
-        return CObservationIMU.class;
-    }
+	@Override
+	public Class<?> getType() {
+		return CObservationIMU.class;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 1;
-    }
+	@Override
+	public int numDisplay() {
+		return 1;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        return textArea;
-    }
+	@Override
+	public JComponent getDisplay(int index) {
+		return textArea;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        return "Odometry";
-    }
+	@Override
+	public String getDisplayName(int index) {
+		return "Odometry";
+	}
 }

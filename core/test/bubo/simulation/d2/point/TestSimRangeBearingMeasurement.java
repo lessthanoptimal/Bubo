@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,31 +30,31 @@ import static org.junit.Assert.*;
  */
 public class TestSimRangeBearingMeasurement {
 
-    @Test
-    public void simpleTest() {
-		SimRangeBearingMeasurement alg = new SimRangeBearingMeasurement(0.5,0.1,20,234234);
+	@Test
+	public void simpleTest() {
+		SimRangeBearingMeasurement alg = new SimRangeBearingMeasurement(0.5, 0.1, 20, 234234);
 
-		alg.setSensorPose(new Se2_F64(1,2,Math.PI/2.0));
+		alg.setSensorPose(new Se2_F64(1, 2, Math.PI / 2.0));
 		assertTrue(alg.process(new Point2D_F64(1, 5)));
 
-		assertEquals(0,alg.getTrueBearing(),1e-8);
-		assertEquals(3,alg.getTrueRange(),1e-8);
+		assertEquals(0, alg.getTrueBearing(), 1e-8);
+		assertEquals(3, alg.getTrueRange(), 1e-8);
 
 		assertTrue(alg.getTrueBearing() != alg.getNoisyBearing());
 		assertTrue(alg.getTrueRange() != alg.getNoisyRange());
 
-		assertEquals(0,alg.getNoisyBearing(),2);
-		assertEquals(3,alg.getNoisyRange(),1);
+		assertEquals(0, alg.getNoisyBearing(), 2);
+		assertEquals(3, alg.getNoisyRange(), 1);
 	}
 
 	@Test
 	public void checkMaxRange() {
-		SimRangeBearingMeasurement alg = new SimRangeBearingMeasurement(0.5,0.1,20,234234);
+		SimRangeBearingMeasurement alg = new SimRangeBearingMeasurement(0.5, 0.1, 20, 234234);
 
-		alg.setSensorPose(new Se2_F64(1,2,Math.PI/2.0));
+		alg.setSensorPose(new Se2_F64(1, 2, Math.PI / 2.0));
 
 		// test within the range
-		assertTrue(alg.process(new Point2D_F64(1,5)));
+		assertTrue(alg.process(new Point2D_F64(1, 5)));
 
 		// test out of range
 		assertFalse(alg.process(new Point2D_F64(1, 50)));

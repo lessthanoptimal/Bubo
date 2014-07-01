@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -37,29 +37,29 @@ public class TestDistanceCylinderToPointVectorNN {
 	@Test
 	public void computeDistance() {
 
-		DistanceCylinderToPointVectorNN alg = new DistanceCylinderToPointVectorNN(Math.PI/2.0);
+		DistanceCylinderToPointVectorNN alg = new DistanceCylinderToPointVectorNN(Math.PI / 2.0);
 
-		Cylinder3D_F64 model = new Cylinder3D_F64(1,-2,3,-0.5,0.2,2,3);
+		Cylinder3D_F64 model = new Cylinder3D_F64(1, -2, 3, -0.5, 0.2, 2, 3);
 		model.line.slope.normalize();
-		PointVectorNN point = new PointVectorNN(3.4,5.6,7.8,0,0,1);
+		PointVectorNN point = new PointVectorNN(3.4, 5.6, 7.8, 0, 0, 1);
 
 		alg.setModel(model);
 
 		double expected = Math.abs(Distance3D_F64.distance(model, point.p));
 		double found = alg.computeDistance(point);
 
-		assertTrue(found>0);
-		assertEquals(expected,found,1e-8);
+		assertTrue(found > 0);
+		assertEquals(expected, found, 1e-8);
 
 		// now try a point inside the cylinder
-		point = new PointVectorNN(1,-2,3.5,0,0,1);
+		point = new PointVectorNN(1, -2, 3.5, 0, 0, 1);
 		alg.setModel(model);
 
 		expected = Math.abs(Distance3D_F64.distance(model, point.p));
 		found = alg.computeDistance(point);
 
-		assertTrue(found>0);
-		assertEquals(expected,found,1e-8);
+		assertTrue(found > 0);
+		assertEquals(expected, found, 1e-8);
 	}
 
 	@Test
@@ -69,29 +69,29 @@ public class TestDistanceCylinderToPointVectorNN {
 
 		DistanceCylinderToPointVectorNN alg = new DistanceCylinderToPointVectorNN(angleTol);
 
-		Cylinder3D_F64 model = new Cylinder3D_F64(0,0,0,0,0,1,2);
+		Cylinder3D_F64 model = new Cylinder3D_F64(0, 0, 0, 0, 0, 1, 2);
 		alg.setModel(model);
 
 		// have it just inside the tolerance
-		double angle = angleTol-0.01;
-		PointVectorNN point = new PointVectorNN(0,3,0,0,Math.cos(angle),Math.sin(angle));
-		assertEquals(1,alg.computeDistance(point),1e-8);
+		double angle = angleTol - 0.01;
+		PointVectorNN point = new PointVectorNN(0, 3, 0, 0, Math.cos(angle), Math.sin(angle));
+		assertEquals(1, alg.computeDistance(point), 1e-8);
 
 		// just outside
-		angle = angleTol+0.01;
-		point = new PointVectorNN(0,3,0,0,Math.cos(angle),Math.sin(angle));
-		assertTrue( Double.MAX_VALUE == alg.computeDistance(point));
+		angle = angleTol + 0.01;
+		point = new PointVectorNN(0, 3, 0, 0, Math.cos(angle), Math.sin(angle));
+		assertTrue(Double.MAX_VALUE == alg.computeDistance(point));
 	}
 
 	@Test
 	public void computeDistance_array() {
-		DistanceCylinderToPointVectorNN alg = new DistanceCylinderToPointVectorNN(Math.PI/2.0);
+		DistanceCylinderToPointVectorNN alg = new DistanceCylinderToPointVectorNN(Math.PI / 2.0);
 
-		Cylinder3D_F64 model = new Cylinder3D_F64(1,-2,3,-0.5,0.2,2,3);
+		Cylinder3D_F64 model = new Cylinder3D_F64(1, -2, 3, -0.5, 0.2, 2, 3);
 		model.line.slope.normalize();
 
-		PointVectorNN pointA = new PointVectorNN(3.4,5.6,7.8,0,0,1);
-		PointVectorNN pointB = new PointVectorNN(1,-2,3.5,0,0,1);
+		PointVectorNN pointA = new PointVectorNN(3.4, 5.6, 7.8, 0, 0, 1);
+		PointVectorNN pointB = new PointVectorNN(1, -2, 3.5, 0, 0, 1);
 
 		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
 		pts.add(pointA);
@@ -100,10 +100,10 @@ public class TestDistanceCylinderToPointVectorNN {
 		double scores[] = new double[2];
 
 		alg.setModel(model);
-		alg.computeDistance(pts,scores);
-		for( int i = 0; i < 2; i++ ) {
+		alg.computeDistance(pts, scores);
+		for (int i = 0; i < 2; i++) {
 			double expected = alg.computeDistance(pts.get(i));
-			assertEquals(expected,scores[i],1e-8);
+			assertEquals(expected, scores[i], 1e-8);
 		}
 	}
 

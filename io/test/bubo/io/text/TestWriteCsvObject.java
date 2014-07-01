@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,94 +30,94 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestWriteCsvObject {
 
-    /**
-     * Sees if it can write a single line comment just fine.
-     */
-    @Test
-    public void comment_single_line() throws IOException {
+	/**
+	 * Sees if it can write a single line comment just fine.
+	 */
+	@Test
+	public void comment_single_line() throws IOException {
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        WriteCsvObject alg = new WriteCsvObject(out,TestReadCsvObject.TestClass.class,"a","b","c","d","e","f","g","h");
+		WriteCsvObject alg = new WriteCsvObject(out, TestReadCsvObject.TestClass.class, "a", "b", "c", "d", "e", "f", "g", "h");
 
-        alg.writeComment("Three Rings for the Elven-kings under the sky,");
+		alg.writeComment("Three Rings for the Elven-kings under the sky,");
 
-        String found = out.toString();
+		String found = out.toString();
 
-        assertTrue(found.compareTo("#Three Rings for the Elven-kings under the sky,\n") == 0 );
-    }
+		assertTrue(found.compareTo("#Three Rings for the Elven-kings under the sky,\n") == 0);
+	}
 
-    /**
-     * Sees if it can write multiple-line comments
-     */
-    @Test
-    public void comment_multiple_lines() throws IOException  {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+	/**
+	 * Sees if it can write multiple-line comments
+	 */
+	@Test
+	public void comment_multiple_lines() throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        WriteCsvObject alg = new WriteCsvObject(out,TestReadCsvObject.TestClass.class,"a","b","c","d","e","f","g","h");
+		WriteCsvObject alg = new WriteCsvObject(out, TestReadCsvObject.TestClass.class, "a", "b", "c", "d", "e", "f", "g", "h");
 
-        alg.writeComment("Three Rings for the Elven-kings under the sky,\n" +
-                         "Seven for the dwarf-lords in their halls of stone,");
+		alg.writeComment("Three Rings for the Elven-kings under the sky,\n" +
+				"Seven for the dwarf-lords in their halls of stone,");
 
-        String found = out.toString();
+		String found = out.toString();
 
-        String expected = "#Three Rings for the Elven-kings under the sky,\n" +
-                          "#Seven for the dwarf-lords in their halls of stone,\n";
+		String expected = "#Three Rings for the Elven-kings under the sky,\n" +
+				"#Seven for the dwarf-lords in their halls of stone,\n";
 
-        assertTrue(found.compareTo(expected) == 0 );
-    }
+		assertTrue(found.compareTo(expected) == 0);
+	}
 
-    /**
-     * Write out an object with just primitive types
-     */
-    @Test
-    public void justPrimitive() throws IOException  {
+	/**
+	 * Write out an object with just primitive types
+	 */
+	@Test
+	public void justPrimitive() throws IOException {
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        WriteCsvObject alg = new WriteCsvObject(out,TestReadCsvObject.TestClass.class,"a","b","c","d","e","f","g","h");
+		WriteCsvObject alg = new WriteCsvObject(out, TestReadCsvObject.TestClass.class, "a", "b", "c", "d", "e", "f", "g", "h");
 
-        TestReadCsvObject.TestClass c = new TestReadCsvObject.TestClass();
+		TestReadCsvObject.TestClass c = new TestReadCsvObject.TestClass();
 
-        c.a = 12;
-        c.b = 'e';
-        c.c = -345;
-        c.d = 8345;
-        c.e = -49358;
-        c.f = 56.446f;
-        c.g = 9342.4234;
-        c.h = "foobar";
+		c.a = 12;
+		c.b = 'e';
+		c.c = -345;
+		c.d = 8345;
+		c.e = -49358;
+		c.f = 56.446f;
+		c.g = 9342.4234;
+		c.h = "foobar";
 
-        alg.writeObject(c);
+		alg.writeObject(c);
 
-        String expected = "12 e -345 8345 -49358 56.446 9342.4234 foobar\n";
-        String found = out.toString();
+		String expected = "12 e -345 8345 -49358 56.446 9342.4234 foobar\n";
+		String found = out.toString();
 
-        assertTrue(found.compareTo(expected) == 0 );
-    }
+		assertTrue(found.compareTo(expected) == 0);
+	}
 
-    /**
-     * Write out an object with array and primitive types
-     */
-    @Test
-    public void primitiveAndArray() throws IOException  {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+	/**
+	 * Write out an object with array and primitive types
+	 */
+	@Test
+	public void primitiveAndArray() throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        WriteCsvObject alg = new WriteCsvObject(out,TestReadCsvObject.TestClass.class,"a","b","i");
+		WriteCsvObject alg = new WriteCsvObject(out, TestReadCsvObject.TestClass.class, "a", "b", "i");
 
-        TestReadCsvObject.TestClass c = new TestReadCsvObject.TestClass();
+		TestReadCsvObject.TestClass c = new TestReadCsvObject.TestClass();
 
-        c.a = 12;
-        c.b = 'e';
-        c.i[0] = -345;
-        c.i[1] = 8345;
-        c.i[2] = -49358;
+		c.a = 12;
+		c.b = 'e';
+		c.i[0] = -345;
+		c.i[1] = 8345;
+		c.i[2] = -49358;
 
-        alg.writeObject(c);
+		alg.writeObject(c);
 
-        String expected = "12 e -345 8345 -49358\n";
-        String found = out.toString();
+		String expected = "12 e -345 8345 -49358\n";
+		String found = out.toString();
 
-        assertTrue(found.compareTo(expected) == 0 );
-    }
+		assertTrue(found.compareTo(expected) == 0);
+	}
 }

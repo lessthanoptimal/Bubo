@@ -26,36 +26,35 @@ import org.junit.Test;
  */
 public class TestArrayGrid2DBase extends GenericMapTests {
 
-    @Override
-    public <T extends OccupancyGrid2D> T createMap(int width, int height) {
-        return (T)new DebugMap(width,height);
-    }
+	@Override
+	public <T extends OccupancyGrid2D> T createMap(int width, int height) {
+		return (T) new DebugMap(width, height);
+	}
 
-    @Test
-    public void isInBounds() {
-        super.isInBounds();
-    }
+	@Test
+	public void isInBounds() {
+		super.isInBounds();
+	}
 
-    @Test
-    public void getWidth_getHeight() {
-        super.getWidth_getHeight();
-    }
+	@Test
+	public void getWidth_getHeight() {
+		super.getWidth_getHeight();
+	}
 
-    private static class DebugMap extends ArrayGrid2DBase
-    {
-        protected DebugMap(int width, int height) {
-            super(width, height);
-        }
+	private static class DebugMap extends ArrayGrid2DBase {
+		protected DebugMap(int width, int height) {
+			super(width, height);
+		}
 
 		@Override
 		public void clear() {
 		}
 
 		@Override
-        public boolean isKnown(int x, int y) {
-            return false;
-        }
-    }
+		public boolean isKnown(int x, int y) {
+			return false;
+		}
+	}
 
 
 }

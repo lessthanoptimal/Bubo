@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -45,15 +45,15 @@ public class LocalizationEkfKnownAssoc {
 	private MultivariateGaussianDM state = new MultivariateGaussianDM(3);
 
 	public LocalizationEkfKnownAssoc(EkfPredictorDiscrete predictor,
-									 LandmarkProjector projector ) {
-		if( predictor.getSystemSize() != 3 )
+									 LandmarkProjector projector) {
+		if (predictor.getSystemSize() != 3)
 			throw new IllegalArgumentException("Predictor: Expecting a state size of 3, (x,y,yaw)");
-		if( projector.getSystemSize() != 3 )
+		if (projector.getSystemSize() != 3)
 			throw new IllegalArgumentException("Projector: Expecting a state size of 3, (x,y,yaw)");
 
 		this.projector = projector;
 
-		ekf = new ExtendedKalmanFilter(predictor,projector);
+		ekf = new ExtendedKalmanFilter(predictor, projector);
 	}
 
 	public void setLandmarks(List<Point2D_F64> landmarks) {
@@ -62,9 +62,10 @@ public class LocalizationEkfKnownAssoc {
 
 	/**
 	 * Specifies the initial state of the robot and the confidence
+	 *
 	 * @param state Initial filter state
 	 */
-	public void setInitialPose( MultivariateGaussianDM state ) {
+	public void setInitialPose(MultivariateGaussianDM state) {
 		this.state.set(state);
 	}
 
@@ -78,18 +79,20 @@ public class LocalizationEkfKnownAssoc {
 
 	/**
 	 * Updates the filter given an observation of the specified landmark
-	 * @param landmarkID index of which landmark has been observed
+	 *
+	 * @param landmarkID  index of which landmark has been observed
 	 * @param measurement The observation
 	 */
-	public void update( int landmarkID , MultivariateGaussianDM measurement  ) {
+	public void update(int landmarkID, MultivariateGaussianDM measurement) {
 		Point2D_F64 p = landmarks.get(landmarkID);
-		projector.setLandmarkLocation(p.x,p.y);
+		projector.setLandmarkLocation(p.x, p.y);
 
-		ekf.update(state,measurement);
+		ekf.update(state, measurement);
 	}
 
 	/**
 	 * The estimated robot pose
+	 *
 	 * @return Robot pose estimate
 	 */
 	public MultivariateGaussianDM getState() {

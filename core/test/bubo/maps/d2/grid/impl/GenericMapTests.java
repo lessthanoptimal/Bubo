@@ -37,14 +37,14 @@ public abstract class GenericMapTests {
 
 	Random rand = new Random(24);
 
-    public abstract <T extends OccupancyGrid2D> T createMap( int width , int height );
+	public abstract <T extends OccupancyGrid2D> T createMap(int width, int height);
 
 	public void clear_F32() {
-		ArrayGrid2D_F32 map = new ArrayGrid2D_F32(5,7);
+		ArrayGrid2D_F32 map = new ArrayGrid2D_F32(5, 7);
 
 		for (int y = 0; y < map.getHeight(); y++) {
 			for (int x = 0; x < map.getWidth(); x++) {
-				map.set(x,y,rand.nextFloat());
+				map.set(x, y, rand.nextFloat());
 			}
 		}
 
@@ -57,52 +57,52 @@ public abstract class GenericMapTests {
 		}
 	}
 
-    public void set_get_F32( float value ) {
-        OccupancyGrid2D_F32 map = new ArrayGrid2D_F32(5,7);
+	public void set_get_F32(float value) {
+		OccupancyGrid2D_F32 map = new ArrayGrid2D_F32(5, 7);
 
-        assertTrue( 5.6f != map.get(2,3));
-        map.set(2,3,value);
-        assertTrue( value == map.get(2,3));
-    }
+		assertTrue(5.6f != map.get(2, 3));
+		map.set(2, 3, value);
+		assertTrue(value == map.get(2, 3));
+	}
 
-    public void isKnown_F32() {
-        OccupancyGrid2D_F32 map = createMap(5,7);
+	public void isKnown_F32() {
+		OccupancyGrid2D_F32 map = createMap(5, 7);
 
-        map.set(2,3,0.5f);
-        assertFalse(map.isKnown(2,3));
-        map.set(2,3,0.25f);
-        assertTrue(map.isKnown(2,3));
-    }
+		map.set(2, 3, 0.5f);
+		assertFalse(map.isKnown(2, 3));
+		map.set(2, 3, 0.25f);
+		assertTrue(map.isKnown(2, 3));
+	}
 
-    public void isValid_F32() {
-        OccupancyGrid2D_F32 map = createMap(5,7);
+	public void isValid_F32() {
+		OccupancyGrid2D_F32 map = createMap(5, 7);
 
-        assertTrue( map.isValid(0f));
-        assertTrue( map.isValid(1.0f));
-        assertTrue( map.isValid(0.6f));
-        assertFalse( map.isValid(-0.01f));
-        assertFalse( map.isValid(1.1f));
-    }
+		assertTrue(map.isValid(0f));
+		assertTrue(map.isValid(1.0f));
+		assertTrue(map.isValid(0.6f));
+		assertFalse(map.isValid(-0.01f));
+		assertFalse(map.isValid(1.1f));
+	}
 
-    public void isInBounds() {
-        int width = 6;
-        int height = 12;
-        OccupancyGrid2D map = createMap(width,height);
+	public void isInBounds() {
+		int width = 6;
+		int height = 12;
+		OccupancyGrid2D map = createMap(width, height);
 
-        assertTrue(map.isInBounds(0,0));
-        assertTrue(map.isInBounds(3,3));
-        assertTrue(map.isInBounds(5,11));
-        assertFalse(map.isInBounds(11,5));
-        assertFalse(map.isInBounds(12,6));
-        assertFalse(map.isInBounds(-1,-1));
-    }
+		assertTrue(map.isInBounds(0, 0));
+		assertTrue(map.isInBounds(3, 3));
+		assertTrue(map.isInBounds(5, 11));
+		assertFalse(map.isInBounds(11, 5));
+		assertFalse(map.isInBounds(12, 6));
+		assertFalse(map.isInBounds(-1, -1));
+	}
 
-    public void getWidth_getHeight() {
-        int width = 6;
-        int height = 12;
-        OccupancyGrid2D map = createMap(width,height);
+	public void getWidth_getHeight() {
+		int width = 6;
+		int height = 12;
+		OccupancyGrid2D map = createMap(width, height);
 
-        assertEquals(width,map.getWidth());
-        assertEquals(height,map.getHeight());
-    }
+		assertEquals(width, map.getWidth());
+		assertEquals(height, map.getHeight());
+	}
 }

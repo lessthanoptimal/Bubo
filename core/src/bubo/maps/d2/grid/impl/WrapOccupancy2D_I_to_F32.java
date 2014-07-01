@@ -26,28 +26,28 @@ import bubo.maps.d2.grid.OccupancyGrid2D_I;
  *
  * @author Peter Abeles
  */
-public class WrapOccupancy2D_I_to_F32 implements OccupancyGrid2D_F32{
+public class WrapOccupancy2D_I_to_F32 implements OccupancyGrid2D_F32 {
 
-    private OccupancyGrid2D_I map;
+	private OccupancyGrid2D_I map;
 
-    public WrapOccupancy2D_I_to_F32(OccupancyGrid2D_I map) {
-        this.map = map;
-    }
+	public WrapOccupancy2D_I_to_F32(OccupancyGrid2D_I map) {
+		this.map = map;
+	}
 
-    @Override
-    public void set(int x, int y, float value) {
-        map.set(x,y,floatToInt(value));
-    }
+	@Override
+	public void set(int x, int y, float value) {
+		map.set(x, y, floatToInt(value));
+	}
 
-    @Override
-    public float get(int x, int y) {
-        return intToFloat(map.get(x,y));
-    }
+	@Override
+	public float get(int x, int y) {
+		return intToFloat(map.get(x, y));
+	}
 
-    @Override
-    public boolean isValid(float value) {
-        return value >= 0f && value <= 1.0f ;
-    }
+	@Override
+	public boolean isValid(float value) {
+		return value >= 0f && value <= 1.0f;
+	}
 
 	@Override
 	public void clear() {
@@ -55,37 +55,37 @@ public class WrapOccupancy2D_I_to_F32 implements OccupancyGrid2D_F32{
 	}
 
 	@Override
-    public boolean isInBounds(int x, int y) {
-        return map.isInBounds(x,y);
-    }
+	public boolean isInBounds(int x, int y) {
+		return map.isInBounds(x, y);
+	}
 
-    @Override
-    public boolean isKnown(int x, int y) {
-        return map.isKnown(x,y);
-    }
+	@Override
+	public boolean isKnown(int x, int y) {
+		return map.isKnown(x, y);
+	}
 
-    @Override
-    public int getWidth() {
-        return map.getWidth();
-    }
+	@Override
+	public int getWidth() {
+		return map.getWidth();
+	}
 
-    @Override
-    public int getHeight() {
-        return map.getHeight();
-    }
+	@Override
+	public int getHeight() {
+		return map.getHeight();
+	}
 
-    /**
-     * Converts a normalized floating point number that is between 0 and 1 inclusive and converts it into
-     * an integer value normalized for the integer map.
-     *
-     * @param value float between 0 and 1 inclusize
-     * @return equivalent int value
-     */
-    public int floatToInt( float value ) {
-        return (int)(map.getMaxValue()*value);
-    }
+	/**
+	 * Converts a normalized floating point number that is between 0 and 1 inclusive and converts it into
+	 * an integer value normalized for the integer map.
+	 *
+	 * @param value float between 0 and 1 inclusize
+	 * @return equivalent int value
+	 */
+	public int floatToInt(float value) {
+		return (int) (map.getMaxValue() * value);
+	}
 
-    public float intToFloat( int value ) {
-        return (float)value/(float)map.getMaxValue();
-    }
+	public float intToFloat(int value) {
+		return (float) value / (float) map.getMaxValue();
+	}
 }

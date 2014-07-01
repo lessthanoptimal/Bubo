@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,7 +24,7 @@ import bubo.io.rawlog.RawlogSerializableStandard;
  * <p>
  * Java implementation of  mrpt/slam/CObservationComment.h. Comment from original source:
  * </p>
- *
+ * <p/>
  * <p>
  * This "observation" is actually a placeholder for a text block with comments or additional parameters attached to a given rawlog file.
  * There should be only one of this observations in a rawlog file, and it's recommended to insert/modify them from the application RawlogViewer.
@@ -34,27 +34,27 @@ import bubo.io.rawlog.RawlogSerializableStandard;
  */
 public class CObservationComment extends CObservation implements RawlogSerializableStandard {
 
-    private String text;
+	private String text;
 
 
-    public String[] getVariableOrder( int version ) {
-        return new String[]{"text","timestamp"};
-    }
+	public String[] getVariableOrder(int version) {
+		return new String[]{"text", "timestamp"};
+	}
 
-    public int getVersion() {
-        return 0;
-    }
+	public int getVersion() {
+		return 0;
+	}
 
-    public String getText() {
-        return text;
-    }
+	public String getText() {
+		return text;
+	}
 
-    public void setText(String text) {
-        this.text = text;
-    }
+	public void setText(String text) {
+		this.text = text;
+	}
 
-    @Override
-    public String toString() {
-        return text;
-    }
+	@Override
+	public String toString() {
+		return text;
+	}
 }

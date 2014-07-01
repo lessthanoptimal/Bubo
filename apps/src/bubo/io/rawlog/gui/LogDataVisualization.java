@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,7 +24,7 @@ import javax.swing.*;
  * <p>
  * Interface for displaying an element in a log.  Each implementing class
  * can only display data for a specific type of data.  The data can be displayed in an arbitrary of
- *  "displays" where each display is shown in its own tab in the GUI.  The displays are
+ * "displays" where each display is shown in its own tab in the GUI.  The displays are
  * rendered inside of a JComponent.
  * </p>
  *
@@ -32,22 +32,26 @@ import javax.swing.*;
  */
 public interface LogDataVisualization {
 
-    /**
-     * Specifies which data is to be viewed.
-     * @param data
-     */
-    public void setData( Object data );
+	/**
+	 * Specifies which data is to be viewed.
+	 *
+	 * @param data
+	 */
+	public void setData(Object data);
 
-    /**
-     * The type of data object that this can visualize
-     * @return
-     */
-    public Class<?> getType();
+	/**
+	 * The type of data object that this can visualize
+	 *
+	 * @return
+	 */
+	public Class<?> getType();
 
 
-    public int numDisplay();
-    public JComponent getDisplay( int index );
-    public String getDisplayName( int index );
+	public int numDisplay();
 
-    // todo add config dialog
+	public JComponent getDisplay(int index);
+
+	public String getDisplayName(int index);
+
+	// todo add config dialog
 }

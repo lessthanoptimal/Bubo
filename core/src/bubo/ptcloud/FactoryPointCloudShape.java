@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -41,26 +41,25 @@ public class FactoryPointCloudShape {
 	 * and detect shapes at different scales.  Based on [1] paper.  See JavaDoc and code comments for significant
 	 * deviations from original paper.
 	 *
-	 * @see ApproximateSurfaceNormals
-	 * @see PointCloudShapeDetectionSchnabel2007
-	 *
-	 * [1] Schnabel, Ruwen, Roland Wahl, and Reinhard Klein. "Efficient RANSAC for Point‐Cloud Shape Detection."
-	 * Computer Graphics Forum. Vol. 26. No. 2. Blackwell Publishing Ltd, 2007.
-	 *
 	 * @param configNormal Configuration for approximation of surface normals.
 	 * @param configRansac Configuration for {@link PointCloudShapeDetectionSchnabel2007}.
-	 * @param configPost Configuration for {@link RemoveFalseShapes}.
+	 * @param configPost   Configuration for {@link RemoveFalseShapes}.
 	 * @return Implementation of {@link PointCloudShapeFinder}.
+	 * @see ApproximateSurfaceNormals
+	 * @see PointCloudShapeDetectionSchnabel2007
+	 * <p/>
+	 * [1] Schnabel, Ruwen, Roland Wahl, and Reinhard Klein. "Efficient RANSAC for Point‐Cloud Shape Detection."
+	 * Computer Graphics Forum. Vol. 26. No. 2. Blackwell Publishing Ltd, 2007.
 	 */
-	public static PointCloudShapeFinder ransacOctree( ConfigSurfaceNormals configNormal ,
-													  ConfigSchnabel2007 configRansac ,
-													  ConfigRemoveFalseShapes configPost ) {
+	public static PointCloudShapeFinder ransacOctree(ConfigSurfaceNormals configNormal,
+													 ConfigSchnabel2007 configRansac,
+													 ConfigRemoveFalseShapes configPost) {
 		configNormal.checkConfig();
 
 		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007(configRansac);
 
 		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
-				configNormal.numPlane,configNormal.maxDistancePlane,configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
+				configNormal.numPlane, configNormal.maxDistancePlane, configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
 
 //		PostProcessShapes postProcess = new MergeShapesPointVectorNN(
 //				configMerge.commonMembershipFraction,configMerge.commonMembershipFraction);
@@ -70,19 +69,19 @@ public class FactoryPointCloudShape {
 
 		List<CloudShapeTypes> shapeList = new ArrayList<CloudShapeTypes>();
 
-		for(ShapeDescription d : configRansac.models ) {
-			if( d.codec instanceof CodecSphere3D_F64 ) {
+		for (ShapeDescription d : configRansac.models) {
+			if (d.codec instanceof CodecSphere3D_F64) {
 				shapeList.add(CloudShapeTypes.SPHERE);
-			} else if( d.codec instanceof CodecCylinder3D_F64) {
+			} else if (d.codec instanceof CodecCylinder3D_F64) {
 				shapeList.add(CloudShapeTypes.CYLINDER);
-			} else if( d.codec instanceof CodecPlaneGeneral3D_F64) {
+			} else if (d.codec instanceof CodecPlaneGeneral3D_F64) {
 				shapeList.add(CloudShapeTypes.PLANE);
 			} else {
 				throw new IllegalArgumentException("Unknown shape contained in configRansac.  Probably a bug.");
 			}
 		}
 
-		return new Schnable2007_to_PointCloudShapeFinder(surface,alg,postProcess,shapeList);
+		return new Schnable2007_to_PointCloudShapeFinder(surface, alg, postProcess, shapeList);
 	}
 
 	/**
@@ -92,19 +91,19 @@ public class FactoryPointCloudShape {
 	 * @param configRansac Configuration for RANSAC
 	 * @return PointCloudShapeFinder
 	 */
-	public static PointCloudShapeFinder ransacSingle( ConfigSurfaceNormals configNormal ,
-													  ConfigMultiShapeRansac configRansac ) {
+	public static PointCloudShapeFinder ransacSingle(ConfigSurfaceNormals configNormal,
+													 ConfigMultiShapeRansac configRansac) {
 
 		configNormal.checkConfig();
 
 		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
-				configNormal.numPlane,configNormal.maxDistancePlane,configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
+				configNormal.numPlane, configNormal.maxDistancePlane, configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
 
 		RansacMulti<PointVectorNN> ransac = new RansacMulti<PointVectorNN>(
-				configRansac.randSeed,configRansac.maxIterations,configRansac.models,PointVectorNN.class);
+				configRansac.randSeed, configRansac.maxIterations, configRansac.models, PointVectorNN.class);
 
-		return new Ransac_to_PointCloudShapeFinder(surface,ransac,
-				configRansac.modelManagers,configRansac.fitters,configRansac.minimumPoints,
+		return new Ransac_to_PointCloudShapeFinder(surface, ransac,
+				configRansac.modelManagers, configRansac.fitters, configRansac.minimumPoints,
 				configRansac.types);
 	}
 }

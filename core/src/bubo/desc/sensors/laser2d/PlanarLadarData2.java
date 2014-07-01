@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,11 +27,11 @@ package bubo.desc.sensors.laser2d;
  */
 public class PlanarLadarData2 {
 
-    // range measurements in standard units (e.g. meters)
-    public double meas[];
-    // the angle of each measurement in radians
-    public double angle[];
-    // number of valid measurements in this data.
-    public int numMeas;
+	// range measurements in standard units (e.g. meters)
+	public double meas[];
+	// the angle of each measurement in radians
+	public double angle[];
+	// number of valid measurements in this data.
+	public int numMeas;
 
 }

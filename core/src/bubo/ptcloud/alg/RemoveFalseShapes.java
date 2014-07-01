@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,7 +35,7 @@ public class RemoveFalseShapes implements PostProcessShapes {
 	List<ShapeDescription> models;
 
 	GrowQueue_I32 cloudToShape = new GrowQueue_I32();
-	FastQueue<PixelInfo> shapePixels = new FastQueue<PixelInfo>(PixelInfo.class,true);
+	FastQueue<PixelInfo> shapePixels = new FastQueue<PixelInfo>(PixelInfo.class, true);
 
 	List<FoundShape> goodShapes = new ArrayList<FoundShape>();
 
@@ -55,26 +55,26 @@ public class RemoveFalseShapes implements PostProcessShapes {
 		goodShapes.clear();
 
 		cloudToShape.resize(cloudSize);
-		for( int i = 0; i < cloudToShape.size; i++ ) {
+		for (int i = 0; i < cloudToShape.size; i++) {
 			cloudToShape.data[i] = -1;
 		}
 
-		pruneFalseShapes(input,goodShapes);
+		pruneFalseShapes(input, goodShapes);
 
 	}
 
-	private void mergeSimilarShapes( List<FoundShape> input , List<FoundShape> output) {
-		for( int i = 0; i < input.size(); i++ ) {
+	private void mergeSimilarShapes(List<FoundShape> input, List<FoundShape> output) {
+		for (int i = 0; i < input.size(); i++) {
 			FoundShape shape = input.get(i);
 
 			// mark all the points which belong to this shape
-			markPointsMember(shape,1);
+			markPointsMember(shape, 1);
 
 			// iterate through all the other shapes and see which ones match it and have a high ratio
-		   //TODO finish merge code
+			//TODO finish merge code
 
 			// clean up
-			markPointsMember(shape,-1);
+			markPointsMember(shape, -1);
 		}
 	}
 
@@ -83,47 +83,47 @@ public class RemoveFalseShapes implements PostProcessShapes {
 		output.addAll(input);
 
 		// find the fraction of points for each shape in which another point has less error
-		double suckRatios[] = new double[ input.size() ];
+		double suckRatios[] = new double[input.size()];
 
-		for( int iter = 0; iter < 100; iter++ ) {
-			System.out.println("Prune iteration "+iter);
-			for( int i = 0; i < output.size(); i++ ) {
+		for (int iter = 0; iter < 100; iter++) {
+			System.out.println("Prune iteration " + iter);
+			for (int i = 0; i < output.size(); i++) {
 				FoundShape shape = output.get(i);
 
 				setupShapeForFalse(shape);
 
-				for( int j = 0; j < output.size(); j++ ) {
-					if( i == j )
+				for (int j = 0; j < output.size(); j++) {
+					if (i == j)
 						continue;
 
-					compareToShape( output.get(j) );
+					compareToShape(output.get(j));
 				}
 
 				// compute how many points are better describe by other shapes and decide if the shape should be kept
 				int totalSuck = 0;
-				for( int j = 0; j < shapePixels.size; j++ ) {
+				for (int j = 0; j < shapePixels.size; j++) {
 					PixelInfo info = shapePixels.get(j);
 
-					if( info.matched ) //info.internal > info.external )
+					if (info.matched) //info.internal > info.external )
 						totalSuck++;
 				}
-				suckRatios[i] = totalSuck/(double)shapePixels.size;
-				System.out.println("  suck ratio = "+suckRatios[i]);
+				suckRatios[i] = totalSuck / (double) shapePixels.size;
+				System.out.println("  suck ratio = " + suckRatios[i]);
 				// clean up
-				markPointsMember(shape,-1);
+				markPointsMember(shape, -1);
 			}
 
 			// select the worst one
 			double worstRatio = 0;
 			int worstIndex = 0;
-			for( int i = 0; i < output.size(); i++ ) {
-				if( suckRatios[i] > worstRatio ) {
+			for (int i = 0; i < output.size(); i++) {
+				if (suckRatios[i] > worstRatio) {
 					worstRatio = suckRatios[i];
 					worstIndex = i;
 				}
 			}
 
-			if( worstRatio > thresholdDiscard ) {
+			if (worstRatio > thresholdDiscard) {
 				output.remove(worstIndex);
 			} else {
 				break;
@@ -131,15 +131,15 @@ public class RemoveFalseShapes implements PostProcessShapes {
 		}
 	}
 
-	private void compareToShape( FoundShape shape ) {
-		ShapeDescription desc = models.get( shape.whichShape );
+	private void compareToShape(FoundShape shape) {
+		ShapeDescription desc = models.get(shape.whichShape);
 		desc.modelDistance.setModel(shape.modelParam);
 
-		for( int i = 0; i < shape.points.size(); i++ ) {
+		for (int i = 0; i < shape.points.size(); i++) {
 			PointVectorNN pv = shape.points.get(i);
 
 			int which = cloudToShape.data[pv.index];
-			if( which < 0 )
+			if (which < 0)
 				continue;
 
 			PixelInfo info = shapePixels.get(which);
@@ -147,22 +147,23 @@ public class RemoveFalseShapes implements PostProcessShapes {
 			info.matched = true;
 
 			double d = desc.modelDistance.computeDistance(pv);
-			info.external = Math.min(d,info.external);
+			info.external = Math.min(d, info.external);
 		}
 	}
 
 	/**
 	 * Marks points in the point cloud as belonging to this shape for false shape detection
+	 *
 	 * @param shape
 	 */
 	private void setupShapeForFalse(FoundShape shape) {
-		ShapeDescription desc = models.get( shape.whichShape );
+		ShapeDescription desc = models.get(shape.whichShape);
 
 		shapePixels.reset();
 
 		desc.modelDistance.setModel(shape.modelParam);
 
-		for( int i = 0; i < shape.points.size(); i++ ) {
+		for (int i = 0; i < shape.points.size(); i++) {
 			PointVectorNN pv = shape.points.get(i);
 
 			cloudToShape.data[pv.index] = i;
@@ -174,8 +175,8 @@ public class RemoveFalseShapes implements PostProcessShapes {
 		}
 	}
 
-	private void markPointsMember( FoundShape shape , int value ) {
-		for( int i = 0; i < shape.points.size(); i++ ) {
+	private void markPointsMember(FoundShape shape, int value) {
+		for (int i = 0; i < shape.points.size(); i++) {
 			PointVectorNN pv = shape.points.get(i);
 
 			cloudToShape.data[pv.index] = value;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceSphereToPoint3D implements DistanceFromModel<Sphere3D_F64,Point3D_F64> {
+public class DistanceSphereToPoint3D implements DistanceFromModel<Sphere3D_F64, Point3D_F64> {
 
 	Sphere3D_F64 model;
 
@@ -46,8 +46,8 @@ public class DistanceSphereToPoint3D implements DistanceFromModel<Sphere3D_F64,P
 
 	@Override
 	public void computeDistance(List<Point3D_F64> points, double[] distance) {
-		for( int i = 0; i < points.size(); i++ ) {
-			distance[i] = Math.abs(Distance3D_F64.distance(model, points.get(i) ));
+		for (int i = 0; i < points.size(); i++) {
+			distance[i] = Math.abs(Distance3D_F64.distance(model, points.get(i)));
 		}
 	}
 }

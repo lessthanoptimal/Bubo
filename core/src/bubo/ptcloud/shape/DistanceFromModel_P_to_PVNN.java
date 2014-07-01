@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,9 +30,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistanceFromModel_P_to_PVNN<Model> implements DistanceFromModel<Model,PointVectorNN> {
+public class DistanceFromModel_P_to_PVNN<Model> implements DistanceFromModel<Model, PointVectorNN> {
 
-	DistanceFromModel<Model,Point3D_F64> alg;
+	DistanceFromModel<Model, Point3D_F64> alg;
 
 	List<Point3D_F64> points = new ArrayList<Point3D_F64>();
 
@@ -54,11 +54,11 @@ public class DistanceFromModel_P_to_PVNN<Model> implements DistanceFromModel<Mod
 	public void computeDistance(List<PointVectorNN> pointVectors, double[] distance) {
 
 		points.clear();
-		for( int i = 0; i < pointVectors.size(); i++ ) {
+		for (int i = 0; i < pointVectors.size(); i++) {
 			PointVectorNN p = pointVectors.get(i);
 			points.add(p.p);
 		}
 
-		alg.computeDistance(points,distance);
+		alg.computeDistance(points, distance);
 	}
 }

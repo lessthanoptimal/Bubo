@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -40,7 +40,7 @@ public class BoundCylinderBasic {
 	double upper;
 	double lower;
 
-	public void bound( Cylinder3D_F64 cylinder , List<Point3D_F64> points ) {
+	public void bound(Cylinder3D_F64 cylinder, List<Point3D_F64> points) {
 
 		upper = -Double.MAX_VALUE;
 		lower = Double.MAX_VALUE;
@@ -49,11 +49,11 @@ public class BoundCylinderBasic {
 		Point3D_F64 origin = cylinder.line.getPoint();
 
 		double n = cylinder.line.slope.norm();
-		double nx = cylinder.line.slope.x/n;
-		double ny = cylinder.line.slope.y/n;
-		double nz = cylinder.line.slope.z/n;
+		double nx = cylinder.line.slope.x / n;
+		double ny = cylinder.line.slope.y / n;
+		double nz = cylinder.line.slope.z / n;
 
-		for( int i = 0; i < points.size(); i++ ) {
+		for (int i = 0; i < points.size(); i++) {
 			Point3D_F64 pt = points.get(i);
 
 			// compute the distance which the point is along the line from the cylinder's origin
@@ -61,19 +61,19 @@ public class BoundCylinderBasic {
 			double dy = pt.y - origin.y;
 			double dz = pt.z - origin.z;
 
-			double d = nx*dx + ny*dy + nz*dz;
+			double d = nx * dx + ny * dy + nz * dz;
 
-			upper = Math.max(d,upper);
-			lower = Math.min(d,lower);
+			upper = Math.max(d, upper);
+			lower = Math.min(d, lower);
 		}
 
-		pointA.x = origin.x + nx*upper;
-		pointA.y = origin.y + ny*upper;
-		pointA.z = origin.z + nz*upper;
+		pointA.x = origin.x + nx * upper;
+		pointA.y = origin.y + ny * upper;
+		pointA.z = origin.z + nz * upper;
 
-		pointB.x = origin.x + nx*lower;
-		pointB.y = origin.y + ny*lower;
-		pointB.z = origin.z + nz*lower;
+		pointB.x = origin.x + nx * lower;
+		pointB.y = origin.y + ny * lower;
+		pointB.z = origin.z + nz * lower;
 
 	}
 

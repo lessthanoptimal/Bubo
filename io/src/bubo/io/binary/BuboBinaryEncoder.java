@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,13 +25,13 @@ import java.io.OutputStream;
  */
 public class BuboBinaryEncoder {
 
-    private OutputStream out;
+	private OutputStream out;
 
-    public BuboBinaryEncoder( OutputStream out  ) {
-        this.out = out;
-    }
+	public BuboBinaryEncoder(OutputStream out) {
+		this.out = out;
+	}
 
-    public Object readObject() {
-        return null;
-    }
+	public Object readObject() {
+		return null;
+	}
 }

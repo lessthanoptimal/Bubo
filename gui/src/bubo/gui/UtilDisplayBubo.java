@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,79 +28,82 @@ import java.awt.event.ComponentListener;
  */
 public class UtilDisplayBubo {
 
-    public static JFrame show( JComponent comp , String windowName , boolean hasScrollBars , int x , int y , int width , int height ) {
-        JFrame frame = new JFrame(windowName);
+	public static JFrame show(JComponent comp, String windowName, boolean hasScrollBars, int x, int y, int width, int height) {
+		JFrame frame = new JFrame(windowName);
 
-        frame.setLocation(x,y);
-        if( hasScrollBars ) {
-            JScrollPane scroll = new JScrollPane(comp);
-            frame.add(scroll, BorderLayout.CENTER);
+		frame.setLocation(x, y);
+		if (hasScrollBars) {
+			JScrollPane scroll = new JScrollPane(comp);
+			frame.add(scroll, BorderLayout.CENTER);
 
-        } else {
-            frame.add(comp, BorderLayout.CENTER);
-        }
-            
-        frame.setSize(width,height);
-        frame.setVisible(true);
+		} else {
+			frame.add(comp, BorderLayout.CENTER);
+		}
 
-        return frame;
-    }
+		frame.setSize(width, height);
+		frame.setVisible(true);
 
-    public static JFrame show( JComponent comp , String windowName ) {
-        JFrame frame = new JFrame(windowName);
+		return frame;
+	}
 
-        frame.add(comp, BorderLayout.CENTER);
+	public static JFrame show(JComponent comp, String windowName) {
+		JFrame frame = new JFrame(windowName);
 
-        frame.pack();
-        frame.setVisible(true);
+		frame.add(comp, BorderLayout.CENTER);
 
-        return frame;
-    }
+		frame.pack();
+		frame.setVisible(true);
 
-    /**
-     * Pauses the program for the specified number of milliseconds.
-     *
-     * @param milliseconds Length of the pause.
-     */
-    public static void pause( long milliseconds ) {
-        if( milliseconds == 0 )
-            return;
-        
-        synchronized ( Thread.currentThread() ) {
-            try {
-                Thread.currentThread().wait(milliseconds);
-            } catch (InterruptedException e) {
+		return frame;
+	}
 
-            }
-        }
-    }
+	/**
+	 * Pauses the program for the specified number of milliseconds.
+	 *
+	 * @param milliseconds Length of the pause.
+	 */
+	public static void pause(long milliseconds) {
+		if (milliseconds == 0)
+			return;
 
-    /**
-     * <p>
-     * Adds a ComponentListener which will automatically change the display's scale factor so that it
-     * shows the same physical area as the component is resized.
-     * </p>
-     *
-     * @param display The SpacialDisplay which is to be rescalled.
-     * @param lengthWordUnits The desired physical length of the display area.
-     */
-    public static void autoRescaleLength( final SpacialDisplay display , final double lengthWordUnits ) {
-        display.addComponentListener( new ComponentListener() {
+		synchronized (Thread.currentThread()) {
+			try {
+				Thread.currentThread().wait(milliseconds);
+			} catch (InterruptedException e) {
 
-            @Override
-            public void componentResized(ComponentEvent e) {
-                int length = Math.min(display.getWidth(),display.getHeight());
-                display.setPixelsPerMeter(length/lengthWordUnits);
-            }
+			}
+		}
+	}
 
-            @Override
-            public void componentMoved(ComponentEvent e) {}
+	/**
+	 * <p>
+	 * Adds a ComponentListener which will automatically change the display's scale factor so that it
+	 * shows the same physical area as the component is resized.
+	 * </p>
+	 *
+	 * @param display         The SpacialDisplay which is to be rescalled.
+	 * @param lengthWordUnits The desired physical length of the display area.
+	 */
+	public static void autoRescaleLength(final SpacialDisplay display, final double lengthWordUnits) {
+		display.addComponentListener(new ComponentListener() {
 
-            @Override
-            public void componentShown(ComponentEvent e) {}
+			@Override
+			public void componentResized(ComponentEvent e) {
+				int length = Math.min(display.getWidth(), display.getHeight());
+				display.setPixelsPerMeter(length / lengthWordUnits);
+			}
 
-            @Override
-            public void componentHidden(ComponentEvent e) {}
-        });
-    }
+			@Override
+			public void componentMoved(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentShown(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+		});
+	}
 }

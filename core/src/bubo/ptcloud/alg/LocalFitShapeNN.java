@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,10 +35,10 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class LocalFitShapeNN <Model> {
+public class LocalFitShapeNN<Model> {
 
 	// used to estimate the shape's parameters
-	private ModelFitter<Model,PointVectorNN> fitter;
+	private ModelFitter<Model, PointVectorNN> fitter;
 	// converts the model parameters to and from double[].  Used to test for convergence
 	private ModelCodec<Model> codec;
 
@@ -67,10 +67,10 @@ public class LocalFitShapeNN <Model> {
 	/**
 	 * Configures the search and fit algorithm
 	 *
-	 * @param maxIterations Maximum number of inlier select and model estimate iterations it will perform.
+	 * @param maxIterations          Maximum number of inlier select and model estimate iterations it will perform.
 	 * @param minimumChangeThreshold When the average change in model parameters is less than this value
-	 *                                  iteration will stop.
-	 * @param findMatchSet The code which searches for neighbors that match the provided model
+	 *                               iteration will stop.
+	 * @param findMatchSet           The code which searches for neighbors that match the provided model
 	 */
 	public LocalFitShapeNN(int maxIterations,
 						   double minimumChangeThreshold,
@@ -84,66 +84,65 @@ public class LocalFitShapeNN <Model> {
 	 * Specifies algorithms for computing he distance between the shape and a point, refining the shape parameters,
 	 * and converting the model parameters into an array.
 	 *
-	 * @param fitter Uses a set of points and an initial guess to estimate the shape's parameters
-	 * @param distance Computes the distance between a shape and a point
-	 * @param codec Converts the shape parameter to and from double array
+	 * @param fitter    Uses a set of points and an initial guess to estimate the shape's parameters
+	 * @param distance  Computes the distance between a shape and a point
+	 * @param codec     Converts the shape parameter to and from double array
 	 * @param threshold Threshold which defined an inlier.  inlier <= threshold
 	 */
-	public void configure( ModelFitter<Model,PointVectorNN> fitter,
-						   DistanceFromModel<Model,PointVectorNN> distance ,
-						   CheckShapeParameters<Model> checkParam ,
-						   ModelCodec<Model> codec ,
-						   double threshold ) {
+	public void configure(ModelFitter<Model, PointVectorNN> fitter,
+						  DistanceFromModel<Model, PointVectorNN> distance,
+						  CheckShapeParameters<Model> checkParam,
+						  ModelCodec<Model> codec,
+						  double threshold) {
 		this.fitter = fitter;
 		this.checkParam = checkParam;
 		this.codec = codec;
 		this.distanceThreshold = threshold;
 
 		findMatchSet.setModelDistance(distance);
-		
-		if( paramPrev.length < codec.getParamLength() ) {
-			paramPrev = new double[ codec.getParamLength() ];
-			paramCurr = new double[ codec.getParamLength() ];
+
+		if (paramPrev.length < codec.getParamLength()) {
+			paramPrev = new double[codec.getParamLength()];
+			paramCurr = new double[codec.getParamLength()];
 		}
 	}
 
 	/**
 	 * Refines the set of points which belong to the shape and the model parameters which define the shape
-	 *
+	 * <p/>
 	 * NOTE: The initialParam is used inside this function to store intermediate results<br>
 	 *
-	 * @param matches (input) Initial set of points which belong to the shape.  (output) Set of points which match the new shape.
-	 * @param model (input) Initial description of the shape. (output) The newly estimated shape description.
+	 * @param matches            (input) Initial set of points which belong to the shape.  (output) Set of points which match the new shape.
+	 * @param model              (input) Initial description of the shape. (output) The newly estimated shape description.
 	 * @param initialFitToPoints (input) If true it will fit the model parameters to the initial points.  If false
 	 *                           it will start by selecting points which match the initial model.
 	 */
-	public boolean refine( List<PointVectorNN> matches , Model model , boolean initialFitToPoints )
-	{
+	public boolean refine(List<PointVectorNN> matches, Model model, boolean initialFitToPoints) {
 		codec.encode(model, paramPrev);
-		if( initialFitToPoints )
+		if (initialFitToPoints)
 			fitter.fitModel(matches, model, model);
 
 		listTempA.clear();
 		listTempA.addAll(matches);
 
 		int iter = 0;
-		while( true ) {
+		while (true) {
 			// find list of points which match the model
 			listTempB.clear();
 			// find the points which match the model
-			findMatchSet.selectMatchSet(listTempA,model,distanceThreshold,true,listTempB);
+			findMatchSet.selectMatchSet(listTempA, model, distanceThreshold, true, listTempB);
 			// use the points which match the model to estimate the parameters.
-			fitter.fitModel(listTempB,model,model);
+			fitter.fitModel(listTempB, model, model);
 
 			// if the model has drifted into the invalid range, stop processing
-			if( !checkParam.valid(model) )
+			if (!checkParam.valid(model))
 				return false;
 
 			// Compute the change in parameters
 			codec.encode(model, paramCurr);
-		
+
 			double change = 0;
-			for( int i = 0; i < codec.getParamLength(); i++ ) {
+			for (int i = 0; i < codec.getParamLength(); i++) {
 				double d = paramCurr[i] - paramPrev[i];
 				change += Math.abs(d);
 			}
@@ -151,7 +150,7 @@ public class LocalFitShapeNN <Model> {
 
 			// check to see if it has converged
 			iter++;
-			if( change <= minimumChangeThreshold || iter >= maxIterations ) {
+			if (change <= minimumChangeThreshold || iter >= maxIterations) {
 				break;
 			} else {
 				// swap current and previous

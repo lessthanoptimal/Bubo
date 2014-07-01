@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -37,10 +37,10 @@ public class TestModelFitter_P_to_PVNN {
 	public void fitModel() {
 		Dummy dummy = new Dummy();
 
-		ModelFitter_P_to_PVNN <Object> alg = new ModelFitter_P_to_PVNN <Object>(dummy);
+		ModelFitter_P_to_PVNN<Object> alg = new ModelFitter_P_to_PVNN<Object>(dummy);
 
 		List<PointVectorNN> list = new ArrayList<PointVectorNN>();
-		for( int i = 0; i < 10; i++ ) {
+		for (int i = 0; i < 10; i++) {
 			PointVectorNN pv = new PointVectorNN();
 			pv.p = new Point3D_F64();
 			list.add(pv);
@@ -50,13 +50,13 @@ public class TestModelFitter_P_to_PVNN {
 
 		assertTrue(dummy.calledFit);
 
-		assertEquals(10,dummy.list.size());
-		for( int i = 0; i < 10; i++ ) {
+		assertEquals(10, dummy.list.size());
+		for (int i = 0; i < 10; i++) {
 			assertTrue(list.get(i).p == dummy.list.get(i));
 		}
 	}
 
-	protected class Dummy implements ModelFitter<Object,Point3D_F64> {
+	protected class Dummy implements ModelFitter<Object, Point3D_F64> {
 
 		boolean calledFit = false;
 		List<Point3D_F64> list;
@@ -64,7 +64,7 @@ public class TestModelFitter_P_to_PVNN {
 		@Override
 		public boolean fitModel(List<Point3D_F64> dataSet, Object initial, Object found) {
 			list = dataSet;
-			calledFit= true;
+			calledFit = true;
 			return true;
 		}
 	}

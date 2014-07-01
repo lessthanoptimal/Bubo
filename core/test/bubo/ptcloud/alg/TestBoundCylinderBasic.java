@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -36,22 +36,22 @@ public class TestBoundCylinderBasic {
 
 	@Test
 	public void basicTest() {
-		Cylinder3D_F64 c = new Cylinder3D_F64(2,-0.5,1.6,0,0.5,0.6,2);
+		Cylinder3D_F64 c = new Cylinder3D_F64(2, -0.5, 1.6, 0, 0.5, 0.6, 2);
 		c.line.slope.normalize();
 
 		BoundCylinderBasic alg = new BoundCylinderBasic();
 
 		List<Point3D_F64> pts = new ArrayList<Point3D_F64>();
-		pts.add(createPt(c,0,0));
-		pts.add(createPt(c,0.5,Math.PI/2.0));
+		pts.add(createPt(c, 0, 0));
+		pts.add(createPt(c, 0.5, Math.PI / 2.0));
 		pts.add(createPt(c, 1, 0.5));
-		pts.add(createPt(c,2.5,-0.6));
+		pts.add(createPt(c, 2.5, -0.6));
 		pts.add(createPt(c, -0.4, 0.2));
 
-		alg.bound(c,pts);
+		alg.bound(c, pts);
 
-		assertEquals(2.5,alg.getUpper(),1e-8);
-		assertEquals(-0.4,alg.getLower(),1e-8);
+		assertEquals(2.5, alg.getUpper(), 1e-8);
+		assertEquals(-0.4, alg.getLower(), 1e-8);
 	}
 
 }

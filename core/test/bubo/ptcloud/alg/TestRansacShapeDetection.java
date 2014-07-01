@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -56,11 +56,11 @@ public class TestRansacShapeDetection {
 		objects.add(o);
 
 		DummyFindMatch dummy = new DummyFindMatch();
-		RansacShapeDetection alg = new RansacShapeDetection(123213,100,dummy,objects);
+		RansacShapeDetection alg = new RansacShapeDetection(123213, 100, dummy, objects);
 
 		// make it so the candidate list is not zero
-		PlaneNormal3D_F64 planeNorm = new PlaneNormal3D_F64(0,0,0,0,0,1);
-		PlaneGeneral3D_F64 plane = UtilPlane3D_F64.convert(planeNorm,null);
+		PlaneNormal3D_F64 planeNorm = new PlaneNormal3D_F64(0, 0, 0, 0, 0, 1);
+		PlaneGeneral3D_F64 plane = UtilPlane3D_F64.convert(planeNorm, null);
 
 		alg.selectMatchSet(o.modelDistance, o.thresholdFit, plane);
 
@@ -76,10 +76,10 @@ public class TestRansacShapeDetection {
 
 		@Override
 		public void selectMatchSet(List<PointVectorNN> initialMatch,
-									  PlaneGeneral3D_F64 param, double threshold,
-									  boolean checkInitial,
-									  List<PointVectorNN> outputMatch) {
-			assertTrue(outputMatch.size()==0);
+								   PlaneGeneral3D_F64 param, double threshold,
+								   boolean checkInitial,
+								   List<PointVectorNN> outputMatch) {
+			assertTrue(outputMatch.size() == 0);
 			assertTrue(modelDistance);
 			modelSet = true;
 		}

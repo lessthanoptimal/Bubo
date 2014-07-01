@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PlaneGeneralSvd_to_ModelFitter implements ModelFitter<PlaneGeneral3D_F64,Point3D_F64> {
+public class PlaneGeneralSvd_to_ModelFitter implements ModelFitter<PlaneGeneral3D_F64, Point3D_F64> {
 
 	FitPlane3D_F64 alg = new FitPlane3D_F64();
 
@@ -42,10 +42,10 @@ public class PlaneGeneralSvd_to_ModelFitter implements ModelFitter<PlaneGeneral3
 	@Override
 	public boolean fitModel(List<Point3D_F64> dataSet, PlaneGeneral3D_F64 initial, PlaneGeneral3D_F64 found) {
 
-		if( !alg.svd(dataSet,planeNorm.p,planeNorm.n) )
+		if (!alg.svd(dataSet, planeNorm.p, planeNorm.n))
 			return false;
 
-		UtilPlane3D_F64.convert(planeNorm,found);
+		UtilPlane3D_F64.convert(planeNorm, found);
 
 		return true;
 	}

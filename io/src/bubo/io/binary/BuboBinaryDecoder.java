@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,13 +26,13 @@ import java.io.Serializable;
  */
 public class BuboBinaryDecoder {
 
-    private InputStream in;
+	private InputStream in;
 
-    public BuboBinaryDecoder( InputStream in  ) {
-        this.in = in;
-    }
+	public BuboBinaryDecoder(InputStream in) {
+		this.in = in;
+	}
 
-    public void writeObject( Serializable obj ) {
+	public void writeObject(Serializable obj) {
 
-    }
+	}
 }

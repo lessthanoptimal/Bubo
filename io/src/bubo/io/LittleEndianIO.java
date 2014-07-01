@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,140 +26,139 @@ import java.io.OutputStream;
 /**
  * Java uses big endian byte order.  To output little endian the byte order needs to be changed.  This class
  * contains functions for writing and reading little endian primitive data.
- * 
+ *
  * @author Peter Abeles
  */
 public class LittleEndianIO {
 
-    public static boolean readBoolean( InputStream in ) throws IOException {
-        return readByte(in) != 0;
-    }
+	public static boolean readBoolean(InputStream in) throws IOException {
+		return readByte(in) != 0;
+	}
 
-    public static short readShort( InputStream in ) throws IOException {
-        short val = 0;
+	public static short readShort(InputStream in) throws IOException {
+		short val = 0;
 
-        val |= readByte(in);
-        val |= readByte(in) << 8;
+		val |= readByte(in);
+		val |= readByte(in) << 8;
 
-        return val;
-    }
+		return val;
+	}
 
-    public static void writeShort( OutputStream out , short val ) throws IOException {
-         out.write( val & 0xff );
-         out.write((val >> 8) & 0xff );
-     }
-    
-    public static int readInt( InputStream in ) throws IOException {
-        int val = 0;
+	public static void writeShort(OutputStream out, short val) throws IOException {
+		out.write(val & 0xff);
+		out.write((val >> 8) & 0xff);
+	}
 
-        val |= readByte(in);
-        val |= readByte(in) << 8;
-        val |= readByte(in) << 16;
-        val |= readByte(in) << 24;
+	public static int readInt(InputStream in) throws IOException {
+		int val = 0;
 
-        return val;
-    }
+		val |= readByte(in);
+		val |= readByte(in) << 8;
+		val |= readByte(in) << 16;
+		val |= readByte(in) << 24;
 
-    public static int readInt( byte[] data , int offset ) throws IOException {
-        int val = 0;
+		return val;
+	}
 
-        val |= (data[offset++] & 0xFF);
-        val |= (data[offset++] & 0xFF) << 8;
-        val |= (data[offset++] & 0xFF) << 16;
-        val |= (data[offset] & 0xFF) << 24;
+	public static int readInt(byte[] data, int offset) throws IOException {
+		int val = 0;
 
-        return val;
-    }
+		val |= (data[offset++] & 0xFF);
+		val |= (data[offset++] & 0xFF) << 8;
+		val |= (data[offset++] & 0xFF) << 16;
+		val |= (data[offset] & 0xFF) << 24;
 
-     public static void writeInt( OutputStream out , int val ) throws IOException {
-         out.write( val & 0xff );
-         out.write((val >> 8) & 0xff );
-         out.write((val >> 16) & 0xff );
-         out.write((val >> 24) & 0xff );
-     }
+		return val;
+	}
 
-    public static float readFloat( InputStream in ) throws IOException {
-        int rawValue = readInt(in);
+	public static void writeInt(OutputStream out, int val) throws IOException {
+		out.write(val & 0xff);
+		out.write((val >> 8) & 0xff);
+		out.write((val >> 16) & 0xff);
+		out.write((val >> 24) & 0xff);
+	}
 
-        return Float.intBitsToFloat(rawValue);
-    }
+	public static float readFloat(InputStream in) throws IOException {
+		int rawValue = readInt(in);
 
-    public static float readFloat( byte[] data , int offset ) throws IOException {
-        int rawValue = readInt(data,offset);
+		return Float.intBitsToFloat(rawValue);
+	}
 
-        return Float.intBitsToFloat(rawValue);
-    }
+	public static float readFloat(byte[] data, int offset) throws IOException {
+		int rawValue = readInt(data, offset);
 
-    public static void writeFloat( OutputStream out , float val ) throws IOException {
-        int valInt = Float.floatToRawIntBits(val);
-        writeInt(out,valInt);
-    }
+		return Float.intBitsToFloat(rawValue);
+	}
 
-    public static double readDouble( InputStream in ) throws IOException {
-        long rawValue = readLong(in);
+	public static void writeFloat(OutputStream out, float val) throws IOException {
+		int valInt = Float.floatToRawIntBits(val);
+		writeInt(out, valInt);
+	}
 
-        return Double.longBitsToDouble(rawValue);
-    }
+	public static double readDouble(InputStream in) throws IOException {
+		long rawValue = readLong(in);
 
-    public static double readDouble( byte[] data , int offset ) throws IOException {
-        long rawValue = readLong(data,offset);
+		return Double.longBitsToDouble(rawValue);
+	}
 
-        return Double.longBitsToDouble(rawValue);
-    }
+	public static double readDouble(byte[] data, int offset) throws IOException {
+		long rawValue = readLong(data, offset);
 
-    public static void writeDouble( OutputStream out , double val ) throws IOException {
-        long valInt = Double.doubleToRawLongBits(val);
-        writeLong(out,valInt);
-    }
+		return Double.longBitsToDouble(rawValue);
+	}
 
-    public static long readLong( InputStream in ) throws IOException {
-        long val = 0;
+	public static void writeDouble(OutputStream out, double val) throws IOException {
+		long valInt = Double.doubleToRawLongBits(val);
+		writeLong(out, valInt);
+	}
 
-        val |= (long)readByte(in);
-        val |= (long)readByte(in) << 8;
-        val |= (long)readByte(in) << 16;
-        val |= (long)readByte(in) << 24;
-        val |= (long)readByte(in) << 32;
-        val |= (long)readByte(in) << 40;
-        val |= (long)readByte(in) << 48;
-        val |= (long)readByte(in) << 56;
+	public static long readLong(InputStream in) throws IOException {
+		long val = 0;
 
-        return val;
-    }
+		val |= (long) readByte(in);
+		val |= (long) readByte(in) << 8;
+		val |= (long) readByte(in) << 16;
+		val |= (long) readByte(in) << 24;
+		val |= (long) readByte(in) << 32;
+		val |= (long) readByte(in) << 40;
+		val |= (long) readByte(in) << 48;
+		val |= (long) readByte(in) << 56;
 
-    public static long readLong( byte[] data , int offset ) throws IOException {
-        long val = 0;
+		return val;
+	}
 
-        val |= (long)(data[offset++] & 0xFF);
-        val |= (long)(data[offset++] & 0xFF) << 8;
-        val |= (long)(data[offset++] & 0xFF) << 16;
-        val |= (long)(data[offset++] & 0xFF) << 24;
-        val |= (long)(data[offset++] & 0xFF) << 32;
-        val |= (long)(data[offset++] & 0xFF) << 40;
-        val |= (long)(data[offset++] & 0xFF) << 48;
-        val |= (long)(data[offset] & 0xFF) << 56;
+	public static long readLong(byte[] data, int offset) throws IOException {
+		long val = 0;
 
-        return val;
-    }
+		val |= (long) (data[offset++] & 0xFF);
+		val |= (long) (data[offset++] & 0xFF) << 8;
+		val |= (long) (data[offset++] & 0xFF) << 16;
+		val |= (long) (data[offset++] & 0xFF) << 24;
+		val |= (long) (data[offset++] & 0xFF) << 32;
+		val |= (long) (data[offset++] & 0xFF) << 40;
+		val |= (long) (data[offset++] & 0xFF) << 48;
+		val |= (long) (data[offset] & 0xFF) << 56;
 
-    public static void writeLong( OutputStream out , long val ) throws IOException {
-        out.write((int)(val & 0xff) );
-        out.write((int)((val >> 8) & 0xff) );
-        out.write((int)((val >> 16) & 0xff) );
-        out.write((int)((val >> 24) & 0xff) );
-        out.write((int)((val >> 32) & 0xff) );
-        out.write((int)((val >> 40) & 0xff) );
-        out.write((int)((val >> 48) & 0xff) );
-        out.write((int)((val >> 56) & 0xff) );
-    }
-    
-    public static int readByte( InputStream in ) throws IOException
-    {
-        int val = in.read();
-        
-        if( val < 0 )
-            throw new EOFException();
-            
-        return val;
-    }
+		return val;
+	}
+
+	public static void writeLong(OutputStream out, long val) throws IOException {
+		out.write((int) (val & 0xff));
+		out.write((int) ((val >> 8) & 0xff));
+		out.write((int) ((val >> 16) & 0xff));
+		out.write((int) ((val >> 24) & 0xff));
+		out.write((int) ((val >> 32) & 0xff));
+		out.write((int) ((val >> 40) & 0xff));
+		out.write((int) ((val >> 48) & 0xff));
+		out.write((int) ((val >> 56) & 0xff));
+	}
+
+	public static int readByte(InputStream in) throws IOException {
+		int val = in.read();
+
+		if (val < 0)
+			throw new EOFException();
+
+		return val;
+	}
 }

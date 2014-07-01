@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,23 +28,23 @@ import bubo.simulation.d2.SimulatedObjectState;
  */
 public class SimStateLrf2D extends SimulatedObjectState {
 
-    // description of the sensor
-    Lrf2dParam sensorParam;
+	// description of the sensor
+	Lrf2dParam sensorParam;
 
-    // current observations
-    double ranges[];
+	// current observations
+	double ranges[];
 
-    public SimStateLrf2D(Lrf2dParam sensorParam) {
-        this.sensorParam = sensorParam;
+	public SimStateLrf2D(Lrf2dParam sensorParam) {
+		this.sensorParam = sensorParam;
 
-        ranges = new double[ sensorParam.getNumberOfScans() ];
-    }
+		ranges = new double[sensorParam.getNumberOfScans()];
+	}
 
-    public Lrf2dParam getSensorParam() {
-        return sensorParam;
-    }
+	public Lrf2dParam getSensorParam() {
+		return sensorParam;
+	}
 
-    public double[] getRanges() {
-        return ranges;
-    }
+	public double[] getRanges() {
+		return ranges;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,9 +27,9 @@ import java.util.List;
  */
 public interface PostProcessShapes {
 
-	public void setup( List<ShapeDescription> models , LocalFitShapeNN refine );
+	public void setup(List<ShapeDescription> models, LocalFitShapeNN refine);
 
-	public void process( List<FoundShape> input , int cloudSize );
+	public void process(List<FoundShape> input, int cloudSize);
 
 	public List<FoundShape> getOutput();
 }

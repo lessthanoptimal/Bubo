@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,39 +31,39 @@ import java.io.OutputStream;
  */
 public class CActionCollection implements RawlogSerializableCustom {
 
-    public CAction actions[];
+	public CAction actions[];
 
-    @Override
-    public void customDecoding(int version, RawlogDecoder decoder ) {
-        if( version != 0 )
-            throw new RuntimeException("Version not supported");
+	@Override
+	public void customDecoding(int version, RawlogDecoder decoder) {
+		if (version != 0)
+			throw new RuntimeException("Version not supported");
 
-        try {
-            int N = LittleEndianIO.readInt(decoder.getInput());
-            actions = new CAction[N];
-            for( int i = 0; i < N; i++ ) {
-                actions[i] = (CAction) decoder.decodeObject();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		try {
+			int N = LittleEndianIO.readInt(decoder.getInput());
+			actions = new CAction[N];
+			for (int i = 0; i < N; i++) {
+				actions[i] = (CAction) decoder.decodeObject();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    public CAction[] getActions() {
-        return actions;
-    }
+	public CAction[] getActions() {
+		return actions;
+	}
 
-    public void setActions(CAction[] actions) {
-        this.actions = actions;
-    }
+	public void setActions(CAction[] actions) {
+		this.actions = actions;
+	}
 
-    @Override
-    public void customEncoding(OutputStream output) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+	@Override
+	public void customEncoding(OutputStream output) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 
-    @Override
-    public int getVersion() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+	@Override
+	public int getVersion() {
+		return 0;  //To change body of implemented methods use File | Settings | File Templates.
+	}
 }

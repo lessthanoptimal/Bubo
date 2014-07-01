@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,45 +28,45 @@ import java.awt.*;
  */
 public class RawlogUnknownVisualization implements LogDataVisualization {
 
-    JLabel label;
+	JLabel label;
 
-    public RawlogUnknownVisualization() {
-        label = new JLabel("Unknown data type");
-        label.setFont(label.getFont().deriveFont(Font.ITALIC));
-        label.setHorizontalAlignment(JLabel.CENTER);
-    }
+	public RawlogUnknownVisualization() {
+		label = new JLabel("Unknown data type");
+		label.setFont(label.getFont().deriveFont(Font.ITALIC));
+		label.setHorizontalAlignment(JLabel.CENTER);
+	}
 
 
-    @Override
-    public void setData(Object data) {
-        String text;
-        if( data == null ) {
-            text = "Null Data";
-        } else {
-            text = "Unknown data type:\n";
-            text += data.getClass().getName();
-        }
+	@Override
+	public void setData(Object data) {
+		String text;
+		if (data == null) {
+			text = "Null Data";
+		} else {
+			text = "Unknown data type:\n";
+			text += data.getClass().getName();
+		}
 
-        label.setText(text);
-    }
+		label.setText(text);
+	}
 
-    @Override
-    public Class<?> getType() {
-        return null;
-    }
+	@Override
+	public Class<?> getType() {
+		return null;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 1;
-    }
+	@Override
+	public int numDisplay() {
+		return 1;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        return label;
-    }
+	@Override
+	public JComponent getDisplay(int index) {
+		return label;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        return "Info";
-    }
+	@Override
+	public String getDisplayName(int index) {
+		return "Info";
+	}
 }

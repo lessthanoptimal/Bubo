@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,9 +32,9 @@ public interface SimulatedRobotTrajectory {
 	 */
 	public void update();
 
-	public void setPose( Se2_F64 pose );
-
 	public Se2_F64 getPose();
+
+	public void setPose(Se2_F64 pose);
 
 	public double[] getControlRequested();
 

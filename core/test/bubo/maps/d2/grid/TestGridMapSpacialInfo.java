@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of Project BUBO.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package bubo.maps.d2.grid;
 
 import georegression.struct.point.Point2D_F64;
@@ -12,16 +30,16 @@ public class TestGridMapSpacialInfo {
 
 	@Test
 	public void globalToMap_mapToGlobal() {
-		GridMapSpacialInfo info = new GridMapSpacialInfo(0.1,2,-3);
+		GridMapSpacialInfo info = new GridMapSpacialInfo(0.1, 2, -3);
 
-		Point2D_F64 world = new Point2D_F64(2.3,4.56);
+		Point2D_F64 world = new Point2D_F64(2.3, 4.56);
 		Point2D_F64 grid = new Point2D_F64();
 		Point2D_F64 found = new Point2D_F64();
 
-		info.globalToMap(world,grid);
-		info.mapToGlobal(grid,found);
+		info.globalToMap(world, grid);
+		info.mapToGlobal(grid, found);
 
-		assertEquals(world.x,found.x,1e-8);
-		assertEquals(world.y,found.y,1e-8);
+		assertEquals(world.x, found.x, 1e-8);
+		assertEquals(world.y, found.y, 1e-8);
 	}
 }

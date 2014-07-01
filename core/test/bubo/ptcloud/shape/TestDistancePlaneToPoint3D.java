@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -36,34 +36,34 @@ public class TestDistancePlaneToPoint3D {
 
 	@Test
 	public void computeDistance() {
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,1,1,0,0,1);
-		PlaneGeneral3D_F64 model = UtilPlane3D_F64.convert(plane,null);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1, 1, 1, 0, 0, 1);
+		PlaneGeneral3D_F64 model = UtilPlane3D_F64.convert(plane, null);
 		Point3D_F64 point;
 
 		DistancePlaneToPoint3D alg = new DistancePlaneToPoint3D();
 		alg.setModel(model);
 
 		// test above the plane
-		point = new Point3D_F64(1,1,2);
+		point = new Point3D_F64(1, 1, 2);
 
 		assertEquals(1, alg.computeDistance(point), 1e-8);
 
 		// test below the plane
-		point = new Point3D_F64(1,1,0);
+		point = new Point3D_F64(1, 1, 0);
 
-		assertEquals(1,alg.computeDistance(point),1e-8);
+		assertEquals(1, alg.computeDistance(point), 1e-8);
 	}
 
 	@Test
 	public void computeDistance_list() {
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,1,1,0,0,1);
-		PlaneGeneral3D_F64 model = UtilPlane3D_F64.convert(plane,null);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1, 1, 1, 0, 0, 1);
+		PlaneGeneral3D_F64 model = UtilPlane3D_F64.convert(plane, null);
 
 		DistancePlaneToPoint3D alg = new DistancePlaneToPoint3D();
 		alg.setModel(model);
 
-		Point3D_F64 pointA = new Point3D_F64(1,1,2);
-		Point3D_F64 pointB = new Point3D_F64(1,1,0);
+		Point3D_F64 pointA = new Point3D_F64(1, 1, 2);
+		Point3D_F64 pointB = new Point3D_F64(1, 1, 0);
 
 		List<Point3D_F64> pts = new ArrayList<Point3D_F64>();
 		pts.add(pointA);
@@ -72,10 +72,10 @@ public class TestDistancePlaneToPoint3D {
 		double scores[] = new double[2];
 
 		alg.setModel(model);
-		alg.computeDistance(pts,scores);
-		for( int i = 0; i < 2; i++ ) {
+		alg.computeDistance(pts, scores);
+		for (int i = 0; i < 2; i++) {
 			double expected = alg.computeDistance(pts.get(i));
-			assertEquals(expected,scores[i],1e-8);
+			assertEquals(expected, scores[i], 1e-8);
 		}
 	}
 

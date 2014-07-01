@@ -31,9 +31,9 @@ public class TestArrayGrid2D_I8 {
 
 	Random rand = new Random(234);
 
-    @Test
-    public void clear() {
-		ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5,7);
+	@Test
+	public void clear() {
+		ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5, 7);
 
 		for (int y = 0; y < map.getHeight(); y++) {
 			for (int x = 0; x < map.getWidth(); x++) {
@@ -48,35 +48,35 @@ public class TestArrayGrid2D_I8 {
 				assertEquals(map.getUnknown(), map.get(x, y), 1e-4);
 			}
 		}
-    }
+	}
 
-    @Test
-    public void set_get() {
-        ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5,7);
+	@Test
+	public void set_get() {
+		ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5, 7);
 
-        assertTrue( 12 != map.get(2,3));
-        map.set(2,3,12);
-        assertTrue( 12 == map.get(2,3));
-    }
+		assertTrue(12 != map.get(2, 3));
+		map.set(2, 3, 12);
+		assertTrue(12 == map.get(2, 3));
+	}
 
-    @Test
-    public void isKnown() {
-        ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5,7);
+	@Test
+	public void isKnown() {
+		ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5, 7);
 
-        map.set(2,3,ArrayGrid2D_I8.UNKNOWN);
-        assertFalse(map.isKnown(2,3));
-        map.set(2,3,10);
-        assertTrue(map.isKnown(2,3));
-    }
+		map.set(2, 3, ArrayGrid2D_I8.UNKNOWN);
+		assertFalse(map.isKnown(2, 3));
+		map.set(2, 3, 10);
+		assertTrue(map.isKnown(2, 3));
+	}
 
-    @Test
-    public void isValid() {
-        ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5,7);
+	@Test
+	public void isValid() {
+		ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5, 7);
 
-        assertTrue( map.isValid(0));
-        assertTrue( map.isValid(256));
-        assertTrue( map.isValid(70));
-        assertFalse( map.isValid(-1));
-        assertFalse( map.isValid(1000));
-    }
+		assertTrue(map.isValid(0));
+		assertTrue(map.isValid(256));
+		assertTrue(map.isValid(70));
+		assertFalse(map.isValid(-1));
+		assertFalse(map.isValid(1000));
+	}
 }

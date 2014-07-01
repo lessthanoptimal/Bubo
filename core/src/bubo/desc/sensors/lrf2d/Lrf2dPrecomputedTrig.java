@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,54 +32,54 @@ import georegression.struct.point.Point2D_F64;
 // todo move out of the desc package?
 public class Lrf2dPrecomputedTrig {
 
-    // Where each sine and cosine function is saved.  One for each scan.
-    public double c[];
-    public double s[];
+	// Where each sine and cosine function is saved.  One for each scan.
+	public double c[];
+	public double s[];
 
-    // end point of ladar
-    public double x;
-    public double y;
+	// end point of ladar
+	public double x;
+	public double y;
 
-    /**
-     * Precomputes trigometric functions for the specified 2D LRF
-     *
-     * @param config
-     */
-    public Lrf2dPrecomputedTrig( final Lrf2dParam config ) {
-        double theta = config.getStartAngle();
-        final double delta = config.getAngleIncrement();
+	/**
+	 * Precomputes trigometric functions for the specified 2D LRF
+	 *
+	 * @param config
+	 */
+	public Lrf2dPrecomputedTrig(final Lrf2dParam config) {
+		double theta = config.getStartAngle();
+		final double delta = config.getAngleIncrement();
 
-        final int N = config.getNumberOfScans();
+		final int N = config.getNumberOfScans();
 
-        c = new double[ N ];
-        s = new double[ N ];
+		c = new double[N];
+		s = new double[N];
 
-        for( int i = 0; i < N; i++ , theta += delta) {
-            c[i] = Math.cos(theta);
-            s[i] = Math.sin(theta);
-        }
-    }
+		for (int i = 0; i < N; i++, theta += delta) {
+			c[i] = Math.cos(theta);
+			s[i] = Math.sin(theta);
+		}
+	}
 
-    /**
-     * Computes the 2D coordinate of the LRF scan point and saves it in the internal x and y variables.
-     *
-     * @param index Which LRF scan is being considered.
-     * @param range The scan's range from the sensor.
-     */
-    public void computeEndPoint( int index , double range ) {
-        x = c[index]*range;
-        y = s[index]*range;
-    }
+	/**
+	 * Computes the 2D coordinate of the LRF scan point and saves it in the internal x and y variables.
+	 *
+	 * @param index Which LRF scan is being considered.
+	 * @param range The scan's range from the sensor.
+	 */
+	public void computeEndPoint(int index, double range) {
+		x = c[index] * range;
+		y = s[index] * range;
+	}
 
-    /**
-     * Computes the 2D coordinate of the LRF scan point and saves it in the provided point.
-     *
-     * @param index Which LRF scan is being considered.
-     * @param range The scan's range from the sensor.
-     * @param pt where the results are stored.
-     */
-    public void computeEndPoint( int index , double range , Point2D_F64 pt ) {
-        pt.x = c[index]*range;
-        pt.y = s[index]*range;
-    }
+	/**
+	 * Computes the 2D coordinate of the LRF scan point and saves it in the provided point.
+	 *
+	 * @param index Which LRF scan is being considered.
+	 * @param range The scan's range from the sensor.
+	 * @param pt    where the results are stored.
+	 */
+	public void computeEndPoint(int index, double range, Point2D_F64 pt) {
+		pt.x = c[index] * range;
+		pt.y = s[index] * range;
+	}
 }

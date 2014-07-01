@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,26 +26,26 @@ import java.util.List;
  */
 public class UtilStrings {
 
-    /**
-     * <p>
-     * Checks to see if the list already contains the string.  if not it is added.  It
-     * either returns the equivalent string in the list or the passed in string if there
-     * is no equivalent already in the list.
-     * </p>
-     * 
-     * @param list List of strings.
-     * @param text string which will be added to the if an equivalent string is not already in it
-     * @return The string which is in the list and is equivalent to 'text'.
-     */
-    public static String checkAddString( List<String> list , String text ) {
-        if( text == null )
-            return null;
-        for( String s : list ) {
-            if( s.compareTo(text) == 0 )
-                return s;
-        }
+	/**
+	 * <p>
+	 * Checks to see if the list already contains the string.  if not it is added.  It
+	 * either returns the equivalent string in the list or the passed in string if there
+	 * is no equivalent already in the list.
+	 * </p>
+	 *
+	 * @param list List of strings.
+	 * @param text string which will be added to the if an equivalent string is not already in it
+	 * @return The string which is in the list and is equivalent to 'text'.
+	 */
+	public static String checkAddString(List<String> list, String text) {
+		if (text == null)
+			return null;
+		for (String s : list) {
+			if (s.compareTo(text) == 0)
+				return s;
+		}
 
-        list.add(text);
-        return text;
-    }
+		list.add(text);
+		return text;
+	}
 }

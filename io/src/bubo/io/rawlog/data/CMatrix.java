@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,74 +32,74 @@ import java.io.OutputStream;
  */
 public class CMatrix implements RawlogSerializableCustom {
 
-    int numRows;
-    int numColumns;
-    float [][]data;
+	int numRows;
+	int numColumns;
+	float[][] data;
 
-    public CMatrix(int numRows, int numColumns) {
-        this.numRows = numRows;
-        this.numColumns = numColumns;
-        data = new float[numRows][numColumns];
-    }
+	public CMatrix(int numRows, int numColumns) {
+		this.numRows = numRows;
+		this.numColumns = numColumns;
+		data = new float[numRows][numColumns];
+	}
 
-    public CMatrix() {
-    }
+	public CMatrix() {
+	}
 
-    @Override
-    public void customDecoding(int version, RawlogDecoder decoder) {
-        if( version != 0 )
-            throw new RuntimeException("Unexpected version: "+version);
-        
-        try {
-            numRows = LittleEndianIO.readInt(decoder.getInput());
-            numColumns = LittleEndianIO.readInt(decoder.getInput());
+	@Override
+	public void customDecoding(int version, RawlogDecoder decoder) {
+		if (version != 0)
+			throw new RuntimeException("Unexpected version: " + version);
 
-            data = new float[ numRows ][];
+		try {
+			numRows = LittleEndianIO.readInt(decoder.getInput());
+			numColumns = LittleEndianIO.readInt(decoder.getInput());
 
-            for( int i = 0; i < numRows; i++ ) {
-                data[i] = decoder.readFloatArray(numColumns);
-            }
+			data = new float[numRows][];
 
-        } catch (IOException e) {
-            throw new RuntimeException("Custom deserialization failed",e);
-        }
-    }
+			for (int i = 0; i < numRows; i++) {
+				data[i] = decoder.readFloatArray(numColumns);
+			}
 
-    @Override
-    public void customEncoding(OutputStream output) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+		} catch (IOException e) {
+			throw new RuntimeException("Custom deserialization failed", e);
+		}
+	}
 
-    public float get( int row , int col ) {
-        return data[row][col];
-    }
+	@Override
+	public void customEncoding(OutputStream output) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 
-    public int getNumRows() {
-        return numRows;
-    }
+	public float get(int row, int col) {
+		return data[row][col];
+	}
 
-    public void setNumRows(int numRows) {
-        this.numRows = numRows;
-    }
+	public int getNumRows() {
+		return numRows;
+	}
 
-    public int getNumColumns() {
-        return numColumns;
-    }
+	public void setNumRows(int numRows) {
+		this.numRows = numRows;
+	}
 
-    public void setNumColumns(int numColumns) {
-        this.numColumns = numColumns;
-    }
+	public int getNumColumns() {
+		return numColumns;
+	}
 
-    public float[][] getData() {
-        return data;
-    }
+	public void setNumColumns(int numColumns) {
+		this.numColumns = numColumns;
+	}
 
-    public void setData(float[][] data) {
-        this.data = data;
-    }
+	public float[][] getData() {
+		return data;
+	}
 
-    @Override
-    public int getVersion() {
-        return 0;
-    }
+	public void setData(float[][] data) {
+		this.data = data;
+	}
+
+	@Override
+	public int getVersion() {
+		return 0;
+	}
 }

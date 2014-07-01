@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,55 +30,55 @@ import georegression.struct.se.Se2_F64;
  */
 public class Extrinsic2D implements ExtrinsicParameters {
 
-    // the component that this transform is in reference to
-    private RobotComponent ref;
+	// the component that this transform is in reference to
+	private RobotComponent ref;
 
-    // coordinate system transform
-    // from the local to the parent reference frame
-    private Se2_F64 tranToParent = new Se2_F64();
+	// coordinate system transform
+	// from the local to the parent reference frame
+	private Se2_F64 tranToParent = new Se2_F64();
 
-    // is this transform fixed
-    private boolean fixed;
+	// is this transform fixed
+	private boolean fixed;
 
-    public Extrinsic2D(RobotComponent ref, boolean fixed) {
-        this.ref = ref;
-        this.fixed = fixed;
-    }
+	public Extrinsic2D(RobotComponent ref, boolean fixed) {
+		this.ref = ref;
+		this.fixed = fixed;
+	}
 
-    public void setTransformToParent( double x , double y , double yaw ) {
-        tranToParent.set(x,y,yaw);
-    }
+	public void setTransformToParent(double x, double y, double yaw) {
+		tranToParent.set(x, y, yaw);
+	}
 
-    /**
-     * <p>
-     * Returns the transform from the local coordinate system to the reference
-     * frame.
-     * </p>
-     *
-     * @return Coordinate system transform.
-     */
-    public Se2_F64 getTransformToParent() {
-        return tranToParent;
-    }
+	/**
+	 * <p>
+	 * Returns the transform from the local coordinate system to the reference
+	 * frame.
+	 * </p>
+	 *
+	 * @return Coordinate system transform.
+	 */
+	public Se2_F64 getTransformToParent() {
+		return tranToParent;
+	}
 
-    /**
-     * If the this transform ever changes or not
-     */
-    public boolean isFixed() {
-        return fixed;
-    }
+	/**
+	 * If the this transform ever changes or not
+	 */
+	public boolean isFixed() {
+		return fixed;
+	}
 
-    public void setFixed(boolean fixed) {
-        this.fixed = fixed;
-    }
+	public void setFixed(boolean fixed) {
+		this.fixed = fixed;
+	}
 
-    @Override
-    public RobotComponent getReference() {
-        return ref;
-    }
+	@Override
+	public RobotComponent getReference() {
+		return ref;
+	}
 
-    @Override
-    public boolean isConstant() {
-        return fixed;
-    }
+	@Override
+	public boolean isConstant() {
+		return fixed;
+	}
 }

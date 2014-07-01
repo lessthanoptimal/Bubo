@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,6 +27,6 @@ import bubo.filters.ekf.EkfProjector;
  */
 public interface LandmarkProjector extends EkfProjector {
 
-	public void setLandmarkLocation( double x , double y );
+	public void setLandmarkLocation(double x, double y);
 
 }

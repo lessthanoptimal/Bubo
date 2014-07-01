@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,94 +32,92 @@ import java.util.List;
  * @author Peter Abeles
  */
 public abstract class LocalAssociateDiscrete implements AssociateLrfMeas {
-    // description of the sensor
-    private Lrf2dParam param;
+	//  LRF scan information.
+	protected ScanInfo scanMatch;
+	protected ScanInfo scanRef;
+	// description of the sensor
+	private Lrf2dParam param;
+	// list of associated points
+	private List<Point2D_F64> matchPts = new ArrayList<Point2D_F64>();
+	private List<Point2D_F64> refPts = new ArrayList<Point2D_F64>();
 
-    //  LRF scan information.
-    protected ScanInfo scanMatch;
-    protected ScanInfo scanRef;
+	// how many indexes away from the target index will it search
+	private int searchNeighborhood;
+	// the maximum distance away two points can be to be associated
+	private double maxSeparation;
 
-    // list of associated points
-    private List<Point2D_F64> matchPts = new ArrayList<Point2D_F64>();
-    private List<Point2D_F64> refPts = new ArrayList<Point2D_F64>();
+	protected LocalAssociateDiscrete(int searchNeighborhood,
+									 double maxSeparation) {
+		this.searchNeighborhood = searchNeighborhood;
+		this.maxSeparation = maxSeparation;
+	}
 
-    // how many indexes away from the target index will it search
-    private int searchNeighborhood;
-    // the maximum distance away two points can be to be associated
-    private double maxSeparation;
+	public void setParam(Lrf2dParam param) {
+		this.param = param;
+	}
 
-    protected LocalAssociateDiscrete(int searchNeighborhood,
-                                     double maxSeparation ) {
-        this.searchNeighborhood = searchNeighborhood;
-        this.maxSeparation = maxSeparation;
-    }
+	@Override
+	public void associate(ScanInfo scanMatch, ScanInfo scanRef) {
 
-    public void setParam(Lrf2dParam param) {
-        this.param = param;
-    }
+		this.scanMatch = scanMatch;
+		this.scanRef = scanRef;
 
-    @Override
-    public void associate(ScanInfo scanMatch, ScanInfo scanRef) {
+		matchPts.clear();
+		refPts.clear();
 
-        this.scanMatch = scanMatch;
-        this.scanRef = scanRef;
+		final int N = param.getNumberOfScans();
+		for (int i = 0; i < N; i++) {
+			if (!scanMatch.vis[i])
+				continue;
 
-        matchPts.clear();
-        refPts.clear();
+			int min = i - searchNeighborhood;
+			int max = i + searchNeighborhood;
+			if (min < 0) min = 0;
+			if (max > N) max = N;
 
-        final int N = param.getNumberOfScans();
-        for( int i = 0; i < N; i++ ) {
-            if( !scanMatch.vis[i] )
-                continue;
+			int bestIndex = -1;
+			double bestDistance = Double.MAX_VALUE;
 
-            int min = i - searchNeighborhood;
-            int max = i + searchNeighborhood;
-            if( min < 0 ) min = 0;
-            if( max > N ) max = N;
+			setTarget(i);
 
-            int bestIndex = -1;
-            double bestDistance = Double.MAX_VALUE;
+			for (int j = min; j < max; j++) {
+				if (!scanRef.vis[j])
+					continue;
 
-            setTarget(i);
+				double dist = distToTarget(j);
 
-            for( int j = min; j < max; j++ ) {
-                if( !scanRef.vis[j] )
-                    continue;
+				if (dist < bestDistance) {
+					bestDistance = dist;
+					bestIndex = j;
+				}
+			}
 
-                double dist = distToTarget(j);
+			if (bestIndex != -1 && bestDistance < maxSeparation) {
+				matchPts.add(scanMatch.pts[i]);
+				refPts.add(scanRef.pts[bestIndex]);
+			}
+		}
+	}
 
-                if( dist < bestDistance ) {
-                    bestDistance = dist;
-                    bestIndex = j;
-                }
-            }
+	@Override
+	public List<Point2D_F64> getListMatch() {
+		return matchPts;
+	}
 
-            if( bestIndex != -1 && bestDistance < maxSeparation) {
-                matchPts.add(scanMatch.pts[i]);
-                refPts.add(scanRef.pts[bestIndex]);
-            }
-        }
-    }
+	@Override
+	public List<Point2D_F64> getListReference() {
+		return refPts;
+	}
 
-    @Override
-    public List<Point2D_F64> getListMatch() {
-        return matchPts;
-    }
+	/**
+	 * Specifies which measurement in the match scan that the distance is being measured against.
+	 *
+	 * @param indexMatch
+	 */
+	public abstract void setTarget(int indexMatch);
 
-    @Override
-    public List<Point2D_F64> getListReference() {
-        return refPts;
-    }
-
-    /**
-     * Specifies which measurement in the match scan that the distance is being measured against.
-     * 
-     * @param indexMatch
-     */
-    public abstract void setTarget( int indexMatch );
-
-    /**
-     * Distance from reference to the specified index
-     */
-    public abstract double distToTarget( int indexRef );
+	/**
+	 * Distance from reference to the specified index
+	 */
+	public abstract double distToTarget(int indexRef);
 }

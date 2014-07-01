@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -75,6 +75,10 @@ public class ExtendedKalmanFilter extends DKFCommon implements KalmanFilterInter
 		this.projector = null;
 	}
 
+	public <T extends EkfPredictor> T getPredictor() {
+		return (T) predictor;
+	}
+
 	/**
 	 * Used to change the propagator used by the filter.
 	 */
@@ -85,19 +89,15 @@ public class ExtendedKalmanFilter extends DKFCommon implements KalmanFilterInter
 		this.predictor = predictor;
 	}
 
+	public EkfProjector getProjector() {
+		return projector;
+	}
+
 	public void setProjector(EkfProjector projector) {
 		if (projector.getMeasurementSize() != getMeasDOF())
 			throw new IllegalArgumentException("The projector must have the same DOF as the filter");
 
 		this.projector = projector;
-	}
-
-	public <T extends EkfPredictor> T getPredictor() {
-		return (T) predictor;
-	}
-
-	public EkfProjector getProjector() {
-		return projector;
 	}
 
 	/**

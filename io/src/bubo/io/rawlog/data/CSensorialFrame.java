@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,49 +32,49 @@ import java.io.OutputStream;
 public class CSensorialFrame extends CObservation implements RawlogSerializableCustom {
 
 
-    CObservation obs[];
+	CObservation obs[];
 
-    @Override
-    public int getVersion() {
-        return 2;
-    }
+	@Override
+	public int getVersion() {
+		return 2;
+	}
 
-    @Override
-    public void customDecoding(int version, RawlogDecoder decoder) {
-        if( version > 2 )
-            throw new RuntimeException("Version not supported");
+	@Override
+	public void customDecoding(int version, RawlogDecoder decoder) {
+		if (version > 2)
+			throw new RuntimeException("Version not supported");
 
-        try {
-            if( version < 2 ) {
-                LittleEndianIO.readInt(decoder.getInput());
-            }
+		try {
+			if (version < 2) {
+				LittleEndianIO.readInt(decoder.getInput());
+			}
 
-            if( version == 0 ) {
-                throw new RuntimeException("It should read in a timestamp here");
-            }
+			if (version == 0) {
+				throw new RuntimeException("It should read in a timestamp here");
+			}
 
-            int N = LittleEndianIO.readInt(decoder.getInput());
-            obs = new CObservation[N];
+			int N = LittleEndianIO.readInt(decoder.getInput());
+			obs = new CObservation[N];
 
-            for( int i = 0; i < N; i++ ) {
-                obs[i] = (CObservation)decoder.decodeObject();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+			for (int i = 0; i < N; i++) {
+				obs[i] = (CObservation) decoder.decodeObject();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
-    }
+	}
 
-    @Override
-    public void customEncoding(OutputStream output) {
-        throw new RuntimeException("Implement");
-    }
+	@Override
+	public void customEncoding(OutputStream output) {
+		throw new RuntimeException("Implement");
+	}
 
-    public CObservation[] getObs() {
-        return obs;
-    }
+	public CObservation[] getObs() {
+		return obs;
+	}
 
-    public void setObs(CObservation[] obs) {
-        this.obs = obs;
-    }
+	public void setObs(CObservation[] obs) {
+		this.obs = obs;
+	}
 }

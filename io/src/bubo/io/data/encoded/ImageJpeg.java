@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -19,7 +19,6 @@
 package bubo.io.data.encoded;
 
 
-
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageUInt8;
 import bubo.io.data.ImageEncoded;
@@ -37,42 +36,42 @@ import java.io.IOException;
  */
 public class ImageJpeg implements ImageEncoded {
 
-    Class imageType = ImageUInt8.class;
-    byte[] data;
-    int length;
+	Class imageType = ImageUInt8.class;
+	byte[] data;
+	int length;
 
-    public ImageJpeg(byte[] data, int length) {
-        this.data = data;
-        this.length = length;
-    }
+	public ImageJpeg(byte[] data, int length) {
+		this.data = data;
+		this.length = length;
+	}
 
-    @Override
-    public byte[] getData() {
-        return data;
-    }
+	@Override
+	public byte[] getData() {
+		return data;
+	}
 
-    @Override
-    public int getDataSize() {
-        return length;
-    }
+	@Override
+	public int getDataSize() {
+		return length;
+	}
 
-    @Override
-    public String getFormat() {
-        return "JPEG";
-    }
+	@Override
+	public String getFormat() {
+		return "JPEG";
+	}
 
-    @Override
-    public <T extends boofcv.struct.image.ImageBase>T convertToImage() {
-        BufferedImage buffImg = convertToBuffered();
-        return (T) ConvertBufferedImage.convertFromSingle(buffImg,null,imageType);
-    }
+	@Override
+	public <T extends boofcv.struct.image.ImageBase> T convertToImage() {
+		BufferedImage buffImg = convertToBuffered();
+		return (T) ConvertBufferedImage.convertFromSingle(buffImg, null, imageType);
+	}
 
-    @Override
-    public BufferedImage convertToBuffered() {
-        try {
-            return ImageIO.read(new ByteArrayInputStream(data));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	@Override
+	public BufferedImage convertToBuffered() {
+		try {
+			return ImageIO.read(new ByteArrayInputStream(data));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,12 +28,13 @@ import java.util.List;
  * Customized version of {@link RansacMulti}.  Instead of finding the inlier set using the sampling set it uses the
  * global set.  This is done by traversing through the nearest-neighbor graph, starting with the
  * points used to generate the model, and finding points which are close to the shape.
- *
+ * <p/>
  * Deviations from paper:
  * <ul>
  * <li>connected components:  Does not use bitmap technique.  Uses nearest neighbor information instead.</li>
  * <li>exit iteration: When no better model has been found after N iterations</li>
  * <ul>
+ *
  * @author Peter Abeles
  */
 public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
@@ -47,7 +48,7 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 
 	public RansacShapeDetection(long randSeed, int maxExtension,
 								FindMatchSetPointVectorNN matchFinder,
-								List<ObjectType> objectTypes ) {
+								List<ObjectType> objectTypes) {
 		super(randSeed, -1, objectTypes, PointVectorNN.class);
 		this.maxExtension = maxExtension;
 		this.matchFinder = matchFinder;
@@ -57,9 +58,9 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 	}
 
 	@Override
-	protected void initialize( List<PointVectorNN> dataSet ) {
+	protected void initialize(List<PointVectorNN> dataSet) {
 		super.initialize(dataSet);
-		maxIterations = maxExtension*2;
+		maxIterations = maxExtension * 2;
 	}
 
 	/**
@@ -67,18 +68,18 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 	 * are marked with a unique ID for this function call so that it knows which ones it has examined.
 	 */
 	@Override
-	protected <Model>void selectMatchSet( DistanceFromModel<Model,PointVectorNN> modelDistance ,
+	protected <Model> void selectMatchSet(DistanceFromModel<Model, PointVectorNN> modelDistance,
 										  double threshold, Model param) {
 		candidatePoints.clear();
 		matchFinder.setModelDistance(modelDistance);
-		matchFinder.selectMatchSet(initialSample.toList(),param,threshold ,false, candidatePoints);
+		matchFinder.selectMatchSet(initialSample.toList(), param, threshold, false, candidatePoints);
 	}
 
 	@Override
-	protected void setBestModel( Object param ) {
+	protected void setBestModel(Object param) {
 		super.setBestModel(param);
 		// extend how long it can run for
-		maxIterations = Math.max(maxIterations,iteration + maxExtension);
+		maxIterations = Math.max(maxIterations, iteration + maxExtension);
 	}
 
 	/**

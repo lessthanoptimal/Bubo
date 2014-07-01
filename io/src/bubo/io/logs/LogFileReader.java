@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,53 +29,51 @@ import java.util.List;
  */
 public interface LogFileReader {
 
-    /**
-     * Reads the specified log file.  Blocks until it is finished.  Its process
-     * can be monitored by adding a listener.
-     *
-     * @param fileName The log file being read.
-     *
-     * @return If the log file was successfully read or not.
-     */
-    public boolean load( String fileName );
+	/**
+	 * Reads the specified log file.  Blocks until it is finished.  Its process
+	 * can be monitored by adding a listener.
+	 *
+	 * @param fileName The log file being read.
+	 * @return If the log file was successfully read or not.
+	 */
+	public boolean load(String fileName);
 
-    /**
-     * Returns the object references found in the log file.
-     *
-     * @return Object references.
-     */
-    public List<LogFileObjectRef> getReferences();
+	/**
+	 * Returns the object references found in the log file.
+	 *
+	 * @return Object references.
+	 */
+	public List<LogFileObjectRef> getReferences();
 
-    /**
-     * Loads an instance of an object from the log file given a reference to the object.
-     * @param ref Reference that describes how to find the object,
-     * @return An instance of the object.
-     */
-    public <T> T getObject( LogFileObjectRef ref );
+	/**
+	 * Loads an instance of an object from the log file given a reference to the object.
+	 *
+	 * @param ref Reference that describes how to find the object,
+	 * @return An instance of the object.
+	 */
+	public <T> T getObject(LogFileObjectRef ref);
 
-    /**
-     * Sets a progress listener.
-     *
-     * @param listener Listener.
-     */
-    public void setListener( Listener listener );
+	/**
+	 * Sets a progress listener.
+	 *
+	 * @param listener Listener.
+	 */
+	public void setListener(Listener listener);
 
-    /**
-     * Tell the file reader that it should stop reading the input file and load() should exit.
-     */
-    public void cancelLoadRequest();
+	/**
+	 * Tell the file reader that it should stop reading the input file and load() should exit.
+	 */
+	public void cancelLoadRequest();
 
-    /**
-     * Used for the display of process information.
-     */
-    public static interface Listener
-    {
-        /**
-         *
-         * @param message Message describing the latest progress.
-         * @param fractionRead number from 0 to 1 that describes how far along it is, where 1 is finished.
-         */
-        public void logLoadProcess( String message , double fractionRead );
-    }
-    
+	/**
+	 * Used for the display of process information.
+	 */
+	public static interface Listener {
+		/**
+		 * @param message      Message describing the latest progress.
+		 * @param fractionRead number from 0 to 1 that describes how far along it is, where 1 is finished.
+		 */
+		public void logLoadProcess(String message, double fractionRead);
+	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,45 +29,45 @@ import javax.swing.*;
  */
 public class VisualizeCActionCollection implements LogDataVisualization {
 
-    JTextArea textArea = new JTextArea();
-    CActionCollection collection;
+	JTextArea textArea = new JTextArea();
+	CActionCollection collection;
 
-    @Override
-    public void setData(Object data) {
-        collection = (CActionCollection)data;
+	@Override
+	public void setData(Object data) {
+		collection = (CActionCollection) data;
 
-        setUpTextArea(collection);
-    }
+		setUpTextArea(collection);
+	}
 
-    private void setUpTextArea( CActionCollection collection ) {
-        String text = "Action Collection:\n";
-        text += "N = "+collection.actions.length+"\n";
-        text += "\n";
-        for( int i = 0; i < collection.actions.length; i++ ) {
-            CAction c = collection.actions[i];
-            text += c.getClass().getSimpleName()+"\n";
-        }
+	private void setUpTextArea(CActionCollection collection) {
+		String text = "Action Collection:\n";
+		text += "N = " + collection.actions.length + "\n";
+		text += "\n";
+		for (int i = 0; i < collection.actions.length; i++) {
+			CAction c = collection.actions[i];
+			text += c.getClass().getSimpleName() + "\n";
+		}
 
-        textArea.setText(text);
-    }
+		textArea.setText(text);
+	}
 
-    @Override
-    public Class<?> getType() {
-        return CActionCollection.class;
-    }
+	@Override
+	public Class<?> getType() {
+		return CActionCollection.class;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 1;
-    }
+	@Override
+	public int numDisplay() {
+		return 1;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        return textArea;
-    }
+	@Override
+	public JComponent getDisplay(int index) {
+		return textArea;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        return "Action List";
-    }
+	@Override
+	public String getDisplayName(int index) {
+		return "Action List";
+	}
 }

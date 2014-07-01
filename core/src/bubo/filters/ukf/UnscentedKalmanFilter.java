@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -59,15 +59,13 @@ import org.ejml.ops.CommonOps;
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
 public class UnscentedKalmanFilter implements KalmanFilterInterface {
 
+	// should it perform an unscented update on the prediction and/or update?
+	boolean unscentedPred;
+	boolean unscentedUpdate;
 	// tuning parameters
 	private double kappa;
 	// the DOF of the state
 	private int n;
-
-	// should it perform an unscented update on the prediction and/or update?
-	boolean unscentedPred;
-	boolean unscentedUpdate;
-
 	// target and sensor models
 	private EkfPredictorDiscrete predictor;
 	private EkfProjector projector;

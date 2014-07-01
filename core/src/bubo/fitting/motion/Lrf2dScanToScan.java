@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -23,7 +23,7 @@ import georegression.struct.se.Se2_F64;
 
 /**
  * Computes a rigid body motion {@link Se2_F64} which when applied to the 'match' scan will minimize the difference
- * between it and the 'reference' scan. 
+ * between it and the 'reference' scan.
  *
  * @author Peter Abeles
  */
@@ -34,7 +34,7 @@ public interface Lrf2dScanToScan {
 	 *
 	 * @param param Sensor parameters.
 	 */
-	public void setSensorParam( Lrf2dParam param );
+	public void setSensorParam(Lrf2dParam param);
 
 	/**
 	 * If {@link #process(georegression.struct.se.Se2_F64)} returned true then this is the motion from the first to second scan.
@@ -48,14 +48,14 @@ public interface Lrf2dScanToScan {
 	 *
 	 * @param scan range measurements.
 	 */
-	public void setReference( double []scan );
+	public void setReference(double[] scan);
 
 	/**
 	 * Specifies range measurements for the scan which is to be matched against the reference.
 	 *
 	 * @param scan range measurements
 	 */
-	public void setMatch( double []scan );
+	public void setMatch(double[] scan);
 
 	/**
 	 * Takes the data associated with the match scan and sets it to be the reference scan.  Often times scan matching
@@ -70,7 +70,7 @@ public interface Lrf2dScanToScan {
 	 * @param hint An initial estimate of the transform from the first to second scan.  Often from odometry.
 	 * @return if registration was successful or not.
 	 */
-	public boolean process( Se2_F64 hint );
+	public boolean process(Se2_F64 hint);
 
 	/**
 	 * A number which represents the error associated with the scan.  Primarily for debugging purposes,

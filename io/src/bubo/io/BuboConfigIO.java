@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,11 +26,11 @@ import java.util.List;
  */
 public class BuboConfigIO {
 
-    public static List<String> DEFAULT_DEFINITION_PATH;
+	public static List<String> DEFAULT_DEFINITION_PATH;
 
-    static {
-        DEFAULT_DEFINITION_PATH = new ArrayList<String>();
+	static {
+		DEFAULT_DEFINITION_PATH = new ArrayList<String>();
 
-        DEFAULT_DEFINITION_PATH.add( "bubo.io.data" );
-    }
+		DEFAULT_DEFINITION_PATH.add("bubo.io.data");
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,25 +35,25 @@ public class TestDistanceSphereToPointVectorNN {
 
 	@Test
 	public void computeDistance() {
-		Sphere3D_F64 model = new Sphere3D_F64(1,1,1,3);
+		Sphere3D_F64 model = new Sphere3D_F64(1, 1, 1, 3);
 
 		DistanceSphereToPointVectorNN alg = new DistanceSphereToPointVectorNN(0.2);
 		alg.setModel(model);
 
 		// test outside the sphere
-		PointVectorNN point = new PointVectorNN(1,1,1+4,0,0,-1);
+		PointVectorNN point = new PointVectorNN(1, 1, 1 + 4, 0, 0, -1);
 
 		assertEquals(1, alg.computeDistance(point), 1e-8);
 
 		// test inside the sphere
-		point = new PointVectorNN(1,1,1+2,0,0,1);
+		point = new PointVectorNN(1, 1, 1 + 2, 0, 0, 1);
 
-		assertEquals(1,alg.computeDistance(point),1e-8);
+		assertEquals(1, alg.computeDistance(point), 1e-8);
 	}
 
 	@Test
 	public void computeDistance_angleCheck() {
-		Sphere3D_F64 model = new Sphere3D_F64(1,1,1,3);
+		Sphere3D_F64 model = new Sphere3D_F64(1, 1, 1, 3);
 
 		double angleTol = 0.2;
 
@@ -61,35 +61,35 @@ public class TestDistanceSphereToPointVectorNN {
 		alg.setModel(model);
 
 		// have it just inside the tolerance
-		double angle = angleTol-0.01;
+		double angle = angleTol - 0.01;
 		double x = model.center.x;
-		double y = model.center.y + Math.sin(angle)*4;
-		double z = model.center.z + Math.cos(angle)*4;
+		double y = model.center.y + Math.sin(angle) * 4;
+		double z = model.center.z + Math.cos(angle) * 4;
 
-		PointVectorNN point = new PointVectorNN(x,y,z,0,0,1);
+		PointVectorNN point = new PointVectorNN(x, y, z, 0, 0, 1);
 
 		assertEquals(1, alg.computeDistance(point), 1e-8);
 
 		// now outside
-		angle = angleTol+0.01;
+		angle = angleTol + 0.01;
 		x = model.center.x;
-		y = model.center.y + Math.sin(angle)*4;
-		z = model.center.z + Math.cos(angle)*4;
+		y = model.center.y + Math.sin(angle) * 4;
+		z = model.center.z + Math.cos(angle) * 4;
 
-		point = new PointVectorNN(x,y,z,0,0,1);
+		point = new PointVectorNN(x, y, z, 0, 0, 1);
 
 		assertTrue(Double.MAX_VALUE == alg.computeDistance(point));
 	}
 
 	@Test
 	public void computeDistance_list() {
-		Sphere3D_F64 model = new Sphere3D_F64(1,1,1,3);
+		Sphere3D_F64 model = new Sphere3D_F64(1, 1, 1, 3);
 
 		DistanceSphereToPointVectorNN alg = new DistanceSphereToPointVectorNN(0.2);
 		alg.setModel(model);
 
-		PointVectorNN pointA = new PointVectorNN(1,1,1+4,0,0,1);
-		PointVectorNN pointB = new PointVectorNN(1,1,1+2,0,0,-1);
+		PointVectorNN pointA = new PointVectorNN(1, 1, 1 + 4, 0, 0, 1);
+		PointVectorNN pointB = new PointVectorNN(1, 1, 1 + 2, 0, 0, -1);
 
 		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
 		pts.add(pointA);
@@ -98,10 +98,10 @@ public class TestDistanceSphereToPointVectorNN {
 		double scores[] = new double[2];
 
 		alg.setModel(model);
-		alg.computeDistance(pts,scores);
-		for( int i = 0; i < 2; i++ ) {
+		alg.computeDistance(pts, scores);
+		for (int i = 0; i < 2; i++) {
 			double expected = alg.computeDistance(pts.get(i));
-			assertEquals(expected,scores[i],1e-8);
+			assertEquals(expected, scores[i], 1e-8);
 		}
 	}
 

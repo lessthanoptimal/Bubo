@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,16 +31,16 @@ import java.util.List;
  */
 public interface AssociateLrfMeas {
 
-    /**
-     * Associates LRF measurements in the two scans.
-     *
-     * @param scanMatch
-     * @param scanReference
-     */
-    public void associate( ScanInfo scanMatch, ScanInfo scanReference );
+	/**
+	 * Associates LRF measurements in the two scans.
+	 *
+	 * @param scanMatch
+	 * @param scanReference
+	 */
+	public void associate(ScanInfo scanMatch, ScanInfo scanReference);
 
-    public List<Point2D_F64> getListMatch();
+	public List<Point2D_F64> getListMatch();
 
-    public List<Point2D_F64> getListReference();
+	public List<Point2D_F64> getListReference();
 
 }

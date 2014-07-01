@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -23,28 +23,26 @@ import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import georegression.struct.se.Se2_F64;
 
 /**
- *
- *
  * @author Peter Abeles
  */
 public class LadarRobot2D {
 
-    RobotDescription desc;
+	RobotDescription desc;
 
-    public LadarRobot2D() {
+	public LadarRobot2D() {
 
-    }
+	}
 
-    public void setLadarParam( Se2_F64 ladarToRobot ,
-                               Lrf2dParam param ) {
+	public void setLadarParam(Se2_F64 ladarToRobot,
+							  Lrf2dParam param) {
 
-    }
+	}
 
-    public void setRobotPosition( double x , double y , double yaw ) {
+	public void setRobotPosition(double x, double y, double yaw) {
 
-    }
+	}
 
-    public Se2_F64 getLadarToWorld() {
-        return null;
-    }
+	public Se2_F64 getLadarToWorld() {
+		return null;
+	}
 }

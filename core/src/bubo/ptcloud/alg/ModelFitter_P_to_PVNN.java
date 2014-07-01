@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,9 +29,9 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ModelFitter_P_to_PVNN<Model> implements ModelFitter<Model,PointVectorNN> {
+public class ModelFitter_P_to_PVNN<Model> implements ModelFitter<Model, PointVectorNN> {
 
-	private ModelFitter<Model,Point3D_F64> model;
+	private ModelFitter<Model, Point3D_F64> model;
 
 	private List<Point3D_F64> points = new ArrayList<Point3D_F64>();
 
@@ -42,11 +42,11 @@ public class ModelFitter_P_to_PVNN<Model> implements ModelFitter<Model,PointVect
 	@Override
 	public boolean fitModel(List<PointVectorNN> dataSet, Model initial, Model found) {
 		points.clear();
-		for( int i = 0; i < dataSet.size(); i++ ) {
+		for (int i = 0; i < dataSet.size(); i++) {
 			PointVectorNN p = dataSet.get(i);
 			points.add(p.p);
 		}
 
-		return model.fitModel(points,initial,found);
+		return model.fitModel(points, initial, found);
 	}
 }

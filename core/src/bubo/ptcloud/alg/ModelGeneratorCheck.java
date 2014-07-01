@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,10 +26,10 @@ import org.ddogleg.fitting.modelset.ModelGenerator;
  *
  * @author Peter Abeles
  */
-public interface ModelGeneratorCheck<Model,Point> extends ModelGenerator<Model,Point> {
+public interface ModelGeneratorCheck<Model, Point> extends ModelGenerator<Model, Point> {
 
 	/**
 	 * Specify a check that it should perform on the shape after parameters have been set
 	 */
-	public void setCheck( CheckShapeParameters<Model> check );
+	public void setCheck(CheckShapeParameters<Model> check);
 }

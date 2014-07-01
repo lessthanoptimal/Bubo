@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,15 +29,15 @@ import org.ejml.data.DenseMatrix64F;
 public class ProjectorRangeBearing2D implements LandmarkProjector {
 
 	// location of the sensor
-	double x,y;
+	double x, y;
 
 	// predicted observation
-	DenseMatrix64F predicted = new DenseMatrix64F(2,1);
+	DenseMatrix64F predicted = new DenseMatrix64F(2, 1);
 	// observation Jacobian
-	DenseMatrix64F H = new DenseMatrix64F(2,3);
+	DenseMatrix64F H = new DenseMatrix64F(2, 3);
 
 	@Override
-	public void setLandmarkLocation( double x , double y ) {
+	public void setLandmarkLocation(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
@@ -61,26 +61,26 @@ public class ProjectorRangeBearing2D implements LandmarkProjector {
 		double dx = x - rx;
 		double dy = y - ry;
 
-		double d2 = dx*dx + dy*dy;
+		double d2 = dx * dx + dy * dy;
 		double d = Math.sqrt(d2);
 
 		// partial of predicted observation relative to robot state
-		H.unsafe_set(0,0, -dx/d );
-		H.unsafe_set(0,1, -dy/d );
+		H.unsafe_set(0, 0, -dx / d);
+		H.unsafe_set(0, 1, -dy / d);
 
-		if( dx != 0 ) {
-			H.unsafe_set(1,0,  dy/d2 );
-			H.unsafe_set(1,1,  -dx/d2 );
+		if (dx != 0) {
+			H.unsafe_set(1, 0, dy / d2);
+			H.unsafe_set(1, 1, -dx / d2);
 		} else {
-			H.unsafe_set(1,0, 0 );
-			H.unsafe_set(1,1, 0 );
+			H.unsafe_set(1, 0, 0);
+			H.unsafe_set(1, 1, 0);
 		}
-		H.unsafe_set(1,2,-1);
+		H.unsafe_set(1, 2, -1);
 
 
 		// predicted observation
 		predicted.data[0] = d;
-		predicted.data[1] = Math.atan2(dy,dx) - rtheta;
+		predicted.data[1] = Math.atan2(dy, dx) - rtheta;
 
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -39,36 +39,36 @@ public class TestDistanceCylinderToPoint3D {
 
 		DistanceCylinderToPoint3D alg = new DistanceCylinderToPoint3D();
 
-		Cylinder3D_F64 model = new Cylinder3D_F64(1,-2,3,-0.5,0.2,2,3);
-		Point3D_F64 point = new Point3D_F64(3.4,5.6,7.8);
+		Cylinder3D_F64 model = new Cylinder3D_F64(1, -2, 3, -0.5, 0.2, 2, 3);
+		Point3D_F64 point = new Point3D_F64(3.4, 5.6, 7.8);
 
 		alg.setModel(model);
 
 		double expected = Math.abs(Distance3D_F64.distance(model, point));
 		double found = alg.computeDistance(point);
 
-		assertTrue(found>0);
-		assertEquals(expected,found,1e-8);
+		assertTrue(found > 0);
+		assertEquals(expected, found, 1e-8);
 
 		// now try a point inside the cylinder
-		point.set(1,-2,3.5);
+		point.set(1, -2, 3.5);
 		alg.setModel(model);
 
 		expected = Math.abs(Distance3D_F64.distance(model, point));
 		found = alg.computeDistance(point);
 
-		assertTrue(found>0);
-		assertEquals(expected,found,1e-8);
+		assertTrue(found > 0);
+		assertEquals(expected, found, 1e-8);
 	}
 
 	@Test
 	public void computeDistance_array() {
 		DistanceCylinderToPoint3D alg = new DistanceCylinderToPoint3D();
 
-		Cylinder3D_F64 model = new Cylinder3D_F64(1,-2,3,-0.5,0.2,2,3);
+		Cylinder3D_F64 model = new Cylinder3D_F64(1, -2, 3, -0.5, 0.2, 2, 3);
 
-		Point3D_F64 pointA = new Point3D_F64(3.4,5.6,7.8);
-		Point3D_F64 pointB = new Point3D_F64(1,-2,3.5);
+		Point3D_F64 pointA = new Point3D_F64(3.4, 5.6, 7.8);
+		Point3D_F64 pointB = new Point3D_F64(1, -2, 3.5);
 
 		List<Point3D_F64> pts = new ArrayList<Point3D_F64>();
 		pts.add(pointA);
@@ -77,10 +77,10 @@ public class TestDistanceCylinderToPoint3D {
 		double scores[] = new double[2];
 
 		alg.setModel(model);
-		alg.computeDistance(pts,scores);
-		for( int i = 0; i < 2; i++ ) {
+		alg.computeDistance(pts, scores);
+		for (int i = 0; i < 2; i++) {
 			double expected = alg.computeDistance(pts.get(i));
-			assertEquals(expected,scores[i],1e-8);
+			assertEquals(expected, scores[i], 1e-8);
 		}
 	}
 

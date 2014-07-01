@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,55 +28,55 @@ import java.util.List;
  */
 public class RobotComponent {
 
-    protected String name;
-    protected ExtrinsicParameters extrinsic;
-    protected IntrinsicParameters intrinsic;
-    protected ComponentIO inputOutput;
+	protected String name;
+	protected ExtrinsicParameters extrinsic;
+	protected IntrinsicParameters intrinsic;
+	protected ComponentIO inputOutput;
 
-    protected List<RobotComponent> childComponents = new ArrayList<RobotComponent>();
+	protected List<RobotComponent> childComponents = new ArrayList<RobotComponent>();
 
-    public RobotComponent(String name, ExtrinsicParameters extrinsic, IntrinsicParameters intrinsic, ComponentIO inputOutput) {
-        this.name = name;
-        this.extrinsic = extrinsic;
-        this.intrinsic = intrinsic;
-        this.inputOutput = inputOutput;
-    }
+	public RobotComponent(String name, ExtrinsicParameters extrinsic, IntrinsicParameters intrinsic, ComponentIO inputOutput) {
+		this.name = name;
+		this.extrinsic = extrinsic;
+		this.intrinsic = intrinsic;
+		this.inputOutput = inputOutput;
+	}
 
-    public void addChild( RobotComponent child ) {
-        childComponents.add(child);
-    }
+	public void addChild(RobotComponent child) {
+		childComponents.add(child);
+	}
 
-    public void setExtrinsic(ExtrinsicParameters extrinsic) {
-        this.extrinsic = extrinsic;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setIntrinsic(IntrinsicParameters intrinsic) {
-        this.intrinsic = intrinsic;
-    }
+	public ExtrinsicParameters getExtrinsic() {
+		return extrinsic;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setExtrinsic(ExtrinsicParameters extrinsic) {
+		this.extrinsic = extrinsic;
+	}
 
-    public ExtrinsicParameters getExtrinsic() {
-        return extrinsic;
-    }
+	public IntrinsicParameters getIntrinsic() {
+		return intrinsic;
+	}
 
-    public IntrinsicParameters getIntrinsic() {
-        return intrinsic;
-    }
+	public void setIntrinsic(IntrinsicParameters intrinsic) {
+		this.intrinsic = intrinsic;
+	}
 
-    public ComponentIO getInputOutput() {
-        return inputOutput;
-    }
+	public ComponentIO getInputOutput() {
+		return inputOutput;
+	}
 
-    /**
-     * List of components which are part of this component but make more sense to be treated
-     * as a separate component.
-     *
-     * @return List of child components.
-     */
-    public List<RobotComponent> getChildComponents() {
-        return childComponents;    
-    }
+	/**
+	 * List of components which are part of this component but make more sense to be treated
+	 * as a separate component.
+	 *
+	 * @return List of child components.
+	 */
+	public List<RobotComponent> getChildComponents() {
+		return childComponents;
+	}
 }

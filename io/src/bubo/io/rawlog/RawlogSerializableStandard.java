@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -19,19 +19,18 @@
 package bubo.io.rawlog;
 
 /**
- *
  * Custom serialization can be performed using {@link bubo.io.rawlog.RawlogSerializableCustom}.
  *
  * @author Peter Abeles
  */
 public interface RawlogSerializableStandard extends RawlogSerializable {
 
-    /**
-     * Returns a list of variables which are serializable and the order in which they are to be serialized.
-     *
-     * @param version Which serialization version is being read/written to.
-     * @return List of variable names and the order they are serialized.
-     */
-    public String[] getVariableOrder( int version );
+	/**
+	 * Returns a list of variables which are serializable and the order in which they are to be serialized.
+	 *
+	 * @param version Which serialization version is being read/written to.
+	 * @return List of variable names and the order they are serialized.
+	 */
+	public String[] getVariableOrder(int version);
 
 }

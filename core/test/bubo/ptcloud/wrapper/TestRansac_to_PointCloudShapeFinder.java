@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,20 +24,19 @@ import bubo.ptcloud.PointCloudShapeFinder;
 /**
  * @author Peter Abeles
  */
-public class TestRansac_to_PointCloudShapeFinder extends GeneralChecksPointCloudShapeFinder
-{
+public class TestRansac_to_PointCloudShapeFinder extends GeneralChecksPointCloudShapeFinder {
 	public TestRansac_to_PointCloudShapeFinder() {
-		super(10,1e-6);
+		super(10, 1e-6);
 	}
 
 	@Override
 	public PointCloudShapeFinder createAlgorithm() {
 
-		ConfigMultiShapeRansac configRansac = ConfigMultiShapeRansac.createDefault(100,0.6,0.1);
+		ConfigMultiShapeRansac configRansac = ConfigMultiShapeRansac.createDefault(100, 0.6, 0.1);
 
 		configRansac.minimumPoints = 20;
 
-		ConfigSurfaceNormals configSurface = new ConfigSurfaceNormals(6,6,3);
+		ConfigSurfaceNormals configSurface = new ConfigSurfaceNormals(6, 6, 3);
 
 		return FactoryPointCloudShape.ransacSingle(configSurface, configRansac);
 	}

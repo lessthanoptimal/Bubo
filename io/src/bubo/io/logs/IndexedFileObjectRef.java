@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,22 +26,22 @@ package bubo.io.logs;
  * @author Peter Abeles
  */
 public class IndexedFileObjectRef extends LogFileObjectRef {
-    // where in the log file is this located
-    public long fileLocation;
+	// where in the log file is this located
+	public long fileLocation;
 
-    public IndexedFileObjectRef(Class<?> dataType, String source, long fileLocation) {
-        super(dataType, source);
-        this.fileLocation = fileLocation;
-    }
+	public IndexedFileObjectRef(Class<?> dataType, String source, long fileLocation) {
+		super(dataType, source);
+		this.fileLocation = fileLocation;
+	}
 
-    public IndexedFileObjectRef() {
-    }
+	public IndexedFileObjectRef() {
+	}
 
-    public long getFileLocation() {
-        return fileLocation;
-    }
+	public long getFileLocation() {
+		return fileLocation;
+	}
 
-    public void setFileLocation(long fileLocation) {
-        this.fileLocation = fileLocation;
-    }
+	public void setFileLocation(long fileLocation) {
+		this.fileLocation = fileLocation;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -36,108 +36,108 @@ import java.awt.event.ActionListener;
 // TODO show data frame index
 public class LadarMappingComponent extends JComponent implements ActionListener {
 
-    Lrf2dParam param;
-    LadarComponent ladarRaw;
+	Lrf2dParam param;
+	LadarComponent ladarRaw;
 
-    MapAndRobotDisplay mapDisplay;
-    GridMapInteractionDisplay interactionDisplay;
+	MapAndRobotDisplay mapDisplay;
+	GridMapInteractionDisplay interactionDisplay;
 
-    JButton bPlay;
-    JButton bStep;
-    JButton bFocusRobot;
-    JButton bSaveMapImage;
+	JButton bPlay;
+	JButton bStep;
+	JButton bFocusRobot;
+	JButton bSaveMapImage;
 
-    public LadarMappingComponent() {
-        setLayout(new BorderLayout());
-        ladarRaw = new LadarComponent();
-        ladarRaw.setAutoRescale(true);
-        ladarRaw.setPreferredSize(new Dimension(400,400));
-        ladarRaw.setMinimumSize(ladarRaw.getPreferredSize());
-      
-        mapDisplay = new MapAndRobotDisplay();
-        mapDisplay.setPixelsPerMeter(20);
+	public LadarMappingComponent() {
+		setLayout(new BorderLayout());
+		ladarRaw = new LadarComponent();
+		ladarRaw.setAutoRescale(true);
+		ladarRaw.setPreferredSize(new Dimension(400, 400));
+		ladarRaw.setMinimumSize(ladarRaw.getPreferredSize());
 
-        interactionDisplay = new GridMapInteractionDisplay(mapDisplay);
+		mapDisplay = new MapAndRobotDisplay();
+		mapDisplay.setPixelsPerMeter(20);
 
-        addToolbar();
-        add(interactionDisplay,BorderLayout.CENTER);
-        add(ladarRaw,BorderLayout.EAST);
-    }
+		interactionDisplay = new GridMapInteractionDisplay(mapDisplay);
 
-    public JButton getPlayButton() {
-        return bPlay;
-    }
+		addToolbar();
+		add(interactionDisplay, BorderLayout.CENTER);
+		add(ladarRaw, BorderLayout.EAST);
+	}
 
-    public JButton getStepButton() {
-        return bStep;
-    }
+	public JButton getPlayButton() {
+		return bPlay;
+	}
 
-    public JButton getFocusRobotButton() {
-        return bFocusRobot;
-    }
+	public JButton getStepButton() {
+		return bStep;
+	}
 
-    public JButton getSaveMapImageButton() {
-        return bSaveMapImage;
-    }
+	public JButton getFocusRobotButton() {
+		return bFocusRobot;
+	}
 
-    /**
-     * Returns the component that is used to render the map and robot.
-     */
-    public MapAndRobotDisplay getMapDisplay() {
-        return mapDisplay;
-    }
+	public JButton getSaveMapImageButton() {
+		return bSaveMapImage;
+	}
 
-    private void addToolbar() {
-        JToolBar toolbar = new JToolBar("Tools");
+	/**
+	 * Returns the component that is used to render the map and robot.
+	 */
+	public MapAndRobotDisplay getMapDisplay() {
+		return mapDisplay;
+	}
 
-        bPlay = new JButton("Play");
-        bStep = new JButton("Step");
-        bFocusRobot = new JButton("Focus Robot");
-        bSaveMapImage = new JButton("Save Map Image");
+	private void addToolbar() {
+		JToolBar toolbar = new JToolBar("Tools");
 
-        toolbar.add(bPlay);
-        toolbar.add(bStep);
-        toolbar.add(bFocusRobot);
-        toolbar.add(bSaveMapImage);
+		bPlay = new JButton("Play");
+		bStep = new JButton("Step");
+		bFocusRobot = new JButton("Focus Robot");
+		bSaveMapImage = new JButton("Save Map Image");
 
-        add(toolbar, BorderLayout.NORTH);
-    }
+		toolbar.add(bPlay);
+		toolbar.add(bStep);
+		toolbar.add(bFocusRobot);
+		toolbar.add(bSaveMapImage);
 
-    public void configureLadar( Lrf2dParam param ) {
-        this.param = param;
-        ladarRaw.configure(param.getStartAngle(),param.getAngleIncrement(),
-                param.getMaxRange(),param.getNumberOfScans());
-    }
+		add(toolbar, BorderLayout.NORTH);
+	}
 
-    public void setMap( GridMapSpacialInfo mapSpacial ,
-                        OccupancyGrid2D_F32 map )
-    {
-        mapDisplay.setMap(mapSpacial,map);
-    }
+	public void configureLadar(Lrf2dParam param) {
+		this.param = param;
+		ladarRaw.configure(param.getStartAngle(), param.getAngleIncrement(),
+				param.getMaxRange(), param.getNumberOfScans());
+	}
 
-    public void updateRobot( Se2_F64 robotLoc ) {
-        mapDisplay.updateRobot(robotLoc);
-    }
+	public void setMap(GridMapSpacialInfo mapSpacial,
+					   OccupancyGrid2D_F32 map) {
+		mapDisplay.setMap(mapSpacial, map);
+	}
 
-    public void updateMap() {
-        mapDisplay.mapChanged();
-    }
+	public void updateRobot(Se2_F64 robotLoc) {
+		mapDisplay.updateRobot(robotLoc);
+	}
 
-	public void updateLadar( double[] rangeData ) {
+	public void updateMap() {
+		mapDisplay.mapChanged();
+	}
+
+	public void updateLadar(double[] rangeData) {
 		ladarRaw.setData(rangeData);
 	}
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+	@Override
+	public void actionPerformed(ActionEvent e) {
 
-    }
+	}
 
-    /**
-     * Specifies where the center of the view should be focused in map coordinates.
-     * @param x x-axis in map units.
-     * @param y y-axis in map units.
-     */
-    public void setViewCenter(double x, double y) {
-        interactionDisplay.setViewCenter((int)mapDisplay.mapToGuiX(x),(int)mapDisplay.mapToGuiY(y));
-    }
+	/**
+	 * Specifies where the center of the view should be focused in map coordinates.
+	 *
+	 * @param x x-axis in map units.
+	 * @param y y-axis in map units.
+	 */
+	public void setViewCenter(double x, double y) {
+		interactionDisplay.setViewCenter((int) mapDisplay.mapToGuiX(x), (int) mapDisplay.mapToGuiY(y));
+	}
 }

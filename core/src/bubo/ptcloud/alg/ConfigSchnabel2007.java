@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -75,56 +75,49 @@ public class ConfigSchnabel2007 {
 	public long randomSeed = 0xDEADBEEF;
 
 	/**
-	 * Checks to see if the specified parameters are internally consistent
-	 */
-	public void checkConfig() {
-
-	}
-
-	/**
 	 * Creates a default set of parameters which can detect
 	 *
-	 * @param fitIterations Number of iterations when refining a shape
-	 * @param angleTolerance Tolerance in radians to reject a model from an initial sample set
+	 * @param fitIterations           Number of iterations when refining a shape
+	 * @param angleTolerance          Tolerance in radians to reject a model from an initial sample set
 	 * @param ransacDistanceThreshold Euclidean distance that RANSAC considers a point an inlier
-	 * @param shapes A list of shape you wish to detect.  If empty or null then all possible shapes will be detected.
-	 *
+	 * @param shapes                  A list of shape you wish to detect.  If empty or null then all possible shapes will be detected.
 	 * @return ConfigSchnabel2007
 	 */
-	public static ConfigSchnabel2007 createDefault( int fitIterations ,
-													double angleTolerance ,
-													double ransacDistanceThreshold ,
-													CloudShapeTypes ...shapes )
-	{
-		if( shapes == null || shapes.length == 0 ) {
+	public static ConfigSchnabel2007 createDefault(int fitIterations,
+												   double angleTolerance,
+												   double ransacDistanceThreshold,
+												   CloudShapeTypes... shapes) {
+		if (shapes == null || shapes.length == 0) {
 			shapes = CloudShapeTypes.values();
 		}
 		List<ShapeDescription> objects = new ArrayList<ShapeDescription>();
 
 		int index = 0;
-		for( CloudShapeTypes shape : shapes ) {
-			switch( shape ) {
+		for (CloudShapeTypes shape : shapes) {
+			switch (shape) {
 				case SPHERE: {
 					ShapeDescription sphere = new ShapeDescription();
 					sphere.modelManager = new ModelManagerSphere3D_F64();
 					sphere.modelDistance = new DistanceSphereToPointVectorNN(angleTolerance);
-					sphere.modelGenerator = new GenerateSpherePointVector(angleTolerance,ransacDistanceThreshold);
+					sphere.modelGenerator = new GenerateSpherePointVector(angleTolerance, ransacDistanceThreshold);
 					sphere.modelFitter = new ModelFitter_P_to_PVNN(new FitSphereToPoints_F64(fitIterations));
 					sphere.codec = new CodecSphere3D_F64();
 					sphere.thresholdFit = ransacDistanceThreshold;
 					objects.add(sphere);
-				} break;
+				}
+				break;
 
 				case CYLINDER: {
 					ShapeDescription cylinder = new ShapeDescription();
 					cylinder.modelManager = new ModelManagerCylinder3D_F64();
 					cylinder.modelDistance = new DistanceCylinderToPointVectorNN(angleTolerance);
-					cylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance,ransacDistanceThreshold);
+					cylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance, ransacDistanceThreshold);
 					cylinder.modelFitter = new ModelFitter_P_to_PVNN(new FitCylinderToPoints_F64(fitIterations));
 					cylinder.codec = new CodecCylinder3D_F64();
 					cylinder.thresholdFit = ransacDistanceThreshold;
 					objects.add(cylinder);
-				} break;
+				}
+				break;
 
 				case PLANE: {
 					ShapeDescription plane = new ShapeDescription();
@@ -135,10 +128,11 @@ public class ConfigSchnabel2007 {
 					plane.codec = new CodecPlaneGeneral3D_F64();
 					plane.thresholdFit = ransacDistanceThreshold;
 					objects.add(plane);
-				} break;
+				}
+				break;
 
 				default:
-					throw new IllegalArgumentException("Unsupported shape: "+shape);
+					throw new IllegalArgumentException("Unsupported shape: " + shape);
 			}
 			index++;
 		}
@@ -147,5 +141,12 @@ public class ConfigSchnabel2007 {
 		config.models = objects;
 
 		return config;
+	}
+
+	/**
+	 * Checks to see if the specified parameters are internally consistent
+	 */
+	public void checkConfig() {
+
 	}
 }

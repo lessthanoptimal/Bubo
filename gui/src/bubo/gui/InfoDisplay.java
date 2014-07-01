@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -36,51 +36,51 @@ import java.util.List;
 // TODO add time stamp
 public class InfoDisplay extends JComponent {
 
-    // logo configuration
-    private List<LogoComponent> logos = new ArrayList<LogoComponent>();
+	// logo configuration
+	private List<LogoComponent> logos = new ArrayList<LogoComponent>();
 
-    public InfoDisplay() {
+	public InfoDisplay() {
 
-        // add all the default logos
-        for( LogoComponent l : BuboIOConfig.DEFAULT_LOGOS )
-            addLogo( l );
-    }
+		// add all the default logos
+		for (LogoComponent l : BuboIOConfig.DEFAULT_LOGOS)
+			addLogo(l);
+	}
 
-    @Override
-    public void paint( Graphics g )  {
-        super.paint(g);
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
 
-        Rectangle view = getVisibleRect();
-        Graphics overlayG = g.create(view.x,view.y,view.width,view.height);
-        drawOverlay(overlayG,view.width,view.height);
-    }
+		Rectangle view = getVisibleRect();
+		Graphics overlayG = g.create(view.x, view.y, view.width, view.height);
+		drawOverlay(overlayG, view.width, view.height);
+	}
 
-    /**
-     * Draws overlay objects after all the other objects have been drawn so that they are always
-     * visible. Unless overloaded this function will draw logo's starting in the lower right hand corner.
-     *
-     * @param g Graphics that the overlays are to be drawn inside of.
-     * @param width Width of the area that the overlays can be drawn in.
-     * @param height Height of the area that the overlays can be drawn in.
-     */
-    protected void drawOverlay( Graphics g , int width , int height ) {
-        int x = width;
+	/**
+	 * Draws overlay objects after all the other objects have been drawn so that they are always
+	 * visible. Unless overloaded this function will draw logo's starting in the lower right hand corner.
+	 *
+	 * @param g      Graphics that the overlays are to be drawn inside of.
+	 * @param width  Width of the area that the overlays can be drawn in.
+	 * @param height Height of the area that the overlays can be drawn in.
+	 */
+	protected void drawOverlay(Graphics g, int width, int height) {
+		int x = width;
 
-        for( JComponent c : logos ) {
-            int y = height - c.getHeight()-5;
-            x -= c.getWidth()+5;
+		for (JComponent c : logos) {
+			int y = height - c.getHeight() - 5;
+			x -= c.getWidth() + 5;
 
-            Graphics componentG = g.create(x,y,c.getWidth(),c.getHeight());
-            c.paint(componentG);
-        }
-    }
+			Graphics componentG = g.create(x, y, c.getWidth(), c.getHeight());
+			c.paint(componentG);
+		}
+	}
 
-    public void addLogo( LogoComponent c ) {
-        logos.add(c);
-    }
+	public void addLogo(LogoComponent c) {
+		logos.add(c);
+	}
 
 
-    public void clearLogos() {
-        logos.clear();
-    }
+	public void clearLogos() {
+		logos.clear();
+	}
 }

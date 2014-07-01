@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -19,11 +19,6 @@
 package bubo.ptcloud;
 
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
-import org.ddogleg.struct.FastQueue;
-
-import java.util.List;
-import java.util.Stack;
 
 /**
  * Creates an octree by adding new cells to the octree only when the number of points in a cell exceeds a specified
@@ -32,7 +27,7 @@ import java.util.Stack;
  *
  * @author Peter Abeles
  */
-public class ConstructOctreeNumPoints extends ConstructOctree{
+public class ConstructOctreeNumPoints extends ConstructOctree {
 
 	// create a new node in the graph when the number of points exceeds
 	private int divideThreshold;
@@ -54,39 +49,39 @@ public class ConstructOctreeNumPoints extends ConstructOctree{
 	 * @return The node which contains the point
 	 */
 	@Override
-	public Octree addPoint( Point3D_F64 point , Object data ) {
+	public Octree addPoint(Point3D_F64 point, Object data) {
 		// declare the structure which stores the point and data
 		Octree.Info info = storageInfo.grow();
 		info.point = point;
 		info.data = data;
 
 		Octree node = tree;
-		tree.points.add( info );
+		tree.points.add(info);
 
-		while( true ) {
-			if( node.isLeaf() ) {
+		while (true) {
+			if (node.isLeaf()) {
 				// see if it needs to create a new node
-				if( node.points.size() > divideThreshold ) {
+				if (node.points.size() > divideThreshold) {
 					node.children = getChildrenArray();
-					computeDivider(node.space,node.divider);
+					computeDivider(node.space, node.divider);
 
 					// create a new child for point to go into
 					int index = node.getChildIndex(point);
-					Octree child = checkAddChild(node,index, info);
+					Octree child = checkAddChild(node, index, info);
 
 					// Create new children where appropriate for all points in node, but 'point'
-					for( int i = 0; i < node.points.size-1; i++ ) {
+					for (int i = 0; i < node.points.size - 1; i++) {
 						Octree.Info infoP = node.points.get(i);
 						int indexP = node.getChildIndex(infoP.point);
 
 						// see if the node exists
-						checkAddChild(node, indexP, infoP );
+						checkAddChild(node, indexP, infoP);
 					}
 
 					// check for the pathological case where all the points are identical
 					boolean pathological = checkPathological(node);
 
-					if( pathological ) {
+					if (pathological) {
 						// avoid infinite recursion by not splitting this node yet
 						undoSplit(node);
 						// search is done since it's at a leaf
@@ -99,7 +94,7 @@ public class ConstructOctreeNumPoints extends ConstructOctree{
 				}
 			} else {
 				int index = node.getChildIndex(point);
-				node = checkAddChild(node, index, info );
+				node = checkAddChild(node, index, info);
 			}
 		}
 	}
@@ -111,9 +106,9 @@ public class ConstructOctreeNumPoints extends ConstructOctree{
 
 		boolean pathological = true;
 		Point3D_F64 first = node.points.data[0].point;
-		for( int i = 1; i < node.points.size; i++ ) {
+		for (int i = 1; i < node.points.size; i++) {
 			Point3D_F64 p = node.points.data[i].point;
-			if( first.x != p.x || first.y != p.y || first.z != p.z ) {
+			if (first.x != p.x || first.y != p.y || first.z != p.z) {
 				pathological = false;
 				break;
 			}

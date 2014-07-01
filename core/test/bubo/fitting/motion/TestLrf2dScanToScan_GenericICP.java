@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,13 +24,13 @@ package bubo.fitting.motion;
 public class TestLrf2dScanToScan_GenericICP extends StandardTestsScanToScan {
 
 
-    public TestLrf2dScanToScan_GenericICP() {
-        angTol = 0.02;
-        tranTol = 0.02;
-    }
+	public TestLrf2dScanToScan_GenericICP() {
+		angTol = 0.02;
+		tranTol = 0.02;
+	}
 
-    @Override
-    public Lrf2dScanToScan createAlg() {
-        return new Lrf2dScanToScan_GenericICP();
-    }
+	@Override
+	public Lrf2dScanToScan createAlg() {
+		return new Lrf2dScanToScan_GenericICP();
+	}
 }

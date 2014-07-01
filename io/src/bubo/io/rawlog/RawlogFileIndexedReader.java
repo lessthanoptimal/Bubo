@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -39,59 +39,59 @@ import java.util.List;
 @SuppressWarnings({"unchecked"})
 public class RawlogFileIndexedReader implements LogFileReader {
 
-    // used to change the location it is reading from in the log file
-    private FileChannel channel;
-    // log file decoder
-    private RawlogDecoder decoder;
+	// used to change the location it is reading from in the log file
+	private FileChannel channel;
+	// log file decoder
+	private RawlogDecoder decoder;
 
-    // list of references that contain the object's location in the log file
-    private List<LogFileObjectRef> refs;
+	// list of references that contain the object's location in the log file
+	private List<LogFileObjectRef> refs;
 
-    @Override
-    public boolean load(String fileName) {
-        RawlogIndexFile reader = new RawlogIndexFile(fileName);
+	@Override
+	public boolean load(String fileName) {
+		RawlogIndexFile reader = new RawlogIndexFile(fileName);
 
-        refs = reader.loadIndex();
+		refs = reader.loadIndex();
 
-        // remove the .index from the end
-        String origFileName = fileName.substring(0,fileName.length()-6);
+		// remove the .index from the end
+		String origFileName = fileName.substring(0, fileName.length() - 6);
 
-        try {
-            FileInputStream fis = new FileInputStream(origFileName);
-            channel = fis.getChannel();
-            decoder = new RawlogDecoder(fis);
-        } catch (FileNotFoundException e) {
-            refs = null;
-        } catch (IOException e) {
-            refs = null;
-        }
+		try {
+			FileInputStream fis = new FileInputStream(origFileName);
+			channel = fis.getChannel();
+			decoder = new RawlogDecoder(fis);
+		} catch (FileNotFoundException e) {
+			refs = null;
+		} catch (IOException e) {
+			refs = null;
+		}
 
-        return refs != null;
-    }
+		return refs != null;
+	}
 
-    @Override
-    public List<LogFileObjectRef> getReferences() {
-        return refs;
-    }
+	@Override
+	public List<LogFileObjectRef> getReferences() {
+		return refs;
+	}
 
-    @Override
-    public <T> T getObject(LogFileObjectRef ref) {
-        try {
-            IndexedFileObjectRef loc = (IndexedFileObjectRef)ref;
+	@Override
+	public <T> T getObject(LogFileObjectRef ref) {
+		try {
+			IndexedFileObjectRef loc = (IndexedFileObjectRef) ref;
 
-            channel.position(loc.fileLocation);
-            return (T)decoder.decode();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+			channel.position(loc.fileLocation);
+			return (T) decoder.decode();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    @Override
-    public void cancelLoadRequest() {
-        
-    }
+	@Override
+	public void cancelLoadRequest() {
 
-    @Override
-    public void setListener(Listener listener) {
-    }
+	}
+
+	@Override
+	public void setListener(Listener listener) {
+	}
 }

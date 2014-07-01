@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -46,7 +46,7 @@ public class FixedTrajectoryVel2D extends SimulatedPredictorModel2D {
 	public FixedTrajectoryVel2D(double vel, double angVel,
 								double sigmaVel, double sigmaAngVel,
 								double timePeriod, long randSeed) {
-		super(new PredictorRobotVelocity2D(0.1,0.1,0.1,0.1), timePeriod);
+		super(new PredictorRobotVelocity2D(0.1, 0.1, 0.1, 0.1), timePeriod);
 
 		this.rand = new Random(randSeed);
 
@@ -59,10 +59,10 @@ public class FixedTrajectoryVel2D extends SimulatedPredictorModel2D {
 
 	@Override
 	protected void drawControlNoise() {
-		request[0] = actual[0] + rand.nextGaussian()*sigmaVel;
-		request[1] = actual[1] + rand.nextGaussian()*sigmaAngVel;
+		request[0] = actual[0] + rand.nextGaussian() * sigmaVel;
+		request[1] = actual[1] + rand.nextGaussian() * sigmaAngVel;
 
-		((PredictorRobotVelocity2D)model).setControl(actual[0],actual[1]);
+		((PredictorRobotVelocity2D) model).setControl(actual[0], actual[1]);
 	}
 
 	@Override

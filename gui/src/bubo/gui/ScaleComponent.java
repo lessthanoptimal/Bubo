@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,119 +28,119 @@ import java.awt.*;
  */
 public class ScaleComponent extends JComponent {
 
-    // the component which this is being drawn in
-    private SpacialDisplay owner;
+	// the component which this is being drawn in
+	private SpacialDisplay owner;
 
-    // How the length is specified
-    private boolean lengthByPixels = false;
-    // the length of the bar in either distance units or by pixels
-    private double length = 1.0;
+	// How the length is specified
+	private boolean lengthByPixels = false;
+	// the length of the bar in either distance units or by pixels
+	private double length = 1.0;
 
-    // height of the end bars in the 'I'
-    private int endHeight = 12;
+	// height of the end bars in the 'I'
+	private int endHeight = 12;
 
-    // what color will everything be drawn.
-    private Color color = Color.BLACK;
+	// what color will everything be drawn.
+	private Color color = Color.BLACK;
 
-    // the units that will be displayed
-    private String unitsText = "m";
+	// the units that will be displayed
+	private String unitsText = "m";
 
-    // stroke used to draw scale bar
-    private Stroke stroke = new BasicStroke(2.0f);
+	// stroke used to draw scale bar
+	private Stroke stroke = new BasicStroke(2.0f);
 
-    // spacing used to spread out some components
-    private int space = 5;
+	// spacing used to spread out some components
+	private int space = 5;
 
-    /**
-     *
-     * @param length Size of the unit bar.
-     */
-    public ScaleComponent( boolean lengthByPixels , double length) {
-        this();
-        this.lengthByPixels = lengthByPixels;
-        this.length = length;
-    }
+	/**
+	 * @param length Size of the unit bar.
+	 */
+	public ScaleComponent(boolean lengthByPixels, double length) {
+		this();
+		this.lengthByPixels = lengthByPixels;
+		this.length = length;
+	}
 
-    public ScaleComponent() {
+	public ScaleComponent() {
 
-    }
+	}
 
-    /**
-     * Sets the length of the unit bar.
-     *
-     * @param lengthByPixels If it is specified in pixels or distance units
-     * @param length The unit bar's new length in pixels or distance units.
-     */
-    public void setLength( boolean lengthByPixels , double length) {
-        this.length = length;
-    }
+	/**
+	 * Sets the length of the unit bar.
+	 *
+	 * @param lengthByPixels If it is specified in pixels or distance units
+	 * @param length         The unit bar's new length in pixels or distance units.
+	 */
+	public void setLength(boolean lengthByPixels, double length) {
+		this.length = length;
+	}
 
-    public Color getColor() {
-        return color;
-    }
+	public Color getColor() {
+		return color;
+	}
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
+	public void setColor(Color color) {
+		this.color = color;
+	}
 
-    /**
-     * Sets the owner of the component.  The metersToPixel conversion is grabbed each time this is shown.
-     * @param owner
-     */
-    public void setOwner(SpacialDisplay owner) {
-        this.owner = owner;
+	/**
+	 * Sets the owner of the component.  The metersToPixel conversion is grabbed each time this is shown.
+	 *
+	 * @param owner
+	 */
+	public void setOwner(SpacialDisplay owner) {
+		this.owner = owner;
 
-        int width = (int)Math.ceil(owner.getPixelsPerMeter()* length)+5;
-        int height = endHeight+10;
+		int width = (int) Math.ceil(owner.getPixelsPerMeter() * length) + 5;
+		int height = endHeight + 10;
 
-        Dimension d = new Dimension(width,height);
-        setSize(d);
-        setMinimumSize(d);
-        setPreferredSize(d);
-    }
+		Dimension d = new Dimension(width, height);
+		setSize(d);
+		setMinimumSize(d);
+		setPreferredSize(d);
+	}
 
-    @Override
-    public void paintComponent(Graphics g) {
+	@Override
+	public void paintComponent(Graphics g) {
 
-        Graphics2D g2 = (Graphics2D)g;
+		Graphics2D g2 = (Graphics2D) g;
 
-        g2.setStroke(stroke);
+		g2.setStroke(stroke);
 
-        int height = getHeight();
+		int height = getHeight();
 
-        double pixelsPerMeter = owner.getPixelsPerMeter();
+		double pixelsPerMeter = owner.getPixelsPerMeter();
 
-        int pixelsWide;
-        double lengthDistance;
+		int pixelsWide;
+		double lengthDistance;
 
-        if( lengthByPixels ) {
-            pixelsWide = (int)length;
-            lengthDistance = length/pixelsPerMeter;
-        } else {
-            pixelsWide = (int)Math.ceil(pixelsPerMeter* length);
-            lengthDistance = length;
-        }
+		if (lengthByPixels) {
+			pixelsWide = (int) length;
+			lengthDistance = length / pixelsPerMeter;
+		} else {
+			pixelsWide = (int) Math.ceil(pixelsPerMeter * length);
+			lengthDistance = length;
+		}
 
-        g2.setColor(color);
+		g2.setColor(color);
 //
-        // draw the end lines
-        g2.drawLine(space,height-endHeight,space,height);
-        g2.drawLine(pixelsWide,height-endHeight,pixelsWide,height);
+		// draw the end lines
+		g2.drawLine(space, height - endHeight, space, height);
+		g2.drawLine(pixelsWide, height - endHeight, pixelsWide, height);
 
-        // draw the center line
-        g2.drawLine(space,height-endHeight/2,pixelsWide,height-endHeight/2);
+		// draw the center line
+		g2.drawLine(space, height - endHeight / 2, pixelsWide, height - endHeight / 2);
 
 
-        // todo compute text size with TextLayout and put in center of the bar
-        String text = String.format("%3.1f "+unitsText, lengthDistance);
-        g2.drawString(text,5+space,height-endHeight/2-5);
-    }
+		// todo compute text size with TextLayout and put in center of the bar
+		String text = String.format("%3.1f " + unitsText, lengthDistance);
+		g2.drawString(text, 5 + space, height - endHeight / 2 - 5);
+	}
 
-    public Stroke getStroke() {
-        return stroke;
-    }
+	public Stroke getStroke() {
+		return stroke;
+	}
 
-    public void setStroke(Stroke stroke) {
-        this.stroke = stroke;
-    }
+	public void setStroke(Stroke stroke) {
+		this.stroke = stroke;
+	}
 }

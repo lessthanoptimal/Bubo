@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,8 +27,8 @@ import static org.junit.Assert.fail;
  */
 public class TestRawlogEncoder {
 
-    @Test
-    public void stuff() {
-        fail("implements");
-    }
+	@Test
+	public void stuff() {
+		fail("implements");
+	}
 }

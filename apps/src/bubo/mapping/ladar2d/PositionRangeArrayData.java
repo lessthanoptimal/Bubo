@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,67 +27,67 @@ import georegression.struct.se.Se2_F64;
  */
 public class PositionRangeArrayData {
 
-    // when was the data collected
-    private long timeStamp;
+	// when was the data collected
+	private long timeStamp;
 
-    private long rangeTimeStamp;
+	private long rangeTimeStamp;
 
-    private long unknown;
+	private long unknown;
 
-    // position of the robot when this observation was made
-    private Se2_F64 position;
-    // list of range measurements from the ladar
-    private double []range;
+	// position of the robot when this observation was made
+	private Se2_F64 position;
+	// list of range measurements from the ladar
+	private double[] range;
 
-    /**
-     * How many range measurements will there be.
-     *
-     * @param numRanges
-     */
-    public PositionRangeArrayData( int numRanges ) {
-        this.range = new double[ numRanges ];
-    }
+	/**
+	 * How many range measurements will there be.
+	 *
+	 * @param numRanges
+	 */
+	public PositionRangeArrayData(int numRanges) {
+		this.range = new double[numRanges];
+	}
 
-    public PositionRangeArrayData() {
-    }
+	public PositionRangeArrayData() {
+	}
 
-    public Se2_F64 getPosition() {
-        return position;
-    }
+	public Se2_F64 getPosition() {
+		return position;
+	}
 
-    public void setPosition(Se2_F64 position) {
-        this.position = position;
-    }
+	public void setPosition(Se2_F64 position) {
+		this.position = position;
+	}
 
-    public double[] getRange() {
-        return range;
-    }
+	public double[] getRange() {
+		return range;
+	}
 
-    public void setRange(double[] range) {
-        this.range = range;
-    }
+	public void setRange(double[] range) {
+		this.range = range;
+	}
 
-    public long getTimeStamp() {
-        return timeStamp;
-    }
+	public long getTimeStamp() {
+		return timeStamp;
+	}
 
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
-    }
+	public void setTimeStamp(long timeStamp) {
+		this.timeStamp = timeStamp;
+	}
 
-    public long getRangeTimeStamp() {
-        return rangeTimeStamp;
-    }
+	public long getRangeTimeStamp() {
+		return rangeTimeStamp;
+	}
 
-    public void setRangeTimeStamp(long rangeTimeStamp) {
-        this.rangeTimeStamp = rangeTimeStamp;
-    }
+	public void setRangeTimeStamp(long rangeTimeStamp) {
+		this.rangeTimeStamp = rangeTimeStamp;
+	}
 
-    public long getUnknown() {
-        return unknown;
-    }
+	public long getUnknown() {
+		return unknown;
+	}
 
-    public void setUnknown(long unknown) {
-        this.unknown = unknown;
-    }
+	public void setUnknown(long unknown) {
+		this.unknown = unknown;
+	}
 }

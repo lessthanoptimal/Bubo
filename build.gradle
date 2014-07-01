@@ -87,7 +87,7 @@ subprojects {
     }
 
     // if Maven central isn't setup in gradle.properties skip all of this
-    if( project.hasProperty('ossrhUsername') ) {
+    if (project.hasProperty('ossrhUsername')) {
         signing {
             sign configurations.archives
         }
@@ -140,14 +140,16 @@ subprojects {
 }
 
 // list of projects for creating javadoc and jars
-def mainProjects = [':apps',':core',':gui',':io']
+def mainProjects = [':apps', ':core', ':gui', ':io']
 
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
-task createLibraryDirectory( dependsOn: mainProjects.collect{ it+":jar"}+mainProjects.collect{ it+":sourcesJar"} ) << {
+task createLibraryDirectory(dependsOn: mainProjects.collect { it + ":jar" } + mainProjects.collect {
+    it + ":sourcesJar"
+}) << {
 
     // dependencies for main and their own jars
-    ext.list = files(mainProjects.collect{ project(it).tasks.jar.archivePath })
-    ext.listSource = files(mainProjects.collect{ project(it).tasks.sourcesJar.archivePath })
+    ext.list = files(mainProjects.collect { project(it).tasks.jar.archivePath })
+    ext.listSource = files(mainProjects.collect { project(it).tasks.sourcesJar.archivePath })
 
     file('libraries').deleteDir()
     file('libraries').mkdir()
@@ -165,16 +167,16 @@ task createLibraryDirectory( dependsOn: mainProjects.collect{ it+":jar"}+mainPro
     }
 }
 
-task oneJar( type: Jar , dependsOn: mainProjects.collect{ it+":compileJava"}) {
+task oneJar(type: Jar, dependsOn: mainProjects.collect { it + ":compileJava" }) {
     baseName = 'ProjectBUBO'
 
-    from files(mainProjects.collect{ project(it).sourceSets.main.output })
+    from files(mainProjects.collect { project(it).sourceSets.main.output })
 }
 
-task oneJarSrc( type: Jar ) {
+task oneJarSrc(type: Jar) {
     baseName = 'ProjectBUBO-src'
 
-    from files(mainProjects.collect{ project(it).sourceSets.main.allSource })
+    from files(mainProjects.collect { project(it).sourceSets.main.allSource })
 }
 
 task alljavadoc(type: Javadoc) {
@@ -186,10 +188,10 @@ task alljavadoc(type: Javadoc) {
     destinationDir = file("${buildDir}/docs/javadoc")
     configure(options) {
         docTitle = "ProjectBUBO JavaDoc ($project.version)"
-        links = [ 'http://docs.oracle.com/javase/7/docs/api/',
-                  'http://ejml.org/javadoc/',
-                  'http://georegression.org/javadoc/',
-                  'http://ddogleg.org/javadoc/']
+        links = ['http://docs.oracle.com/javase/7/docs/api/',
+                 'http://ejml.org/javadoc/',
+                 'http://georegression.org/javadoc/',
+                 'http://ddogleg.org/javadoc/']
 //        header = file('misc/header.txt').text.replace("\n", "")
 //        bottom = file('misc/bottom.txt').text.replace("\n", "")
     }

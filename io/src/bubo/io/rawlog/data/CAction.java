@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,6 +25,6 @@ import bubo.io.rawlog.RawlogSerializable;
  * @author Peter Abeles
  */
 public abstract class CAction implements RawlogSerializable {
-    public long timeStamp;
+	public long timeStamp;
 
 }

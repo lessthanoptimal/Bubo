@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,11 +25,11 @@ package bubo.desc;
  */
 public interface ExtrinsicParameters extends ComponentParameters {
 
-    /**
-     * The component that these parameters are in reference to. Typically it is physically
-     * attached to that component.
-     *
-     * @return A robot component that its extrinsic parameters are in reference to.
-     */
-    public RobotComponent getReference();
+	/**
+	 * The component that these parameters are in reference to. Typically it is physically
+	 * attached to that component.
+	 *
+	 * @return A robot component that its extrinsic parameters are in reference to.
+	 */
+	public RobotComponent getReference();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -37,6 +37,33 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 public class TestInhomoInteractingMultipleModelFilter {
+
+	/**
+	 * Create a predictor where nothing changes
+	 */
+	public static EkfPredictorDiscrete createStaticPredictor() {
+		DenseMatrix64F F = CommonOps.identity(3);
+		DenseMatrix64F Q = CommonOps.identity(3);
+		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
+
+		return new KfToEkfPredictorDiscrete(kalmanPred, null);
+	}
+
+	public static EkfPredictorDiscrete createPredictorN(int dof) {
+		DenseMatrix64F F = CommonOps.identity(dof);
+		DenseMatrix64F Q = CommonOps.identity(dof);
+		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
+
+		return new KfToEkfPredictorDiscrete(kalmanPred, null);
+	}
+
+	public static EkfProjector createProjectorN(int dof) {
+		DenseMatrix64F H = new DenseMatrix64F(1, dof);
+		H.set(0, 0, 1.0);
+		FixedKalmanProjector kfProj = new FixedKalmanProjector(H);
+
+		return new KfToEkfProjector(kfProj);
+	}
 
 	/**
 	 * Compare the IMM that has the exact same model for each state against a
@@ -151,32 +178,5 @@ public class TestInhomoInteractingMultipleModelFilter {
 		converter.setModelDimensions(2, 2, 3);
 
 		return new InhomoInteractingMultipleModel(converter, filters, pi);
-	}
-
-	/**
-	 * Create a predictor where nothing changes
-	 */
-	public static EkfPredictorDiscrete createStaticPredictor() {
-		DenseMatrix64F F = CommonOps.identity(3);
-		DenseMatrix64F Q = CommonOps.identity(3);
-		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
-
-		return new KfToEkfPredictorDiscrete(kalmanPred, null);
-	}
-
-	public static EkfPredictorDiscrete createPredictorN(int dof) {
-		DenseMatrix64F F = CommonOps.identity(dof);
-		DenseMatrix64F Q = CommonOps.identity(dof);
-		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
-
-		return new KfToEkfPredictorDiscrete(kalmanPred, null);
-	}
-
-	public static EkfProjector createProjectorN(int dof) {
-		DenseMatrix64F H = new DenseMatrix64F(1, dof);
-		H.set(0, 0, 1.0);
-		FixedKalmanProjector kfProj = new FixedKalmanProjector(H);
-
-		return new KfToEkfProjector(kfProj);
 	}
 }

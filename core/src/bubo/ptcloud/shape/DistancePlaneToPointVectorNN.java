@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,14 +31,12 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DistancePlaneToPointVectorNN implements DistanceFromModel<PlaneGeneral3D_F64,PointVectorNN> {
-
-	// tolerance cos(angle) for vector normals
-	private double tolAngleCosine;
+public class DistancePlaneToPointVectorNN implements DistanceFromModel<PlaneGeneral3D_F64, PointVectorNN> {
 
 	PlaneGeneral3D_F64 model;
-
 	Vector3D_F64 n = new Vector3D_F64();
+	// tolerance cos(angle) for vector normals
+	private double tolAngleCosine;
 
 	public DistancePlaneToPointVectorNN(double tolAngle) {
 		this.tolAngleCosine = Math.cos(tolAngle);
@@ -47,7 +45,7 @@ public class DistancePlaneToPointVectorNN implements DistanceFromModel<PlaneGene
 	@Override
 	public void setModel(PlaneGeneral3D_F64 model) {
 		this.model = model;
-		n.set(model.A,model.B,model.C);
+		n.set(model.A, model.B, model.C);
 		n.normalize();
 	}
 
@@ -55,7 +53,7 @@ public class DistancePlaneToPointVectorNN implements DistanceFromModel<PlaneGene
 	public double computeDistance(PointVectorNN pv) {
 
 
-		if( Math.abs(n.dot(pv.normal)) < tolAngleCosine)
+		if (Math.abs(n.dot(pv.normal)) < tolAngleCosine)
 			return Double.MAX_VALUE;
 
 		return Math.abs(Distance3D_F64.distance(model, pv.p));
@@ -63,8 +61,8 @@ public class DistancePlaneToPointVectorNN implements DistanceFromModel<PlaneGene
 
 	@Override
 	public void computeDistance(List<PointVectorNN> points, double[] distance) {
-		for( int i = 0; i < points.size(); i++ ) {
-			distance[i] = computeDistance( points.get(i) );
+		for (int i = 0; i < points.size(); i++) {
+			distance[i] = computeDistance(points.get(i));
 		}
 	}
 }

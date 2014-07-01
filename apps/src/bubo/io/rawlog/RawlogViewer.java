@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -36,357 +36,348 @@ import java.util.List;
  * @author Peter Abeles
  */
 // TODO if an exception is thrown when using the index, display a dialog saying bad index, delete old index and reload the index.
-public class RawlogViewer implements LoadRawlogFile.Listener , ActionListener {
+public class RawlogViewer implements LoadRawlogFile.Listener, ActionListener {
 
-    // where all the information is displayed
-    DataLogIndexSplitPane mainPanel;
-    // the window containing mainPanel
-    JFrame window;
+	final JFileChooser fileChooser = new JFileChooser();
+	// where all the information is displayed
+	DataLogIndexSplitPane mainPanel;
+	// the window containing mainPanel
+	JFrame window;
+	// used to read the raw log file
+	LoadRawlogFile openHelper;
+	// list of data locations in the file
+	List<LogFileObjectRef> indexes;
+	// system information and user preferences
+	Config config = new Config();
+	// dialog for selecting a filter for the data
+	FilterDialog filterDialog;
+	// thread that controls playback.
+	// is null if not playing back
+	PlaybackThread playback;
+	// menu bar items
+	JMenuBar menuBar;
+	JMenuItem mQuit;
+	JMenuItem mOpen;
+	JMenuItem mSave;
+	JMenuItem mCreateIndex;
+	JMenuItem mSelectAll;
+	JMenuItem mDelete;
+	JMenuItem mConfig;
+	JMenuItem mFilter;
 
-    // used to read the raw log file
-    LoadRawlogFile openHelper;
+	JButton bFilter;
+	JButton bPlay;
 
-    // list of data locations in the file
-    List<LogFileObjectRef> indexes;
+	public RawlogViewer() {
+		mainPanel = new DataLogIndexSplitPane();
+		mainPanel.setUnknownVisualizer(new VisualizePrimitive(null));
+		mainPanel.addVisualizaton(new VisualizeCObservationComment());
+		mainPanel.addVisualizaton(new VisualizeCObservationImage(config));
+		mainPanel.addVisualizaton(new VisualizeCObservationIMU());
+		mainPanel.addVisualizaton(new VisualizeCObservationGPS());
+		mainPanel.addVisualizaton(new VisualizeCObservation2DRangeScan());
+		mainPanel.addVisualizaton(new VisualizeCActionCollection());
+		mainPanel.addVisualizaton(new VisualizeCSensorialFrame());
+		mainPanel.addVisualizaton(new VisualizeCPose2D());
+		mainPanel.addVisualizaton(new VisualizeCPose3D());
+		mainPanel.addVisualizaton(new VisualizeCMRPTImage(config));
 
-    // system information and user preferences
-    Config config = new Config();
+		window = new JFrame("Log File Viewer");
+		window.add(mainPanel, BorderLayout.CENTER);
+		addMenuBar(window);
+		addToolbar(window);
 
-    // dialog for selecting a filter for the data
-    FilterDialog filterDialog;
+		window.pack();
+		window.setVisible(true);
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    // thread that controls playback.
-    // is null if not playing back
-    PlaybackThread playback;
+		filterDialog = new FilterDialog(window);
+		filterDialog.pack();
+		filterDialog.setVisible(false);
+	}
 
-    final JFileChooser fileChooser = new JFileChooser();
+	public static void main(String args[]) {
+		final String fileName = "/home/pja/data/dataset_corridor2.2_20070308/2007-03MAR-08_Stereo_20fps_pasillo.rawlog.index";
 
-    // menu bar items
-    JMenuBar menuBar;
-    JMenuItem mQuit;
-    JMenuItem mOpen;
-    JMenuItem mSave;
-    JMenuItem mCreateIndex;
-    JMenuItem mSelectAll;
-    JMenuItem mDelete;
-    JMenuItem mConfig;
-    JMenuItem mFilter;
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				RawlogViewer viewer = new RawlogViewer();
 
-    JButton bFilter;
-    JButton bPlay;
+				viewer.loadFile(fileName);
+				// todo if that fails add select file
+			}
+		});
 
-    public RawlogViewer() {
-        mainPanel = new DataLogIndexSplitPane();
-        mainPanel.setUnknownVisualizer(new VisualizePrimitive(null));
-        mainPanel.addVisualizaton(new VisualizeCObservationComment());
-        mainPanel.addVisualizaton(new VisualizeCObservationImage(config));
-        mainPanel.addVisualizaton(new VisualizeCObservationIMU());
-        mainPanel.addVisualizaton(new VisualizeCObservationGPS());
-        mainPanel.addVisualizaton(new VisualizeCObservation2DRangeScan());
-        mainPanel.addVisualizaton(new VisualizeCActionCollection());
-        mainPanel.addVisualizaton(new VisualizeCSensorialFrame());
-        mainPanel.addVisualizaton(new VisualizeCPose2D());
-        mainPanel.addVisualizaton(new VisualizeCPose3D());
-        mainPanel.addVisualizaton(new VisualizeCMRPTImage(config));
+	}
 
-        window = new JFrame("Log File Viewer");
-        window.add(mainPanel, BorderLayout.CENTER);
-        addMenuBar(window);
-        addToolbar(window);
+	/**
+	 * Let the user select a file to open.
+	 *
+	 * @return if a file was selected and successfully read.
+	 */
+	public boolean selectFile() {
+		// open in the current directory, if one is set
+		if (config.directory != null) {
+			fileChooser.setCurrentDirectory(new File(config.directory));
+		}
+		int ret = fileChooser.showOpenDialog(mainPanel);
+		if (ret == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+			loadFile(file.getAbsolutePath());
+			return true;
+		}
+		return false;
+	}
 
-        window.pack();
-        window.setVisible(true);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	/**
+	 * Discard any previously loaded data and load the specified log file.
+	 *
+	 * @param fileName Name of the file which is to be loaded.
+	 * @return if the file was loaded or not.
+	 */
+	public void loadFile(String fileName) {
+		// prevent the user from doing two actions at the same time
+		setMenuBarEnabled(false);
+		indexes = null;
+		openHelper = null;
 
-        filterDialog = new FilterDialog(window);
-        filterDialog.pack();
-        filterDialog.setVisible(false);
-    }
+		openHelper = new LoadRawlogFile(mainPanel, this);
+		openHelper.startRead(fileName);
+	}
 
-    /**
-     * Let the user select a file to open.
-     *
-     * @return if a file was selected and successfully read.
-     */
-    public boolean selectFile() {
-        // open in the current directory, if one is set
-        if( config.directory != null ) {
-            fileChooser.setCurrentDirectory(new File(config.directory));
-        }
-        int ret = fileChooser.showOpenDialog(mainPanel);
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            loadFile(file.getAbsolutePath());
-            return true;
-        }
-        return false;
-    }
+	private void setMenuBarEnabled(boolean state) {
+		menuBar.setEnabled(state);
+		for (int i = 0; i < menuBar.getMenuCount(); i++) {
+			menuBar.getMenu(i).setEnabled(state);
+		}
+	}
 
-    /**
-     * Discard any previously loaded data and load the specified log file.
-     *
-     * @param fileName Name of the file which is to be loaded.
-     * @return if the file was loaded or not.
-     */
-    public void loadFile( String fileName ) {
-        // prevent the user from doing two actions at the same time
-        setMenuBarEnabled(false);
-        indexes = null;
-        openHelper = null;
+	/**
+	 * Turns off components to prevent a conflict from happening when playing back
+	 * data in a log.
+	 *
+	 * @param isPlaying is it playing back data or not
+	 */
+	private void adjustGuiForPlayBack(boolean isPlaying) {
+		mOpen.setEnabled(!isPlaying);
+		mSave.setEnabled(!isPlaying);
+		mCreateIndex.setEnabled(!isPlaying);
+		mSelectAll.setEnabled(!isPlaying);
+		mDelete.setEnabled(!isPlaying);
+		mConfig.setEnabled(!isPlaying);
+		mFilter.setEnabled(!isPlaying);
+		bFilter.setEnabled(!isPlaying);
+	}
 
-        openHelper = new LoadRawlogFile(mainPanel,this);
-        openHelper.startRead(fileName);
-    }
+	/**
+	 * Sets up a menu bar for the applications window.
+	 *
+	 * @param window window where the menu bar goes.
+	 */
+	private void addMenuBar(JFrame window) {
+		menuBar = new JMenuBar();
 
+		JMenu fileMenu = new JMenu("File");
+		mOpen = new JMenuItem("Open", KeyEvent.VK_O);
+		mOpen.addActionListener(this);
+		mOpen.setMnemonic(KeyEvent.VK_O);
+		mOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+		mSave = new JMenuItem("Save");
+		mSave.addActionListener(this);
+		mCreateIndex = new JMenuItem("Create Index");
+		mCreateIndex.addActionListener(this);
 
+		mQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+		mQuit.addActionListener(this);
+		mQuit.setMnemonic(KeyEvent.VK_Q);
+		mQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+		fileMenu.add(mOpen);
+		fileMenu.add(mSave);
+		fileMenu.add(mCreateIndex);
+		fileMenu.add(mQuit);
 
-    private void setMenuBarEnabled( boolean state ) {
-        menuBar.setEnabled(state);
-        for( int i = 0; i < menuBar.getMenuCount(); i++ ) {
-            menuBar.getMenu(i).setEnabled(state);
-        }
-    }
-
-    /**
-     * Turns off components to prevent a conflict from happening when playing back
-     *  data in a log.
-     *
-     * @param isPlaying is it playing back data or not
-     */
-    private void adjustGuiForPlayBack( boolean isPlaying ) {
-        mOpen.setEnabled(!isPlaying);
-        mSave.setEnabled(!isPlaying);
-        mCreateIndex.setEnabled(!isPlaying);
-        mSelectAll.setEnabled(!isPlaying);
-        mDelete.setEnabled(!isPlaying);
-        mConfig.setEnabled(!isPlaying);
-        mFilter.setEnabled(!isPlaying);
-        bFilter.setEnabled(!isPlaying);
-    }
-
-    /**
-     * Sets up a menu bar for the applications window.
-     * @param window window where the menu bar goes.
-     */
-    private void addMenuBar(JFrame window) {
-        menuBar = new JMenuBar();
-
-        JMenu fileMenu = new JMenu("File");
-        mOpen = new JMenuItem("Open",KeyEvent.VK_O);
-        mOpen.addActionListener(this);
-        mOpen.setMnemonic(KeyEvent.VK_O);
-        mOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-        mSave = new JMenuItem("Save");
-        mSave.addActionListener(this);
-        mCreateIndex = new JMenuItem("Create Index");
-        mCreateIndex.addActionListener(this);
-
-        mQuit = new JMenuItem("Quit",KeyEvent.VK_Q);
-        mQuit.addActionListener(this);
-        mQuit.setMnemonic(KeyEvent.VK_Q);
-        mQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
-        fileMenu.add(mOpen);
-        fileMenu.add(mSave);
-        fileMenu.add(mCreateIndex);
-        fileMenu.add(mQuit);
-
-        JMenu editMenu = new JMenu("Edit");
-        mSelectAll = new JMenuItem("Select All");
-        mSelectAll.addActionListener(this);
-        mDelete = new JMenuItem("Delete");
-        mDelete.addActionListener(this);
-        editMenu.add(mSelectAll);
-        editMenu.add(mDelete);
+		JMenu editMenu = new JMenu("Edit");
+		mSelectAll = new JMenuItem("Select All");
+		mSelectAll.addActionListener(this);
+		mDelete = new JMenuItem("Delete");
+		mDelete.addActionListener(this);
+		editMenu.add(mSelectAll);
+		editMenu.add(mDelete);
 
 
-        JMenu optionMenu = new JMenu("Options");
-        mConfig = new JMenuItem("Configure");
-        mConfig.addActionListener(this);
-        mFilter = new JMenuItem("Filter",KeyEvent.VK_F);
-        mFilter.addActionListener(this);
-        mFilter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
-        mFilter.setMnemonic(KeyEvent.VK_F);
-        optionMenu.add(mConfig);
-        optionMenu.add(mFilter);
+		JMenu optionMenu = new JMenu("Options");
+		mConfig = new JMenuItem("Configure");
+		mConfig.addActionListener(this);
+		mFilter = new JMenuItem("Filter", KeyEvent.VK_F);
+		mFilter.addActionListener(this);
+		mFilter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+		mFilter.setMnemonic(KeyEvent.VK_F);
+		optionMenu.add(mConfig);
+		optionMenu.add(mFilter);
 
-        menuBar.add(fileMenu);
-        menuBar.add(editMenu);
-        menuBar.add(optionMenu);
+		menuBar.add(fileMenu);
+		menuBar.add(editMenu);
+		menuBar.add(optionMenu);
 
-        window.setJMenuBar(menuBar);
-    }
+		window.setJMenuBar(menuBar);
+	}
 
-    private void addToolbar( JFrame window ) {
-        JToolBar toolbar = new JToolBar("Tools");
+	private void addToolbar(JFrame window) {
+		JToolBar toolbar = new JToolBar("Tools");
 
-        JButton bSort = new JButton("Sort");
-        bSort.addActionListener(this);
-        bFilter = new JButton("Filter");
-        bFilter.addActionListener(this);
-        bPlay = new JButton("Play");
-        bPlay.addActionListener(this);
-        
-        toolbar.add(bPlay);
-        toolbar.add(bSort);
-        toolbar.add(bFilter);
+		JButton bSort = new JButton("Sort");
+		bSort.addActionListener(this);
+		bFilter = new JButton("Filter");
+		bFilter.addActionListener(this);
+		bPlay = new JButton("Play");
+		bPlay.addActionListener(this);
 
-        window.add(toolbar, BorderLayout.PAGE_START);
-    }
+		toolbar.add(bPlay);
+		toolbar.add(bSort);
+		toolbar.add(bFilter);
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if( e.getSource() == mQuit ) {
-            System.exit(0);
-        } else if( e.getSource() == mOpen ) {
-            selectFile();
-        } else if( e.getSource() == mConfig ) {
+		window.add(toolbar, BorderLayout.PAGE_START);
+	}
 
-        } else if( e.getSource() == mCreateIndex ) {
-            setMenuBarEnabled(false);
-            CreateLogIndex createIndex = new CreateLogIndex(mainPanel,this);
-            createIndex.start(openHelper.getFile().getAbsolutePath());
-        } else if( e.getSource() == mFilter || e.getSource() == bFilter ) {
-            if( filterDialog.performSelection(mainPanel)) {
-                filterList();
-            }
-        } else if( e.getSource() == bPlay ) {
-            if( playback == null ) {
-                bPlay.setText("Stop");
-                playback = new PlaybackThread(mainPanel,this,20);
-                playback.start();
-                adjustGuiForPlayBack(true);
-            } else {
-                playbackIsFinished();
-            }
-        }
-    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == mQuit) {
+			System.exit(0);
+		} else if (e.getSource() == mOpen) {
+			selectFile();
+		} else if (e.getSource() == mConfig) {
 
-    /**
-     * Call when the playback has finished or needs to stop.
-     */
-    public void playbackIsFinished() {
-        bPlay.setText("Play");
-        playback.stopPlaying();
-        playback = null;
-        adjustGuiForPlayBack(false);
-    }
+		} else if (e.getSource() == mCreateIndex) {
+			setMenuBarEnabled(false);
+			CreateLogIndex createIndex = new CreateLogIndex(mainPanel, this);
+			createIndex.start(openHelper.getFile().getAbsolutePath());
+		} else if (e.getSource() == mFilter || e.getSource() == bFilter) {
+			if (filterDialog.performSelection(mainPanel)) {
+				filterList();
+			}
+		} else if (e.getSource() == bPlay) {
+			if (playback == null) {
+				bPlay.setText("Stop");
+				playback = new PlaybackThread(mainPanel, this, 20);
+				playback.start();
+				adjustGuiForPlayBack(true);
+			} else {
+				playbackIsFinished();
+			}
+		}
+	}
 
-    /**
-     * Filters data based on what was selected inside of the filter dialog.
-     */
-    private void filterList() {
-        switch( filterDialog.getFilterType() ) {
-          case NO_FILTERING:
-              mainPanel.setObjectList(indexes,openHelper.getReader());
-              break;
+	/**
+	 * Call when the playback has finished or needs to stop.
+	 */
+	public void playbackIsFinished() {
+		bPlay.setText("Play");
+		playback.stopPlaying();
+		playback = null;
+		adjustGuiForPlayBack(false);
+	}
 
-          case SOURCE:
-              filterBySource(filterDialog.getSelectedSources());
-              break;
+	/**
+	 * Filters data based on what was selected inside of the filter dialog.
+	 */
+	private void filterList() {
+		switch (filterDialog.getFilterType()) {
+			case NO_FILTERING:
+				mainPanel.setObjectList(indexes, openHelper.getReader());
+				break;
 
-          case DATA:
-              filterByType(filterDialog.getSelectedTypes());
-              break;
-        }
-    }
+			case SOURCE:
+				filterBySource(filterDialog.getSelectedSources());
+				break;
 
-    /**
-     * Filters indexed data by source
-     *
-     * @param allowed List containing the types of data it is allowed to display.
-     */
-    private void filterBySource( List<String> allowed ) {
-        List<LogFileObjectRef> list = new ArrayList<LogFileObjectRef>();
+			case DATA:
+				filterByType(filterDialog.getSelectedTypes());
+				break;
+		}
+	}
 
-        for( LogFileObjectRef o : indexes ) {
-            if( o.getSource() == null )
-                continue;
+	/**
+	 * Filters indexed data by source
+	 *
+	 * @param allowed List containing the types of data it is allowed to display.
+	 */
+	private void filterBySource(List<String> allowed) {
+		List<LogFileObjectRef> list = new ArrayList<LogFileObjectRef>();
 
-            for( String s : allowed ) {
+		for (LogFileObjectRef o : indexes) {
+			if (o.getSource() == null)
+				continue;
 
-                if( o.getSource().compareTo(s) == 0 ) {
-                    list.add(o);
-                    break;
-                }
-            }
-        }
+			for (String s : allowed) {
 
-        mainPanel.setObjectList(list, openHelper.getReader());
-    }
+				if (o.getSource().compareTo(s) == 0) {
+					list.add(o);
+					break;
+				}
+			}
+		}
 
-    /**
-     * Filters indexed data by data type
-     *
-     * @param allowed List containing the types of data it is allowed to display.
-     */
-    private void filterByType( List<Class<?>> allowed ) {
-        List<LogFileObjectRef> list = new ArrayList<LogFileObjectRef>();
+		mainPanel.setObjectList(list, openHelper.getReader());
+	}
 
-        for( LogFileObjectRef o : indexes ) {
+	/**
+	 * Filters indexed data by data type
+	 *
+	 * @param allowed List containing the types of data it is allowed to display.
+	 */
+	private void filterByType(List<Class<?>> allowed) {
+		List<LogFileObjectRef> list = new ArrayList<LogFileObjectRef>();
 
-            for( Class<?> s : allowed ) {
-                if( o.getDataType() == s ) {
-                    list.add(o);
-                    break;
-                }
-            }
-        }
+		for (LogFileObjectRef o : indexes) {
 
-        mainPanel.setObjectList(list, openHelper.getReader());
-    }
+			for (Class<?> s : allowed) {
+				if (o.getDataType() == s) {
+					list.add(o);
+					break;
+				}
+			}
+		}
 
-    @Override
-    public void loadFileComplete() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if( !openHelper.isSuccessful() ) {
-                    System.out.println("Load file failed!");
-                    setMenuBarEnabled(true);
-                    return;
-                }
+		mainPanel.setObjectList(list, openHelper.getReader());
+	}
 
-                indexes = openHelper.getReader().getReferences();
+	@Override
+	public void loadFileComplete() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if (!openHelper.isSuccessful()) {
+					System.out.println("Load file failed!");
+					setMenuBarEnabled(true);
+					return;
+				}
 
-                File f = openHelper.getFile();
-                config.directory = f.getParent();
-                setMenuBarEnabled(true);
+				indexes = openHelper.getReader().getReferences();
 
-                filterDialog.setData(openHelper.getAllTypes(),openHelper.getAllSources());
-                mainPanel.setObjectList(indexes, openHelper.getReader());
-                String[] a = f.getName().split("[.]");
-                if( a.length > 0 )
-                    window.setTitle(a[0]);
-                else
-                    window.setTitle(f.getName());
-                setMenuBarEnabled(true);
-            }
-        });
-    }
+				File f = openHelper.getFile();
+				config.directory = f.getParent();
+				setMenuBarEnabled(true);
 
-    public void finishedCreateIndex() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                setMenuBarEnabled(true);
-            }
-        });
-    }
+				filterDialog.setData(openHelper.getAllTypes(), openHelper.getAllSources());
+				mainPanel.setObjectList(indexes, openHelper.getReader());
+				String[] a = f.getName().split("[.]");
+				if (a.length > 0)
+					window.setTitle(a[0]);
+				else
+					window.setTitle(f.getName());
+				setMenuBarEnabled(true);
+			}
+		});
+	}
 
-    public static class Config
-    {
-        public String directory;
-    }
+	public void finishedCreateIndex() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				setMenuBarEnabled(true);
+			}
+		});
+	}
 
-    public static void main( String args[] ) {
-        final String fileName = "/home/pja/data/dataset_corridor2.2_20070308/2007-03MAR-08_Stereo_20fps_pasillo.rawlog.index";
-
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                RawlogViewer viewer = new RawlogViewer();
-
-                viewer.loadFile(fileName);
-                // todo if that fails add select file
-            }
-        });
-        
-    }
+	public static class Config {
+		public String directory;
+	}
 }

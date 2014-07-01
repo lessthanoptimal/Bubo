@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -47,7 +47,7 @@ public class ConstructOctreeCellSize extends ConstructOctree {
 	 * @return The node which contains the point
 	 */
 	@Override
-	public Octree addPoint( Point3D_F64 point , Object data ) {
+	public Octree addPoint(Point3D_F64 point, Object data) {
 		// declare the structure which stores the point and data
 		Octree.Info info = storageInfo.grow();
 		info.point = point;
@@ -59,24 +59,26 @@ public class ConstructOctreeCellSize extends ConstructOctree {
 	/**
 	 * Traverses down the octree and makes sure there is a leaf at the specified point.  New nodes are created as
 	 * needed. However the point is not added to the Octree.
+	 *
 	 * @param point Point in which the leaf is contained.
 	 * @return The lead which has the point
 	 */
-	public Octree addLeaf( Point3D_F64 point ) {
-		return traverseToLeaf(point,null);
+	public Octree addLeaf(Point3D_F64 point) {
+		return traverseToLeaf(point, null);
 	}
 
 	/**
 	 * Traverses down the octree and searches for a leaf which contains the point and is <= the maximumCellSize.
 	 * If none exist then null is returned.
+	 *
 	 * @param point Point in which the leaf is contained.
 	 * @return The lead which has the point
 	 */
-	public Octree findLeaf( Point3D_F64 point ) {
+	public Octree findLeaf(Point3D_F64 point) {
 		Octree node = tree.findDeepest(point);
 
-		if( node != null ) {
-			if( node.space.getLengthX() <= maximumCellSize )
+		if (node != null) {
+			if (node.space.getLengthX() <= maximumCellSize)
 				return node;
 		}
 		return null;
@@ -88,26 +90,26 @@ public class ConstructOctreeCellSize extends ConstructOctree {
 	private Octree traverseToLeaf(Point3D_F64 point, Octree.Info info) {
 		Octree node = tree;
 
-		while( true ) {
-			if( node.isLeaf() ) {
-				if( node.space.getLengthX() > maximumCellSize ) {
+		while (true) {
+			if (node.isLeaf()) {
+				if (node.space.getLengthX() > maximumCellSize) {
 					// add data for the children
 					node.children = getChildrenArray();
 					// compute a divider in the center
-					computeDivider(node.space,node.divider);
+					computeDivider(node.space, node.divider);
 
 					// create a new child for point to go into
 					int index = node.getChildIndex(point);
-					node = checkAddChild(node,index);
+					node = checkAddChild(node, index);
 				} else {
 					// it's small enough to be a leaf
-					if( info != null)
+					if (info != null)
 						node.points.add(info);
 					return node;
 				}
 			} else {
 				int index = node.getChildIndex(point);
-				node = checkAddChild(node, index );
+				node = checkAddChild(node, index);
 			}
 		}
 	}

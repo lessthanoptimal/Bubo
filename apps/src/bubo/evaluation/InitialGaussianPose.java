@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -40,9 +40,9 @@ public class InitialGaussianPose implements InitialPose {
 	@Override
 	public void generatePose(Se2_F64 poseTruth) {
 
-		double x = poseTruth.getX() + rand.nextGaussian()*sigmaXY;
-		double y = poseTruth.getY() + rand.nextGaussian()*sigmaXY;
-		double yaw = UtilAngle.bound(poseTruth.getY() + rand.nextGaussian()*sigmaYaw);
+		double x = poseTruth.getX() + rand.nextGaussian() * sigmaXY;
+		double y = poseTruth.getY() + rand.nextGaussian() * sigmaXY;
+		double yaw = UtilAngle.bound(poseTruth.getY() + rand.nextGaussian() * sigmaYaw);
 
 	}
 

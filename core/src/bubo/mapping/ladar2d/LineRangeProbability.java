@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,28 +27,28 @@ package bubo.mapping.ladar2d;
  */
 public interface LineRangeProbability {
 
-    /**
-     * To extends the range along the map the line is projected so that the distribution can be fully
-     * described.  The distribution beyound the range plus extension are assumed to have a probability
-     * of 0.5.
-     *
-     * @return
-     */
-    public double lineExtension();
+	/**
+	 * To extends the range along the map the line is projected so that the distribution can be fully
+	 * described.  The distribution beyound the range plus extension are assumed to have a probability
+	 * of 0.5.
+	 *
+	 * @return
+	 */
+	public double lineExtension();
 
-    /**
-     * Sets the range of the measurement.
-     *
-     * @param meas Measurement's range.
-     */
-    public void setRangeMeasurement( double meas );
+	/**
+	 * Sets the range of the measurement.
+	 *
+	 * @param meas Measurement's range.
+	 */
+	public void setRangeMeasurement(double meas);
 
-    /**
-     * Computes the probability that the obstacle's range true value is 'dist'.  Pr(dist| measured range).
-     * For those who are pedantic, the area of integration is the map's cell size.
-     *
-     * @param dist Distance along the line.
-     * @return Probability that this is the true range.  Between 0 and 1.
-     */
-    public float computeProbability( double dist );
+	/**
+	 * Computes the probability that the obstacle's range true value is 'dist'.  Pr(dist| measured range).
+	 * For those who are pedantic, the area of integration is the map's cell size.
+	 *
+	 * @param dist Distance along the line.
+	 * @return Probability that this is the true range.  Between 0 and 1.
+	 */
+	public float computeProbability(double dist);
 }

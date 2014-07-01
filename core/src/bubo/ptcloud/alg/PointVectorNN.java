@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,35 +29,45 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class PointVectorNN {
-	/** Reference to the point in the point cloud */
+	/**
+	 * Reference to the point in the point cloud
+	 */
 	public Point3D_F64 p;
-	/** Normal to the surface at p.  Is normalized to one. */
+	/**
+	 * Normal to the surface at p.  Is normalized to one.
+	 */
 	public Vector3D_F64 normal = new Vector3D_F64();
 
-	/** Points which are its neighbors.  Does not include this point. */
-	public FastQueue<PointVectorNN> neighbors = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+	/**
+	 * Points which are its neighbors.  Does not include this point.
+	 */
+	public FastQueue<PointVectorNN> neighbors = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
 	/**
 	 * Unique ID assigned to the point when it is constructed.  The 'index' in the same as the index in the list.
 	 */
 	public int index;
 
-	/** Used to keep track of points which have been searched already */
+	/**
+	 * Used to keep track of points which have been searched already
+	 */
 	public int matchMarker = 0;
 
-	/** If true then the point is already used by a shape */
+	/**
+	 * If true then the point is already used by a shape
+	 */
 	public boolean used;
 
-	public PointVectorNN( double x , double y , double z , double nx , double ny, double nz) {
-		p = new Point3D_F64(x,y,z);
-		normal.set(nx,ny,nz);
+	public PointVectorNN(double x, double y, double z, double nx, double ny, double nz) {
+		p = new Point3D_F64(x, y, z);
+		normal.set(nx, ny, nz);
 	}
 
 	public PointVectorNN() {
 	}
 
 	public String toString() {
-		return "PointVector P( "+p.x+" , "+p.y+" , "+p.z+" ) Normal( "+normal.x+" , "+normal.y+" , "+normal.z+" )";
+		return "PointVector P( " + p.x + " , " + p.y + " , " + p.z + " ) Normal( " + normal.x + " , " + normal.y + " , " + normal.z + " )";
 	}
 
 	public void reset() {

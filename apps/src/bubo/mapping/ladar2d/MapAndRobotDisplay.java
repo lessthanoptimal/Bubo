@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,45 +30,45 @@ import java.awt.*;
  */
 public class MapAndRobotDisplay extends GridMapBasicDisplay {
 
-    Se2_F64 robotLoc;
-    int radius = 10;
-    BasicStroke directionStroke = new BasicStroke(3);
+	Se2_F64 robotLoc;
+	int radius = 10;
+	BasicStroke directionStroke = new BasicStroke(3);
 
-    public void updateRobot( Se2_F64 robotLoc ) {
-        this.robotLoc = robotLoc.copy();
-    }
+	public void updateRobot(Se2_F64 robotLoc) {
+		this.robotLoc = robotLoc.copy();
+	}
 
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 
-        if( robotLoc == null )
-            return;
+		if (robotLoc == null)
+			return;
 
-        Graphics2D g2 = (Graphics2D)g;
+		Graphics2D g2 = (Graphics2D) g;
 
-        // global to map coordinates
-        double x = robotLoc.getX() - spacial.getBl().x;
-        double y = robotLoc.getY() - spacial.getBl().y;
+		// global to map coordinates
+		double x = robotLoc.getX() - spacial.getBl().x;
+		double y = robotLoc.getY() - spacial.getBl().y;
 
-        // map coordinates to image pixel coordinates
-        int pixelX = (int) mapToGuiX(x) - radius;
-        int pixelY = (int) mapToGuiY(y) - radius;
+		// map coordinates to image pixel coordinates
+		int pixelX = (int) mapToGuiX(x) - radius;
+		int pixelY = (int) mapToGuiY(y) - radius;
 
 //        System.out.println("vis rect "+v.x+" "+v.y+" "+v.width+" "+v.height);
 
-        g2.setColor(Color.WHITE);
-        g2.drawOval(pixelX,pixelY,radius*2+1,radius*2+1);
-        g2.setColor(Color.RED);
-        g2.fillOval(pixelX+1,pixelY+1,radius*2-1,radius*2-1);
+		g2.setColor(Color.WHITE);
+		g2.drawOval(pixelX, pixelY, radius * 2 + 1, radius * 2 + 1);
+		g2.setColor(Color.RED);
+		g2.fillOval(pixelX + 1, pixelY + 1, radius * 2 - 1, radius * 2 - 1);
 
-        // draw the robot's orientation
-        g2.setColor(Color.BLACK);
-        g2.setStroke(directionStroke);
-        pixelX += radius;
-        pixelY += radius;
-        int dx = (int)(robotLoc.getCosineYaw()*radius);
-        int dy = (int)(robotLoc.getSineYaw()*radius);
-        g2.drawLine(pixelX,pixelY,pixelX+dx,pixelY-dy);
-    }
+		// draw the robot's orientation
+		g2.setColor(Color.BLACK);
+		g2.setStroke(directionStroke);
+		pixelX += radius;
+		pixelY += radius;
+		int dx = (int) (robotLoc.getCosineYaw() * radius);
+		int dy = (int) (robotLoc.getSineYaw() * radius);
+		g2.drawLine(pixelX, pixelY, pixelX + dx, pixelY - dy);
+	}
 }

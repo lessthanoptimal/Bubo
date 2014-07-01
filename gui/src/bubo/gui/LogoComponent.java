@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,47 +29,47 @@ import java.awt.image.BufferedImage;
  */
 public class LogoComponent extends JComponent {
 
-    private BufferedImage logo;
-    private double logoTranslucent = 0.0;
-    private double logoScale = 1.0;
+	private BufferedImage logo;
+	private double logoTranslucent = 0.0;
+	private double logoScale = 1.0;
 
-    public LogoComponent( BufferedImage logo ) {
+	public LogoComponent(BufferedImage logo) {
 		this.logo = logo;
 
-        Dimension d = new Dimension(logo.getWidth(),logo.getHeight());
+		Dimension d = new Dimension(logo.getWidth(), logo.getHeight());
 
-        setSize(d);
-        setPreferredSize(d);
-        setMinimumSize(d);
-    }
+		setSize(d);
+		setPreferredSize(d);
+		setMinimumSize(d);
+	}
 
-    public BufferedImage getLogo() {
-        return logo;
-    }
+	public BufferedImage getLogo() {
+		return logo;
+	}
 
-    @Override
-    public void setBounds( int x , int y , int width , int height ) {
-        super.setBounds(x,y,width,height);
+	@Override
+	public void setBounds(int x, int y, int width, int height) {
+		super.setBounds(x, y, width, height);
 
-    }
+	}
 
-    @Override
-    public void paintComponent(Graphics g) {
+	@Override
+	public void paintComponent(Graphics g) {
 
-        Graphics2D g2 = (Graphics2D)g;
+		Graphics2D g2 = (Graphics2D) g;
 
-        float alpha = 0.75f;
-        int type = AlphaComposite.SRC_OVER;
+		float alpha = 0.75f;
+		int type = AlphaComposite.SRC_OVER;
 
-        AlphaComposite composite =
-                AlphaComposite.getInstance(type, alpha);
+		AlphaComposite composite =
+				AlphaComposite.getInstance(type, alpha);
 
-        g2.setComposite(composite);
-        g2.drawImage(logo,0,0,null);
+		g2.setComposite(composite);
+		g2.drawImage(logo, 0, 0, null);
 
 //        Dimension d = getSize();
 //
 //        g.setColor(Color.RED);
 //        g.fillRect(0,0,d.width,d.height);
-    }
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,5 +31,5 @@ public interface CheckShapeParameters<Model> {
 	 * @param param Model parameters for a shape
 	 * @return true if valid or false if not
 	 */
-	public boolean valid( Model param );
+	public boolean valid(Model param);
 }

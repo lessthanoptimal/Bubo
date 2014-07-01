@@ -26,28 +26,28 @@ import org.junit.Test;
  */
 public class TestArrayGrid2D_F32 extends GenericMapTests {
 
-    @Test
-    public void clear() {
-        super.clear_F32();
-    }
+	@Test
+	public void clear() {
+		super.clear_F32();
+	}
 
-    @Test
-    public void set_get() {
-        super.set_get_F32(5.6f);
-    }
+	@Test
+	public void set_get() {
+		super.set_get_F32(5.6f);
+	}
 
-    @Test
-    public void isKnown() {
-        super.isKnown_F32();
-    }
+	@Test
+	public void isKnown() {
+		super.isKnown_F32();
+	}
 
-    @Test
-    public void isValid() {
-        super.isValid_F32();
-    }
+	@Test
+	public void isValid() {
+		super.isValid_F32();
+	}
 
-    @Override
-    public <T extends OccupancyGrid2D> T createMap(int width, int height) {
-        return (T)new ArrayGrid2D_F32(width,height);
-    }
+	@Override
+	public <T extends OccupancyGrid2D> T createMap(int width, int height) {
+		return (T) new ArrayGrid2D_F32(width, height);
+	}
 }

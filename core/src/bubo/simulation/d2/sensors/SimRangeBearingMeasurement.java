@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -57,7 +57,7 @@ public class SimRangeBearingMeasurement {
 	private Point2D_F64 landmarkInSensorFrame = new Point2D_F64();
 
 	public SimRangeBearingMeasurement(double rangeSigma, double bearingSigma,
-									  double maximumRange , long randSeed ) {
+									  double maximumRange, long randSeed) {
 		this.rand = new Random(randSeed);
 		this.rangeSigma = rangeSigma;
 		this.bearingSigma = bearingSigma;
@@ -79,18 +79,18 @@ public class SimRangeBearingMeasurement {
 	 * @param landmark Location of the landmark in global coordinates.
 	 * @return true if the landmark was observed.
 	 */
-	public boolean process( Point2D_F64 landmark ) {
-		SePointOps_F64.transform(worldToSensor,landmark,landmarkInSensorFrame);
+	public boolean process(Point2D_F64 landmark) {
+		SePointOps_F64.transform(worldToSensor, landmark, landmarkInSensorFrame);
 
 		trueRange = landmarkInSensorFrame.norm();
-		trueBearing = Math.atan2( landmarkInSensorFrame.y,landmarkInSensorFrame.x);
+		trueBearing = Math.atan2(landmarkInSensorFrame.y, landmarkInSensorFrame.x);
 
 		// add noise
-		noisyRange = trueRange + rand.nextGaussian()*rangeSigma;
-		noisyBearing = trueBearing + rand.nextGaussian()*bearingSigma;
+		noisyRange = trueRange + rand.nextGaussian() * rangeSigma;
+		noisyBearing = trueBearing + rand.nextGaussian() * bearingSigma;
 
 		// apply very basic physical constraints and numerical bounds
-		if( noisyRange < 0 ) noisyRange = 0;
+		if (noisyRange < 0) noisyRange = 0;
 		noisyBearing = UtilAngle.bound(noisyBearing);
 
 		// use the noisy range to decide if it can be seen or not so that there isn't a hard threshold for visibility
@@ -114,6 +114,6 @@ public class SimRangeBearingMeasurement {
 	}
 
 	public DenseMatrix64F getMeasurementCovariance() {
-		return CommonOps.diag(rangeSigma*rangeSigma,bearingSigma*bearingSigma);
+		return CommonOps.diag(rangeSigma * rangeSigma, bearingSigma * bearingSigma);
 	}
 }

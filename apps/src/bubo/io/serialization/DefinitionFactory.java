@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,19 +26,18 @@ import georegression.struct.shapes.Rectangle2D_F64;
  */
 public class DefinitionFactory {
 
-    public static SerializationDefinitionManager createDefinition( boolean geometry )
-    {
-        SerializationDefinitionManager ret = new SerializationDefinitionManager();
+	public static SerializationDefinitionManager createDefinition(boolean geometry) {
+		SerializationDefinitionManager ret = new SerializationDefinitionManager();
 
-        if( geometry ) {
-            ret.loadDefinition(Point2D_F32.class,"x","y");
-            ret.loadDefinition(Point2D_F64.class,"x","y");
-            ret.loadDefinition(Point2D_I16.class,"x","y");
-            ret.loadDefinition(Point2D_I32.class,"x","y");
-            ret.loadDefinition(Point3D_F64.class,"x","y","z");
-            ret.loadDefinition(Rectangle2D_F64.class,"x","y","width","height");
-        }
+		if (geometry) {
+			ret.loadDefinition(Point2D_F32.class, "x", "y");
+			ret.loadDefinition(Point2D_F64.class, "x", "y");
+			ret.loadDefinition(Point2D_I16.class, "x", "y");
+			ret.loadDefinition(Point2D_I32.class, "x", "y");
+			ret.loadDefinition(Point3D_F64.class, "x", "y", "z");
+			ret.loadDefinition(Rectangle2D_F64.class, "x", "y", "width", "height");
+		}
 
-        return ret;
-    }
+		return ret;
+	}
 }

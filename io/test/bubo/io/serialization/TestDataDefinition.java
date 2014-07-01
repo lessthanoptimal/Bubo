@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,25 +28,25 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestDataDefinition {
 
-    @Test
-    public void constructor() {
-        DataDefinition def = new DataDefinition("Foo",DummyData.class,"value");
+	@Test
+	public void constructor() {
+		DataDefinition def = new DataDefinition("Foo", DummyData.class, "value");
 
-        assertTrue( def.typeName.compareTo("Foo") == 0 );
-        assertTrue( def.type == DummyData.class );
-        assertEquals( 1 , def.setters.length );
-        assertEquals( 1 , def.getters.length );
-        assertEquals( 1 , def.variableNames.length );
-        assertEquals( 1 , def.variableTypes.length );
-        assertTrue( def.variableNames[0].compareTo("value") == 0 );
-    }
+		assertTrue(def.typeName.compareTo("Foo") == 0);
+		assertTrue(def.type == DummyData.class);
+		assertEquals(1, def.setters.length);
+		assertEquals(1, def.getters.length);
+		assertEquals(1, def.variableNames.length);
+		assertEquals(1, def.variableTypes.length);
+		assertTrue(def.variableNames[0].compareTo("value") == 0);
+	}
 
-    @Test
-    public void createInstance() {
-        DataDefinition def = new DataDefinition("Foo",DummyData.class,"value");
+	@Test
+	public void createInstance() {
+		DataDefinition def = new DataDefinition("Foo", DummyData.class, "value");
 
-        DummyData found = def.createInstance(45);
+		DummyData found = def.createInstance(45);
 
-        assertEquals(45,found.value);
-    }
+		assertEquals(45, found.value);
+	}
 }

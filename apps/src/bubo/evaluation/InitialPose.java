@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,7 +24,7 @@ import georegression.struct.se.Se2_F64;
  * @author Peter Abeles
  */
 public interface InitialPose {
-	public void generatePose( Se2_F64 poseTruth );
+	public void generatePose(Se2_F64 poseTruth);
 
 	public Se2_F64 getPoseNoisy();
 

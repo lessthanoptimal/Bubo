@@ -26,29 +26,29 @@ package bubo.maps.d2.grid;
  */
 public interface OccupancyGrid2D_F32 extends OccupancyGrid2D {
 
-    /**
-     * Sets the specified cell to 'value'.
-     *
-     * @param x x-coordinate of the cell.
-     * @param y y-coordinate of the cell.
-     * @param value The cell's new value.
-     */
-    public void set( int x , int y , float value );
+	/**
+	 * Sets the specified cell to 'value'.
+	 *
+	 * @param x     x-coordinate of the cell.
+	 * @param y     y-coordinate of the cell.
+	 * @param value The cell's new value.
+	 */
+	public void set(int x, int y, float value);
 
-    /**
-     * Gets the value of the cell at the specified coordinate.
-     *
-     * @param x x-coordinate of the cell.
-     * @param y y-coordinate of the cell.
-     * @return The cell's value.
-     */
-    public float get( int x , int y );
+	/**
+	 * Gets the value of the cell at the specified coordinate.
+	 *
+	 * @param x x-coordinate of the cell.
+	 * @param y y-coordinate of the cell.
+	 * @return The cell's value.
+	 */
+	public float get(int x, int y);
 
-     /**
-     * Checks to see if the provided value is within the valid range.
-     *
-     * @param value the value being tested
-     * @return if it is valid or not
-     */
-    public boolean isValid( float value );
+	/**
+	 * Checks to see if the provided value is within the valid range.
+	 *
+	 * @param value the value being tested
+	 * @return if it is valid or not
+	 */
+	public boolean isValid(float value);
 }

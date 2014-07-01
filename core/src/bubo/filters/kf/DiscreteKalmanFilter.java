@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -66,13 +66,12 @@ public class DiscreteKalmanFilter extends DKFCommon implements KalmanFilterInter
 		this.controlInput = controlInput;
 	}
 
-	public void setControlInput(DenseMatrix64F controlInput) {
-		this.controlInput = new DenseMatrix64F(controlInput);
-	}
-
-
 	public DenseMatrix64F getControlInput() {
 		return controlInput;
+	}
+
+	public void setControlInput(DenseMatrix64F controlInput) {
+		this.controlInput = new DenseMatrix64F(controlInput);
 	}
 
 	/**

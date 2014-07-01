@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,36 +32,36 @@ import java.awt.image.BufferedImage;
  */
 public class ImageUnknown implements ImageEncoded {
 
-    byte[] data;
-    int length;
+	byte[] data;
+	int length;
 
-    public ImageUnknown(byte[] data, int length) {
-        this.data = data;
-        this.length = length;
-    }
+	public ImageUnknown(byte[] data, int length) {
+		this.data = data;
+		this.length = length;
+	}
 
-    @Override
-    public byte[] getData() {
-        return data;
-    }
+	@Override
+	public byte[] getData() {
+		return data;
+	}
 
-    @Override
-    public int getDataSize() {
-        return length;
-    }
+	@Override
+	public int getDataSize() {
+		return length;
+	}
 
-    @Override
-    public String getFormat() {
-        return "unknown";
-    }
+	@Override
+	public String getFormat() {
+		return "unknown";
+	}
 
-    @Override
-    public ImageBase convertToImage() {
-        return null;
-    }
+	@Override
+	public ImageBase convertToImage() {
+		return null;
+	}
 
-    @Override
-    public BufferedImage convertToBuffered() {
-        return null;
-    }
+	@Override
+	public BufferedImage convertToBuffered() {
+		return null;
+	}
 }

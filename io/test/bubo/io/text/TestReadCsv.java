@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,46 +32,46 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestReadCsv {
 
-    private String A = "this is a test 23490235 dooodad.asdf\n#   of the\tYYYY local broad cast system.";
+	private String A = "this is a test 23490235 dooodad.asdf\n#   of the\tYYYY local broad cast system.";
 
-    /**
-     * Parses a string with a known set of words.
-     *
-     * @throws IOException
-     */
-    @Test
-    public void extractWords() throws IOException {
-        ReadCsv reader = new ReadCsv(new ByteArrayInputStream(A.getBytes()));
+	/**
+	 * Parses a string with a known set of words.
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void extractWords() throws IOException {
+		ReadCsv reader = new ReadCsv(new ByteArrayInputStream(A.getBytes()));
 
-        List<String> line0 = reader.extractWords();
-        List<String> line1 = reader.extractWords();
-        List<String> line2 = reader.extractWords();
+		List<String> line0 = reader.extractWords();
+		List<String> line1 = reader.extractWords();
+		List<String> line2 = reader.extractWords();
 
-        assertTrue(line2 == null);
-        assertEquals(6,line0.size());
-        assertEquals(8,line1.size());
+		assertTrue(line2 == null);
+		assertEquals(6, line0.size());
+		assertEquals(8, line1.size());
 
-        assertTrue(line0.get(0).compareTo("this") == 0);
-        assertTrue(line0.get(2).compareTo("a") == 0);
-        assertTrue(line1.get(3).compareTo("YYYY") == 0);
-    }
+		assertTrue(line0.get(0).compareTo("this") == 0);
+		assertTrue(line0.get(2).compareTo("a") == 0);
+		assertTrue(line1.get(3).compareTo("YYYY") == 0);
+	}
 
-    /**
-     * Parse the same string but specify a comment character.
-     */
-    @Test
-    public void extractWords_comments() throws IOException {
-        ReadCsv reader = new ReadCsv(new ByteArrayInputStream(A.getBytes()));
+	/**
+	 * Parse the same string but specify a comment character.
+	 */
+	@Test
+	public void extractWords_comments() throws IOException {
+		ReadCsv reader = new ReadCsv(new ByteArrayInputStream(A.getBytes()));
 
-        reader.setComment('#');
+		reader.setComment('#');
 
-        List<String> line0 = reader.extractWords();
-        List<String> line1 = reader.extractWords();
+		List<String> line0 = reader.extractWords();
+		List<String> line1 = reader.extractWords();
 
-        assertTrue(line1 == null);
-        assertEquals(6,line0.size());
+		assertTrue(line1 == null);
+		assertEquals(6, line0.size());
 
-        assertTrue(line0.get(0).compareTo("this") == 0);
-        assertTrue(line0.get(2).compareTo("a") == 0);
-    }
+		assertTrue(line0.get(0).compareTo("this") == 0);
+		assertTrue(line0.get(2).compareTo("a") == 0);
+	}
 }

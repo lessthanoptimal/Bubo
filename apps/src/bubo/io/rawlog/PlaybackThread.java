@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,77 +29,77 @@ import javax.swing.*;
  */
 public class PlaybackThread extends Thread {
 
-    // the main program which called this
-    RawlogViewer owner;
+	// the main program which called this
+	RawlogViewer owner;
 
-    // what's displaying the data
-    DataLogIndexSplitPane view;
+	// what's displaying the data
+	DataLogIndexSplitPane view;
 
-    // how long it will wait in milliseconds before moving onto the next item
-    long waitTime;
+	// how long it will wait in milliseconds before moving onto the next item
+	long waitTime;
 
-    // is it playing through the log
-    volatile boolean play;
+	// is it playing through the log
+	volatile boolean play;
 
-    // used to tell if the thread has run or not
-    volatile int counter;
+	// used to tell if the thread has run or not
+	volatile int counter;
 
-    /**
-     * Creates a new playback thread.
-     *
-     * @param view What's displaying the data.
-     * @param waitTime How long it waits in milliseconds between data frames.
-     */
-    public PlaybackThread(DataLogIndexSplitPane view, RawlogViewer owner ,long waitTime) {
-        this.view = view;
-        this.owner = owner;
-        this.waitTime = waitTime;
-    }
+	/**
+	 * Creates a new playback thread.
+	 *
+	 * @param view     What's displaying the data.
+	 * @param waitTime How long it waits in milliseconds between data frames.
+	 */
+	public PlaybackThread(DataLogIndexSplitPane view, RawlogViewer owner, long waitTime) {
+		this.view = view;
+		this.owner = owner;
+		this.waitTime = waitTime;
+	}
 
-    public boolean isPlay() {
-        return play;
-    }
+	public boolean isPlay() {
+		return play;
+	}
 
-    /**
-     * Tell the thread to stop playing through the data
-     */
-    public void stopPlaying() {
-        play = false;
-        owner = null;
-    }
+	/**
+	 * Tell the thread to stop playing through the data
+	 */
+	public void stopPlaying() {
+		play = false;
+		owner = null;
+	}
 
-    @Override
-    public void run() {
-        play = true;
+	@Override
+	public void run() {
+		play = true;
 
-        counter = 0;
-        while( play ) {
-            // need to jump through some hoops or else swing will throw random exceptions
-            // and get all messed up
-            int before = counter;
-            Thread r = new Thread() {
-                public void run() {
-                    if( !view.selectNextItem() ) {
-                        play = false;
-                    }
-                    counter++;
-                }
-            };
-            SwingUtilities.invokeLater(r);
+		counter = 0;
+		while (play) {
+			// need to jump through some hoops or else swing will throw random exceptions
+			// and get all messed up
+			int before = counter;
+			Thread r = new Thread() {
+				public void run() {
+					if (!view.selectNextItem()) {
+						play = false;
+					}
+					counter++;
+				}
+			};
+			SwingUtilities.invokeLater(r);
 
-            // wait until the elapsed time has passed and the thread has finished running
-            synchronized ( this ) {
-                try {
-                    wait(waitTime);
-                    while( before == counter && play )
-                        wait(2);
-                } catch (InterruptedException e) {
-                }
-            }
-        }
+			// wait until the elapsed time has passed and the thread has finished running
+			synchronized (this) {
+				try {
+					wait(waitTime);
+					while (before == counter && play)
+						wait(2);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
 
-        play = false;
-        if( owner != null )
-            owner.playbackIsFinished();
-    }
+		play = false;
+		if (owner != null)
+			owner.playbackIsFinished();
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -46,86 +46,86 @@ public class TestApproximateSurfaceNormals {
 
 		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
 
-		for( int i = 0; i < 50; i++ ) {
-			for( int j = 0; j < 40; j++ ) {
-				cloud.add( new Point3D_F64(j*0.1,i*0.1,-4));
+		for (int i = 0; i < 50; i++) {
+			for (int j = 0; j < 40; j++) {
+				cloud.add(new Point3D_F64(j * 0.1, i * 0.1, -4));
 			}
 		}
 
-		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(numNeighbors,maxDistance,numNeighbors,maxDistance);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(numNeighbors, maxDistance, numNeighbors, maxDistance);
 
-		alg.process(cloud,output);
+		alg.process(cloud, output);
 
-		assertEquals(cloud.size(),output.size());
+		assertEquals(cloud.size(), output.size());
 
-		for( int i = 0; i < cloud.size(); i++ ) {
+		for (int i = 0; i < cloud.size(); i++) {
 			PointVectorNN pv = output.get(i);
 
 			// see if the normal is valid
-			assertEquals(0,pv.normal.x,1e-8);
-			assertEquals(0,pv.normal.y,1e-8);
-			assertEquals(1,Math.abs(pv.normal.z),1e-8);
+			assertEquals(0, pv.normal.x, 1e-8);
+			assertEquals(0, pv.normal.y, 1e-8);
+			assertEquals(1, Math.abs(pv.normal.z), 1e-8);
 
 			// see if it's neighbors are close by
-			assertEquals(numNeighbors,pv.neighbors.size);
-			for( int j = 0; j < pv.neighbors.size; j++ ) {
+			assertEquals(numNeighbors, pv.neighbors.size);
+			for (int j = 0; j < pv.neighbors.size; j++) {
 				double d = pv.neighbors.get(j).p.distance(pv.p);
 				assertTrue(d <= maxDistance);
 
 				// the point should not be a neighbor to itself
-				assertTrue( Math.abs(d) > 1e-8 );
+				assertTrue(Math.abs(d) > 1e-8);
 			}
 		}
 	}
 
 	/**
 	 * Makes sure the output vectors are normalized to one.  If no normal was found then it should be set to all zeros.
-	 *
+	 * <p/>
 	 * Also checks to see that the index is correctly setup
 	 */
 	@Test
 	public void checkVectorNormalizedToOne_index() {
 		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
 
-		for( int i = 0; i < 200; i++ ) {
-			double x = 3*(rand.nextDouble()-0.5);
-			double y = 3*(rand.nextDouble()-0.5);
-			double z = 3*(rand.nextDouble()-0.5);
+		for (int i = 0; i < 200; i++) {
+			double x = 3 * (rand.nextDouble() - 0.5);
+			double y = 3 * (rand.nextDouble() - 0.5);
+			double z = 3 * (rand.nextDouble() - 0.5);
 
-			cloud.add( new Point3D_F64(x,y,z) );
+			cloud.add(new Point3D_F64(x, y, z));
 		}
 
-		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,0.4,8,0.4);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8, 0.4, 8, 0.4);
 
-		alg.process(cloud,output);
+		alg.process(cloud, output);
 
-		assertEquals(cloud.size(),output.size());
+		assertEquals(cloud.size(), output.size());
 
 		int numNorm = 0;
 		int numZero = 0;
-		for( int i = 0; i < cloud.size(); i++ ) {
+		for (int i = 0; i < cloud.size(); i++) {
 			PointVectorNN pv = output.get(i);
 
 			// check index
-			assertEquals(i,pv.index);
+			assertEquals(i, pv.index);
 
 			// check normal
 			double n = pv.normal.norm();
 
-			if( n == 0 ) {
+			if (n == 0) {
 				numZero++;
 			} else {
-				assertEquals(1,pv.normal.norm(),1e-8);
+				assertEquals(1, pv.normal.norm(), 1e-8);
 				numNorm++;
 			}
 		}
 
-		assertTrue(numZero>0);
-		assertTrue(numNorm>0);
+		assertTrue(numZero > 0);
+		assertTrue(numNorm > 0);
 	}
 
 	/**
@@ -137,45 +137,45 @@ public class TestApproximateSurfaceNormals {
 		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
 
 		// give it points on the plane
-		cloud.add(new Point3D_F64(0,0,0));
-		cloud.add(new Point3D_F64(1,0,0));
-		cloud.add(new Point3D_F64(0,1,0));
-		cloud.add(new Point3D_F64(-1,-1,0));
+		cloud.add(new Point3D_F64(0, 0, 0));
+		cloud.add(new Point3D_F64(1, 0, 0));
+		cloud.add(new Point3D_F64(0, 1, 0));
+		cloud.add(new Point3D_F64(-1, -1, 0));
 
 		// now give it some points way off the plane
-		cloud.add(new Point3D_F64(0,0,100));
-		cloud.add(new Point3D_F64(1,0,-100));
+		cloud.add(new Point3D_F64(0, 0, 100));
+		cloud.add(new Point3D_F64(1, 0, -100));
 
-		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(4,10000,8,10000);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(4, 10000, 8, 10000);
 
-		alg.process(cloud,output);
+		alg.process(cloud, output);
 
-		assertEquals(6,output.size);
+		assertEquals(6, output.size);
 
 		// on the first pass the first for should have good normals
-		for( int i = 0; i < 4; i++ ) {
+		for (int i = 0; i < 4; i++) {
 			PointVectorNN pv = output.data[i];
-			assertEquals(5,pv.neighbors.size);
-			assertEquals(0,pv.normal.x,1e-8);
-			assertEquals(0,pv.normal.y,1e-8);
-			assertEquals(1,Math.abs(pv.normal.z),1e-8);
+			assertEquals(5, pv.neighbors.size);
+			assertEquals(0, pv.normal.x, 1e-8);
+			assertEquals(0, pv.normal.y, 1e-8);
+			assertEquals(1, Math.abs(pv.normal.z), 1e-8);
 		}
 
 		output.reset();
-		alg = new ApproximateSurfaceNormals(8,10000,8,10000);
+		alg = new ApproximateSurfaceNormals(8, 10000, 8, 10000);
 
-		alg.process(cloud,output);
-		assertEquals(6,output.size);
+		alg.process(cloud, output);
+		assertEquals(6, output.size);
 
 		// the second pass they should be messed up
-		for( int i = 0; i < 4; i++ ) {
+		for (int i = 0; i < 4; i++) {
 			PointVectorNN pv = output.data[i];
-			assertEquals(5,pv.neighbors.size);
+			assertEquals(5, pv.neighbors.size);
 			assertFalse(Math.abs(pv.normal.x) < 1e-8);
 			assertFalse(Math.abs(pv.normal.y) < 1e-8);
-			assertFalse(Math.abs(Math.abs(pv.normal.z)-1) < 1e-8);
+			assertFalse(Math.abs(Math.abs(pv.normal.z) - 1) < 1e-8);
 		}
 	}
 
@@ -187,33 +187,33 @@ public class TestApproximateSurfaceNormals {
 		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
 
 		// give it points on the plane
-		cloud.add(new Point3D_F64(0,0,0));
-		cloud.add(new Point3D_F64(1,0,0));
-		cloud.add(new Point3D_F64(0,1,0));
-		cloud.add(new Point3D_F64(-1,-1,0));
+		cloud.add(new Point3D_F64(0, 0, 0));
+		cloud.add(new Point3D_F64(1, 0, 0));
+		cloud.add(new Point3D_F64(0, 1, 0));
+		cloud.add(new Point3D_F64(-1, -1, 0));
 
 		// now give it some points way off the plane
-		cloud.add(new Point3D_F64(0,0,100));
-		cloud.add(new Point3D_F64(1,0,-100));
+		cloud.add(new Point3D_F64(0, 0, 100));
+		cloud.add(new Point3D_F64(1, 0, -100));
 
-		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,5,8,10000);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8, 5, 8, 10000);
 
-		alg.process(cloud,output);
+		alg.process(cloud, output);
 
-		assertEquals(6,output.size);
+		assertEquals(6, output.size);
 
 		// on the first pass the first for should have good normals
-		for( int i = 0; i < 4; i++ ) {
+		for (int i = 0; i < 4; i++) {
 			PointVectorNN pv = output.data[i];
 			// all the points should be in the neighbor list
-			assertEquals(5,pv.neighbors.size);
+			assertEquals(5, pv.neighbors.size);
 			// however, only a subset of the points will be used to compute the normal.  If that is the case
 			// then the normal will be pointed upwards
-			assertEquals(0,pv.normal.x,1e-8);
-			assertEquals(0,pv.normal.y,1e-8);
-			assertEquals(1,Math.abs(pv.normal.z),1e-8);
+			assertEquals(0, pv.normal.x, 1e-8);
+			assertEquals(0, pv.normal.y, 1e-8);
+			assertEquals(1, Math.abs(pv.normal.z), 1e-8);
 		}
 	}
 
@@ -224,59 +224,59 @@ public class TestApproximateSurfaceNormals {
 	public void multipleCalls() {
 		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
 
-		for( int i = 0; i < 200; i++ ) {
-			double x = 3*(rand.nextDouble()-0.5);
-			double y = 3*(rand.nextDouble()-0.5);
-			double z = 3*(rand.nextDouble()-0.5);
+		for (int i = 0; i < 200; i++) {
+			double x = 3 * (rand.nextDouble() - 0.5);
+			double y = 3 * (rand.nextDouble() - 0.5);
+			double z = 3 * (rand.nextDouble() - 0.5);
 
-			cloud.add( new Point3D_F64(x,y,z) );
+			cloud.add(new Point3D_F64(x, y, z));
 		}
 
-		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
-		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8,0.4,8,0.4);
+		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(8, 0.4, 8, 0.4);
 
-		alg.process(cloud,output);
+		alg.process(cloud, output);
 
-		assertEquals(cloud.size(),output.size());
+		assertEquals(cloud.size(), output.size());
 
 		int numNorm = 0;
 		int numZero = 0;
-		for( int i = 0; i < cloud.size(); i++ ) {
+		for (int i = 0; i < cloud.size(); i++) {
 			PointVectorNN pv = output.get(i);
 
 			double n = pv.normal.norm();
 
-			if( n == 0 ) {
+			if (n == 0) {
 				numZero++;
 			} else {
 				numNorm++;
 			}
 		}
 
-		assertTrue(numZero>0);
-		assertTrue(numNorm>0);
+		assertTrue(numZero > 0);
+		assertTrue(numNorm > 0);
 
 		output.reset();
-		alg.process(cloud,output);
+		alg.process(cloud, output);
 
-		assertEquals(cloud.size(),output.size());
+		assertEquals(cloud.size(), output.size());
 
 		int numNorm2 = 0;
 		int numZero2 = 0;
-		for( int i = 0; i < cloud.size(); i++ ) {
+		for (int i = 0; i < cloud.size(); i++) {
 			PointVectorNN pv = output.get(i);
 
 			double n = pv.normal.norm();
 
-			if( n == 0 ) {
+			if (n == 0) {
 				numZero2++;
 			} else {
 				numNorm2++;
 			}
 		}
 
-		assertTrue(numZero == numZero2 );
+		assertTrue(numZero == numZero2);
 		assertTrue(numNorm == numNorm2);
 	}
 

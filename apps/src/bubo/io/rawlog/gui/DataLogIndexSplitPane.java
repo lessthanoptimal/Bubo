@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -36,131 +36,128 @@ import java.util.Map;
  *
  * @author Peter Abeles
  */
-public class DataLogIndexSplitPane extends JSplitPane implements DataListComponent.SelectionListener  {
+public class DataLogIndexSplitPane extends JSplitPane implements DataListComponent.SelectionListener {
 
-    // where the data is visualized
-    private DataVisualizationComponent dataVis;
-    // where data can be selected from a list
-    private DataListComponent dataList;
+	VisualizationState stateUnknown;
+	Map<String, VisualizationState> visualizations = new HashMap<String, VisualizationState>();
+	// what is currently being displayed
+	VisualizationState active;
+	// what was previously displayed
+	VisualizationState prev;
+	// where the data is visualized
+	private DataVisualizationComponent dataVis;
+	// where data can be selected from a list
+	private DataListComponent dataList;
 
-    VisualizationState stateUnknown;
-    Map<String,VisualizationState> visualizations = new HashMap<String,VisualizationState>();
+	public DataLogIndexSplitPane() {
+		dataList = new DataListComponent(this);
 
-    // what is currently being displayed
-    VisualizationState active;
-    // what was previously displayed
-    VisualizationState prev;
+		dataVis = new DataVisualizationComponent();
 
-    public DataLogIndexSplitPane() {
-        dataList = new DataListComponent(this);
+		JScrollPane pictureScrollPane = new JScrollPane(dataVis);
 
-        dataVis = new DataVisualizationComponent();
+		setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		setLeftComponent(dataList);
+		setRightComponent(pictureScrollPane);
+		setDividerLocation(250);
 
-        JScrollPane pictureScrollPane = new JScrollPane(dataVis);
+		//Provide minimum sizes for the two components in the split pane.
+		Dimension minimumSize = new Dimension(150, 150);
+		dataList.setMinimumSize(minimumSize);
+		pictureScrollPane.setMinimumSize(minimumSize);
 
-        setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-        setLeftComponent(dataList);
-        setRightComponent(pictureScrollPane);
-        setDividerLocation(250);
+		//Provide a preferred size for the split pane.
+		setPreferredSize(new Dimension(800, 600));
+		setMinimumSize(getPreferredSize());
+	}
 
-        //Provide minimum sizes for the two components in the split pane.
-        Dimension minimumSize = new Dimension(150, 150);
-        dataList.setMinimumSize(minimumSize);
-        pictureScrollPane.setMinimumSize(minimumSize);
+	/**
+	 * Select the next item in the list.  Useful when playing a lot file
+	 *
+	 * @return If it is NOT at the last element.
+	 */
+	public boolean selectNextItem() {
+		return dataList.selectNextItem();
+	}
 
-        //Provide a preferred size for the split pane.
-        setPreferredSize(new Dimension(800, 600));
-        setMinimumSize(getPreferredSize());
-    }
+	/**
+	 * Specifies the visualizer that is used when the data type is known.
+	 *
+	 * @param vis
+	 */
+	public void setUnknownVisualizer(LogDataVisualization vis) {
+		stateUnknown = new VisualizationState();
+		stateUnknown.activeWindow = 0;
+		stateUnknown.vis = vis;
+	}
 
-    /**
-     * Select the next item in the list.  Useful when playing a lot file
-     *
-     * @return If it is NOT at the last element.
-     */
-    public boolean selectNextItem() {
-        return dataList.selectNextItem();
-    }
+	/**
+	 * Adds a new general purpose visualizer
+	 *
+	 * @param visualizer
+	 */
+	public void addVisualizaton(LogDataVisualization visualizer) {
+		VisualizationState state = new VisualizationState();
+		state.type = visualizer.getType();
+		state.activeWindow = 0;
+		state.vis = visualizer;
 
-    /**
-     * Specifies the visualizer that is used when the data type is known.
-     *
-     * @param vis
-     */
-    public void setUnknownVisualizer( LogDataVisualization vis ) {
-        stateUnknown = new VisualizationState();
-        stateUnknown.activeWindow = 0;
-        stateUnknown.vis = vis;
-    }
+		visualizations.put(visualizer.getType().getName(), state);
+	}
 
-    /**
-     * Adds a new general purpose visualizer
-     * 
-     * @param visualizer
-     */
-    public void addVisualizaton( LogDataVisualization visualizer ) {
-        VisualizationState state = new VisualizationState();
-        state.type = visualizer.getType();
-        state.activeWindow = 0;
-        state.vis = visualizer;
+	/**
+	 * Provides a list of objects read in the from the log file and the reader for
+	 * accessing that information
+	 *
+	 * @param listData
+	 * @param reader
+	 */
+	public void setObjectList(List<LogFileObjectRef> listData,
+							  LogFileReader reader) {
+		prev = null;
+		dataList.setObjectList(listData, reader);
+	}
 
-        visualizations.put( visualizer.getType().getName() , state );
-    }
+	/**
+	 * Called when the user has selected a new object for viewing.
+	 */
+	@Override
+	public void selectionChanged(Object d) {
 
-    /**
-     * Provides a list of objects read in the from the log file and the reader for
-     * accessing that information
-     *
-     * @param listData
-     * @param reader
-     */
-    public void setObjectList( List<LogFileObjectRef> listData ,
-                               LogFileReader reader ) {
-        prev = null;
-        dataList.setObjectList(listData,reader);
-    }
+		// save the previous view
+		if (active != null)
+			active.activeWindow = dataVis.getActiveView();
 
-    /**
-     * Called when the user has selected a new object for viewing.
-     */
-    @Override
-    public void selectionChanged(Object d) {
+		VisualizationState v = d == null ? null : visualizations.get(d.getClass().getName());
 
-        // save the previous view
-        if( active != null )
-            active.activeWindow = dataVis.getActiveView();
+		boolean changed = prev != v;
 
-        VisualizationState v = d == null ? null : visualizations.get(d.getClass().getName());
+		if (v == null) {
+			if (stateUnknown == null)
+				throw new RuntimeException("Must set the unknown state visualizer!");
+			active = stateUnknown;
+		} else {
+			active = v;
+		}
 
-        boolean changed = prev != v;
+		// only repaint or change the view when needed
+		active.vis.setData(d);
+		if (changed)
+			dataVis.setTarget(active.vis, active.activeWindow);
+		else
+			dataVis.repaint();
 
-        if( v == null ) {
-            if( stateUnknown == null )
-                throw new RuntimeException("Must set the unknown state visualizer!");
-            active = stateUnknown;
-        } else {
-            active = v;
-        }
+		prev = v;
+	}
 
-        // only repaint or change the view when needed
-        active.vis.setData(d);
-        if( changed )
-            dataVis.setTarget(active.vis,active.activeWindow);
-        else
-            dataVis.repaint();
-
-        prev = v;
-    }
-
-    /**
-     * Saves the current state of a visualization object.  When a user changes to another data type
-     * and comes back the same tab will be visible.  Making it easier to stream through
-     * data in a movie format.
-     */
-    private static class VisualizationState
-    {
-        Class<?> type;
-        int activeWindow;
-        LogDataVisualization vis;
-    }
+	/**
+	 * Saves the current state of a visualization object.  When a user changes to another data type
+	 * and comes back the same tab will be visible.  Making it easier to stream through
+	 * data in a movie format.
+	 */
+	private static class VisualizationState {
+		Class<?> type;
+		int activeWindow;
+		LogDataVisualization vis;
+	}
 }

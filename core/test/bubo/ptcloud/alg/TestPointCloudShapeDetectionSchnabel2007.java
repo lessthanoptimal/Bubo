@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -42,79 +42,79 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 	Random rand = new Random(234234);
 
 	// make sure the order is known
-	CloudShapeTypes shapeDetect[]=
-			new CloudShapeTypes[]{CloudShapeTypes.SPHERE,CloudShapeTypes.PLANE,CloudShapeTypes.CYLINDER};
+	CloudShapeTypes shapeDetect[] =
+			new CloudShapeTypes[]{CloudShapeTypes.SPHERE, CloudShapeTypes.PLANE, CloudShapeTypes.CYLINDER};
 
 	@Test
 	public void perfectDataNoNoise_singleShape() {
 
-		FastQueue<PointVectorNN> list = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+		FastQueue<PointVectorNN> list = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
-		Sphere3D_F64 sphere = new Sphere3D_F64(1,2,3,4);
-		addSpherePoints(list, sphere,400);
+		Sphere3D_F64 sphere = new Sphere3D_F64(1, 2, 3, 4);
+		addSpherePoints(list, sphere, 400);
 
 		PointCloudShapeDetectionSchnabel2007 alg = createAlgorithm();
 
-		alg.process(list, new Cube3D_F64(-100,-100,-100,200,200,200));
+		alg.process(list, new Cube3D_F64(-100, -100, -100, 200, 200, 200));
 
 		FastQueue<FoundShape> found = alg.getFoundObjects();
 
-		assertEquals(1,found.size());
-		assertEquals(0,found.get(0).whichShape);
-		assertEquals(400,found.get(0).points.size());
+		assertEquals(1, found.size());
+		assertEquals(0, found.get(0).whichShape);
+		assertEquals(400, found.get(0).points.size());
 
-		Sphere3D_F64 foundShape = (Sphere3D_F64)found.get(0).modelParam;
+		Sphere3D_F64 foundShape = (Sphere3D_F64) found.get(0).modelParam;
 
-		assertEquals(sphere.radius,foundShape.radius,1e-8);
-		assertEquals(0,foundShape.center.distance(sphere.center),1e-8);
+		assertEquals(sphere.radius, foundShape.radius, 1e-8);
+		assertEquals(0, foundShape.center.distance(sphere.center), 1e-8);
 	}
 
 	@Test
 	public void perfectDataNoNoise_multipleShapes() {
-		FastQueue<PointVectorNN> list = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+		FastQueue<PointVectorNN> list = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
-		Sphere3D_F64 sphere = new Sphere3D_F64(1,2,3,4);
+		Sphere3D_F64 sphere = new Sphere3D_F64(1, 2, 3, 4);
 		addSpherePoints(list, sphere, 400);
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(-10,10,0,0,1,1);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(-10, 10, 0, 0, 1, 1);
 		addPlanePoints(list, plane, 400);
 
 		PointCloudShapeDetectionSchnabel2007 alg = createAlgorithm();
 
-		alg.process(list, new Cube3D_F64(-100,-100,-100,200,200,200));
+		alg.process(list, new Cube3D_F64(-100, -100, -100, 200, 200, 200));
 
 		FastQueue<FoundShape> found = alg.getFoundObjects();
 
-		assertEquals(2,found.size());
+		assertEquals(2, found.size());
 
 		int numSpheres = 0;
 		int numPlanes = 0;
 
-		for( int i = 0; i < found.size(); i++ ) {
+		for (int i = 0; i < found.size(); i++) {
 			FoundShape shape = found.get(i);
 
-			if( shape.whichShape == 0 ) {
+			if (shape.whichShape == 0) {
 				numSpheres++;
 
-				assertEquals(400,found.get(i).points.size());
+				assertEquals(400, found.get(i).points.size());
 
-				Sphere3D_F64 foundShape = (Sphere3D_F64)found.get(i).modelParam;
+				Sphere3D_F64 foundShape = (Sphere3D_F64) found.get(i).modelParam;
 
-				assertEquals(sphere.radius,foundShape.radius,1e-8);
-				assertEquals(0,foundShape.center.distance(sphere.center),1e-8);
+				assertEquals(sphere.radius, foundShape.radius, 1e-8);
+				assertEquals(0, foundShape.center.distance(sphere.center), 1e-8);
 
-			} else if( shape.whichShape == 1 ) {
-		        numPlanes++;
+			} else if (shape.whichShape == 1) {
+				numPlanes++;
 
-				assertEquals(400,found.get(i).points.size());
+				assertEquals(400, found.get(i).points.size());
 
-				PlaneGeneral3D_F64 foundShape = (PlaneGeneral3D_F64)found.get(i).modelParam;
+				PlaneGeneral3D_F64 foundShape = (PlaneGeneral3D_F64) found.get(i).modelParam;
 
 				TestGeneratePlanePointVector.checkPlanes(plane, foundShape, 1e-8);
 			}
 		}
 
-		assertEquals(1,numSpheres);
-		assertEquals(1,numPlanes);
+		assertEquals(1, numSpheres);
+		assertEquals(1, numPlanes);
 	}
 
 	@Test
@@ -125,7 +125,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 		Octree prev = tree.getTree();
 
-		for( int i = 0; i < 10; i++ ) {
+		for (int i = 0; i < 10; i++) {
 			Octree o1 = tree.getAllNodes().grow();
 			o1.parent = prev;
 			Octree o2 = tree.getAllNodes().grow();
@@ -141,38 +141,38 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 		alg.findLeafs();
 
 		FastQueue<Octree> leafs = alg.getLeafs();
-		assertEquals(10+1,leafs.size);
+		assertEquals(10 + 1, leafs.size);
 	}
 
-	private void addSpherePoints(FastQueue<PointVectorNN> list, Sphere3D_F64 sphere, int N ) {
-		for( int i = 0; i < N; i++ ) {
-			double phi = 2.0*rand.nextDouble()*Math.PI;
-			double theta = 2.0*rand.nextDouble()*Math.PI;
+	private void addSpherePoints(FastQueue<PointVectorNN> list, Sphere3D_F64 sphere, int N) {
+		for (int i = 0; i < N; i++) {
+			double phi = 2.0 * rand.nextDouble() * Math.PI;
+			double theta = 2.0 * rand.nextDouble() * Math.PI;
 
 			PointVectorNN p = TestGenerateSpherePointVector.createPt(sphere, phi, theta, 1);
 
 			list.add(p);
 
-			if( list.size() > 1 ) {
-				PointVectorNN prev = list.get(list.size()-2);
+			if (list.size() > 1) {
+				PointVectorNN prev = list.get(list.size() - 2);
 				prev.neighbors.add(p);
 				p.neighbors.add(prev);
 			}
 		}
 	}
 
-	private void addPlanePoints(FastQueue<PointVectorNN> list, PlaneNormal3D_F64 plane, int N ) {
+	private void addPlanePoints(FastQueue<PointVectorNN> list, PlaneNormal3D_F64 plane, int N) {
 
-		for( int i = 0; i < N; i++ ) {
-			double x = 3.0*(rand.nextDouble()-0.5);
-			double y = 3.0*(rand.nextDouble()-0.5);
+		for (int i = 0; i < N; i++) {
+			double x = 3.0 * (rand.nextDouble() - 0.5);
+			double y = 3.0 * (rand.nextDouble() - 0.5);
 
 			PointVectorNN p = TestGeneratePlanePointVector.createPt(plane, x, y, 1);
 
 			list.add(p);
 
-			if( list.size() > 1 ) {
-				PointVectorNN prev = list.get(list.size()-2);
+			if (list.size() > 1) {
+				PointVectorNN prev = list.get(list.size() - 2);
 				prev.neighbors.add(p);
 				p.neighbors.add(prev);
 			}
@@ -181,7 +181,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 	private PointCloudShapeDetectionSchnabel2007 createAlgorithm() {
 
-		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100,0.2,0.2,shapeDetect);
+		ConfigSchnabel2007 config = ConfigSchnabel2007.createDefault(100, 0.2, 0.2, shapeDetect);
 
 		config.minModelAccept = 10;
 		config.octreeSplit = 20;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,18 +29,18 @@ import static org.junit.Assert.fail;
  * @author Peter Abeles
  */
 public class TestLrf2dScanToScan_IDC extends StandardTestsScanToScan {
-    public TestLrf2dScanToScan_IDC() {
-        angTol = 0.02;
-        tranTol = 0.02;
-    }
+	public TestLrf2dScanToScan_IDC() {
+		angTol = 0.02;
+		tranTol = 0.02;
+	}
 
-    @Override
-    public Lrf2dScanToScan createAlg() {
-        StoppingCondition stop = new StoppingCondition(20,0.0001);
+	@Override
+	public Lrf2dScanToScan createAlg() {
+		StoppingCondition stop = new StoppingCondition(20, 0.0001);
 
-        double searchRadius = UtilAngle.degreeToRadian(20);
-        return new Lrf2dScanToScan_IDC(stop, searchRadius,0.2,0.1);
-    }
+		double searchRadius = UtilAngle.degreeToRadian(20);
+		return new Lrf2dScanToScan_IDC(stop, searchRadius, 0.2, 0.1);
+	}
 
 	// todo implement generic interpolation test where it sees if it performs perfectly on original points
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -72,52 +72,53 @@ public class ConfigMultiShapeRansac {
 	/**
 	 * Used to create new shape parameter data structures. The elements in this list correspond to elements in models.
 	 */
-	public List<ModelFitter<Object,PointVectorNN>> fitters;
+	public List<ModelFitter<Object, PointVectorNN>> fitters;
 
 	/**
 	 * Creates a default set of parameters which can detect
 	 *
-	 * @param fitIterations Number of iterations when refining a shape
-	 * @param angleTolerance Tolerance in radians to reject a model from an initial sample set
+	 * @param fitIterations           Number of iterations when refining a shape
+	 * @param angleTolerance          Tolerance in radians to reject a model from an initial sample set
 	 * @param ransacDistanceThreshold Euclidean distance that RANSAC considers a point an inlier
-	 * @param shapes A list of shape you wish to detect.  If empty or null then all possible shapes will be detected.
-	 *
+	 * @param shapes                  A list of shape you wish to detect.  If empty or null then all possible shapes will be detected.
 	 * @return ConfigSchnabel2007
 	 */
-	public static ConfigMultiShapeRansac createDefault( int fitIterations ,
-														double angleTolerance ,
-														double ransacDistanceThreshold ,
-														CloudShapeTypes...shapes ) {
-		if( shapes == null || shapes.length == 0 ) {
+	public static ConfigMultiShapeRansac createDefault(int fitIterations,
+													   double angleTolerance,
+													   double ransacDistanceThreshold,
+													   CloudShapeTypes... shapes) {
+		if (shapes == null || shapes.length == 0) {
 			shapes = CloudShapeTypes.values();
 		}
 		List<RansacMulti.ObjectType> objects = new ArrayList<RansacMulti.ObjectType>();
 		List<ModelManager> modelManagers = new ArrayList<ModelManager>();
-		List<ModelFitter<Object,PointVectorNN>> fitters = new ArrayList<ModelFitter<Object, PointVectorNN>>();
+		List<ModelFitter<Object, PointVectorNN>> fitters = new ArrayList<ModelFitter<Object, PointVectorNN>>();
 
-		for( CloudShapeTypes shape : shapes ) {
-			switch( shape ) {
+		for (CloudShapeTypes shape : shapes) {
+			switch (shape) {
 				case SPHERE: {
 					RansacMulti.ObjectType sphere = new RansacMulti.ObjectType();
 					sphere.modelManager = new ModelManagerSphere3D_F64();
 					sphere.modelDistance = new DistanceSphereToPointVectorNN(angleTolerance);
-					sphere.modelGenerator = new GenerateSpherePointVector(angleTolerance,ransacDistanceThreshold);
+					sphere.modelGenerator = new GenerateSpherePointVector(angleTolerance, ransacDistanceThreshold);
 					sphere.thresholdFit = ransacDistanceThreshold;
 					objects.add(sphere);
 					modelManagers.add(new ModelManagerSphere3D_F64());
-					fitters.add( new ModelFitter_P_to_PVNN(new FitSphereToPoints_F64(fitIterations)));
-				} break;
+					fitters.add(new ModelFitter_P_to_PVNN(new FitSphereToPoints_F64(fitIterations)));
+				}
+				break;
 
 				case CYLINDER: {
 					RansacMulti.ObjectType cylinder = new RansacMulti.ObjectType();
 					cylinder.modelManager = new ModelManagerCylinder3D_F64();
 					cylinder.modelDistance = new DistanceCylinderToPointVectorNN(angleTolerance);
-					cylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance,ransacDistanceThreshold);
+					cylinder.modelGenerator = new GenerateCylinderPointVector(angleTolerance, ransacDistanceThreshold);
 					cylinder.thresholdFit = ransacDistanceThreshold;
 					objects.add(cylinder);
 					modelManagers.add(new ModelManagerCylinder3D_F64());
 					fitters.add(new ModelFitter_P_to_PVNN(new FitCylinderToPoints_F64(fitIterations)));
-				} break;
+				}
+				break;
 
 				case PLANE: {
 					RansacMulti.ObjectType plane = new RansacMulti.ObjectType();
@@ -128,10 +129,11 @@ public class ConfigMultiShapeRansac {
 					objects.add(plane);
 					modelManagers.add(new ModelManagerPlaneGeneral3D_F64());
 					fitters.add(new ModelFitter_P_to_PVNN(new PlaneGeneralSvd_to_ModelFitter()));
-				} break;
+				}
+				break;
 
 				default:
-					throw new IllegalArgumentException("Unsupported shape: "+shape);
+					throw new IllegalArgumentException("Unsupported shape: " + shape);
 			}
 		}
 
@@ -140,7 +142,7 @@ public class ConfigMultiShapeRansac {
 		config.modelManagers = modelManagers;
 		config.fitters = fitters;
 		config.types = new ArrayList<CloudShapeTypes>();
-		for(CloudShapeTypes t: shapes) {
+		for (CloudShapeTypes t : shapes) {
 			config.types.add(t);
 		}
 

@@ -18,6 +18,6 @@
 
 <project name="BUBO_Core" basedir="." default="main">
 
-  <import file="../build_common.xml"/>
+    <import file="../build_common.xml"/>
 
 </project>

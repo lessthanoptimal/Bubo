@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,6 +24,6 @@ import georegression.struct.se.Se2_F64;
  * @author Peter Abeles
  */
 public class CircularRobot2D {
-    Se2_F64 pose;
-    double radius;
+	Se2_F64 pose;
+	double radius;
 }

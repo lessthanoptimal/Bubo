@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -41,16 +41,16 @@ public class TestPointCloudShapeTools {
 
 	@Test
 	public void createPt_sphere() {
-		Sphere3D_F64 sphere = new Sphere3D_F64(2,-3,4,4.5);
+		Sphere3D_F64 sphere = new Sphere3D_F64(2, -3, 4, 4.5);
 
 		DistanceSphereToPoint3D distance = new DistanceSphereToPoint3D();
 		distance.setModel(sphere);
 
-		for( int i = 0; i < 50; i++ ) {
-			double phi = 2*Math.PI*rand.nextDouble();
-			double theta = 2*Math.PI*rand.nextDouble();
+		for (int i = 0; i < 50; i++) {
+			double phi = 2 * Math.PI * rand.nextDouble();
+			double theta = 2 * Math.PI * rand.nextDouble();
 
-			Point3D_F64 p = PointCloudShapeTools.createPt(sphere,phi,theta);
+			Point3D_F64 p = PointCloudShapeTools.createPt(sphere, phi, theta);
 
 			double d = distance.computeDistance(p);
 			assertEquals(0, d, 1e-8);
@@ -59,16 +59,16 @@ public class TestPointCloudShapeTools {
 
 	@Test
 	public void createPt_plane() {
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(2,-3,4,4.5,2,3);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(2, -3, 4, 4.5, 2, 3);
 
 		DistancePlaneToPoint3D distance = new DistancePlaneToPoint3D();
-		distance.setModel(UtilPlane3D_F64.convert(plane,null));
+		distance.setModel(UtilPlane3D_F64.convert(plane, null));
 
-		for( int i = 0; i < 50; i++ ) {
-			double x = 2*(rand.nextDouble()-0.5);
-			double y = 2*(rand.nextDouble()-0.5);
+		for (int i = 0; i < 50; i++) {
+			double x = 2 * (rand.nextDouble() - 0.5);
+			double y = 2 * (rand.nextDouble() - 0.5);
 
-			Point3D_F64 p = PointCloudShapeTools.createPt(plane,x,y);
+			Point3D_F64 p = PointCloudShapeTools.createPt(plane, x, y);
 
 			double d = distance.computeDistance(p);
 			assertEquals(0, d, 1e-8);
@@ -77,16 +77,16 @@ public class TestPointCloudShapeTools {
 
 	@Test
 	public void createPt_cylinder() {
-		Cylinder3D_F64 cylinder = new Cylinder3D_F64(2,-3,4,4.5,2,-1.3,3);
+		Cylinder3D_F64 cylinder = new Cylinder3D_F64(2, -3, 4, 4.5, 2, -1.3, 3);
 
 		DistanceCylinderToPoint3D distance = new DistanceCylinderToPoint3D();
 		distance.setModel(cylinder);
 
-		for( int i = 0; i < 50; i++ ) {
-			double z = 2*(rand.nextDouble()-0.5);
-			double theta = 2*Math.PI*rand.nextDouble();
+		for (int i = 0; i < 50; i++) {
+			double z = 2 * (rand.nextDouble() - 0.5);
+			double theta = 2 * Math.PI * rand.nextDouble();
 
-			Point3D_F64 p = PointCloudShapeTools.createPt(cylinder,z,theta);
+			Point3D_F64 p = PointCloudShapeTools.createPt(cylinder, z, theta);
 
 			double d = distance.computeDistance(p);
 			assertEquals(0, d, 1e-8);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,13 +30,13 @@ import java.util.List;
  */
 public interface LocalizationAlgorithm {
 
-	public void configure( List<Point2D_F64> landmarks , DenseMatrix64F R );
+	public void configure(List<Point2D_F64> landmarks, DenseMatrix64F R);
 
-	void setInitial(Se2_F64 pose , double sigmaXY , double sigmaYaw );
+	void setInitial(Se2_F64 pose, double sigmaXY, double sigmaYaw);
 
-	public void predict( double vel , double angVel );
+	public void predict(double vel, double angVel);
 
-	public void update( List<RangeBearing> measNoisy , List<RangeBearing> measTrue);
+	public void update(List<RangeBearing> measNoisy, List<RangeBearing> measTrue);
 
 	public Se2_F64 getPoseEstimate();
 

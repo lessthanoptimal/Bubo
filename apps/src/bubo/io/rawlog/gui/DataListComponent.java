@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -49,365 +49,356 @@ import java.util.Vector;
  * @author Peter Abeles
  */
 public class DataListComponent extends JComponent
-        implements ActionListener, TreeSelectionListener ,
-        ListSelectionListener
-{
+		implements ActionListener, TreeSelectionListener,
+		ListSelectionListener {
 
-    // used to select which view
-    private JComboBox viewSelect;
+	// previously selected base ref.
+	// by keeping track of this unnecessary reads to the file can be avoided
+	LogFileObjectRef prevBaseRef;
+	Object prevObject;
+	// used to select which view
+	private JComboBox viewSelect;
+	// shows a list of all the objects
+	private JList flatList;
+	// shows a list of all the objects and their children
+	private JTree treeList;
+	// list of log references to the data
+	private List<LogFileObjectRef> flatData;
+	// listener for when the user selects a new object to view
+	private SelectionListener listener;
+	// used to switch between the two list views
+	private JPanel listPanel = new JPanel(new CardLayout());
+	// reads the log file
+	private LogFileReader reader;
 
-    // shows a list of all the objects
-    private JList flatList;
-    // shows a list of all the objects and their children
-    private JTree treeList;
+	public DataListComponent(SelectionListener listener) {
 
-    // list of log references to the data
-    private List<LogFileObjectRef> flatData;
+		this.listener = listener;
 
-    // listener for when the user selects a new object to view
-    private SelectionListener listener;
+		setLayout(new BorderLayout());
 
-    // used to switch between the two list views
-    private JPanel listPanel = new JPanel(new CardLayout());
+		JScrollPane listScrollPane = new JScrollPane(listPanel);
+		add(BorderLayout.CENTER, listScrollPane);
 
-    // reads the log file
-    private LogFileReader reader;
+		configureComboBox();
+		configureFlatList();
+		configureTreeView();
+	}
 
-    // previously selected base ref.
-    // by keeping track of this unnecessary reads to the file can be avoided
-    LogFileObjectRef prevBaseRef;
-    Object prevObject;
+	private void configureComboBox() {
+		String[] petStrings = {"Flat", "Tree"};
 
-    public DataListComponent( SelectionListener listener ) {
+		viewSelect = new JComboBox(petStrings);
+		viewSelect.setSelectedIndex(0);
+		viewSelect.addActionListener(this);
 
-        this.listener = listener;
+		add(BorderLayout.NORTH, viewSelect);
+	}
 
-        setLayout(new BorderLayout());
+	private void configureFlatList() {
+		flatList = new JList();
 
-        JScrollPane listScrollPane = new JScrollPane(listPanel);
-        add(BorderLayout.CENTER,listScrollPane);
+		flatList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		flatList.getSelectionModel().setSelectionMode
+				(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-        configureComboBox();
-        configureFlatList();
-        configureTreeView();
-    }
+		flatList.addListSelectionListener(this);
 
-    private void configureComboBox() {
-        String[] petStrings = { "Flat", "Tree"};
+		listPanel.add(flatList, "Flat");
+	}
 
-        viewSelect = new JComboBox(petStrings);
-        viewSelect.setSelectedIndex(0);
-        viewSelect.addActionListener(this);
+	private void configureTreeView() {
+		treeList = new JTree();
+		treeList.setRootVisible(false);
+		treeList.getSelectionModel().setSelectionMode
+				(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		treeList.addTreeSelectionListener(this);
 
-        add(BorderLayout.NORTH,viewSelect);
-    }
+		listPanel.add(treeList, "Tree");
+	}
 
-    private void configureFlatList() {
-        flatList = new JList();
+	public void setObjectList(List<LogFileObjectRef> flatData,
+							  LogFileReader reader) {
+		flatList.clearSelection();
+		this.flatData = flatData;
+		this.reader = reader;
 
-        flatList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        flatList.getSelectionModel().setSelectionMode
-                (TreeSelectionModel.SINGLE_TREE_SELECTION);
+		this.flatList.setListData(new Vector(flatData));
+		flatList.setSelectedIndex(0);
+		createTreeView(flatData);
+	}
 
-        flatList.addListSelectionListener(this);
+	/**
+	 * Adds the base objects to the tree view.  The children are added at a later time
+	 * when the user selects the base object for viewing.
+	 *
+	 * @param data
+	 */
+	protected void createTreeView(List<LogFileObjectRef> data) {
+		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Root");
 
-        listPanel.add(flatList,"Flat");
-    }
+		for (LogFileObjectRef d : data) {
+			DefaultMutableTreeNode parent = null;
+			parent = new DefaultMutableTreeNode(d);
+			rootNode.add(parent);
+		}
+		treeList.setModel(new DefaultTreeModel(rootNode));
+	}
 
-    private void configureTreeView() {
-        treeList = new JTree();
-        treeList.setRootVisible(false);
-        treeList.getSelectionModel().setSelectionMode
-                (TreeSelectionModel.SINGLE_TREE_SELECTION);
-        treeList.addTreeSelectionListener(this);
+	/**
+	 * Returns the object which is currently selected.
+	 *
+	 * @return
+	 */
+	public Object getSelected() {
+		if (isFlatSelected()) {
+			int selectedIndex = flatList.getSelectedIndex();
+			if (selectedIndex == -1)
+				return null;
 
-        listPanel.add(treeList,"Tree");
-    }
+			return reader.getObject(flatData.get(selectedIndex));
+		} else {
+			TreePath treePath = treeList.getSelectionPath();
 
-    public void setObjectList( List<LogFileObjectRef> flatData ,
-                               LogFileReader reader ) {
-        flatList.clearSelection();
-        this.flatData = flatData;
-        this.reader = reader;
+			if (treePath == null)
+				return null;
 
-        this.flatList.setListData(new Vector(flatData));
-        flatList.setSelectedIndex(0);
-        createTreeView(flatData);
-    }
+			Object[] path = treePath.getPath();
 
-    /**
-     * Adds the base objects to the tree view.  The children are added at a later time
-     * when the user selects the base object for viewing.
-     *
-     * @param data
-     */
-    protected void createTreeView( List<LogFileObjectRef> data )
-    {
-        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Root");
+			LogFileObjectRef ref = (LogFileObjectRef) ((DefaultMutableTreeNode) path[1]).getUserObject();
+			Object o = prevBaseRef == ref ? prevObject : reader.getObject(ref);
 
-        for( LogFileObjectRef d : data ) {
-            DefaultMutableTreeNode parent = null;
-            parent = new DefaultMutableTreeNode(d);
-            rootNode.add(parent);
-        }
-        treeList.setModel(new DefaultTreeModel(rootNode));
-    }
+			// save the current reference to avoid loading it again each time a child is selected
+			prevBaseRef = ref;
+			prevObject = o;
 
-    /**
-     * Returns the object which is currently selected.
-     *
-     * @return
-     */
-    public Object getSelected() {
-        if(isFlatSelected()) {
-            int selectedIndex = flatList.getSelectedIndex();
-            if( selectedIndex == -1 )
-                return null;
+			try {
+				// the base data structure was selected
+				if (path.length == 2) {
 
-            return reader.getObject(flatData.get(selectedIndex));
-        } else {
-            TreePath treePath = treeList.getSelectionPath();
+					updateTreeView(o, treePath);
 
-            if( treePath == null )
-                return null;
+					return o;
+				} else {
+					// a child data structure was selected
+					return findChild(o, path);
+				}
+			} catch (InvocationTargetException e) {
+				throw new RuntimeException(e);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
 
-            Object[] path = treePath.getPath();
+		}
+	}
 
-            LogFileObjectRef ref = (LogFileObjectRef)((DefaultMutableTreeNode)path[1]).getUserObject();
-            Object o = prevBaseRef == ref ? prevObject : reader.getObject(ref);
+	/**
+	 * Updates the tree view for an object dynamically after it has been selected to show
+	 * all the child data it references.
+	 *
+	 * @param o
+	 */
+	private void updateTreeView(Object o, TreePath treePath) throws InvocationTargetException, IllegalAccessException {
+		DefaultMutableTreeNode baseData = (DefaultMutableTreeNode) treePath.getPathComponent(1);
 
-            // save the current reference to avoid loading it again each time a child is selected
-            prevBaseRef = ref;
-            prevObject = o;
+		// the view has already been extracted
+		if (baseData.getChildCount() > 0)
+			return;
 
-            try {
-                // the base data structure was selected
-                if( path.length == 2 ) {
+		addChildren(o, baseData);
+	}
 
-                    updateTreeView(o,treePath);
+	/**
+	 * Examines the children of the parent data and adds them to the tree view
+	 */
+	private void addChildren(Object parentData, DefaultMutableTreeNode parentNode) throws InvocationTargetException, IllegalAccessException {
 
-                    return o;
-                } else {
-                    // a child data structure was selected
-                    return findChild( o , path);
-                }
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+		if (parentData.getClass().isArray()) {
+			addChildrenArray(parentData, parentNode);
+		} else if (parentData.getClass().isAssignableFrom(List.class)) {
+			addChildrenList(parentData, parentNode);
+		} else {
+			addChildrenGetters(parentData, parentNode);
+		}
 
-        }
-    }
+	}
 
-    /**
-     * Updates the tree view for an object dynamically after it has been selected to show
-     * all the child data it references.
-     * @param o
-     */
-    private void updateTreeView( Object o , TreePath treePath ) throws InvocationTargetException, IllegalAccessException {
-        DefaultMutableTreeNode baseData = (DefaultMutableTreeNode)treePath.getPathComponent(1);
+	/**
+	 * Adds all the elements in a list to the tree view
+	 */
+	private void addChildrenList(Object parentData, DefaultMutableTreeNode parentNode) throws InvocationTargetException, IllegalAccessException {
+		List<?> list = (List) parentData;
 
-        // the view has already been extracted
-        if( baseData.getChildCount() > 0 )
-            return;
+		for (int i = 0; i < list.size(); i++) {
+			Object childData = list.get(i);
+			if (childData == null)
+				continue;
 
-        addChildren(o,baseData);
-    }
+			ChildInfo info = new ChildInfo();
+			info.name = childData.getClass().getSimpleName();
+			info.getter = null;
+			info.index = i;
 
-    /**
-     * Examines the children of the parent data and adds them to the tree view
-     */
-    private void addChildren( Object parentData , DefaultMutableTreeNode parentNode ) throws InvocationTargetException, IllegalAccessException {
+			DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(info);
+			parentNode.add(childNode);
+			addChildren(childData, childNode);
+		}
+	}
 
-        if( parentData.getClass().isArray() ) {
-            addChildrenArray(parentData, parentNode);
-        } else if( parentData.getClass().isAssignableFrom(List.class)) {
-            addChildrenList(parentData, parentNode);
-        } else {
-            addChildrenGetters(parentData, parentNode);
-        }
+	/**
+	 * Adds all the elements in an array to the tree view
+	 */
+	private void addChildrenArray(Object parentData, DefaultMutableTreeNode parentNode) throws InvocationTargetException, IllegalAccessException {
+		final int N = Array.getLength(parentData);
 
-    }
+		for (int i = 0; i < N; i++) {
+			Object childData = Array.get(parentData, i);
+			if (childData == null)
+				continue;
 
-    /**
-     * Adds all the elements in a list to the tree view
-     */
-    private void addChildrenList(Object parentData, DefaultMutableTreeNode parentNode) throws InvocationTargetException, IllegalAccessException {
-        List<?> list = (List)parentData;
+			ChildInfo info = new ChildInfo();
+			info.name = childData.getClass().getSimpleName();
+			info.getter = null;
+			info.index = i;
 
-        for( int i = 0; i < list.size(); i++ ) {
-            Object childData = list.get(i);
-            if( childData == null )
-                continue;
+			DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(info);
+			parentNode.add(childNode);
+			addChildren(childData, childNode);
+		}
+	}
 
-            ChildInfo info = new ChildInfo();
-            info.name = childData.getClass().getSimpleName();
-            info.getter = null;
-            info.index = i;
+	/**
+	 * Uses reflections to get a list of getter that are part of a getter/setter pair and
+	 * adds children that are referenced by them
+	 */
+	private void addChildrenGetters(Object parentData, DefaultMutableTreeNode parentNode) throws IllegalAccessException, InvocationTargetException {
+		List<String> names = new ArrayList<String>();
+		List<Method> getters = new ArrayList<Method>();
 
-            DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(info);
-            parentNode.add(childNode);
-            addChildren(childData,childNode);
-        }
-    }
+		UtilReflections.findAccessors(parentData.getClass(), null, getters, names);
 
-    /**
-     * Adds all the elements in an array to the tree view
-     */
-    private void addChildrenArray(Object parentData, DefaultMutableTreeNode parentNode) throws InvocationTargetException, IllegalAccessException {
-        final int N = Array.getLength(parentData);
+		for (int i = 0; i < names.size(); i++) {
+			String n = names.get(i);
+			Method g = getters.get(i);
 
-        for( int i = 0; i < N; i++ ) {
-            Object childData = Array.get(parentData,i);
-            if( childData == null )
-                continue;
+			ChildInfo info = new ChildInfo();
+			info.name = n;
+			info.getter = g;
 
-            ChildInfo info = new ChildInfo();
-            info.name = childData.getClass().getSimpleName();
-            info.getter = null;
-            info.index = i;
+			Object childData = g.invoke(parentData);
+			DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(info);
+			parentNode.add(childNode);
 
-            DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(info);
-            parentNode.add(childNode);
-            addChildren(childData,childNode);
-        }
-    }
+			if (childData != null) {
+				addChildren(childData, childNode);
+			}
+		}
+	}
 
-    /**
-     * Uses reflections to get a list of getter that are part of a getter/setter pair and
-     * adds children that are referenced by them
-     */
-    private void addChildrenGetters(Object parentData, DefaultMutableTreeNode parentNode) throws IllegalAccessException, InvocationTargetException {
-        List<String> names = new ArrayList<String>();
-        List<Method> getters = new ArrayList<Method>();
+	/**
+	 * Given a parent object and the tree path selected in the GUI, return the object
+	 * that it specifies.
+	 */
+	private Object findChild(Object o, Object[] path) throws InvocationTargetException, IllegalAccessException {
+		for (int i = 2; i < path.length; i++) {
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path[i];
+			ChildInfo info = (ChildInfo) node.getUserObject();
 
-        UtilReflections.findAccessors(parentData.getClass(),null,getters,names);
+			if (info.getter == null) {
+				if (o.getClass().isAssignableFrom(List.class)) {
+					List<?> list = (List<?>) o;
+					o = list.get(info.index);
+				} else if (o.getClass().isArray()) {
+					o = Array.get(o, info.index);
+				}
+			} else {
+				o = info.getter.invoke(o);
+			}
+		}
 
-        for( int i = 0; i < names.size(); i++ ) {
-            String n = names.get(i);
-            Method g = getters.get(i);
+		return o;
+	}
 
-            ChildInfo info = new ChildInfo();
-            info.name = n;
-            info.getter = g;
+	/**
+	 * Returns true if the flat list is selected
+	 */
+	private boolean isFlatSelected() {
+		return viewSelect.getSelectedIndex() == 0;
+	}
 
-            Object childData = g.invoke(parentData);
-            DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(info);
-            parentNode.add(childNode);
+	/**
+	 * Select the next item in the list.  Useful when playing a lot file
+	 *
+	 * @return If it is NOT at the last element.
+	 */
+	public boolean selectNextItem() {
+		int index = flatList.getSelectedIndex();
+		if (index == flatData.size() - 1)
+			return false;
+		flatList.setSelectedIndex(index + 1);
+		Rectangle a = flatList.getCellBounds(index, index);
+		flatList.scrollRectToVisible(a);
+		return true;
+	}
 
-            if( childData != null ) {
-                addChildren(childData,childNode);
-            }
-        }
-    }
-
-    /**
-     * Given a parent object and the tree path selected in the GUI, return the object
-     * that it specifies.
-     */
-    private Object findChild( Object o , Object[] path ) throws InvocationTargetException, IllegalAccessException {
-        for( int i = 2; i < path.length; i++ ) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)path[i];
-            ChildInfo info = (ChildInfo)node.getUserObject();
-
-            if( info.getter == null ) {
-                if( o.getClass().isAssignableFrom(List.class)) {
-                    List<?> list = (List<?>)o;
-                    o = list.get( info.index );
-                } else if( o.getClass().isArray() ) {
-                    o = Array.get(o,info.index);
-                }
-            } else {
-                o = info.getter.invoke(o);
-            }
-        }
-
-        return o;
-    }
-
-    /**
-     * Returns true if the flat list is selected
-     */
-    private boolean isFlatSelected() {
-        return viewSelect.getSelectedIndex() == 0;
-    }
-
-    /**
-     * Select the next item in the list.  Useful when playing a lot file
-     *
-     * @return If it is NOT at the last element.
-     */
-    public boolean selectNextItem() {
-        int index = flatList.getSelectedIndex();
-        if( index == flatData.size()-1 )
-            return false;
-        flatList.setSelectedIndex(index+1);
-        Rectangle a = flatList.getCellBounds(index,index);
-        flatList.scrollRectToVisible(a);
-        return true;
-    }
-
-    @Override
-    public void valueChanged(TreeSelectionEvent e) {
+	@Override
+	public void valueChanged(TreeSelectionEvent e) {
 //        System.out.println("Tree value changed");
-        Object o = getSelected();
+		Object o = getSelected();
 //        if( o == null )
 //            return;
 
-        listener.selectionChanged(o);
-    }
+		listener.selectionChanged(o);
+	}
 
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if( e.getValueIsAdjusting())
-            return;
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		if (e.getValueIsAdjusting())
+			return;
 
-        Object o = getSelected();
-        if( o == null )
-            return;
+		Object o = getSelected();
+		if (o == null)
+			return;
 
-        listener.selectionChanged(o);
-    }
+		listener.selectionChanged(o);
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if( e.getSource() == viewSelect ) {
-            CardLayout cl = (CardLayout)(listPanel.getLayout());
-            if( isFlatSelected() ) {
-                cl.show(listPanel,"Flat");
-            } else {
-                cl.show(listPanel,"Tree");
-            }
-        }
-    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == viewSelect) {
+			CardLayout cl = (CardLayout) (listPanel.getLayout());
+			if (isFlatSelected()) {
+				cl.show(listPanel, "Flat");
+			} else {
+				cl.show(listPanel, "Tree");
+			}
+		}
+	}
 
-    /**
-     * Stores information on how to access the child data in an object
-     */
-    public static class ChildInfo
-    {
-        // the classes name as it is displayed
-        public String name;
-        // if access through a getter this is not null.  if it is a container it is null
-        public Method getter;
-        // if it is a container object this is the element being referenced.
-        public int index;
+	/**
+	 * Used to notify other classes when the user selects a new object for viewing
+	 */
+	public static interface SelectionListener {
+		public void selectionChanged(Object selected);
+	}
 
-        @Override
-        public String toString() {
-            if( getter != null )
-                return name;
-            else
-                return index+" "+name;
-        }
-    }
+	/**
+	 * Stores information on how to access the child data in an object
+	 */
+	public static class ChildInfo {
+		// the classes name as it is displayed
+		public String name;
+		// if access through a getter this is not null.  if it is a container it is null
+		public Method getter;
+		// if it is a container object this is the element being referenced.
+		public int index;
 
-    /**
-     * Used to notify other classes when the user selects a new object for viewing
-     */
-    public static interface SelectionListener
-    {
-        public void selectionChanged( Object selected );
-    }
+		@Override
+		public String toString() {
+			if (getter != null)
+				return name;
+			else
+				return index + " " + name;
+		}
+	}
 }

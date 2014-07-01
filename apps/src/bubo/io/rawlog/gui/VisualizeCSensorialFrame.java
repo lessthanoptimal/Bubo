@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,47 +29,47 @@ import javax.swing.*;
  */
 public class VisualizeCSensorialFrame implements LogDataVisualization {
 
-    CSensorialFrame frame;
-    JTextArea textArea = new JTextArea();
+	CSensorialFrame frame;
+	JTextArea textArea = new JTextArea();
 
-    @Override
-    public void setData(Object data) {
-        frame = (CSensorialFrame)data;
+	@Override
+	public void setData(Object data) {
+		frame = (CSensorialFrame) data;
 
-        setText(frame);
-    }
+		setText(frame);
+	}
 
-    public void setText( CSensorialFrame frame ) {
+	public void setText(CSensorialFrame frame) {
 
-        CObservation[] obs = frame.getObs();
+		CObservation[] obs = frame.getObs();
 
-        String str = "CSensorialFrame\n";
-        str += " N = "+obs.length+"\n";
-        str += "\n";
-        for( int i = 0; i < obs.length; i++ ) {
-            str += obs[i].getClass().getSimpleName()+"\n";
-        }
+		String str = "CSensorialFrame\n";
+		str += " N = " + obs.length + "\n";
+		str += "\n";
+		for (int i = 0; i < obs.length; i++) {
+			str += obs[i].getClass().getSimpleName() + "\n";
+		}
 
-        textArea.setText(str);
-    }
+		textArea.setText(str);
+	}
 
-    @Override
-    public Class<?> getType() {
-        return CSensorialFrame.class;
-    }
+	@Override
+	public Class<?> getType() {
+		return CSensorialFrame.class;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 1;
-    }
+	@Override
+	public int numDisplay() {
+		return 1;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        return textArea;
-    }
+	@Override
+	public JComponent getDisplay(int index) {
+		return textArea;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        return "Observation List";
-    }
+	@Override
+	public String getDisplayName(int index) {
+		return "Observation List";
+	}
 }

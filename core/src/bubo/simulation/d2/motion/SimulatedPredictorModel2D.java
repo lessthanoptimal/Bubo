@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -40,21 +40,21 @@ public abstract class SimulatedPredictorModel2D implements SimulatedRobotTraject
 	// elapsed time since last update
 	private double T;
 	// temporary storage for robot state
-	private DenseMatrix64F x = new DenseMatrix64F(3,1);
+	private DenseMatrix64F x = new DenseMatrix64F(3, 1);
 
-	public SimulatedPredictorModel2D(EkfPredictorTime model, double timePeriod ) {
+	public SimulatedPredictorModel2D(EkfPredictorTime model, double timePeriod) {
 		this.model = model;
 		T = timePeriod;
 	}
 
 	@Override
-	public void setPose(Se2_F64 pose) {
-		this.pose.set(pose);
+	public Se2_F64 getPose() {
+		return pose;
 	}
 
 	@Override
-	public Se2_F64 getPose() {
-		return pose;
+	public void setPose(Se2_F64 pose) {
+		this.pose.set(pose);
 	}
 
 	public void setTimePeriod(double timePeriod) {
@@ -70,11 +70,11 @@ public abstract class SimulatedPredictorModel2D implements SimulatedRobotTraject
 		drawControlNoise();
 
 		// move the robot forward
-		model.compute(x,T);
+		model.compute(x, T);
 
 		// Update the robot's pose
 		DenseMatrix64F x_pred = model.getPredictedState();
-		pose.set(x_pred.data[0],x_pred.data[1],x_pred.data[2]);
+		pose.set(x_pred.data[0], x_pred.data[1], x_pred.data[2]);
 	}
 
 	/**

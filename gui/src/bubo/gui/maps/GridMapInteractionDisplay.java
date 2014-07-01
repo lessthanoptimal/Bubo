@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,28 +31,28 @@ import java.awt.*;
  * @author Peter Abeles
  */
 // todo information in bar: cell size, mouse grid coordinate
-    // todo comment
+// todo comment
 public class GridMapInteractionDisplay extends ScrollableSpacialPane {
 
-    GridMapBasicDisplay mapDisplay;
+	GridMapBasicDisplay mapDisplay;
 
-    public GridMapInteractionDisplay() {
-        mapDisplay = new GridMapBasicDisplay();
-        setDisplay(mapDisplay);
-    }
+	public GridMapInteractionDisplay() {
+		mapDisplay = new GridMapBasicDisplay();
+		setDisplay(mapDisplay);
+	}
 
-    public GridMapInteractionDisplay(GridMapBasicDisplay mapDisplay ) {
-        this.mapDisplay = mapDisplay;
-        setDisplay(mapDisplay);
-    }
+	public GridMapInteractionDisplay(GridMapBasicDisplay mapDisplay) {
+		this.mapDisplay = mapDisplay;
+		setDisplay(mapDisplay);
+	}
 
-    public void setMap( GridMapSpacialInfo spacial , OccupancyGrid2D_F32 map ) {
-        mapDisplay.setMap(spacial,map);
-    }
+	public void setMap(GridMapSpacialInfo spacial, OccupancyGrid2D_F32 map) {
+		mapDisplay.setMap(spacial, map);
+	}
 
-    public GridMapBasicDisplay getMapDisplay() {
-        return mapDisplay;
-    }
+	public GridMapBasicDisplay getMapDisplay() {
+		return mapDisplay;
+	}
 
 	/**
 	 * Updates the preferred, minimum, and maximum size using the mapDisplay
@@ -61,7 +61,7 @@ public class GridMapInteractionDisplay extends ScrollableSpacialPane {
 		// there is bound to be a better way to do this.  Solutions I found searching online didn't seem to work
 		Dimension dmap = mapDisplay.getPreferredSize();
 		Dimension dtool = toolbar.getPreferredSize();
-		setPreferredSize(new Dimension(dmap.width+5,dtool.height+dmap.height+5));
+		setPreferredSize(new Dimension(dmap.width + 5, dtool.height + dmap.height + 5));
 		setMinimumSize(getPreferredSize());
 		setMaximumSize(getPreferredSize());
 		revalidate();

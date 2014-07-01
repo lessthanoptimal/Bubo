@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,46 +28,46 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestSerializationDefinitionManager {
 
-    @Test
-    public void loadDefinition_string() {
-        SerializationDefinitionManager manager = new SerializationDefinitionManager();
-        manager.addPath("bubo.io.serialization");
+	@Test
+	public void loadDefinition_string() {
+		SerializationDefinitionManager manager = new SerializationDefinitionManager();
+		manager.addPath("bubo.io.serialization");
 
-        DataDefinition found = manager.loadDefinition(DummyDataTypeDescription.class.getSimpleName());
+		DataDefinition found = manager.loadDefinition(DummyDataTypeDescription.class.getSimpleName());
 
-        checkLoad(manager, found , DummyDataTypeDescription.class );
-    }
+		checkLoad(manager, found, DummyDataTypeDescription.class);
+	}
 
-    @Test
-    public void loadDefinition_string_class() {
-        SerializationDefinitionManager manager = new SerializationDefinitionManager();
+	@Test
+	public void loadDefinition_string_class() {
+		SerializationDefinitionManager manager = new SerializationDefinitionManager();
 
-        DataDefinition found = manager.loadDefinition(DummyData.class,"value");
+		DataDefinition found = manager.loadDefinition(DummyData.class, "value");
 
-        checkLoad(manager, found , DummyData.class );
-    }
+		checkLoad(manager, found, DummyData.class);
+	}
 
-    @Test
-    public void addDefinition() {
-        SerializationDefinitionManager manager = new SerializationDefinitionManager();
+	@Test
+	public void addDefinition() {
+		SerializationDefinitionManager manager = new SerializationDefinitionManager();
 
-        DataDefinition found = manager.loadDefinition(DummyData.class,"value");
+		DataDefinition found = manager.loadDefinition(DummyData.class, "value");
 
-        SerializationDefinitionManager manager2 = new SerializationDefinitionManager();
-        manager2.addDefinition(found);
+		SerializationDefinitionManager manager2 = new SerializationDefinitionManager();
+		manager2.addDefinition(found);
 
-        checkLoad(manager2, found , DummyData.class );
-    }
+		checkLoad(manager2, found, DummyData.class);
+	}
 
-    private void checkLoad(SerializationDefinitionManager manager, DataDefinition found , Class<?> type ) {
-        assertTrue( found.type == type );
-        assertTrue( found.typeName.compareTo(type.getSimpleName()) == 0 );
-        assertEquals( 1 , found.setters.length );
-        assertEquals( 1 , found.getters.length );
-        assertEquals( 1 , found.variableNames.length );
-        assertEquals( 1 , found.variableTypes.length );
-        assertTrue( found.variableNames[0].compareTo("value") == 0 );
+	private void checkLoad(SerializationDefinitionManager manager, DataDefinition found, Class<?> type) {
+		assertTrue(found.type == type);
+		assertTrue(found.typeName.compareTo(type.getSimpleName()) == 0);
+		assertEquals(1, found.setters.length);
+		assertEquals(1, found.getters.length);
+		assertEquals(1, found.variableNames.length);
+		assertEquals(1, found.variableTypes.length);
+		assertTrue(found.variableNames[0].compareTo("value") == 0);
 
-        assertTrue( found == manager.lookup(type.getSimpleName()));
-    }
+		assertTrue(found == manager.lookup(type.getSimpleName()));
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -37,7 +37,7 @@ public class TestPlaneGeneralSvd_to_ModelFitter {
 
 	@Test
 	public void fitModel() {
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(0,0,0,0,0,1);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(0, 0, 0, 0, 0, 1);
 
 		List<Point3D_F64> pts = new ArrayList<Point3D_F64>();
 		pts.add(PointCloudShapeTools.createPt(plane, 1, 0));
@@ -47,7 +47,7 @@ public class TestPlaneGeneralSvd_to_ModelFitter {
 		PlaneGeneralSvd_to_ModelFitter alg = new PlaneGeneralSvd_to_ModelFitter();
 
 		PlaneGeneral3D_F64 found = new PlaneGeneral3D_F64();
-		assertTrue(alg.fitModel(pts, null , found));
+		assertTrue(alg.fitModel(pts, null, found));
 
 		TestGeneratePlanePointVector.checkPlanes(plane, found, 1e-8);
 	}

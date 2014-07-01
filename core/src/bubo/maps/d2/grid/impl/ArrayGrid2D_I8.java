@@ -23,48 +23,48 @@ import bubo.maps.d2.grid.OccupancyGrid2D_I;
 /**
  * Dense array floating point implementation of  OccupancyGrid2D_F32.
  *
- *  @author Peter Abeles
+ * @author Peter Abeles
  */
 public class ArrayGrid2D_I8 extends ArrayGrid2DBase implements OccupancyGrid2D_I {
 
-    public static int MAX = 255;
-    public static byte UNKNOWN = (byte)127;
+	public static int MAX = 255;
+	public static byte UNKNOWN = (byte) 127;
 
-    // grid map in a row major format
-    private byte data[];
+	// grid map in a row major format
+	private byte data[];
 
-    public ArrayGrid2D_I8( int width , int height ) {
-        super(width,height);
+	public ArrayGrid2D_I8(int width, int height) {
+		super(width, height);
 
-        data = new byte[ width*height ];
-    }
+		data = new byte[width * height];
+	}
 
 	@Override
 	public void clear() {
-		for( int i = 0; i < data.length; i++ ) {
+		for (int i = 0; i < data.length; i++) {
 			data[i] = UNKNOWN;
 		}
 	}
 
-    @Override
-    public void set(int x, int y, int value) {
-        data[y*width + x] = (byte)value;
-    }
+	@Override
+	public void set(int x, int y, int value) {
+		data[y * width + x] = (byte) value;
+	}
 
-    @Override
-    public int get(int x, int y) {
-        return data[y*width + x];
-    }
+	@Override
+	public int get(int x, int y) {
+		return data[y * width + x];
+	}
 
-    @Override
-    public boolean isKnown(int x, int y) {
-        return data[y*width + x] != UNKNOWN;
-    }
+	@Override
+	public boolean isKnown(int x, int y) {
+		return data[y * width + x] != UNKNOWN;
+	}
 
-    @Override
-    public int getMaxValue() {
-        return MAX;
-    }
+	@Override
+	public int getMaxValue() {
+		return MAX;
+	}
 
 	@Override
 	public int getUnknown() {
@@ -72,16 +72,16 @@ public class ArrayGrid2D_I8 extends ArrayGrid2DBase implements OccupancyGrid2D_I
 	}
 
 	@Override
-    public boolean isValid(int value) {
-        return value >= 0 && value <= 256;
-    }
+	public boolean isValid(int value) {
+		return value >= 0 && value <= 256;
+	}
 
-    @Override
-    public OccupancyGrid2D_I copy() {
-        ArrayGrid2D_I8 ret = new ArrayGrid2D_I8(width,height);
+	@Override
+	public OccupancyGrid2D_I copy() {
+		ArrayGrid2D_I8 ret = new ArrayGrid2D_I8(width, height);
 
-        System.arraycopy(data,0,ret.data,0,data.length);
+		System.arraycopy(data, 0, ret.data, 0, data.length);
 
-        return ret;
-    }
+		return ret;
+	}
 }

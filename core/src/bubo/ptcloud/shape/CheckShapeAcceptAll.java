@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -20,6 +20,7 @@ package bubo.ptcloud.shape;
 
 /**
  * Accepts all shapes
+ *
  * @author Peter Abeles
  */
 public class CheckShapeAcceptAll<Model> implements CheckShapeParameters<Model> {

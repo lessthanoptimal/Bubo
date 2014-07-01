@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -36,14 +36,14 @@ public class TestOctree {
 	@Test
 	public void findPathToPoint() {
 
-		Point3D_F64 target = new Point3D_F64(21,22,27);
+		Point3D_F64 target = new Point3D_F64(21, 22, 27);
 
 		Octree tree = new Octree();
-		tree.divider = new Point3D_F64(20,30,40);
-		tree.space = new Cube3D_F64(-100,-100,-100,200,200,200);
+		tree.divider = new Point3D_F64(20, 30, 40);
+		tree.space = new Cube3D_F64(-100, -100, -100, 200, 200, 200);
 
 		Octree node0 = new Octree();
-		tree.divider = new Point3D_F64(5,-10,50);
+		tree.divider = new Point3D_F64(5, -10, 50);
 
 		Octree node1 = new Octree();
 
@@ -54,24 +54,24 @@ public class TestOctree {
 		node0.children[node0.getChildIndex(target)] = node1;
 
 		List<Octree> found = new ArrayList<Octree>();
-		tree.findPathToPoint(target,found);
+		tree.findPathToPoint(target, found);
 
-		assertEquals(3,found.size());
+		assertEquals(3, found.size());
 		assertTrue(tree == found.get(0));
 		assertTrue(node0 == found.get(1));
-		assertTrue(node1==found.get(2));
+		assertTrue(node1 == found.get(2));
 	}
 
 	@Test
 	public void findDeepest() {
-		Point3D_F64 target = new Point3D_F64(21,22,27);
+		Point3D_F64 target = new Point3D_F64(21, 22, 27);
 
 		Octree tree = new Octree();
-		tree.divider = new Point3D_F64(20,30,40);
-		tree.space = new Cube3D_F64(-100,-100,-100,200,200,200);
+		tree.divider = new Point3D_F64(20, 30, 40);
+		tree.space = new Cube3D_F64(-100, -100, -100, 200, 200, 200);
 
 		Octree node0 = new Octree();
-		tree.divider = new Point3D_F64(5,-10,50);
+		tree.divider = new Point3D_F64(5, -10, 50);
 
 		Octree node1 = new Octree();
 
@@ -81,32 +81,32 @@ public class TestOctree {
 		tree.children[tree.getChildIndex(target)] = node0;
 		node0.children[node0.getChildIndex(target)] = node1;
 
-		assertTrue( null == tree.findDeepest(new Point3D_F64(10000,0,0)));
-		assertTrue( node1 == tree.findDeepest(target));
-		assertTrue( tree == tree.findDeepest(new Point3D_F64(-99,-99,-99)));
+		assertTrue(null == tree.findDeepest(new Point3D_F64(10000, 0, 0)));
+		assertTrue(node1 == tree.findDeepest(target));
+		assertTrue(tree == tree.findDeepest(new Point3D_F64(-99, -99, -99)));
 	}
 
 	@Test
 	public void getChildIndex() {
 		Octree tree = new Octree();
-		tree.divider = new Point3D_F64(20,30,40);
+		tree.divider = new Point3D_F64(20, 30, 40);
 
 		// check easy cases
-		assertEquals(0,tree.getChildIndex(new Point3D_F64(18,28,38)));
-		assertEquals(1,tree.getChildIndex(new Point3D_F64(18,32,38)));
-		assertEquals(2,tree.getChildIndex(new Point3D_F64(22,28,38)));
-		assertEquals(3,tree.getChildIndex(new Point3D_F64(22,32,38)));
-		assertEquals(4,tree.getChildIndex(new Point3D_F64(18,28,42)));
-		assertEquals(5,tree.getChildIndex(new Point3D_F64(18,32,42)));
-		assertEquals(6,tree.getChildIndex(new Point3D_F64(22,28,42)));
-		assertEquals(7,tree.getChildIndex(new Point3D_F64(22,32,42)));
+		assertEquals(0, tree.getChildIndex(new Point3D_F64(18, 28, 38)));
+		assertEquals(1, tree.getChildIndex(new Point3D_F64(18, 32, 38)));
+		assertEquals(2, tree.getChildIndex(new Point3D_F64(22, 28, 38)));
+		assertEquals(3, tree.getChildIndex(new Point3D_F64(22, 32, 38)));
+		assertEquals(4, tree.getChildIndex(new Point3D_F64(18, 28, 42)));
+		assertEquals(5, tree.getChildIndex(new Point3D_F64(18, 32, 42)));
+		assertEquals(6, tree.getChildIndex(new Point3D_F64(22, 28, 42)));
+		assertEquals(7, tree.getChildIndex(new Point3D_F64(22, 32, 42)));
 
 		// check edge cases
-		assertEquals(7,tree.getChildIndex(new Point3D_F64(20,30,40)));
+		assertEquals(7, tree.getChildIndex(new Point3D_F64(20, 30, 40)));
 
-		assertEquals(2,tree.getChildIndex(new Point3D_F64(20,28,38)));
-		assertEquals(1,tree.getChildIndex(new Point3D_F64(18,30,38)));
-		assertEquals(4,tree.getChildIndex(new Point3D_F64(18,28,40)));
+		assertEquals(2, tree.getChildIndex(new Point3D_F64(20, 28, 38)));
+		assertEquals(1, tree.getChildIndex(new Point3D_F64(18, 30, 38)));
+		assertEquals(4, tree.getChildIndex(new Point3D_F64(18, 28, 40)));
 	}
 
 }

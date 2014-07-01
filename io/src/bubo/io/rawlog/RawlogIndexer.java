@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -39,117 +39,116 @@ import java.util.List;
  */
 public class RawlogIndexer {
 
-    // input stream
-    private FileInputStream fis;
+	// input stream
+	private FileInputStream fis;
 
-    // channel used to lookup data structures
-    private FileChannel channel;
+	// channel used to lookup data structures
+	private FileChannel channel;
 
-    // parses the rawlog file
-    private RawlogDecoder decoder;
+	// parses the rawlog file
+	private RawlogDecoder decoder;
 
-    // listener for progress while reading lg files
-    private Listener listener;
+	// listener for progress while reading lg files
+	private Listener listener;
 
-    // list of all the data types it found
-    private List<Class<?>> allDataTypes = new ArrayList<Class<?>>();
+	// list of all the data types it found
+	private List<Class<?>> allDataTypes = new ArrayList<Class<?>>();
 
-    // list of all the sources it found
-    private List<String> allSources = new ArrayList<String>();
+	// list of all the sources it found
+	private List<String> allSources = new ArrayList<String>();
 
-    public RawlogIndexer( String fileName ) throws FileNotFoundException {
-        fis = new FileInputStream(fileName);
-        channel = fis.getChannel();
-        try {
-            // gzip file's can't be indexed since the index will refer to the location in
-            // the compressed file, which does not have a 1 to 1 ratio with the decompressed file
-            decoder = new RawlogDecoder(fis);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	public RawlogIndexer(String fileName) throws FileNotFoundException {
+		fis = new FileInputStream(fileName);
+		channel = fis.getChannel();
+		try {
+			// gzip file's can't be indexed since the index will refer to the location in
+			// the compressed file, which does not have a 1 to 1 ratio with the decompressed file
+			decoder = new RawlogDecoder(fis);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    protected RawlogIndexer(){}
+	protected RawlogIndexer() {
+	}
 
-    /**
-     * Add a listener that reports the indexing status and can cancel the indexing process.
-     */
-    public void setListener(Listener listener) {
-        this.listener = listener;
-    }
+	/**
+	 * Add a listener that reports the indexing status and can cancel the indexing process.
+	 */
+	public void setListener(Listener listener) {
+		this.listener = listener;
+	}
 
-    public List<Class<?>> getAllDataTypes() {
-        return allDataTypes;
-    }
+	public List<Class<?>> getAllDataTypes() {
+		return allDataTypes;
+	}
 
-    public List<String> getAllSources() {
-        return allSources;
-    }
+	public List<String> getAllSources() {
+		return allSources;
+	}
 
-    /**
-     * Reads in a rawlog file and indexes the location of each data element inside the file for quick lookup later on
-     *
-     * @return List of object types and locations in the file
-     *
-     * @throws FileNotFoundException
-     */
-    public List<LogFileObjectRef> computeIndexes() {
-        List<LogFileObjectRef> ret = new ArrayList<LogFileObjectRef>();
-        allSources.clear();
-        allDataTypes.clear();
+	/**
+	 * Reads in a rawlog file and indexes the location of each data element inside the file for quick lookup later on
+	 *
+	 * @return List of object types and locations in the file
+	 * @throws FileNotFoundException
+	 */
+	public List<LogFileObjectRef> computeIndexes() {
+		List<LogFileObjectRef> ret = new ArrayList<LogFileObjectRef>();
+		allSources.clear();
+		allDataTypes.clear();
 
-        try {
-            long location = channel.position();
+		try {
+			long location = channel.position();
 
-            while( true ) {
-                RawlogSerializable o = decoder.decode();
+			while (true) {
+				RawlogSerializable o = decoder.decode();
 
-                // set up the object locaiton description and make a list of all the unique data source/type locations
-                IndexedFileObjectRef a = new IndexedFileObjectRef();
-                a.dataType = o.getClass();
-                a.setFileLocation(location);
-                if( o instanceof CObservation) {
-                    a.source = ((CObservation)o).getSensorLabel();
+				// set up the object locaiton description and make a list of all the unique data source/type locations
+				IndexedFileObjectRef a = new IndexedFileObjectRef();
+				a.dataType = o.getClass();
+				a.setFileLocation(location);
+				if (o instanceof CObservation) {
+					a.source = ((CObservation) o).getSensorLabel();
 
-                    if( a.source != null )
-                        UtilStrings.checkAddString(allSources,a.source);
-                    else
-                        a.source = RawlogIndexFile.NO_SOURCE;
-                }
+					if (a.source != null)
+						UtilStrings.checkAddString(allSources, a.source);
+					else
+						a.source = RawlogIndexFile.NO_SOURCE;
+				}
 
-                if( !allDataTypes.contains(a.dataType))
-                    allDataTypes.add(a.dataType);
+				if (!allDataTypes.contains(a.dataType))
+					allDataTypes.add(a.dataType);
 
-                ret.add( a );
+				ret.add(a);
 
-                location = channel.position();
+				location = channel.position();
 
-                if( listener != null ) {
-                    double fractionProcessed = (double)location/(double)channel.size();
-                    listener.update(a.dataType.getSimpleName(),fractionProcessed);
+				if (listener != null) {
+					double fractionProcessed = (double) location / (double) channel.size();
+					listener.update(a.dataType.getSimpleName(), fractionProcessed);
 
-                    if( listener.cancelRequested() ) {
-                        return null;
-                    }
-                }
-            }
+					if (listener.cancelRequested()) {
+						return null;
+					}
+				}
+			}
 
-        } catch (IOException e) {
-            System.out.println(e);
-        }
+		} catch (IOException e) {
+			System.out.println(e);
+		}
 
-        try {
-            fis.close();
-        } catch (IOException e) {
-        }
+		try {
+			fis.close();
+		} catch (IOException e) {
+		}
 
-        return ret;
-    }
+		return ret;
+	}
 
-    public static interface Listener
-    {
-        public void update( String name , double fraction );
+	public static interface Listener {
+		public void update(String name, double fraction);
 
-        public boolean cancelRequested();
-    }
+		public boolean cancelRequested();
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,6 +35,87 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TestInteractingMultipleModelFilter {
+
+	private static DiscreteKalmanFilter createKalman() {
+		KalmanPredictor pred = createPred();
+
+		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 0, 0}});
+		FixedKalmanProjector projector = new FixedKalmanProjector(H);
+
+		return new DiscreteKalmanFilter(pred, projector);
+	}
+
+	private static KalmanPredictor createPred() {
+
+		return new ConstAccel1D(1, 1);
+	}
+
+	/**
+	 * Create an IMM that will produce the same output as a Kalman filter because it has
+	 * three models which are identical.
+	 */
+	public static InteractingMultipleModelFilter createEquivIMM() {
+		int numModels = 3;
+
+		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 0, 0}});
+		FixedKalmanProjector kfProj = new FixedKalmanProjector(H);
+
+		KfToEkfPredictorDiscrete pred = new KfToEkfPredictorDiscrete(createPred(), null);
+		EkfProjector proj = new KfToEkfProjector(kfProj);
+
+		KfToEkfPredictorDiscrete preds[] = new KfToEkfPredictorDiscrete[numModels];
+		for (int i = 0; i < numModels; i++) {
+			preds[i] = pred;
+		}
+
+		ExtendedKalmanFilter filter = new ExtendedKalmanFilter(3, 1);
+		filter.setProjector(proj);
+
+		DenseMatrix64F pi = createTransitionMatrix(numModels);
+
+		return new ImmCheckingFilter(filter, preds, pi);
+	}
+
+	/**
+	 * Creates a Markov state transition matrix.  It creates an asymetric
+	 * matrix for three models.  This is designed for the Kalman filter
+	 * equivalence test where all the models are the same.
+	 */
+	public static DenseMatrix64F createTransitionMatrix(int numModels) {
+		DenseMatrix64F pi = new DenseMatrix64F(numModels, numModels);
+		double a = 0.2 / (numModels - 1);
+		for (int i = 0; i < numModels; i++) {
+			int b = 0;
+			for (int j = 0; j < numModels; j++) {
+				if (i == j) {
+					pi.set(i, i, 0.8);
+				} else {
+					// give it different values so the matrix isn't symetric
+					// which will hide some common errors
+					if (b == 0) {
+						pi.set(i, j, a * 1.5);
+					} else if (b == 1) {
+						pi.set(i, j, a * 0.5);
+					} else {
+						pi.set(i, j, a);
+					}
+					b++;
+				}
+			}
+		}
+		return pi;
+	}
+
+	/**
+	 * Create a predictor where nothing changes
+	 */
+	public static EkfPredictorDiscrete createStaticPredictor() {
+		DenseMatrix64F F = CommonOps.identity(3);
+		DenseMatrix64F Q = CommonOps.identity(3);
+		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
+
+		return new KfToEkfPredictorDiscrete(kalmanPred, null);
+	}
 
 	/**
 	 * Compare the IMM that has the exact same model for each state against a
@@ -117,76 +198,6 @@ public class TestInteractingMultipleModelFilter {
 		return ret;
 	}
 
-	private static DiscreteKalmanFilter createKalman() {
-		KalmanPredictor pred = createPred();
-
-		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 0, 0}});
-		FixedKalmanProjector projector = new FixedKalmanProjector(H);
-
-		return new DiscreteKalmanFilter(pred, projector);
-	}
-
-	private static KalmanPredictor createPred() {
-
-		return new ConstAccel1D(1, 1);
-	}
-
-	/**
-	 * Create an IMM that will produce the same output as a Kalman filter because it has
-	 * three models which are identical.
-	 */
-	public static InteractingMultipleModelFilter createEquivIMM() {
-		int numModels = 3;
-
-		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 0, 0}});
-		FixedKalmanProjector kfProj = new FixedKalmanProjector(H);
-
-		KfToEkfPredictorDiscrete pred = new KfToEkfPredictorDiscrete(createPred(), null);
-		EkfProjector proj = new KfToEkfProjector(kfProj);
-
-		KfToEkfPredictorDiscrete preds[] = new KfToEkfPredictorDiscrete[numModels];
-		for (int i = 0; i < numModels; i++) {
-			preds[i] = pred;
-		}
-
-		ExtendedKalmanFilter filter = new ExtendedKalmanFilter(3, 1);
-		filter.setProjector(proj);
-
-		DenseMatrix64F pi = createTransitionMatrix(numModels);
-
-		return new ImmCheckingFilter(filter, preds, pi);
-	}
-
-	/**
-	 * Creates a Markov state transition matrix.  It creates an asymetric
-	 * matrix for three models.  This is designed for the Kalman filter
-	 * equivalence test where all the models are the same.
-	 */
-	public static DenseMatrix64F createTransitionMatrix(int numModels) {
-		DenseMatrix64F pi = new DenseMatrix64F(numModels, numModels);
-		double a = 0.2 / (numModels - 1);
-		for (int i = 0; i < numModels; i++) {
-			int b = 0;
-			for (int j = 0; j < numModels; j++) {
-				if (i == j) {
-					pi.set(i, i, 0.8);
-				} else {
-					// give it different values so the matrix isn't symetric
-					// which will hide some common errors
-					if (b == 0) {
-						pi.set(i, j, a * 1.5);
-					} else if (b == 1) {
-						pi.set(i, j, a * 0.5);
-					} else {
-						pi.set(i, j, a);
-					}
-					b++;
-				}
-			}
-		}
-		return pi;
-	}
-
 	/**
 	 * Create an IMM with two models.  one is static and the other moves.
 	 */
@@ -208,16 +219,5 @@ public class TestInteractingMultipleModelFilter {
 		DenseMatrix64F pi = new DenseMatrix64F(new double[][]{{0.95, 0.05}, {0.05, 0.95}});
 
 		return new ImmCheckingFilter(filter, preds, pi);
-	}
-
-	/**
-	 * Create a predictor where nothing changes
-	 */
-	public static EkfPredictorDiscrete createStaticPredictor() {
-		DenseMatrix64F F = CommonOps.identity(3);
-		DenseMatrix64F Q = CommonOps.identity(3);
-		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
-
-		return new KfToEkfPredictorDiscrete(kalmanPred, null);
 	}
 }

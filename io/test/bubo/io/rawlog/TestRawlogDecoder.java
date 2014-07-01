@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -33,43 +33,43 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestRawlogDecoder {
 
-    /**
-     * See if it can decode a very simple object multiple times
-     *
-     * @throws IOException
-     */
-    @Test
-    public void decodeSimpleObject() throws IOException {
-        // manually encode a simple data structure
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+	/**
+	 * See if it can decode a very simple object multiple times
+	 *
+	 * @throws IOException
+	 */
+	@Test
+	public void decodeSimpleObject() throws IOException {
+		// manually encode a simple data structure
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        writeTrivialObject(out,57);
-        writeTrivialObject(out,34);
+		writeTrivialObject(out, 57);
+		writeTrivialObject(out, 34);
 
-        // now read it back in
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+		// now read it back in
+		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 
-        RawlogDecoder decoder = new RawlogDecoder(in);
+		RawlogDecoder decoder = new RawlogDecoder(in);
 
-        Trivialdata found = decoder.decode();
-        assertEquals(found.getData(),57);
+		Trivialdata found = decoder.decode();
+		assertEquals(found.getData(), 57);
 
-        found = decoder.decode();
-        assertEquals(found.getData(),34);
-    }
+		found = decoder.decode();
+		assertEquals(found.getData(), 34);
+	}
 
-    /**
-     * Writes a trivial object that just has an int to output using the rawlog format
-     */
-    private void writeTrivialObject( ByteArrayOutputStream out , int value ) throws IOException {
-        // class name
-        RawlogEncoder.writeClassName(out, Trivialdata.class.getSimpleName());
-        // class version
-        out.write(0);
-        // data
-        LittleEndianIO.writeInt(out,value);
-        // end bit
-        out.write(0x88);
-    }
+	/**
+	 * Writes a trivial object that just has an int to output using the rawlog format
+	 */
+	private void writeTrivialObject(ByteArrayOutputStream out, int value) throws IOException {
+		// class name
+		RawlogEncoder.writeClassName(out, Trivialdata.class.getSimpleName());
+		// class version
+		out.write(0);
+		// data
+		LittleEndianIO.writeInt(out, value);
+		// end bit
+		out.write(0x88);
+	}
 
 }

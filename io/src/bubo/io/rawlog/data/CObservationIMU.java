@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,51 +26,54 @@ import bubo.io.rawlog.RawlogSerializableStandard;
  * @author Peter Abeles
  */
 public class CObservationIMU extends CObservation implements RawlogSerializableStandard {
-    /** The pose of the sensor on the robot.
-     */
-    private CPose3D  sensorPose;
+	/**
+	 * The pose of the sensor on the robot.
+	 */
+	private CPose3D sensorPose;
 
-    /** Each of the 15 entries of this vector is true if the corresponding data index contains valid data (the IMU unit supplies that kind of data).
-     *  See the top of this page for the meaning of the indices.
-     */
-    private boolean[] dataIsPresent;
+	/**
+	 * Each of the 15 entries of this vector is true if the corresponding data index contains valid data (the IMU unit supplies that kind of data).
+	 * See the top of this page for the meaning of the indices.
+	 */
+	private boolean[] dataIsPresent;
 
-    /** The accelerometer and/or gyroscope measurements taken by the IMU at the given timestamp.
-     * \sa dataIsPresent, CObservation::timestamp
-     */
-    private double[]  rawMeasurements;
+	/**
+	 * The accelerometer and/or gyroscope measurements taken by the IMU at the given timestamp.
+	 * \sa dataIsPresent, CObservation::timestamp
+	 */
+	private double[] rawMeasurements;
 
-    @Override
-    public String[] getVariableOrder(int version) {
-        return new String[]{"sensorPose","dataIsPresent","timestamp","rawMeasurements","sensorLabel"};
-    }
+	@Override
+	public String[] getVariableOrder(int version) {
+		return new String[]{"sensorPose", "dataIsPresent", "timestamp", "rawMeasurements", "sensorLabel"};
+	}
 
-    public CPose3D getSensorPose() {
-        return sensorPose;
-    }
+	public CPose3D getSensorPose() {
+		return sensorPose;
+	}
 
-    public void setSensorPose(CPose3D sensorPose) {
-        this.sensorPose = sensorPose;
-    }
+	public void setSensorPose(CPose3D sensorPose) {
+		this.sensorPose = sensorPose;
+	}
 
-    public boolean[] getDataIsPresent() {
-        return dataIsPresent;
-    }
+	public boolean[] getDataIsPresent() {
+		return dataIsPresent;
+	}
 
-    public void setDataIsPresent(boolean[] dataIsPresent) {
-        this.dataIsPresent = dataIsPresent;
-    }
+	public void setDataIsPresent(boolean[] dataIsPresent) {
+		this.dataIsPresent = dataIsPresent;
+	}
 
-    public double[] getRawMeasurements() {
-        return rawMeasurements;
-    }
+	public double[] getRawMeasurements() {
+		return rawMeasurements;
+	}
 
-    public void setRawMeasurements(double[] rawMeasurements) {
-        this.rawMeasurements = rawMeasurements;
-    }
+	public void setRawMeasurements(double[] rawMeasurements) {
+		this.rawMeasurements = rawMeasurements;
+	}
 
-    @Override
-    public int getVersion() {
-        return 1;
-    }
+	@Override
+	public int getVersion() {
+		return 1;
+	}
 }

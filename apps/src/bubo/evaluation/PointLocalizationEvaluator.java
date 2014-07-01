@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -18,7 +18,6 @@
 
 package bubo.evaluation;
 
-import org.ddogleg.struct.GrowQueue_F64;
 import bubo.models.kinematics.PredictorRobotVelocity2D;
 import bubo.models.sensor.ProjectorRangeBearing2D;
 import bubo.simulation.d2.SimulatedRobotTrajectory;
@@ -29,6 +28,7 @@ import bubo.simulation.d2.sensors.SimRangeBearingMeasurement;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
+import org.ddogleg.struct.GrowQueue_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,44 +65,59 @@ public class PointLocalizationEvaluator {
 
 	public PointLocalizationEvaluator(SimulatedRobotTrajectory trajectory,
 									  SimRangeBearingMeasurement sensorModel,
-									  InitialPose initialPose )
-	{
+									  InitialPose initialPose) {
 		this.trajectory = trajectory;
 		this.sensorModel = sensorModel;
 		this.initialPose = initialPose;
 
 	}
 
-	public void setLocalization( LocalizationAlgorithm alg ) {
+	public static void main(String args[]) {
+
+		double T = 0.1;
+
+		PredictorRobotVelocity2D predictor = new PredictorRobotVelocity2D(0.1, 0.1, 0.1, 0.1);
+		ProjectorRangeBearing2D projector = new ProjectorRangeBearing2D();
+
+		SimulatedRobotTrajectory trajectory = new FixedTrajectoryVel2D(1, 0.1, 0, 0, T, 234234);
+		SimRangeBearingMeasurement sensorModel = new SimRangeBearingMeasurement(0.2, 0.01, 50, 83832);
+		InitialPose initialPose = new InitialGaussianPose();
+
+		PointLocalizationEvaluator evaluator = new PointLocalizationEvaluator(trajectory, sensorModel, initialPose);
+
+		evaluator.setLocalization(new WrapLocalizationEkfKnownAssoc(predictor, projector, T));
+	}
+
+	public void setLocalization(LocalizationAlgorithm alg) {
 		this.alg = alg;
 	}
 
-	public void generateWorld( long randSeed , int numberLandmarks , double worldWidth ) {
+	public void generateWorld(long randSeed, int numberLandmarks, double worldWidth) {
 		this.rand = new Random(randSeed);
 
 		// randomly assign landmark locations
 		landmarks.clear();
-		for( int i = 0; i < numberLandmarks; i++ ) {
+		for (int i = 0; i < numberLandmarks; i++) {
 			PointLandmark l = new PointLandmark();
 			l.id = i;
-			l.x = rand.nextDouble()*worldWidth - worldWidth/2;
-			l.y = rand.nextDouble()*worldWidth - worldWidth/2;
+			l.x = rand.nextDouble() * worldWidth - worldWidth / 2;
+			l.y = rand.nextDouble() * worldWidth - worldWidth / 2;
 			landmarks.add(l);
 		}
 
 		// set the initial robot pose away from the outer landmark border
-		double w = worldWidth*0.8;
-		robotPose.T.x = rand.nextDouble()*w-w/2;
-		robotPose.T.y = rand.nextDouble()*w-w/2;
-		robotPose.setYaw( 2*(rand.nextDouble()-0.5)*Math.PI);
+		double w = worldWidth * 0.8;
+		robotPose.T.x = rand.nextDouble() * w - w / 2;
+		robotPose.T.y = rand.nextDouble() * w - w / 2;
+		robotPose.setYaw(2 * (rand.nextDouble() - 0.5) * Math.PI);
 
 		// initialize algorithm
 		initialPose.generatePose(robotPose);
-		alg.setInitial(initialPose.getPoseNoisy(),initialPose.getSigmaLocation(),initialPose.getSigmaYaw());
+		alg.setInitial(initialPose.getPoseNoisy(), initialPose.getSigmaLocation(), initialPose.getSigmaYaw());
 		List<Point2D_F64> pts = new ArrayList<Point2D_F64>();
-		for( PointLandmark p : landmarks )
+		for (PointLandmark p : landmarks)
 			pts.add(p);
-		alg.configure(pts,sensorModel.getMeasurementCovariance());
+		alg.configure(pts, sensorModel.getMeasurementCovariance());
 
 		// reset simulation time
 		this.tick = 0;
@@ -114,22 +129,22 @@ public class PointLocalizationEvaluator {
 
 		List<RangeBearing> measNoisy = new ArrayList<RangeBearing>();
 		List<RangeBearing> measTruth = new ArrayList<RangeBearing>();
-		for( PointLandmark l : landmarks ) {
-			if( sensorModel.process(l) ) {
-				measNoisy.add( new RangeBearing(l.id,sensorModel.getNoisyRange(),sensorModel.getNoisyBearing()));
-				measTruth.add( new RangeBearing(l.id,sensorModel.getTrueRange(),sensorModel.getTrueBearing()));
+		for (PointLandmark l : landmarks) {
+			if (sensorModel.process(l)) {
+				measNoisy.add(new RangeBearing(l.id, sensorModel.getNoisyRange(), sensorModel.getNoisyBearing()));
+				measTruth.add(new RangeBearing(l.id, sensorModel.getTrueRange(), sensorModel.getTrueBearing()));
 			}
 		}
 
 		// update pose estimate and evaluate accuracy
-		alg.update(measNoisy,measTruth);
+		alg.update(measNoisy, measTruth);
 		evaluate();
 
 		// move the robot and passe on noisy information to estimation algorithm
 		trajectory.update();
 		robotPose.set(trajectory.getPose());
 		double u[] = trajectory.getControlTruth();
-		alg.predict(u[0],u[1]);
+		alg.predict(u[0], u[1]);
 		tick++;
 	}
 
@@ -137,27 +152,11 @@ public class PointLocalizationEvaluator {
 		Se2_F64 estimated = alg.getPoseEstimate();
 
 		double locationError = estimated.getTranslation().distance(robotPose.getTranslation());
-		double angleError = UtilAngle.dist(estimated.getYaw(),robotPose.getYaw());
+		double angleError = UtilAngle.dist(estimated.getYaw(), robotPose.getYaw());
 
 		errorsT.push(locationError);
 		errorsYaw.push(angleError);
 
-		System.out.printf("Errors loc = %5.2f  ang = %5.2f\n",locationError,angleError);
-	}
-
-	public static void main( String args[] ) {
-
-		double T=0.1;
-
-		PredictorRobotVelocity2D predictor = new PredictorRobotVelocity2D(0.1,0.1,0.1,0.1);
-		ProjectorRangeBearing2D projector = new ProjectorRangeBearing2D();
-
-		SimulatedRobotTrajectory trajectory = new FixedTrajectoryVel2D(1,0.1,0,0,T,234234);
-		SimRangeBearingMeasurement sensorModel = new SimRangeBearingMeasurement(0.2,0.01,50,83832);
-		InitialPose initialPose = new InitialGaussianPose();
-
-		PointLocalizationEvaluator evaluator = new PointLocalizationEvaluator(trajectory,sensorModel,initialPose);
-
-		evaluator.setLocalization(new WrapLocalizationEkfKnownAssoc(predictor,projector,T));
+		System.out.printf("Errors loc = %5.2f  ang = %5.2f\n", locationError, angleError);
 	}
 }

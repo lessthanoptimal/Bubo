@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,18 +25,18 @@ package bubo.io.logs;
  * @author Peter Abeles
  */
 public class MemoryFileObjectRef<T> extends LogFileObjectRef {
-    private T data;
+	private T data;
 
-    public MemoryFileObjectRef(Class<?> dataType, String source, T data) {
-        super(dataType, source);
-        this.data = data;
-    }
+	public MemoryFileObjectRef(Class<?> dataType, String source, T data) {
+		super(dataType, source);
+		this.data = data;
+	}
 
-    public T getData() {
-        return data;
-    }
+	public T getData() {
+		return data;
+	}
 
-    public void setData(T data) {
-        this.data = data;
-    }
+	public void setData(T data) {
+		this.data = data;
+	}
 }

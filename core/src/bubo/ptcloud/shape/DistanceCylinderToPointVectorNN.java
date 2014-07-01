@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,20 +27,19 @@ import java.util.List;
 
 /**
  * Euclidean distance from a {@link georegression.struct.shapes.Cylinder3D_F64} for use with {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.
- *
+ * <p/>
  * TODO comment
  *
  * @author Peter Abeles
  */
-public class DistanceCylinderToPointVectorNN implements DistanceFromModel<Cylinder3D_F64,PointVectorNN> {
+public class DistanceCylinderToPointVectorNN implements DistanceFromModel<Cylinder3D_F64, PointVectorNN> {
 
+	Cylinder3D_F64 model;
 	// tolerance cos(angle) for vector normals
 	private double tolAngleCosine;
 
-	Cylinder3D_F64 model;
-
 	public DistanceCylinderToPointVectorNN(double tolAngle) {
-		this.tolAngleCosine = Math.cos(Math.PI/2.0 - tolAngle);
+		this.tolAngleCosine = Math.cos(Math.PI / 2.0 - tolAngle);
 	}
 
 	@Override
@@ -53,7 +52,7 @@ public class DistanceCylinderToPointVectorNN implements DistanceFromModel<Cylind
 
 		double acute = model.line.slope.dot(pv.normal);
 
-		if( Math.abs(acute) > tolAngleCosine)
+		if (Math.abs(acute) > tolAngleCosine)
 			return Double.MAX_VALUE;
 
 		return Math.abs(Distance3D_F64.distance(model, pv.p));
@@ -61,7 +60,7 @@ public class DistanceCylinderToPointVectorNN implements DistanceFromModel<Cylind
 
 	@Override
 	public void computeDistance(List<PointVectorNN> points, double[] distance) {
-		for( int i = 0; i < points.size(); i++ ) {
+		for (int i = 0; i < points.size(); i++) {
 			distance[i] = computeDistance(points.get(i));
 		}
 	}

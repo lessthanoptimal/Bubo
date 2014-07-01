@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,6 +35,6 @@ public interface ClosestPointToModel<T extends GeoTuple> {
 	 * @return Closest model point, if any has been found.  null otherwise.  The returned point should not
 	 * be modified or saved since if the model is updated its value can change.
 	 */
-	public T findClosestPoint( T target );
+	public T findClosestPoint(T target);
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,8 +25,8 @@ package bubo.io.serialization;
  */
 public class DummyDataTypeDescription extends DummyData implements SerializationDescription {
 
-    @Override
-    public String[] getVariables() {
-        return new String[]{"value"};
-    }
+	@Override
+	public String[] getVariables() {
+		return new String[]{"value"};
+	}
 }

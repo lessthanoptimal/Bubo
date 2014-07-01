@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,25 +25,24 @@ import bubo.io.rawlog.RawlogSerializableStandard;
  *
  * @author Peter Abeles
  */
-public class Trivialdata implements RawlogSerializableStandard
-{
-    int data;
+public class Trivialdata implements RawlogSerializableStandard {
+	int data;
 
-    @Override
-    public String[] getVariableOrder(int version) {
-        return new String[]{"data"};
-    }
+	@Override
+	public String[] getVariableOrder(int version) {
+		return new String[]{"data"};
+	}
 
-    @Override
-    public int getVersion() {
-        return 0;
-    }
+	@Override
+	public int getVersion() {
+		return 0;
+	}
 
-    public int getData() {
-        return data;
-    }
+	public int getData() {
+		return data;
+	}
 
-    public void setData(int data) {
-        this.data = data;
-    }
+	public void setData(int data) {
+		this.data = data;
+	}
 }

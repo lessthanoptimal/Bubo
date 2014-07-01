@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -37,87 +37,87 @@ import java.io.OutputStream;
  */
 public class CImage implements RawlogSerializableCustom {
 
-    // if stored internally
-    private ImageEncoded image;
+	// if stored internally
+	private ImageEncoded image;
 
-    @Override
-    public void customDecoding(int version, RawlogDecoder decoder) {
-        if( version <= 1 )
-            throw new RuntimeException("Version not supported");
+	@Override
+	public void customDecoding(int version, RawlogDecoder decoder) {
+		if (version <= 1)
+			throw new RuntimeException("Version not supported");
 
-        try {
-            boolean externalStorage;
+		try {
+			boolean externalStorage;
 
-            if( version >= 6 )
-                externalStorage = LittleEndianIO.readBoolean(decoder.getInput());
-            else
-                externalStorage = false;
+			if (version >= 6)
+				externalStorage = LittleEndianIO.readBoolean(decoder.getInput());
+			else
+				externalStorage = false;
 
-            if(externalStorage) {
-                String externalFileName = decoder.readString();
-                image = new ImageFile(externalFileName);
-            } else {
-                boolean hasColor = LittleEndianIO.readBoolean(decoder.getInput());
+			if (externalStorage) {
+				String externalFileName = decoder.readString();
+				image = new ImageFile(externalFileName);
+			} else {
+				boolean hasColor = LittleEndianIO.readBoolean(decoder.getInput());
 
-                if( hasColor ) {
-                    boolean loadJPEG=true;
+				if (hasColor) {
+					boolean loadJPEG = true;
 
-                    if( version >= 7 ) {
-                        throw new RuntimeException("not supported");
-                    }
+					if (version >= 7) {
+						throw new RuntimeException("not supported");
+					}
 
-                    if( loadJPEG ) {
-                        int size = LittleEndianIO.readInt(decoder.getInput());
-                        byte jpegData[] = decoder.readByteArray(size);
+					if (loadJPEG) {
+						int size = LittleEndianIO.readInt(decoder.getInput());
+						byte jpegData[] = decoder.readByteArray(size);
 
-                        image = new ImageJpeg(jpegData,size);
-                    }
+						image = new ImageJpeg(jpegData, size);
+					}
 
-                } else {
-                    int width = LittleEndianIO.readInt(decoder.getInput());
-                    int height = LittleEndianIO.readInt(decoder.getInput());
-                    int origin = LittleEndianIO.readInt(decoder.getInput());
-                    int imageSize = LittleEndianIO.readInt(decoder.getInput());
+				} else {
+					int width = LittleEndianIO.readInt(decoder.getInput());
+					int height = LittleEndianIO.readInt(decoder.getInput());
+					int origin = LittleEndianIO.readInt(decoder.getInput());
+					int imageSize = LittleEndianIO.readInt(decoder.getInput());
 
-                    if( version == 2 ) {
-                        // read in raw bytes
+					if (version == 2) {
+						// read in raw bytes
 						ImageUInt8 img = new ImageUInt8();
 						img.data = decoder.readByteArray(imageSize);
 						img.width = width;
-                        img.height = height;
+						img.height = height;
 						this.image = new ImageStandard(img);
-                    } else {
-                        boolean storedAsZip = LittleEndianIO.readBoolean(decoder.getInput());
+					} else {
+						boolean storedAsZip = LittleEndianIO.readBoolean(decoder.getInput());
 
-                        if( storedAsZip ) {
-                            throw new RuntimeException("Zip compression not supported yet");
-                        } else {
-                            throw new RuntimeException("Normal images not supported yet");
-                        }
-                    }
-                }
-            }
+						if (storedAsZip) {
+							throw new RuntimeException("Zip compression not supported yet");
+						} else {
+							throw new RuntimeException("Normal images not supported yet");
+						}
+					}
+				}
+			}
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    @Override
-    public void customEncoding(OutputStream output) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+	@Override
+	public void customEncoding(OutputStream output) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 
-    public ImageEncoded getImage() {
-        return image;
-    }
+	public ImageEncoded getImage() {
+		return image;
+	}
 
-    public void setImage(ImageEncoded image) {
-        this.image = image;
-    }
+	public void setImage(ImageEncoded image) {
+		this.image = image;
+	}
 
-    @Override
-    public int getVersion() {
-        return 7;
-    }
+	@Override
+	public int getVersion() {
+		return 7;
+	}
 }

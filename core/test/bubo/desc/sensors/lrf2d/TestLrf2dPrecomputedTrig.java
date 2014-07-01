@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,47 +28,47 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestLrf2dPrecomputedTrig {
 
-    @Test
-    public void computeEndPoint_internal() {
-        Lrf2dParam param = createParam();
+	@Test
+	public void computeEndPoint_internal() {
+		Lrf2dParam param = createParam();
 
-        Lrf2dPrecomputedTrig alg = new Lrf2dPrecomputedTrig(param);
+		Lrf2dPrecomputedTrig alg = new Lrf2dPrecomputedTrig(param);
 
-        double r = 25.0;
-        alg.computeEndPoint(5,r);
+		double r = 25.0;
+		alg.computeEndPoint(5, r);
 
-        double foundR = Math.sqrt(alg.x*alg.x + alg.y*alg.y);
-        double foundYaw = Math.atan2(alg.y,alg.x);
+		double foundR = Math.sqrt(alg.x * alg.x + alg.y * alg.y);
+		double foundYaw = Math.atan2(alg.y, alg.x);
 
-        assertEquals(r,foundR,1e-8);
-        assertEquals(foundYaw,-Math.PI+5.0/100.0*Math.PI,1e-8);
-    }
+		assertEquals(r, foundR, 1e-8);
+		assertEquals(foundYaw, -Math.PI + 5.0 / 100.0 * Math.PI, 1e-8);
+	}
 
-    @Test
-    public void computeEndPoint_point() {
-        Lrf2dParam param = createParam();
+	@Test
+	public void computeEndPoint_point() {
+		Lrf2dParam param = createParam();
 
-        Lrf2dPrecomputedTrig alg = new Lrf2dPrecomputedTrig(param);
+		Lrf2dPrecomputedTrig alg = new Lrf2dPrecomputedTrig(param);
 
-        Point2D_F64 pt = new Point2D_F64();
+		Point2D_F64 pt = new Point2D_F64();
 
-        double r = 25.0;
-        alg.computeEndPoint(5,r,pt);
+		double r = 25.0;
+		alg.computeEndPoint(5, r, pt);
 
-        double foundR = Math.sqrt(pt.x*pt.x + pt.y*pt.y);
-        double foundYaw = Math.atan2(pt.y,pt.x);
+		double foundR = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
+		double foundYaw = Math.atan2(pt.y, pt.x);
 
-        assertEquals(r,foundR,1e-8);
-        assertEquals(foundYaw,-Math.PI+5.0/100.0*Math.PI,1e-8);
-    }
+		assertEquals(r, foundR, 1e-8);
+		assertEquals(foundYaw, -Math.PI + 5.0 / 100.0 * Math.PI, 1e-8);
+	}
 
-    private Lrf2dParam createParam() {
-        Lrf2dParam param = new Lrf2dParam();
+	private Lrf2dParam createParam() {
+		Lrf2dParam param = new Lrf2dParam();
 
-        param.setNumberOfScans(100);
-        param.setSweepAngle(Math.PI);
-        param.setStartAngle(-Math.PI);
+		param.setNumberOfScans(100);
+		param.setSweepAngle(Math.PI);
+		param.setStartAngle(-Math.PI);
 
-        return param;
-    }
+		return param;
+	}
 }

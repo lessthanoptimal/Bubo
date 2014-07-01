@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -33,6 +33,23 @@ import static org.junit.Assert.assertTrue;
  * comments in each test for the details
  */
 public abstract class GenericKalmanFilterTests {
+
+	/**
+	 * Creates a Gaussian distribution with a covariance matrix and the specified state.
+	 */
+	public static MultivariateGaussianDM createState(double cov, double... x) {
+		DenseMatrix64F X = new DenseMatrix64F(x.length, 1);
+		DenseMatrix64F P = new DenseMatrix64F(x.length, x.length);
+
+		for (int i = 0; i < x.length; i++) {
+			X.set(i, 0, x[i]);
+			P.set(i, i, cov);
+		}
+		MultivariateGaussianDM ret = new MultivariateGaussianDM();
+		ret.assignRef(X, P);
+
+		return ret;
+	}
 
 	public void performAllGenericTests() {
 		testPropagationCovarianceIncrease();
@@ -131,21 +148,4 @@ public abstract class GenericKalmanFilterTests {
 	 */
 	protected abstract MultivariateGaussianDM createPerfectMeas(KalmanFilterInterface filter,
 																DenseMatrix64F state);
-
-	/**
-	 * Creates a Gaussian distribution with a covariance matrix and the specified state.
-	 */
-	public static MultivariateGaussianDM createState(double cov, double... x) {
-		DenseMatrix64F X = new DenseMatrix64F(x.length, 1);
-		DenseMatrix64F P = new DenseMatrix64F(x.length, x.length);
-
-		for (int i = 0; i < x.length; i++) {
-			X.set(i, 0, x[i]);
-			P.set(i, i, cov);
-		}
-		MultivariateGaussianDM ret = new MultivariateGaussianDM();
-		ret.assignRef(X, P);
-
-		return ret;
-	}
 }

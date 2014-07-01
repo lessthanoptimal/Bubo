@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,10 +24,10 @@ package bubo.desc;
  * @author Peter Abeles
  */
 public interface ComponentParameters {
-    /**
-     * Do these parameters change with time or are they constant.
-     *
-     * @return true if constant, false if variable.
-     */
-    public boolean isConstant();
+	/**
+	 * Do these parameters change with time or are they constant.
+	 *
+	 * @return true if constant, false if variable.
+	 */
+	public boolean isConstant();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,7 +32,7 @@ import java.io.DataOutput;
  */
 public interface CustomBinarySerialization extends SerializationDescription {
 
-    public void decode( DataInput input );
+	public void decode(DataInput input);
 
-    public void encode( DataOutput output );
+	public void encode(DataOutput output);
 }

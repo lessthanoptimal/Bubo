@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -39,31 +39,31 @@ public class PointModel<T extends GeoTuple_F64> implements ClosestPointToModel<T
 		this.maxDistanceSq = Double.MAX_VALUE;
 	}
 
-	public PointModel(List<T> points , double maxDistance ) {
+	public PointModel(List<T> points, double maxDistance) {
 		this.points = points;
-		this.maxDistanceSq = maxDistance*maxDistance;
+		this.maxDistanceSq = maxDistance * maxDistance;
 	}
 
 	@Override
 	public T findClosestPoint(T target) {
-		if( points.size() <= 0 )
+		if (points.size() <= 0)
 			return null;
 
 		T closestPoint = points.get(0);
 		double closestDist = closestPoint.distance2(target);
 
-		for( int i = 1; i < points.size(); i++ ) {
+		for (int i = 1; i < points.size(); i++) {
 			T p = points.get(i);
 
 			double d = p.distance2(target);
 
-			if( d < closestDist ) {
+			if (d < closestDist) {
 				closestDist = d;
 				closestPoint = p;
 			}
 		}
 
-		if( closestDist >= maxDistanceSq )
+		if (closestDist >= maxDistanceSq)
 			return null;
 
 		return closestPoint;

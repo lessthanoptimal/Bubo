@@ -28,8 +28,8 @@ public interface OccupancyGrid3D_F32 {
 	/**
 	 * Sets the specified cell to 'value'.
 	 *
-	 * @param x x-coordinate of the cell.
-	 * @param y y-coordinate of the cell.
+	 * @param x     x-coordinate of the cell.
+	 * @param y     y-coordinate of the cell.
 	 * @param value The cell's new value.
 	 */
 	public void set(int x, int y, int z, float value);

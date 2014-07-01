@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,57 +29,55 @@ import georegression.struct.point.Point2D_F64;
  */
 public class GridMapSpacialInfo {
 
-    // size of a grid cell in global units
-    double cellSize;
+	// size of a grid cell in global units
+	double cellSize;
 
-    // bottom left corner of the map in the global frame
-    Point2D_F64 bl;
+	// bottom left corner of the map in the global frame
+	Point2D_F64 bl;
 
 	/**
-	 *
-	 * @param cellSize Size of a map cell
+	 * @param cellSize   Size of a map cell
 	 * @param bottomLeft Bottom left coordinate of the map
 	 */
-    public GridMapSpacialInfo(double cellSize, Point2D_F64 bottomLeft) {
-        this.cellSize = cellSize;
-        this.bl = bottomLeft.copy();
-    }
+	public GridMapSpacialInfo(double cellSize, Point2D_F64 bottomLeft) {
+		this.cellSize = cellSize;
+		this.bl = bottomLeft.copy();
+	}
 
 	/**
-	 *
 	 * @param cellSize Size of a map cell
-	 * @param bl_x Bottom left of the map.  x-coordinate
-	 * @param bl_y Bottom left of the map.  y-coordinate
+	 * @param bl_x     Bottom left of the map.  x-coordinate
+	 * @param bl_y     Bottom left of the map.  y-coordinate
 	 */
-    public GridMapSpacialInfo(double cellSize, double bl_x , double bl_y ) {
-        this.cellSize = cellSize;
-        this.bl = new Point2D_F64(bl_x,bl_y);
-    }
+	public GridMapSpacialInfo(double cellSize, double bl_x, double bl_y) {
+		this.cellSize = cellSize;
+		this.bl = new Point2D_F64(bl_x, bl_y);
+	}
 
-    public GridMapSpacialInfo() {
-    }
+	public GridMapSpacialInfo() {
+	}
 
 	/**
 	 * Convert from global coordinates into map cell coordinates.
 	 */
-    public void globalToMap( Point2D_F64 global , Point2D_F64 map ) {
-		map.x = (global.x - bl.x)/cellSize;
-		map.y = (global.y - bl.y)/cellSize;
-    }
+	public void globalToMap(Point2D_F64 global, Point2D_F64 map) {
+		map.x = (global.x - bl.x) / cellSize;
+		map.y = (global.y - bl.y) / cellSize;
+	}
 
 	/**
 	 * Convert from map cell coordinates into global coordinates
 	 */
-    public void mapToGlobal( Point2D_F64 map , Point2D_F64 global ) {
-		global.x = map.x*cellSize + bl.x;
-		global.y = map.y*cellSize + bl.y;
+	public void mapToGlobal(Point2D_F64 map, Point2D_F64 global) {
+		global.x = map.x * cellSize + bl.x;
+		global.y = map.y * cellSize + bl.y;
 	}
 
-    public double getCellSize() {
-        return cellSize;
-    }
+	public double getCellSize() {
+		return cellSize;
+	}
 
-    public Point2D_F64 getBl() {
-        return bl;
-    }
+	public Point2D_F64 getBl() {
+		return bl;
+	}
 }

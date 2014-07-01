@@ -50,160 +50,161 @@ import java.io.IOException;
 
 // todo rename
 
-    // todo create a growable occupancy grid
+// todo create a growable occupancy grid
 public class ProcessPositionLadarCsv implements ActionListener {
 
-    private static final long pauseTimeMilli = 0;//5;
+	private static final long pauseTimeMilli = 0;//5;
 
-    LadarMappingComponent gui;
+	LadarMappingComponent gui;
 
-    LadarMapBayesUpdate mapBuilder;
-    OccupancyGrid2D_F32 map;
-    GridMapSpacialInfo mapSpacial;
+	LadarMapBayesUpdate mapBuilder;
+	OccupancyGrid2D_F32 map;
+	GridMapSpacialInfo mapSpacial;
 
-    // todo add algorithm which can process the data
-    ReadCsvObjectSmart<PositionRangeArrayData> reader;
-    PositionRangeArrayData data;
-    Lrf2dParam param;
-    // todo make GUI on or off configurable
+	// todo add algorithm which can process the data
+	ReadCsvObjectSmart<PositionRangeArrayData> reader;
+	PositionRangeArrayData data;
+	Lrf2dParam param;
+	// todo make GUI on or off configurable
 
-    int frameNum;
+	int frameNum;
 
-    volatile boolean paused = false;
-    volatile boolean takeStep = false;
-
-
-    double rangeToMeters = 0.001;
-    public ProcessPositionLadarCsv( String fileName , Lrf2dParam param) throws FileNotFoundException {
-        this.param = param;
-        data = new PositionRangeArrayData(param.getNumberOfScans());
-
-        SerializationDefinitionManager def = new SerializationDefinitionManager();
-        def.loadDefinition(PositionRangeArrayData.class,"timeStamp","position","rangeTimeStamp","unknown","range");
-        def.loadDefinition(Se2_F64.class,"x","y","yaw");
-
-        reader = new ReadCsvObjectSmart<PositionRangeArrayData>(new FileInputStream(fileName),def,PositionRangeArrayData.class.getSimpleName());
-        reader.setComment('#');
-        reader.setIgnoreUnparsedData(true);  // TODO read hokuyo config and make sure this is needed
-
-        gui = new LadarMappingComponent();
-        gui.configureLadar(param);
-
-        gui.getPlayButton().addActionListener(this);
-        gui.getStepButton().addActionListener(this);
-        gui.getFocusRobotButton().addActionListener(this);
-        gui.getSaveMapImageButton().addActionListener(this);
-
-        gui.getMapDisplay().setColorUnknown(null);
-
-        UtilDisplayBubo.show(gui,"Ladar Mapping",false,0,0,1200,800);
-    }
-
-    public void process() throws IOException {
-
-        mapBuilder = new LadarMapBayesUpdate();
-
-        map = null;
-        mapSpacial = null;
-        if( reader.nextObject(data) != null ) {
-            double cellSize = 0.1;
-            map = new ArrayGrid2D_F32(1400,2000);
-
-            double bl_x = data.getPosition().getX() - map.getWidth()*cellSize/2.0;
-            double bl_y = data.getPosition().getY() - map.getHeight()*cellSize/2.0;
-
-            mapSpacial = new GridMapSpacialInfo(cellSize,new Point2D_F64(bl_x,bl_y));
-
-            map.clear();
-
-            mapBuilder.init(param,map,mapSpacial);
-
-            gui.setMap(mapSpacial,map);
-        }
-
-        frameNum = 0;
-        while( reader.nextObject(data) != null ) {
-
-            if( frameNum == 11000 )
-                paused = true;
-            
-            // convert range data into standard units and special cases
-            double []ranges = data.getRange();
-
-            for( int i = 0; i < param.getNumberOfScans(); i++ ) {
-                ranges[i]*= rangeToMeters;
-            }
-
-            mapBuilder.process(data);
-
-            gui.updateRobot(mapBuilder.getPosition());
-            gui.updateLadar(data.getRange());
-            gui.updateMap();
-            gui.repaint();
-            
-            if( frameNum == 0 ) {
-                // focus on the robot initially
-                setDisplayToRobot();
-            }
-
-            UtilDisplayBubo.pause(pauseTimeMilli);
-            while( paused ) {
-                UtilDisplayBubo.pause(5);
-                if( takeStep ) {
-                    takeStep = false;
-                    break;
-                }
-            }
-
-            System.out.println("Processed Data "+frameNum);
-            frameNum++;
-           // todo create histogram viewer
-            // todo write odometry + ladar to a map and display that
+	volatile boolean paused = false;
+	volatile boolean takeStep = false;
 
 
-        }
-    }
+	double rangeToMeters = 0.001;
 
-    public static void main( String args[] ) throws IOException {
+	public ProcessPositionLadarCsv(String fileName, Lrf2dParam param) throws FileNotFoundException {
+		this.param = param;
+		data = new PositionRangeArrayData(param.getNumberOfScans());
 
-        String fileName = "csv_data.txt";
+		SerializationDefinitionManager def = new SerializationDefinitionManager();
+		def.loadDefinition(PositionRangeArrayData.class, "timeStamp", "position", "rangeTimeStamp", "unknown", "range");
+		def.loadDefinition(Se2_F64.class, "x", "y", "yaw");
 
-        Lrf2dParam param = Lrf2dParamFactory.createHokuyo();
+		reader = new ReadCsvObjectSmart<PositionRangeArrayData>(new FileInputStream(fileName), def, PositionRangeArrayData.class.getSimpleName());
+		reader.setComment('#');
+		reader.setIgnoreUnparsedData(true);  // TODO read hokuyo config and make sure this is needed
 
-        ProcessPositionLadarCsv p = new ProcessPositionLadarCsv(fileName,param);
+		gui = new LadarMappingComponent();
+		gui.configureLadar(param);
 
-        p.process();
-    }
+		gui.getPlayButton().addActionListener(this);
+		gui.getStepButton().addActionListener(this);
+		gui.getFocusRobotButton().addActionListener(this);
+		gui.getSaveMapImageButton().addActionListener(this);
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if( e.getSource() == gui.getPlayButton() ) {
-            paused = !paused;
-        } else if( e.getSource() == gui.getStepButton() ) {
-            if( !paused ) {
-                paused = true;
-            } else {
-                takeStep = true;
-            }
-        } else if( e.getSource() == gui.getFocusRobotButton() ) {
-            setDisplayToRobot();
-        } else if( e.getSource() == gui.getSaveMapImageButton() ) {
-            String fileName = String.format("frame%05d.png",frameNum);
+		gui.getMapDisplay().setColorUnknown(null);
 
-            BufferedImage renderedMap = OccupancyGridIO.render_F32(map,true);
-            UtilImageIO.saveImage(renderedMap,fileName);
-            System.out.println("Saved map to image");
-        }
-    }
+		UtilDisplayBubo.show(gui, "Ladar Mapping", false, 0, 0, 1200, 800);
+	}
 
-    private void setDisplayToRobot() {
-        // world coordinates
-        Se2_F64 position = mapBuilder.getPosition();
+	public static void main(String args[]) throws IOException {
 
-        // map coordinates
-        double x = position.getX() - mapSpacial.getBl().x;
-        double y = position.getY() - mapSpacial.getBl().y;
+		String fileName = "csv_data.txt";
 
-        gui.setViewCenter(x,y);
-    }
+		Lrf2dParam param = Lrf2dParamFactory.createHokuyo();
+
+		ProcessPositionLadarCsv p = new ProcessPositionLadarCsv(fileName, param);
+
+		p.process();
+	}
+
+	public void process() throws IOException {
+
+		mapBuilder = new LadarMapBayesUpdate();
+
+		map = null;
+		mapSpacial = null;
+		if (reader.nextObject(data) != null) {
+			double cellSize = 0.1;
+			map = new ArrayGrid2D_F32(1400, 2000);
+
+			double bl_x = data.getPosition().getX() - map.getWidth() * cellSize / 2.0;
+			double bl_y = data.getPosition().getY() - map.getHeight() * cellSize / 2.0;
+
+			mapSpacial = new GridMapSpacialInfo(cellSize, new Point2D_F64(bl_x, bl_y));
+
+			map.clear();
+
+			mapBuilder.init(param, map, mapSpacial);
+
+			gui.setMap(mapSpacial, map);
+		}
+
+		frameNum = 0;
+		while (reader.nextObject(data) != null) {
+
+			if (frameNum == 11000)
+				paused = true;
+
+			// convert range data into standard units and special cases
+			double[] ranges = data.getRange();
+
+			for (int i = 0; i < param.getNumberOfScans(); i++) {
+				ranges[i] *= rangeToMeters;
+			}
+
+			mapBuilder.process(data);
+
+			gui.updateRobot(mapBuilder.getPosition());
+			gui.updateLadar(data.getRange());
+			gui.updateMap();
+			gui.repaint();
+
+			if (frameNum == 0) {
+				// focus on the robot initially
+				setDisplayToRobot();
+			}
+
+			UtilDisplayBubo.pause(pauseTimeMilli);
+			while (paused) {
+				UtilDisplayBubo.pause(5);
+				if (takeStep) {
+					takeStep = false;
+					break;
+				}
+			}
+
+			System.out.println("Processed Data " + frameNum);
+			frameNum++;
+			// todo create histogram viewer
+			// todo write odometry + ladar to a map and display that
+
+
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == gui.getPlayButton()) {
+			paused = !paused;
+		} else if (e.getSource() == gui.getStepButton()) {
+			if (!paused) {
+				paused = true;
+			} else {
+				takeStep = true;
+			}
+		} else if (e.getSource() == gui.getFocusRobotButton()) {
+			setDisplayToRobot();
+		} else if (e.getSource() == gui.getSaveMapImageButton()) {
+			String fileName = String.format("frame%05d.png", frameNum);
+
+			BufferedImage renderedMap = OccupancyGridIO.render_F32(map, true);
+			UtilImageIO.saveImage(renderedMap, fileName);
+			System.out.println("Saved map to image");
+		}
+	}
+
+	private void setDisplayToRobot() {
+		// world coordinates
+		Se2_F64 position = mapBuilder.getPosition();
+
+		// map coordinates
+		double x = position.getX() - mapSpacial.getBl().x;
+		double y = position.getY() - mapSpacial.getBl().y;
+
+		gui.setViewCenter(x, y);
+	}
 }

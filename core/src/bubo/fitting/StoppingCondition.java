@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,41 +26,41 @@ package bubo.fitting;
  */
 public class StoppingCondition {
 
-    int maxIterations;
-    double errorThreshold;
+	int maxIterations;
+	double errorThreshold;
 
-    int iteration;
-    double previousError;
+	int iteration;
+	double previousError;
 
-    public StoppingCondition(int maxIterations, double errorThreshold) {
-        this.maxIterations = maxIterations;
-        this.errorThreshold = errorThreshold;
-    }
+	public StoppingCondition(int maxIterations, double errorThreshold) {
+		this.maxIterations = maxIterations;
+		this.errorThreshold = errorThreshold;
+	}
 
-    public void reset() {
-        iteration = 0;
-        previousError = 0;
-    }
+	public void reset() {
+		iteration = 0;
+		previousError = 0;
+	}
 
-    public boolean isFinished( double foundError ) {
-        if( foundError < errorThreshold )
-            return true;
+	public boolean isFinished(double foundError) {
+		if (foundError < errorThreshold)
+			return true;
 
-        if( iteration++ > 0 ) {
-            // see if its at a minimum
-            if( Math.abs(previousError-foundError) <= 1e-10 )
-                return true;
-        }
-        previousError = foundError;
+		if (iteration++ > 0) {
+			// see if its at a minimum
+			if (Math.abs(previousError - foundError) <= 1e-10)
+				return true;
+		}
+		previousError = foundError;
 
-        return iteration >= maxIterations;
-    }
+		return iteration >= maxIterations;
+	}
 
-    public StoppingCondition copy() {
-        return new StoppingCondition(maxIterations,errorThreshold);
-    }
+	public StoppingCondition copy() {
+		return new StoppingCondition(maxIterations, errorThreshold);
+	}
 
-    public int getIteration() {
-        return iteration;
-    }
+	public int getIteration() {
+		return iteration;
+	}
 }

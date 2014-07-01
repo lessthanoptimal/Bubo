@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,26 +30,26 @@ import static org.junit.Assert.*;
  */
 public class TestUtilCompression {
 
-    /**
-     * Make sure that these tests will run correctly.
-     */
-    @Test
-    public void isHomeDirectorySetCorrectlyForTheseTests() {
-        if( !new File("testdata/file.txt").exists())
-            fail("Need to change input directory to be bubo io's home directory");
-    }
+	/**
+	 * Make sure that these tests will run correctly.
+	 */
+	@Test
+	public void isHomeDirectorySetCorrectlyForTheseTests() {
+		if (!new File("testdata/file.txt").exists())
+			fail("Need to change input directory to be bubo io's home directory");
+	}
 
-    /**
-     * Provide both a positive and negative case.
-     */
-    @Test
-    public void isGzipFile() {
+	/**
+	 * Provide both a positive and negative case.
+	 */
+	@Test
+	public void isGzipFile() {
 
-        boolean positive = UtilCompression.isGzipFile(new File("testdata/file.txt.gz"));
-        boolean negative = UtilCompression.isGzipFile(new File("testdata/file.txt"));
+		boolean positive = UtilCompression.isGzipFile(new File("testdata/file.txt.gz"));
+		boolean negative = UtilCompression.isGzipFile(new File("testdata/file.txt"));
 
-        assertTrue(positive);
-        assertFalse(negative);
-    }
+		assertTrue(positive);
+		assertFalse(negative);
+	}
 
 }

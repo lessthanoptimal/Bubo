@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,101 +32,101 @@ import java.io.OutputStream;
  */
 public class TCamera implements RawlogSerializableCustom {
 
-    // Number of pixels along the images width and height 
-    private int width,height;
-    //!< 3 by 3 Matrix of intrinsic parameters (containing the focal length and principal point coordinates)
-    private CMatrixD intrinsicParams;
-    //!< [k1 k2 t1 t2 t3] -> k_i: parameters of radial distortion, t_i: parameters of tangential distortion (default=0)
-    private double[] distortion = new double[5];
-    //!< The focal length of the camera, in meters (can be used among 'intrinsicParams' to determine the pixel size).
-    private double focalLengthMeters;
+	// Number of pixels along the images width and height
+	private int width, height;
+	//!< 3 by 3 Matrix of intrinsic parameters (containing the focal length and principal point coordinates)
+	private CMatrixD intrinsicParams;
+	//!< [k1 k2 t1 t2 t3] -> k_i: parameters of radial distortion, t_i: parameters of tangential distortion (default=0)
+	private double[] distortion = new double[5];
+	//!< The focal length of the camera, in meters (can be used among 'intrinsicParams' to determine the pixel size).
+	private double focalLengthMeters;
 
-    @Override
-    public void customDecoding(int version, RawlogDecoder decoder) {
-        try {
-            focalLengthMeters = LittleEndianIO.readDouble(decoder.getInput());
-            for( int i = 0; i < 5; i++ )
-                distortion[i] = LittleEndianIO.readDouble(decoder.getInput());
-            intrinsicParams = (CMatrixD) decoder.decodeObject();
-            focalLengthMeters = LittleEndianIO.readDouble(decoder.getInput());
+	@Override
+	public void customDecoding(int version, RawlogDecoder decoder) {
+		try {
+			focalLengthMeters = LittleEndianIO.readDouble(decoder.getInput());
+			for (int i = 0; i < 5; i++)
+				distortion[i] = LittleEndianIO.readDouble(decoder.getInput());
+			intrinsicParams = (CMatrixD) decoder.decodeObject();
+			focalLengthMeters = LittleEndianIO.readDouble(decoder.getInput());
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    @Override
-    public void customEncoding(OutputStream output) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+	@Override
+	public void customEncoding(OutputStream output) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 
-    public void setDistortion( CMatrix dist ) {
-        for( int i = 0; i < dist.getNumRows(); i++ ) {
-            distortion[i] = dist.get(i,0);
-        }
-    }
+	public void setDistortion(CMatrix dist) {
+		for (int i = 0; i < dist.getNumRows(); i++) {
+			distortion[i] = dist.get(i, 0);
+		}
+	}
 
-    public void setIntrinsic( CMatrix a ) {
-        intrinsicParams = new CMatrixD( a );
-    }
+	public void setIntrinsic(CMatrix a) {
+		intrinsicParams = new CMatrixD(a);
+	}
 
-    public int getWidth() {
-        return width;
-    }
+	public int getWidth() {
+		return width;
+	}
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
+	public void setWidth(int width) {
+		this.width = width;
+	}
 
-    public int getHeight() {
-        return height;
-    }
+	public int getHeight() {
+		return height;
+	}
 
-    public void setHeight(int height) {
-        this.height = height;
-    }
+	public void setHeight(int height) {
+		this.height = height;
+	}
 
-    public CMatrixD getIntrinsicParams() {
-        return intrinsicParams;
-    }
+	public CMatrixD getIntrinsicParams() {
+		return intrinsicParams;
+	}
 
-    public void setIntrinsicParams(CMatrixD intrinsicParams) {
-        this.intrinsicParams = intrinsicParams;
-    }
+	public void setIntrinsicParams(CMatrixD intrinsicParams) {
+		this.intrinsicParams = intrinsicParams;
+	}
 
-    public double[] getDistortion() {
-        return distortion;
-    }
+	public double[] getDistortion() {
+		return distortion;
+	}
 
-    public void setDistortion(double[] distortion) {
-        this.distortion = distortion;
-    }
+	public void setDistortion(double[] distortion) {
+		this.distortion = distortion;
+	}
 
-    public double getFocalLengthMeters() {
-        return focalLengthMeters;
-    }
+	public double getFocalLengthMeters() {
+		return focalLengthMeters;
+	}
 
-    public void setFocalLengthMeters(double focalLengthMeters) {
-        this.focalLengthMeters = focalLengthMeters;
-    }
+	public void setFocalLengthMeters(double focalLengthMeters) {
+		this.focalLengthMeters = focalLengthMeters;
+	}
 
-    @Override
-    public int getVersion() {
-        return 2;
-    }
+	@Override
+	public int getVersion() {
+		return 2;
+	}
 
-    public String toReadableText() {
-        String ret = "";
+	public String toReadableText() {
+		String ret = "";
 
-        ret += "Dimension "+width+" by "+height+"\n";
-        ret += "Focal Length "+focalLengthMeters+" (m)\n";
-        ret += "Intrinsic matrix:  implement\n";
-        ret += "Distortion param: ";
-        for( int i = 0; i < distortion.length; i++) {
-            ret += distortion[i]+" ";
-        }
-        ret += "\n";
+		ret += "Dimension " + width + " by " + height + "\n";
+		ret += "Focal Length " + focalLengthMeters + " (m)\n";
+		ret += "Intrinsic matrix:  implement\n";
+		ret += "Distortion param: ";
+		for (int i = 0; i < distortion.length; i++) {
+			ret += distortion[i] + " ";
+		}
+		ret += "\n";
 
-        return ret;
-    }
+		return ret;
+	}
 }

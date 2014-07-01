@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,25 +28,25 @@ import bubo.io.rawlog.RawlogSerializable;
  */
 public abstract class CObservation implements RawlogSerializable {
 
-    // The associated time-stamp.
-    private long timestamp;
+	// The associated time-stamp.
+	private long timestamp;
 
-    // An arbitrary label that can be used to identify the sensor.
-    private String sensorLabel;
+	// An arbitrary label that can be used to identify the sensor.
+	private String sensorLabel;
 
-    public long getTimestamp() {
-        return timestamp;
-    }
+	public long getTimestamp() {
+		return timestamp;
+	}
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
 
-    public String getSensorLabel() {
-        return sensorLabel;
-    }
+	public String getSensorLabel() {
+		return sensorLabel;
+	}
 
-    public void setSensorLabel(String sensorLabel) {
-        this.sensorLabel = sensorLabel;
-    }
+	public void setSensorLabel(String sensorLabel) {
+		this.sensorLabel = sensorLabel;
+	}
 }

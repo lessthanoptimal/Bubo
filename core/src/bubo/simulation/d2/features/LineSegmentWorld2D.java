@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,5 +28,5 @@ import java.util.List;
  */
 public class LineSegmentWorld2D {
 
-    public List<LineSegment2D_F64> lines = new ArrayList<LineSegment2D_F64>();
+	public List<LineSegment2D_F64> lines = new ArrayList<LineSegment2D_F64>();
 }

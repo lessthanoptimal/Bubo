@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -34,58 +34,57 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestLocalAssociateDiscrete {
 
-    /**
-     * Test basic association functionality by having it associate a trivial example
-     */
-    @Test
-    public void trivialCase() {
-        Lrf2dParam param = TestGeneralizedScanToScan.createParam();
-        int N = param.getNumberOfScans();
+	/**
+	 * Test basic association functionality by having it associate a trivial example
+	 */
+	@Test
+	public void trivialCase() {
+		Lrf2dParam param = TestGeneralizedScanToScan.createParam();
+		int N = param.getNumberOfScans();
 
-        ScanInfo scanMatch = new ScanInfo(N);
-        ScanInfo scanRef = new ScanInfo(N);
+		ScanInfo scanMatch = new ScanInfo(N);
+		ScanInfo scanRef = new ScanInfo(N);
 
-        for( int i = 0; i < N; i++ ) {
-            scanMatch.pts[i] = new Point2D_F64(i,i);
-            scanRef.pts[i] = new Point2D_F64(i,i);
-            scanMatch.vis[i] = true;
-            scanRef.vis[i] = true;
-        }
+		for (int i = 0; i < N; i++) {
+			scanMatch.pts[i] = new Point2D_F64(i, i);
+			scanRef.pts[i] = new Point2D_F64(i, i);
+			scanMatch.vis[i] = true;
+			scanRef.vis[i] = true;
+		}
 
-        DummyAssociate alg = new DummyAssociate(10,5);
-        alg.setParam(param);
+		DummyAssociate alg = new DummyAssociate(10, 5);
+		alg.setParam(param);
 
-        alg.associate(scanMatch,scanRef);
+		alg.associate(scanMatch, scanRef);
 
-        // should associate to the point with the same index
-        List<Point2D_F64> match = alg.getListMatch();
-        List<Point2D_F64> ref = alg.getListReference();
+		// should associate to the point with the same index
+		List<Point2D_F64> match = alg.getListMatch();
+		List<Point2D_F64> ref = alg.getListReference();
 
-        for( int i = 0; i < N; i++ ) {
-            assertTrue( match.get(i) == scanMatch.pts[i]);
-            assertTrue( ref.get(i) == scanRef.pts[i]);
-        }
-    }
+		for (int i = 0; i < N; i++) {
+			assertTrue(match.get(i) == scanMatch.pts[i]);
+			assertTrue(ref.get(i) == scanRef.pts[i]);
+		}
+	}
 
-    /**
-     * Very simple implementation of associate.  Does it based upon the index alone.
-     */
-    private static class DummyAssociate extends LocalAssociateDiscrete
-    {
-        int indexFrom;
+	/**
+	 * Very simple implementation of associate.  Does it based upon the index alone.
+	 */
+	private static class DummyAssociate extends LocalAssociateDiscrete {
+		int indexFrom;
 
-        protected DummyAssociate(int searchNeighborhood, double maxSeparation) {
-            super(searchNeighborhood, maxSeparation);
-        }
+		protected DummyAssociate(int searchNeighborhood, double maxSeparation) {
+			super(searchNeighborhood, maxSeparation);
+		}
 
-        @Override
-        public void setTarget(int indexFrom) {
-            this.indexFrom = indexFrom;
-        }
+		@Override
+		public void setTarget(int indexFrom) {
+			this.indexFrom = indexFrom;
+		}
 
-        @Override
-        public double distToTarget(int indexTo) {
-            return Math.abs(indexTo-indexFrom);
-        }
-    }
+		@Override
+		public double distToTarget(int indexTo) {
+			return Math.abs(indexTo - indexFrom);
+		}
+	}
 }

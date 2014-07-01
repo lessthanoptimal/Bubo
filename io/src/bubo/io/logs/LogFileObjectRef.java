@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,41 +24,42 @@ package bubo.io.logs;
  * where the data came from.  If the type or source values are not applicable then they
  * are set to null.
  * </p>
+ *
  * @author Peter Abeles
  */
 public class LogFileObjectRef {
-    // the type of data object
-    public Class<?> dataType;
-    
-    // which sensor it came from
-    public String source;
+	// the type of data object
+	public Class<?> dataType;
 
-    public LogFileObjectRef() {
-    }
+	// which sensor it came from
+	public String source;
 
-    public LogFileObjectRef(Class<?> dataType, String source) {
-        this.dataType = dataType;
-        this.source = source;
-    }
+	public LogFileObjectRef() {
+	}
 
-    @Override
-    public String toString() {
-        return dataType.getSimpleName();
-    }
+	public LogFileObjectRef(Class<?> dataType, String source) {
+		this.dataType = dataType;
+		this.source = source;
+	}
 
-    public Class<?> getDataType() {
-        return dataType;
-    }
+	@Override
+	public String toString() {
+		return dataType.getSimpleName();
+	}
 
-    public void setDataType(Class<?> dataType) {
-        this.dataType = dataType;
-    }
+	public Class<?> getDataType() {
+		return dataType;
+	}
 
-    public String getSource() {
-        return source;
-    }
+	public void setDataType(Class<?> dataType) {
+		this.dataType = dataType;
+	}
 
-    public void setSource(String source) {
-        this.source = source;
-    }
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
 }

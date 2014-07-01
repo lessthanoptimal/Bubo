@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -60,6 +60,23 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 	}
 
 	/**
+	 * Copies all but a top left portion of one matrix into another one.
+	 * <p/>
+	 * The matrices must be the same size.
+	 * <p/>
+	 * An element will be copied if its x index is >= minX OR y index is >= minY
+	 */
+	public static void copyExcludeSubMatrix(DenseMatrix64F src, DenseMatrix64F dest,
+											int minX, int minY) {
+		for (int i = 0; i < dest.numRows; i++) {
+			for (int j = 0; j < dest.numCols; j++) {
+				if (i >= minY || j >= minX)
+					dest.unsafe_set(i, j, src.get(i, j));
+			}
+		}
+	}
+
+	/**
 	 * @param def The state which will be used as a default value.  A copy is made.
 	 */
 	public void setDefault(MultivariateGaussianDM def) {
@@ -72,7 +89,6 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 
 		System.arraycopy(internal, 0, internalDimen, 0, internal.length);
 	}
-
 
 	@Override
 	public DenseMatrix64F convertMergeFrom(boolean isMean,
@@ -114,27 +130,9 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 			int maxX = isMean ? 1 : fromDimen;
 			DenseMatrix64F def = isMean ? this.def.getMean() : this.def.getCovariance();
 			CommonOps.extract(fromState, 0, fromDimen, 0, maxX, a, 0, 0);
-			copyExcludeSubMatrix(def,a,maxX,fromDimen);
+			copyExcludeSubMatrix(def, a, maxX, fromDimen);
 		}
 
 		return a;
-	}
-
-	/**
-	 * Copies all but a top left portion of one matrix into another one.
-	 *
-	 * The matrices must be the same size.
-	 *
-	 * An element will be copied if its x index is >= minX OR y index is >= minY
-	 */
-	public static void copyExcludeSubMatrix( DenseMatrix64F src , DenseMatrix64F dest ,
-											 int minX , int minY )
-	{
-		for( int i = 0; i < dest.numRows ; i++ ) {
-			for( int j = 0; j < dest.numCols; j++ ) {
-				if( i >= minY || j >= minX )
-					dest.unsafe_set(i, j, src.get(i, j));
-			}
-		}
 	}
 }

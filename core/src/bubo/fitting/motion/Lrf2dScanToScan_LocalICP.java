@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -43,19 +43,19 @@ public class Lrf2dScanToScan_LocalICP extends GeneralizedScanToScan {
 	/**
 	 * Constructor.
 	 *
-	 * @param stop Optimization stopping condition.
+	 * @param stop              Optimization stopping condition.
 	 * @param associationRadius How many indexes around the current
-	 * @param maxSeparation Maximum distance two points can be for them to be associated.
+	 * @param maxSeparation     Maximum distance two points can be for them to be associated.
 	 */
 	public Lrf2dScanToScan_LocalICP(StoppingCondition stop, int associationRadius, double maxSeparation) {
 		super(stop);
 
-		assoc = new DistanceAssociate(associationRadius,maxSeparation*maxSeparation);
+		assoc = new DistanceAssociate(associationRadius, maxSeparation * maxSeparation);
 
 	}
 
 	@Override
-	public void setSensorParam(Lrf2dParam param ) {
+	public void setSensorParam(Lrf2dParam param) {
 		super.setSensorParam(param);
 		assoc.setParam(param);
 	}
@@ -68,8 +68,7 @@ public class Lrf2dScanToScan_LocalICP extends GeneralizedScanToScan {
 	/**
 	 * Associates points based on cartesian distance.
 	 */
-	protected class DistanceAssociate extends LocalAssociateDiscrete
-	{
+	protected class DistanceAssociate extends LocalAssociateDiscrete {
 		Point2D_F64 fromPt;
 
 		protected DistanceAssociate(int searchNeighborhood, double maxSeparation) {

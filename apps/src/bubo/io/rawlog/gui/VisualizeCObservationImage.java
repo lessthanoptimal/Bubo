@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -34,94 +34,94 @@ import java.awt.image.BufferedImage;
  */
 public class VisualizeCObservationImage implements LogDataVisualization {
 
-    CObservationImage obs;
+	CObservationImage obs;
 
-    // display the image
-    JPanel imageComponent = new JPanel();
-    // displays text information about the image
-    JTextArea infoComponent = new JTextArea();
+	// display the image
+	JPanel imageComponent = new JPanel();
+	// displays text information about the image
+	JTextArea infoComponent = new JTextArea();
 
-    // components that go inside imageComponent
-    JLabel imageText = new JLabel("Not Set!");
-    BufferedImageComponent imageDisplay = new BufferedImageComponent(null);
+	// components that go inside imageComponent
+	JLabel imageText = new JLabel("Not Set!");
+	BufferedImageComponent imageDisplay = new BufferedImageComponent(null);
 
 
-    RawlogViewer.Config config;
+	RawlogViewer.Config config;
 
-    public VisualizeCObservationImage(RawlogViewer.Config config) {
-        this.config = config;
-        imageComponent.add(new JLabel("Not set"));
-    }
+	public VisualizeCObservationImage(RawlogViewer.Config config) {
+		this.config = config;
+		imageComponent.add(new JLabel("Not set"));
+	}
 
-    @Override
-    public void setData(Object data) {
-        this.obs = (CObservationImage)data;
+	public static String basicObservationText(CObservation obs) {
+		String text = "";
+		text += "Source: " + obs.getSensorLabel() + "\n";
+		text += "Time Stamp: " + obs.getTimestamp() + "\n";
+		text += "Version: " + obs.getVersion() + "\n";
+		return text;
+	}
 
-        ImageEncoded encoded = obs.getImage().getImage();
+	@Override
+	public void setData(Object data) {
+		this.obs = (CObservationImage) data;
 
-        BufferedImage img;
-        String imageInfo;
+		ImageEncoded encoded = obs.getImage().getImage();
 
-        if( encoded instanceof ImageFile) {
-            imageInfo = config.directory+"/Images/"+((ImageFile)encoded).getFileLocation();
-            img = UtilImageIO.loadImage(imageInfo);
-            imageInfo = "File Name: "+imageInfo;
-        } else {
-            img = encoded.convertToBuffered();
-            imageInfo = "Format: "+encoded.getFormat();
-        }
+		BufferedImage img;
+		String imageInfo;
 
-        imageComponent.removeAll();
-        if( img == null ) {
-            imageText.setText("No Image Loaded: "+imageInfo);
-            imageComponent.add(imageText);
-        } else {
-            imageDisplay.setImage(img);
-            imageComponent.add(imageDisplay);
-        }
+		if (encoded instanceof ImageFile) {
+			imageInfo = config.directory + "/Images/" + ((ImageFile) encoded).getFileLocation();
+			img = UtilImageIO.loadImage(imageInfo);
+			imageInfo = "File Name: " + imageInfo;
+		} else {
+			img = encoded.convertToBuffered();
+			imageInfo = "Format: " + encoded.getFormat();
+		}
 
-        String text = basicObservationText(obs);
-        text += imageInfo+"\n";
-        text += obs.getCameraPose().toReadableText();
-        text += obs.getCameraParams().toReadableText();
+		imageComponent.removeAll();
+		if (img == null) {
+			imageText.setText("No Image Loaded: " + imageInfo);
+			imageComponent.add(imageText);
+		} else {
+			imageDisplay.setImage(img);
+			imageComponent.add(imageDisplay);
+		}
 
-        infoComponent.setText(text);
-    }
+		String text = basicObservationText(obs);
+		text += imageInfo + "\n";
+		text += obs.getCameraPose().toReadableText();
+		text += obs.getCameraParams().toReadableText();
 
-    public static String basicObservationText( CObservation obs ) {
-        String text = "";
-        text += "Source: "+obs.getSensorLabel()+"\n";
-        text += "Time Stamp: "+obs.getTimestamp()+"\n";
-        text += "Version: "+obs.getVersion()+"\n";
-        return text;
-    }
+		infoComponent.setText(text);
+	}
 
-    @Override
-    public Class<?> getType() {
-        return CObservationImage.class;
-    }
+	@Override
+	public Class<?> getType() {
+		return CObservationImage.class;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 2;
-    }
+	@Override
+	public int numDisplay() {
+		return 2;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        if( index == 0 )
-            return infoComponent;
-        else if( index == 1 )
-            return imageComponent;
+	@Override
+	public JComponent getDisplay(int index) {
+		if (index == 0)
+			return infoComponent;
+		else if (index == 1)
+			return imageComponent;
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        if( index == 0 )
-            return "Info";
-        else if( index == 1 )
-            return "Image";
-        return null;
-    }
+	@Override
+	public String getDisplayName(int index) {
+		if (index == 0)
+			return "Info";
+		else if (index == 1)
+			return "Image";
+		return null;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,119 +35,118 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestGeneralizedScanToScan {
 
-    /**
-     * Sees if the location of the scan's end points are correctly computed.
-     */
-    @Test
-    public void computeScan() {
-        Lrf2dParam param = createParam();
-        Helper h = new Helper(null);
-        h.setSensorParam(param);
+	public static Lrf2dParam createParam() {
+		return new Lrf2dParam(null, -Math.PI * 0.75, Math.PI * 0.75, 100, 5, 0.01, 0.01);
+	}
 
-        final int N = param.getNumberOfScans();
-        final double range = param.getMaxRange()*0.9;
+	/**
+	 * Sees if the location of the scan's end points are correctly computed.
+	 */
+	@Test
+	public void computeScan() {
+		Lrf2dParam param = createParam();
+		Helper h = new Helper(null);
+		h.setSensorParam(param);
 
-        double ranges[] = new double[N];
-        Point2D_F64 pts[] = new Point2D_F64[N];
-        for( int i = 0; i < N; i++ ) {
-            ranges[i] = range;
-            pts[i] = new Point2D_F64();
-        }
+		final int N = param.getNumberOfScans();
+		final double range = param.getMaxRange() * 0.9;
 
-        // it should skip over points which exceed the max range
-        ranges[10] = param.getMaxRange()+10;
+		double ranges[] = new double[N];
+		Point2D_F64 pts[] = new Point2D_F64[N];
+		for (int i = 0; i < N; i++) {
+			ranges[i] = range;
+			pts[i] = new Point2D_F64();
+		}
 
-        h.computeScanEndPoint(ranges, pts);
+		// it should skip over points which exceed the max range
+		ranges[10] = param.getMaxRange() + 10;
 
-        // validate by computing the range of each point
-        for( int i = 0; i < N; i++ ) {
-            double r = pts[i].norm();
-            if( i != 10 )
-                assertEquals(range,r,1e-8);
-            else
-                assertTrue(r < 1);
-        }
-    }
+		h.computeScanEndPoint(ranges, pts);
 
-    /**
-     * Check to see if scans with theta in an unexpected direction are set
-     * as not visible
-     */
-    @Test
-    public void checkVisibleByDeltaAngle() {
-        Lrf2dParam param = createParam();
-        Helper h = new Helper(null);
-        h.setSensorParam(param);
+		// validate by computing the range of each point
+		for (int i = 0; i < N; i++) {
+			double r = pts[i].norm();
+			if (i != 10)
+				assertEquals(range, r, 1e-8);
+			else
+				assertTrue(r < 1);
+		}
+	}
 
-        final int N = param.getNumberOfScans();
-        ScanInfo info = new ScanInfo(N);
-        for( int i = 0; i < N; i++ ) {
-            info.theta[i] = param.getStartAngle()+param.getAngleIncrement()*i;
-            info.vis[i] = true;
-        }
-        // cause a bad point
-        info.theta[10] = param.getStartAngle();
+	/**
+	 * Check to see if scans with theta in an unexpected direction are set
+	 * as not visible
+	 */
+	@Test
+	public void checkVisibleByDeltaAngle() {
+		Lrf2dParam param = createParam();
+		Helper h = new Helper(null);
+		h.setSensorParam(param);
 
-        h.checkVisibleByDeltaAngle(info);
+		final int N = param.getNumberOfScans();
+		ScanInfo info = new ScanInfo(N);
+		for (int i = 0; i < N; i++) {
+			info.theta[i] = param.getStartAngle() + param.getAngleIncrement() * i;
+			info.vis[i] = true;
+		}
+		// cause a bad point
+		info.theta[10] = param.getStartAngle();
 
-        for( int i = 0; i < N; i++ ) {
-            assertTrue(info.vis[i] == (i!=10));
-        }
-    }
+		h.checkVisibleByDeltaAngle(info);
 
-    @Test
-    public void projectScan() {
-        Lrf2dParam param = createParam();
-        Helper h = new Helper(null);
-        h.setSensorParam(param);
+		for (int i = 0; i < N; i++) {
+			assertTrue(info.vis[i] == (i != 10));
+		}
+	}
 
-        double r = param.getMaxRange()*0.9;
+	@Test
+	public void projectScan() {
+		Lrf2dParam param = createParam();
+		Helper h = new Helper(null);
+		h.setSensorParam(param);
 
-        final int N = param.getNumberOfScans();
-        ScanInfo info = new ScanInfo(N);
-        double range[] = new double[ N ];
-        for( int i = 0; i < N; i++ ) {
-            range[i] = r;
-            info.pts[i].set(1,1);
-            info.vis[i] = false;
-        }
-        // cause a bad point
-        range[10] = param.getMaxRange()*1.1;
+		double r = param.getMaxRange() * 0.9;
 
-        h.projectScan(range,info);
+		final int N = param.getNumberOfScans();
+		ScanInfo info = new ScanInfo(N);
+		double range[] = new double[N];
+		for (int i = 0; i < N; i++) {
+			range[i] = r;
+			info.pts[i].set(1, 1);
+			info.vis[i] = false;
+		}
+		// cause a bad point
+		range[10] = param.getMaxRange() * 1.1;
 
-        // see if visible and angle has been correctly set
-        for( int i = 0; i < N; i++ ) {
-            if( i != 10 ) {
-                assertEquals(info.theta[i],Math.PI/4,1e-8);
-                assertTrue(info.vis[i]);
-            } else {
-                assertTrue(!info.vis[i]);
-            }
-        }
-    }
+		h.projectScan(range, info);
 
-    public static Lrf2dParam createParam() {
-        return new Lrf2dParam(null,-Math.PI*0.75,Math.PI*0.75,100,5,0.01,0.01);
-    }
+		// see if visible and angle has been correctly set
+		for (int i = 0; i < N; i++) {
+			if (i != 10) {
+				assertEquals(info.theta[i], Math.PI / 4, 1e-8);
+				assertTrue(info.vis[i]);
+			} else {
+				assertTrue(!info.vis[i]);
+			}
+		}
+	}
 
-    public static class Helper extends GeneralizedScanToScan
-    {
-        public Helper(StoppingCondition stop) {
-            super(stop);
-        }
+	public static class Helper extends GeneralizedScanToScan {
+		public Helper(StoppingCondition stop) {
+			super(stop);
+		}
 
-        @Override
-        protected Se2_F64 estimateMotion() {
-            return null;
-        }
+		@Override
+		protected Se2_F64 estimateMotion() {
+			return null;
+		}
 
-        public void checkVisibleByDeltaAngle( ScanInfo info ) {
-            super.checkVisibleByDeltaAngle(info);
-        }
+		public void checkVisibleByDeltaAngle(ScanInfo info) {
+			super.checkVisibleByDeltaAngle(info);
+		}
 
-        public void projectScan( double measuredRange[] , ScanInfo info ) {
-            super.projectScan(measuredRange,info);
-        }
-    }
+		public void projectScan(double measuredRange[], ScanInfo info) {
+			super.projectScan(measuredRange, info);
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -34,22 +34,34 @@ import java.util.Stack;
  */
 public class ShapeDescription<Model> {
 
-	/** how close a point needs to be considered part of the model */
+	/**
+	 * how close a point needs to be considered part of the model
+	 */
 	public double thresholdFit;
-	/** Creates new instances and copies */
+	/**
+	 * Creates new instances and copies
+	 */
 	public ModelManager<Model> modelManager;
-	/** generates an initial model given a set of points */
-	public ModelGeneratorCheck<Model,PointVectorNN> modelGenerator;
-	/** Used to refine an initial model estimate when given an initial estimate */
-	public ModelFitter<Model,PointVectorNN> modelFitter;
-	/** computes the distance a point is from the model */
-	public DistanceFromModel<Model,PointVectorNN> modelDistance;
+	/**
+	 * generates an initial model given a set of points
+	 */
+	public ModelGeneratorCheck<Model, PointVectorNN> modelGenerator;
+	/**
+	 * Used to refine an initial model estimate when given an initial estimate
+	 */
+	public ModelFitter<Model, PointVectorNN> modelFitter;
+	/**
+	 * computes the distance a point is from the model
+	 */
+	public DistanceFromModel<Model, PointVectorNN> modelDistance;
 	/**
 	 * Specifies an optional check which can be used to remove physically impossible shapes.  If null then
 	 * no check will be performed
-	 **/
+	 */
 	public CheckShapeParameters<Model> modelCheck;
-	/** Converts the model parameter into double[] */
+	/**
+	 * Converts the model parameter into double[]
+	 */
 	public ModelCodec<Model> codec;
 
 	// storage for models so that they can be recycled
@@ -65,13 +77,13 @@ public class ShapeDescription<Model> {
 	 * Takes the most recently created model and removes it from the used list and puts it into the unused list
 	 */
 	public void recycleTail() {
-		Model m = used.remove( used.size()-1 );
+		Model m = used.remove(used.size() - 1);
 		unused.add(m);
 	}
 
 	public Model createModel() {
 		Model m;
-		if( unused.isEmpty() ) {
+		if (unused.isEmpty()) {
 			m = modelManager.createModelInstance();
 		} else {
 			m = unused.pop();

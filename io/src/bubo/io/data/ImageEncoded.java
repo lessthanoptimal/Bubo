@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,38 +32,38 @@ import java.awt.image.BufferedImage;
  */
 public interface ImageEncoded {
 
-    /**
-     * Returns the raw encoded data.  If not supported null is returned.
-     *
-     * @return raw encoded image data.
-     */
-    byte[] getData();
+	/**
+	 * Returns the raw encoded data.  If not supported null is returned.
+	 *
+	 * @return raw encoded image data.
+	 */
+	byte[] getData();
 
-    /**
-     * The size of the encoded data.  If not supported -1 is returned.
-     *
-     * @return size of encoded data.
-     */
-    int getDataSize();
+	/**
+	 * The size of the encoded data.  If not supported -1 is returned.
+	 *
+	 * @return size of encoded data.
+	 */
+	int getDataSize();
 
-    /**
-     * Name of the format the image is encoded in.
-     */
-    public String getFormat();
+	/**
+	 * Name of the format the image is encoded in.
+	 */
+	public String getFormat();
 
-    /**
-     * Convert the image into a standard image format.  If this decoding can't be done
-     * null is returned.  If not supported null is returned.
-     *
-     * @return Equivalent image in standard format.
-     */
-    <T extends ImageBase> T convertToImage();
+	/**
+	 * Convert the image into a standard image format.  If this decoding can't be done
+	 * null is returned.  If not supported null is returned.
+	 *
+	 * @return Equivalent image in standard format.
+	 */
+	<T extends ImageBase> T convertToImage();
 
-    /**
-     * Converts the image into a buffered image for ease of display.
-     * If not supported null is returned.
-     *
-     * @return Buffered image.
-     */
-    BufferedImage convertToBuffered();
+	/**
+	 * Converts the image into a buffered image for ease of display.
+	 * If not supported null is returned.
+	 *
+	 * @return Buffered image.
+	 */
+	BufferedImage convertToBuffered();
 }

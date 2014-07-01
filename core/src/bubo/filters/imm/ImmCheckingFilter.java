@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -43,18 +43,6 @@ public class ImmCheckingFilter extends InteractingMultipleModelFilter {
 		super(filter, propagators, interaction);
 
 		isValidMarkovMatrix(interaction);
-	}
-
-	@Override
-	public void predict(ImmState state) {
-		super.predict(state);
-		sanityCheckFilter(state.hypotheses);
-	}
-
-	@Override
-	public void update(ImmState state, MultivariateGaussianDM meas) {
-		super.update(state, meas);
-		sanityCheckFilter(state.hypotheses);
 	}
 
 	/**
@@ -104,6 +92,17 @@ public class ImmCheckingFilter extends InteractingMultipleModelFilter {
 		}
 	}
 
+	@Override
+	public void predict(ImmState state) {
+		super.predict(state);
+		sanityCheckFilter(state.hypotheses);
+	}
+
+	@Override
+	public void update(ImmState state, MultivariateGaussianDM meas) {
+		super.update(state, meas);
+		sanityCheckFilter(state.hypotheses);
+	}
 
 	/**
 	 * An exception to indicate that a sanity check failed in the IMM.

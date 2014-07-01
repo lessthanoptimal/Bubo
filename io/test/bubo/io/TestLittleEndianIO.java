@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,194 +31,194 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestLittleEndianIO {
-    @Test
-    public void readBoolean() throws IOException {
-        byte[] data = new byte[2];
-        data[0] = 1;
-        data[1] = 0;
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
+	@Test
+	public void readBoolean() throws IOException {
+		byte[] data = new byte[2];
+		data[0] = 1;
+		data[1] = 0;
+		ByteArrayInputStream in = new ByteArrayInputStream(data);
 
-        assertTrue( LittleEndianIO.readBoolean(in));
-        assertFalse( LittleEndianIO.readBoolean(in));
-    }
+		assertTrue(LittleEndianIO.readBoolean(in));
+		assertFalse(LittleEndianIO.readBoolean(in));
+	}
 
-    @Test
-    public void readShort() throws IOException {
+	@Test
+	public void readShort() throws IOException {
 
-        short value = -1235;
+		short value = -1235;
 
-        byte[] data = new byte[2];
-        data[0] = (byte)(0xFF & value);
-        data[1] = (byte)(0xFF & (value >> 8) );
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
+		byte[] data = new byte[2];
+		data[0] = (byte) (0xFF & value);
+		data[1] = (byte) (0xFF & (value >> 8));
+		ByteArrayInputStream in = new ByteArrayInputStream(data);
 
-        assertTrue( LittleEndianIO.readShort(in) == value);
-    }
+		assertTrue(LittleEndianIO.readShort(in) == value);
+	}
 
-    @Test
-    public void writeShort() throws IOException {
-        short value = -1235;
+	@Test
+	public void writeShort() throws IOException {
+		short value = -1235;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        LittleEndianIO.writeShort(out,value);
+		LittleEndianIO.writeShort(out, value);
 
-        byte data[] = out.toByteArray();
+		byte data[] = out.toByteArray();
 
-        int found = data[0] & 0xFF;
-        found |= (data[1] & 0xFF) << 8;
+		int found = data[0] & 0xFF;
+		found |= (data[1] & 0xFF) << 8;
 
-        assertTrue( (short)found == value );
-    }
+		assertTrue((short) found == value);
+	}
 
-    @Test
-    public void readInt() throws IOException {
-        int value = -14552345;
+	@Test
+	public void readInt() throws IOException {
+		int value = -14552345;
 
-        byte[] data = new byte[8];
-        data[0] = (byte)(0xFF & value);
-        data[1] = (byte)(0xFF & (value >> 8) );
-        data[2] = (byte)(0xFF & (value >> 16) );
-        data[3] = (byte)(0xFF & (value >> 24) );
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
+		byte[] data = new byte[8];
+		data[0] = (byte) (0xFF & value);
+		data[1] = (byte) (0xFF & (value >> 8));
+		data[2] = (byte) (0xFF & (value >> 16));
+		data[3] = (byte) (0xFF & (value >> 24));
+		ByteArrayInputStream in = new ByteArrayInputStream(data);
 
-        assertTrue( LittleEndianIO.readInt(in) == value);
-    }
+		assertTrue(LittleEndianIO.readInt(in) == value);
+	}
 
-    @Test
-    public void writeInt() throws IOException {
-        int value = -14552345;
+	@Test
+	public void writeInt() throws IOException {
+		int value = -14552345;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        LittleEndianIO.writeInt(out,value);
+		LittleEndianIO.writeInt(out, value);
 
-        byte data[] = out.toByteArray();
+		byte data[] = out.toByteArray();
 
-        int found = data[0] & 0xFF;
-        found |= (data[1] & 0xFF) << 8;
-        found |= (data[2] & 0xFF) << 16;
-        found |= (data[3] & 0xFF) << 24;
+		int found = data[0] & 0xFF;
+		found |= (data[1] & 0xFF) << 8;
+		found |= (data[2] & 0xFF) << 16;
+		found |= (data[3] & 0xFF) << 24;
 
-        assertTrue( found == value );
-    }
+		assertTrue(found == value);
+	}
 
-    @Test
-    public void readLong() throws IOException {
-        long value = -14552778345L;
+	@Test
+	public void readLong() throws IOException {
+		long value = -14552778345L;
 
-        byte[] data = new byte[8];
-        data[0] = (byte)(0xFF & value);
-        data[1] = (byte)(0xFF & (value >> 8) );
-        data[2] = (byte)(0xFF & (value >> 16) );
-        data[3] = (byte)(0xFF & (value >> 24) );
-        data[4] = (byte)(0xFF & (value >> 32) );
-        data[5] = (byte)(0xFF & (value >> 40) );
-        data[6] = (byte)(0xFF & (value >> 48) );
-        data[7] = (byte)(0xFF & (value >> 56) );
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
+		byte[] data = new byte[8];
+		data[0] = (byte) (0xFF & value);
+		data[1] = (byte) (0xFF & (value >> 8));
+		data[2] = (byte) (0xFF & (value >> 16));
+		data[3] = (byte) (0xFF & (value >> 24));
+		data[4] = (byte) (0xFF & (value >> 32));
+		data[5] = (byte) (0xFF & (value >> 40));
+		data[6] = (byte) (0xFF & (value >> 48));
+		data[7] = (byte) (0xFF & (value >> 56));
+		ByteArrayInputStream in = new ByteArrayInputStream(data);
 
-        assertTrue( LittleEndianIO.readLong(in) == value);
-    }
+		assertTrue(LittleEndianIO.readLong(in) == value);
+	}
 
-    @Test
-    public void writeLong() throws IOException {
-        long value = -14552778345L;
+	@Test
+	public void writeLong() throws IOException {
+		long value = -14552778345L;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        LittleEndianIO.writeLong(out,value);
+		LittleEndianIO.writeLong(out, value);
 
-        byte data[] = out.toByteArray();
+		byte data[] = out.toByteArray();
 
-        long found = data[0] & 0xFF;
-        found |= ((long)(data[1] & 0xFF) << 8);
-        found |= ((long)(data[2] & 0xFF) << 16);
-        found |= ((long)(data[3] & 0xFF) << 24);
-        found |= ((long)(data[4] & 0xFF) << 32);
-        found |= ((long)(data[5] & 0xFF) << 40);
-        found |= ((long)(data[6] & 0xFF) << 48);
-        found |= ((long)(data[7] & 0xFF) << 56);
+		long found = data[0] & 0xFF;
+		found |= ((long) (data[1] & 0xFF) << 8);
+		found |= ((long) (data[2] & 0xFF) << 16);
+		found |= ((long) (data[3] & 0xFF) << 24);
+		found |= ((long) (data[4] & 0xFF) << 32);
+		found |= ((long) (data[5] & 0xFF) << 40);
+		found |= ((long) (data[6] & 0xFF) << 48);
+		found |= ((long) (data[7] & 0xFF) << 56);
 
-        assertTrue( found == value );
-    }
+		assertTrue(found == value);
+	}
 
-    @Test
-    public void readFloat() throws IOException {
-        float value = 234.423f;
+	@Test
+	public void readFloat() throws IOException {
+		float value = 234.423f;
 
-        int valueInt = Float.floatToRawIntBits(value);
+		int valueInt = Float.floatToRawIntBits(value);
 
-        byte[] data = new byte[8];
-        data[0] = (byte)(0xFF & valueInt);
-        data[1] = (byte)(0xFF & (valueInt >> 8) );
-        data[2] = (byte)(0xFF & (valueInt >> 16) );
-        data[3] = (byte)(0xFF & (valueInt >> 24) );
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
+		byte[] data = new byte[8];
+		data[0] = (byte) (0xFF & valueInt);
+		data[1] = (byte) (0xFF & (valueInt >> 8));
+		data[2] = (byte) (0xFF & (valueInt >> 16));
+		data[3] = (byte) (0xFF & (valueInt >> 24));
+		ByteArrayInputStream in = new ByteArrayInputStream(data);
 
-        assertTrue( LittleEndianIO.readFloat(in) == value);
-    }
+		assertTrue(LittleEndianIO.readFloat(in) == value);
+	}
 
-    @Test
-    public void writeFloat() throws IOException {
-        float value = 234.423f;
+	@Test
+	public void writeFloat() throws IOException {
+		float value = 234.423f;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        LittleEndianIO.writeFloat(out,value);
+		LittleEndianIO.writeFloat(out, value);
 
-        byte data[] = out.toByteArray();
+		byte data[] = out.toByteArray();
 
-        int found = data[0] & 0xFF;
-        found |= (data[1] & 0xFF) << 8;
-        found |= (data[2] & 0xFF) << 16;
-        found |= (data[3] & 0xFF) << 24;
+		int found = data[0] & 0xFF;
+		found |= (data[1] & 0xFF) << 8;
+		found |= (data[2] & 0xFF) << 16;
+		found |= (data[3] & 0xFF) << 24;
 
-        float foundFloat = Float.intBitsToFloat(found);
-        assertTrue(value==foundFloat);
-    }
+		float foundFloat = Float.intBitsToFloat(found);
+		assertTrue(value == foundFloat);
+	}
 
-    @Test
-    public void readDouble() throws IOException {
-        double value = 23424.59384877;
-        long valueInt = Double.doubleToRawLongBits(value);
+	@Test
+	public void readDouble() throws IOException {
+		double value = 23424.59384877;
+		long valueInt = Double.doubleToRawLongBits(value);
 
-        byte[] data = new byte[8];
-        data[0] = (byte)(0xFF & valueInt);
-        data[1] = (byte)(0xFF & (valueInt >> 8) );
-        data[2] = (byte)(0xFF & (valueInt >> 16) );
-        data[3] = (byte)(0xFF & (valueInt >> 24) );
-        data[4] = (byte)(0xFF & (valueInt >> 32) );
-        data[5] = (byte)(0xFF & (valueInt >> 40) );
-        data[6] = (byte)(0xFF & (valueInt >> 48) );
-        data[7] = (byte)(0xFF & (valueInt >> 56) );
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
+		byte[] data = new byte[8];
+		data[0] = (byte) (0xFF & valueInt);
+		data[1] = (byte) (0xFF & (valueInt >> 8));
+		data[2] = (byte) (0xFF & (valueInt >> 16));
+		data[3] = (byte) (0xFF & (valueInt >> 24));
+		data[4] = (byte) (0xFF & (valueInt >> 32));
+		data[5] = (byte) (0xFF & (valueInt >> 40));
+		data[6] = (byte) (0xFF & (valueInt >> 48));
+		data[7] = (byte) (0xFF & (valueInt >> 56));
+		ByteArrayInputStream in = new ByteArrayInputStream(data);
 
-        assertTrue( LittleEndianIO.readDouble(in) == value);
-    }
+		assertTrue(LittleEndianIO.readDouble(in) == value);
+	}
 
-    @Test
-    public void writeDouble() throws IOException {
-        double value = 23424.59384877;
+	@Test
+	public void writeDouble() throws IOException {
+		double value = 23424.59384877;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        LittleEndianIO.writeDouble(out,value);
+		LittleEndianIO.writeDouble(out, value);
 
-        byte data[] = out.toByteArray();
+		byte data[] = out.toByteArray();
 
-        long found = data[0] & 0xFF;
-        found |= ((long)(data[1] & 0xFF) << 8);
-        found |= ((long)(data[2] & 0xFF) << 16);
-        found |= ((long)(data[3] & 0xFF) << 24);
-        found |= ((long)(data[4] & 0xFF) << 32);
-        found |= ((long)(data[5] & 0xFF) << 40);
-        found |= ((long)(data[6] & 0xFF) << 48);
-        found |= ((long)(data[7] & 0xFF) << 56);
+		long found = data[0] & 0xFF;
+		found |= ((long) (data[1] & 0xFF) << 8);
+		found |= ((long) (data[2] & 0xFF) << 16);
+		found |= ((long) (data[3] & 0xFF) << 24);
+		found |= ((long) (data[4] & 0xFF) << 32);
+		found |= ((long) (data[5] & 0xFF) << 40);
+		found |= ((long) (data[6] & 0xFF) << 48);
+		found |= ((long) (data[7] & 0xFF) << 56);
 
-        double foundFloat = Double.longBitsToDouble(found);
-        assertTrue(value==foundFloat);
-    }
+		double foundFloat = Double.longBitsToDouble(found);
+		assertTrue(value == foundFloat);
+	}
 
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,29 +25,29 @@ package bubo.desc.sensors.laser2d;
  */
 public class PlanarLadarParamFactory {
 
-    public static PlanarLadarParam createSickLms200() {
-        PlanarLadarParam param = new PlanarLadarParam();
+	public static PlanarLadarParam createSickLms200() {
+		PlanarLadarParam param = new PlanarLadarParam();
 
-        param.setStartAngle( -Math.PI/2.0 );
-        param.setAngleIncrement( Math.PI/360.0 );
-        param.setNumberOfScans( 361 );
-        param.setMaxRange( 7.5 );
+		param.setStartAngle(-Math.PI / 2.0);
+		param.setAngleIncrement(Math.PI / 360.0);
+		param.setNumberOfScans(361);
+		param.setMaxRange(7.5);
 
-        return param;
-    }
+		return param;
+	}
 
-    public static PlanarLadarParam createHokuyo() {
-        PlanarLadarParam param = new PlanarLadarParam();
+	public static PlanarLadarParam createHokuyo() {
+		PlanarLadarParam param = new PlanarLadarParam();
 
-        int frontStep = 384;
-        int initialStep = 44;
-        int finalStep = 725;
+		int frontStep = 384;
+		int initialStep = 44;
+		int finalStep = 725;
 
-        param.setAngleIncrement( 2.0*Math.PI/1024.0 );
-        param.setStartAngle( -param.getAngleIncrement()*(frontStep-initialStep) );
-        param.setNumberOfScans( finalStep - initialStep + 1);
-        param.setMaxRange( 5.5 );
+		param.setAngleIncrement(2.0 * Math.PI / 1024.0);
+		param.setStartAngle(-param.getAngleIncrement() * (frontStep - initialStep));
+		param.setNumberOfScans(finalStep - initialStep + 1);
+		param.setMaxRange(5.5);
 
-        return param;
-    }
+		return param;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,26 +28,26 @@ import java.util.List;
  */
 public class RobotDescription {
 
-    private List<RobotComponent> components;
-    private RobotComponent self;
+	private List<RobotComponent> components;
+	private RobotComponent self;
 
-    /**
-     * Components that compose the robot.
-     *
-     * @return
-     */
-    public List<RobotComponent> getComponents() {
-        return components;
-    }
+	/**
+	 * Components that compose the robot.
+	 *
+	 * @return
+	 */
+	public List<RobotComponent> getComponents() {
+		return components;
+	}
 
-    /**
-     * This is the component which is the center of the robot's coordinate frame.  Its state
-     * represents the robot's state in the global frame.  It also contains information which are
-     * not part of any component but also describe the robot.
-     *
-     * @return Description of the robot in the global frame and a description of itself.
-     */
-    public RobotComponent getSelf() {
-        return self;
-    }
+	/**
+	 * This is the component which is the center of the robot's coordinate frame.  Its state
+	 * represents the robot's state in the global frame.  It also contains information which are
+	 * not part of any component but also describe the robot.
+	 *
+	 * @return Description of the robot in the global frame and a description of itself.
+	 */
+	public RobotComponent getSelf() {
+		return self;
+	}
 }

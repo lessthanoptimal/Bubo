@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,86 +32,86 @@ import java.io.OutputStream;
  */
 public class CMatrixD implements RawlogSerializableCustom {
 
-    int numRows;
-    int numColumns;
-    double [][]data;
+	int numRows;
+	int numColumns;
+	double[][] data;
 
-    public CMatrixD(int numRows, int numColumns) {
-        this.numRows = numRows;
-        this.numColumns = numColumns;
-        data = new double[numRows][numColumns];
-    }
+	public CMatrixD(int numRows, int numColumns) {
+		this.numRows = numRows;
+		this.numColumns = numColumns;
+		data = new double[numRows][numColumns];
+	}
 
-    public CMatrixD( CMatrix a ) {
-        this(a.numRows,a.numColumns);
-        set(a);
-    }
+	public CMatrixD(CMatrix a) {
+		this(a.numRows, a.numColumns);
+		set(a);
+	}
 
-    public CMatrixD() {
-    }
+	public CMatrixD() {
+	}
 
-    public String[] getVariableOrder(int version) {
-        return new String[]{"numRows","numColumns","data"};
-    }
+	public String[] getVariableOrder(int version) {
+		return new String[]{"numRows", "numColumns", "data"};
+	}
 
-    public void customDecoding( int version , RawlogDecoder decoder ) {
-        try {
-            numRows = LittleEndianIO.readInt(decoder.getInput());
-            numColumns = LittleEndianIO.readInt(decoder.getInput());
+	public void customDecoding(int version, RawlogDecoder decoder) {
+		try {
+			numRows = LittleEndianIO.readInt(decoder.getInput());
+			numColumns = LittleEndianIO.readInt(decoder.getInput());
 
-            data = new double[ numRows ][];
+			data = new double[numRows][];
 
-            for( int i = 0; i < numRows; i++ ) {
-                data[i] = decoder.readDoubleArray(numColumns);
-            }
+			for (int i = 0; i < numRows; i++) {
+				data[i] = decoder.readDoubleArray(numColumns);
+			}
 
-        } catch (IOException e) {
-            throw new RuntimeException("Custom deserialization failed",e);
-        }
-    }
+		} catch (IOException e) {
+			throw new RuntimeException("Custom deserialization failed", e);
+		}
+	}
 
-    @Override
-    public void customEncoding(OutputStream output) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+	@Override
+	public void customEncoding(OutputStream output) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 
-    public int getNumRows() {
-        return numRows;
-    }
+	public int getNumRows() {
+		return numRows;
+	}
 
-    public void setNumRows(int numRows) {
-        this.numRows = numRows;
-    }
+	public void setNumRows(int numRows) {
+		this.numRows = numRows;
+	}
 
-    public int getNumColumns() {
-        return numColumns;
-    }
+	public int getNumColumns() {
+		return numColumns;
+	}
 
-    public void setNumColumns(int numColumns) {
-        this.numColumns = numColumns;
-    }
+	public void setNumColumns(int numColumns) {
+		this.numColumns = numColumns;
+	}
 
-    public double[][] getData() {
-        return data;
-    }
+	public double[][] getData() {
+		return data;
+	}
 
-    public void setData(double[][] data) {
-        this.data = data;
-    }
+	public void setData(double[][] data) {
+		this.data = data;
+	}
 
-    public int getVersion() {
-        return 0;
-    }
+	public int getVersion() {
+		return 0;
+	}
 
-    public void set(CMatrix a) {
-        for( int i = 0; i < a.numRows; i++ ) {
-            for( int j = 0; j < a.numColumns; j++ ) {
-                data[i][j] = a.data[i][j];
-            }
-        }
-    }
+	public void set(CMatrix a) {
+		for (int i = 0; i < a.numRows; i++) {
+			for (int j = 0; j < a.numColumns; j++) {
+				data[i][j] = a.data[i][j];
+			}
+		}
+	}
 
-    public double get(int row, int col) {
-        return data[row][col];
-    }
+	public double get(int row, int col) {
+		return data[row][col];
+	}
 }

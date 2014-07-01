@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -38,21 +38,21 @@ public class TestShapeDescription {
 		desc.createModel();
 		desc.createModel();
 
-		assertEquals(0,desc.unused.size());
-		assertEquals(3,desc.used.size());
+		assertEquals(0, desc.unused.size());
+		assertEquals(3, desc.used.size());
 
 		desc.reset();
 
-		assertEquals(3,desc.unused.size());
-		assertEquals(0,desc.used.size());
+		assertEquals(3, desc.unused.size());
+		assertEquals(0, desc.used.size());
 
 		desc.createModel();
 		desc.createModel();
 		desc.createModel();
 		desc.createModel();
 
-		assertEquals(0,desc.unused.size());
-		assertEquals(4,desc.used.size());
+		assertEquals(0, desc.unused.size());
+		assertEquals(4, desc.used.size());
 	}
 
 	@Test
@@ -64,13 +64,13 @@ public class TestShapeDescription {
 		desc.createModel();
 		desc.createModel();
 
-		assertEquals(0,desc.unused.size());
-		assertEquals(3,desc.used.size());
+		assertEquals(0, desc.unused.size());
+		assertEquals(3, desc.used.size());
 
 		desc.recycleTail();
 
-		assertEquals(1,desc.unused.size());
-		assertEquals(2,desc.used.size());
+		assertEquals(1, desc.unused.size());
+		assertEquals(2, desc.used.size());
 	}
 
 }

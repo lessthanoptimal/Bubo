@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -46,9 +46,9 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 
 	List<FoundShape> mergeList = new ArrayList<FoundShape>();
 
-	FastQueue<PointVectorNN> pointNormList = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+	FastQueue<PointVectorNN> pointNormList = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
-	FastQueue<Shape> output = new FastQueue<Shape>(Shape.class,true);
+	FastQueue<Shape> output = new FastQueue<Shape>(Shape.class, true);
 
 	Cube3D_F64 boundingBox = new Cube3D_F64();
 
@@ -57,7 +57,7 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 	public Schnable2007_to_PointCloudShapeFinder(ApproximateSurfaceNormals surfaceNormals,
 												 PointCloudShapeDetectionSchnabel2007 shapeDetector,
 												 PostProcessShapes postProcess,
-												 List<CloudShapeTypes> shapeList ) {
+												 List<CloudShapeTypes> shapeList) {
 		this.surfaceNormals = surfaceNormals;
 		this.shapeDetector = shapeDetector;
 		this.postProcess = postProcess;
@@ -65,17 +65,17 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 	}
 
 	@Override
-	public void process(List<Point3D_F64> cloud , Cube3D_F64 boundingBox ) {
+	public void process(List<Point3D_F64> cloud, Cube3D_F64 boundingBox) {
 		pointNormList.reset();
-		surfaceNormals.process(cloud,pointNormList);
+		surfaceNormals.process(cloud, pointNormList);
 
-		if( boundingBox == null ) {
-			UtilPoint3D_F64.boundingCube(cloud,this.boundingBox);
+		if (boundingBox == null) {
+			UtilPoint3D_F64.boundingCube(cloud, this.boundingBox);
 		} else {
 			this.boundingBox.set(boundingBox);
 		}
 
-		shapeDetector.process(pointNormList,this.boundingBox);
+		shapeDetector.process(pointNormList, this.boundingBox);
 
 		mergeList.clear();
 		mergeList.addAll(shapeDetector.getFoundObjects().toList());
@@ -90,16 +90,16 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 	 */
 	private void convertIntoOuput(List<FoundShape> schnabelShapes) {
 		output.reset();
-		for( int i = 0; i < schnabelShapes.size(); i++ ) {
+		for (int i = 0; i < schnabelShapes.size(); i++) {
 			FoundShape fs = schnabelShapes.get(i);
 			Shape os = output.grow();
 			os.parameters = fs.modelParam;
-			os.type = shapeList.get( fs.whichShape );
+			os.type = shapeList.get(fs.whichShape);
 			os.points.clear();
 			os.indexes.reset();
 
 			// add the points to it
-			for( int j = 0; j < fs.points.size(); j++ ) {
+			for (int j = 0; j < fs.points.size(); j++) {
 				PointVectorNN pv = fs.points.get(j);
 				os.points.add(pv.p);
 				os.indexes.add(pv.index);
@@ -113,12 +113,12 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 	}
 
 	@Override
-	public void getUnmatched( List<Point3D_F64> unmatched ) {
+	public void getUnmatched(List<Point3D_F64> unmatched) {
 		unmatchePV.clear();
 		shapeDetector.findUnmatchedPoints(unmatchePV);
 
-		for( int i = 0; i < unmatchePV.size(); i++ ) {
-			unmatched.add( unmatchePV.get(i).p );
+		for (int i = 0; i < unmatchePV.size(); i++) {
+			unmatched.add(unmatchePV.get(i).p);
 		}
 	}
 

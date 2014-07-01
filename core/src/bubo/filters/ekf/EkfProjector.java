@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -53,7 +53,7 @@ public interface EkfProjector {
 	 * </p>
 	 *
 	 * @return Observation Jacobian matrix. WARNING DO NOT MODIFY!
-	 *         DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
+	 * DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
 	 */
 	public DenseMatrix64F getJacobianH();
 
@@ -61,7 +61,7 @@ public interface EkfProjector {
 	 * Returns the estimated measurement, given the current state estimate.
 	 *
 	 * @return Estimated measurement column vector.
-	 *         WARNING DO NOT MODIFY!  DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
+	 * WARNING DO NOT MODIFY!  DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
 	 */
 	public DenseMatrix64F getProjected();
 }

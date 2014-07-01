@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -34,20 +34,21 @@ public class StandardProjectorTests {
 	EkfProjector projector;
 	double tol;
 
-	public StandardProjectorTests(double tolerance ) {
+	public StandardProjectorTests(double tolerance) {
 		this.tol = tolerance;
 	}
 
 	/**
 	 * Checks the projector jacobian against a numerical jacobian
+	 *
 	 * @param input
 	 */
-	public void checkProjectorAtPoint( EkfProjector projector , boolean printResults , double ...input ) {
+	public void checkProjectorAtPoint(EkfProjector projector, boolean printResults, double... input) {
 		this.projector = projector;
 		ProjectorJacobian j = new ProjectorJacobian();
 		ProjectorFunction f = new ProjectorFunction();
 
-		if( printResults ) {
+		if (printResults) {
 			JacobianChecker.jacobianPrint(f, j, input, tol);
 		}
 		assertTrue(JacobianChecker.jacobian(f, j, input, tol));
@@ -67,19 +68,18 @@ public class StandardProjectorTests {
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F X = new DenseMatrix64F(3,1,true,input);
+			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
 
 			projector.compute(X);
 
 			double[] found = projector.getProjected().data;
 
-			System.arraycopy(found,0,output,0,found.length);
+			System.arraycopy(found, 0, output, 0, found.length);
 
 		}
 	}
 
-	private class ProjectorJacobian implements FunctionNtoMxN
-	{
+	private class ProjectorJacobian implements FunctionNtoMxN {
 
 		@Override
 		public int getNumOfInputsN() {
@@ -93,13 +93,13 @@ public class StandardProjectorTests {
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F X = new DenseMatrix64F(3,1,true,input);
+			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
 
 			projector.compute(X);
 
 			double[] found = projector.getJacobianH().data;
 
-			System.arraycopy(found,0,output,0,found.length);
+			System.arraycopy(found, 0, output, 0, found.length);
 		}
 	}
 }

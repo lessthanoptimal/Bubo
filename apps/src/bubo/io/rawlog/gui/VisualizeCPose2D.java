@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,42 +28,42 @@ import javax.swing.*;
  */
 public class VisualizeCPose2D implements LogDataVisualization {
 
-    JTextArea textArea = new JTextArea();
+	JTextArea textArea = new JTextArea();
 
-    @Override
-    public void setData(Object data) {
-        setText((CPose2D)data);
-    }
+	@Override
+	public void setData(Object data) {
+		setText((CPose2D) data);
+	}
 
-    public void setText( CPose2D pose ) {
+	public void setText(CPose2D pose) {
 
 
-        String str = "CPose2D\n";
-        str += "\n";
-        str += "x   = "+pose.getPose().getX()+"\n";
-        str += "y   = "+pose.getPose().getY()+"\n";
-        str += "yaw = "+pose.getYaw();
+		String str = "CPose2D\n";
+		str += "\n";
+		str += "x   = " + pose.getPose().getX() + "\n";
+		str += "y   = " + pose.getPose().getY() + "\n";
+		str += "yaw = " + pose.getYaw();
 
-        textArea.setText(str);
-    }
+		textArea.setText(str);
+	}
 
-    @Override
-    public Class<?> getType() {
-        return CPose2D.class;
-    }
+	@Override
+	public Class<?> getType() {
+		return CPose2D.class;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 1;
-    }
+	@Override
+	public int numDisplay() {
+		return 1;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        return textArea;
-    }
+	@Override
+	public JComponent getDisplay(int index) {
+		return textArea;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        return "Text Info";
-    }
+	@Override
+	public String getDisplayName(int index) {
+		return "Text Info";
+	}
 }

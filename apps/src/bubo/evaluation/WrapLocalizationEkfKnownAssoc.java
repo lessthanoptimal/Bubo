@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -46,10 +46,10 @@ public class WrapLocalizationEkfKnownAssoc implements LocalizationAlgorithm {
 	// the estimate robot pose
 	Se2_F64 pose = new Se2_F64();
 
-	public WrapLocalizationEkfKnownAssoc( PredictorRobotVelocity2D predictor , LandmarkProjector projector , double T ) {
+	public WrapLocalizationEkfKnownAssoc(PredictorRobotVelocity2D predictor, LandmarkProjector projector, double T) {
 		this.predictor = predictor;
 
-		alg = new LocalizationEkfKnownAssoc(new TimeToDiscrete(predictor,T),projector);
+		alg = new LocalizationEkfKnownAssoc(new TimeToDiscrete(predictor, T), projector);
 	}
 
 	@Override
@@ -70,27 +70,27 @@ public class WrapLocalizationEkfKnownAssoc implements LocalizationAlgorithm {
 		X.data[1] = pose.getY();
 		X.data[2] = pose.getYaw();
 
-		P.set(0,0,sigmaXY*sigmaXY);
-		P.set(1,1,sigmaXY*sigmaXY);
-		P.set(2,2,sigmaYaw*sigmaYaw);
+		P.set(0, 0, sigmaXY * sigmaXY);
+		P.set(1, 1, sigmaXY * sigmaXY);
+		P.set(2, 2, sigmaYaw * sigmaYaw);
 
 		alg.setInitialPose(state);
 	}
 
 	@Override
 	public void predict(double vel, double angVel) {
-		predictor.setControl(vel,angVel);
+		predictor.setControl(vel, angVel);
 		alg.predict();
 	}
 
 	@Override
 	public void update(List<RangeBearing> measNoisy, List<RangeBearing> measTrue) {
-		for( RangeBearing m : measNoisy ) {
+		for (RangeBearing m : measNoisy) {
 
 			r.x.set(0, m.r);
 			r.x.set(1, m.bearing);
 
-			alg.update((int)m.id,r);
+			alg.update((int) m.id, r);
 		}
 	}
 
@@ -98,7 +98,7 @@ public class WrapLocalizationEkfKnownAssoc implements LocalizationAlgorithm {
 	public Se2_F64 getPoseEstimate() {
 		DenseMatrix64F X = alg.getState().getMean();
 
-		pose.set(X.data[0],X.data[1],X.data[2]);
+		pose.set(X.data[0], X.data[1], X.data[2]);
 
 		return pose;
 	}

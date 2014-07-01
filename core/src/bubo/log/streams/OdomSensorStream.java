@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,48 +26,49 @@ package bubo.log.streams;
  *
  * @author Peter Abeles
  */
-public interface OdomSensorStream <C,O,S> {
+public interface OdomSensorStream<C, O, S> {
 
-    /**
-     * <p>
-     * Get the robot and sensor configurations.
-     * </p>
-     * 
-     * @return Senor and robot configuration.
-     */
-    public C getConfiguration();
+	/**
+	 * <p>
+	 * Get the robot and sensor configurations.
+	 * </p>
+	 *
+	 * @return Senor and robot configuration.
+	 */
+	public C getConfiguration();
 
-    /**
-     * <p>
-     * Checks to see if there is more data remaining.  If so the odometry and sensor
-     * data returned by {@link #getOdometry()} and {@link #getSensorObservation()} is updated
-     * and true returned.
-     * </p>
-     *
-     * @return If there is more data available to process.
-     */
-    public boolean hasNext();
+	/**
+	 * <p>
+	 * Checks to see if there is more data remaining.  If so the odometry and sensor
+	 * data returned by {@link #getOdometry()} and {@link #getSensorObservation()} is updated
+	 * and true returned.
+	 * </p>
+	 *
+	 * @return If there is more data available to process.
+	 */
+	public boolean hasNext();
 
-    /**
-     * <p>
-     * Vehicle's motion as estimated by odometry at the time when the new sensor data arrived.
-     * </p>
-     * <p>
-     * WARNING: The same variable instance might be returned each time, but its values changed.
-     * </p>
-     * @return Odometry data.
-     */
-    public O getOdometry();
+	/**
+	 * <p>
+	 * Vehicle's motion as estimated by odometry at the time when the new sensor data arrived.
+	 * </p>
+	 * <p>
+	 * WARNING: The same variable instance might be returned each time, but its values changed.
+	 * </p>
+	 *
+	 * @return Odometry data.
+	 */
+	public O getOdometry();
 
-    /**
-     * <p> The latest sensor observations. </p>
-     *
-     * <p>
-     * WARNING: The same variable instance might be returned each time, but its values changed.
-     * </p>
-     *
-     * @return Sensor observation.
-     */
-    public S getSensorObservation();
+	/**
+	 * <p> The latest sensor observations. </p>
+	 * <p/>
+	 * <p>
+	 * WARNING: The same variable instance might be returned each time, but its values changed.
+	 * </p>
+	 *
+	 * @return Sensor observation.
+	 */
+	public S getSensorObservation();
 
 }

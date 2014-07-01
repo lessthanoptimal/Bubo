@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -56,14 +56,14 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 	// most recently estimated motion
 	private Se2_F64 foundMotion = new Se2_F64();
 
-	private IterativeClosestPoint<Se2_F64,Point2D_F64> icp = new IterativeClosestPoint<Se2_F64,Point2D_F64>(
-			new StoppingCondition(20,0.0001), new MotionSe2PointSVD_F64());
+	private IterativeClosestPoint<Se2_F64, Point2D_F64> icp = new IterativeClosestPoint<Se2_F64, Point2D_F64>(
+			new StoppingCondition(20, 0.0001), new MotionSe2PointSVD_F64());
 
 	// maximum assumed distance that the robot can move between scans
 	private double maxPointDistance = 0.2;
 
 	public Lrf2dScanToScan_GenericICP() {
-		icp.setModel(new PointModel<Point2D_F64>(reference,maxPointDistance));
+		icp.setModel(new PointModel<Point2D_F64>(reference, maxPointDistance));
 	}
 
 	@Override
@@ -72,10 +72,10 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 		this.lrf2pt = new Lrf2dPrecomputedTrig(param);
 
 		// precompute all the points that might be needed
-		for( int i = 0; i < param.getNumberOfScans(); i++ ) {
-			savedPts.add( new Point2D_F64());
-			savedPts.add( new Point2D_F64());
-			savedPts.add( new Point2D_F64());
+		for (int i = 0; i < param.getNumberOfScans(); i++) {
+			savedPts.add(new Point2D_F64());
+			savedPts.add(new Point2D_F64());
+			savedPts.add(new Point2D_F64());
 		}
 	}
 
@@ -97,13 +97,13 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 	/**
 	 * Computes the 2D coordinate of each LRF scan.
 	 *
-	 * @param scan range measurements
+	 * @param scan   range measurements
 	 * @param points 2D coordinates.  Old points contained in the list are recycled.
 	 */
-	private void computePoints(double[] scan, List<Point2D_F64> points ) {
+	private void computePoints(double[] scan, List<Point2D_F64> points) {
 		final int N = param.getNumberOfScans();
 
-		if( scan.length < N  )
+		if (scan.length < N)
 			throw new IllegalArgumentException("Scan does not match LRF description");
 
 		// recycle old points
@@ -111,13 +111,13 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 		points.clear();
 
 		// find the coordinates and use available points
-		for( int i = 0; i < N; i++ ) {
+		for (int i = 0; i < N; i++) {
 			double r = scan[i];
 
-			if( param.isValidRange(r) ) {
-				Point2D_F64 p = savedPts.remove( savedPts.size() -1 );
+			if (param.isValidRange(r)) {
+				Point2D_F64 p = savedPts.remove(savedPts.size() - 1);
 				points.add(p);
-				lrf2pt.computeEndPoint(i,scan[i],p);
+				lrf2pt.computeEndPoint(i, scan[i], p);
 			}
 		}
 	}
@@ -131,7 +131,7 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 		reference = match;
 		match = temp;
 
-		icp.setModel(new PointModel<Point2D_F64>(reference,maxPointDistance));
+		icp.setModel(new PointModel<Point2D_F64>(reference, maxPointDistance));
 	}
 
 	/**
@@ -141,22 +141,22 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 		savedPts.addAll(working);
 		working.clear();
 
-		for( Point2D_F64 p : match) {
-			Point2D_F64 w = savedPts.remove( savedPts.size() - 1 );
+		for (Point2D_F64 p : match) {
+			Point2D_F64 w = savedPts.remove(savedPts.size() - 1);
 			w.x = p.x;
 			w.y = p.y;
 			working.add(w);
 		}
 	}
-    
+
 	@Override
-	public boolean process( Se2_F64 hint ) {
+	public boolean process(Se2_F64 hint) {
 
 		createWorkingCopy();
 
-		if( hint != null ) {
+		if (hint != null) {
 			// use the hint to bring the two sets of odometry closer
-			SePointOps_F64.transform(hint,working);
+			SePointOps_F64.transform(hint, working);
 		}
 
 		// the motion is found from the current scan to the previous scan this is because in the robot's frame the
@@ -166,8 +166,8 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 		icp.process(working);
 
 		// save the found motion
-		if( hint != null )
-			hint.concat(icp.getMotion(),foundMotion);
+		if (hint != null)
+			hint.concat(icp.getMotion(), foundMotion);
 		else
 			foundMotion.set(icp.getMotion());
 

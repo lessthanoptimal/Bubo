@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -33,37 +33,37 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestRawlogDecoderEncoderMirroredFunctions {
 
-    @Test
-    public void dataString() throws IOException {
-        String expected = "philospher";
+	@Test
+	public void dataString() throws IOException {
+		String expected = "philospher";
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        RawlogEncoder.writeString(out,expected);
+		RawlogEncoder.writeString(out, expected);
 
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 
-        RawlogDecoder decoder = new RawlogDecoder(in);
+		RawlogDecoder decoder = new RawlogDecoder(in);
 
-        String found = decoder.readString();
+		String found = decoder.readString();
 
-        assertTrue(found.compareTo(expected) == 0 );
-    }
+		assertTrue(found.compareTo(expected) == 0);
+	}
 
-    @Test
-    public void dataClassName() throws IOException {
-        String expected = "philospher";
+	@Test
+	public void dataClassName() throws IOException {
+		String expected = "philospher";
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        RawlogEncoder.writeClassName(out,expected);
+		RawlogEncoder.writeClassName(out, expected);
 
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-        RawlogDecoder decoder = new RawlogDecoder(in);
+		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+		RawlogDecoder decoder = new RawlogDecoder(in);
 
-        int length = in.read() & 0x7F;
-        String found = decoder.readClassName(length);
+		int length = in.read() & 0x7F;
+		String found = decoder.readClassName(length);
 
-        assertTrue(found.compareTo(expected) == 0 );
-    }
+		assertTrue(found.compareTo(expected) == 0);
+	}
 }

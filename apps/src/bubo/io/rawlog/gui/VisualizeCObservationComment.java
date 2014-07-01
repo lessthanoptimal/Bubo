@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,38 +28,38 @@ import javax.swing.*;
  * @author Peter Abeles
  */
 public class VisualizeCObservationComment implements LogDataVisualization {
-    CObservationComment comment;
+	CObservationComment comment;
 
-    JTextArea text;
+	JTextArea text;
 
-    public VisualizeCObservationComment() {
-        text = new JTextArea();
-    }
+	public VisualizeCObservationComment() {
+		text = new JTextArea();
+	}
 
-    @Override
-    public void setData(Object data) {
-        comment = (CObservationComment)data;
+	@Override
+	public void setData(Object data) {
+		comment = (CObservationComment) data;
 
-        text.setText(comment.getText());
-    }
+		text.setText(comment.getText());
+	}
 
-    @Override
-    public Class<?> getType() {
-        return CObservationComment.class;
-    }
+	@Override
+	public Class<?> getType() {
+		return CObservationComment.class;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 1;
-    }
+	@Override
+	public int numDisplay() {
+		return 1;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        return text;
-    }
+	@Override
+	public JComponent getDisplay(int index) {
+		return text;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        return "Text";
-    }
+	@Override
+	public String getDisplayName(int index) {
+		return "Text";
+	}
 }

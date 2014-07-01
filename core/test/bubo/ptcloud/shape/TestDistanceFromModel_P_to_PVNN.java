@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -54,21 +54,21 @@ public class TestDistanceFromModel_P_to_PVNN {
 		DistanceFromModel_P_to_PVNN<Object> alg = new DistanceFromModel_P_to_PVNN<Object>(dummy);
 
 		List<PointVectorNN> list = new ArrayList<PointVectorNN>();
-		for( int i = 0; i < 10; i++ ) {
+		for (int i = 0; i < 10; i++) {
 			PointVectorNN pv = new PointVectorNN();
 			pv.p = new Point3D_F64();
 			list.add(pv);
 		}
 
 		alg.setModel(1);
-		alg.computeDistance(list,new double[10]);
+		alg.computeDistance(list, new double[10]);
 
 		assertTrue(dummy.calledModel);
 		assertFalse(dummy.calledSingle);
 		assertTrue(dummy.calledMultiple);
 
-		assertEquals(10,dummy.list.size());
-		for( int i = 0; i < 10; i++ ) {
+		assertEquals(10, dummy.list.size());
+		for (int i = 0; i < 10; i++) {
 			assertTrue(list.get(i).p == dummy.list.get(i));
 		}
 	}

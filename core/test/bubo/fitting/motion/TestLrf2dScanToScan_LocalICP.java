@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,15 +25,15 @@ import bubo.fitting.StoppingCondition;
  * @author Peter Abeles
  */
 public class TestLrf2dScanToScan_LocalICP extends StandardTestsScanToScan {
-    public TestLrf2dScanToScan_LocalICP() {
-        angTol = 0.02;
-        tranTol = 0.02;
-    }
+	public TestLrf2dScanToScan_LocalICP() {
+		angTol = 0.02;
+		tranTol = 0.02;
+	}
 
-    @Override
-    public Lrf2dScanToScan createAlg() {
-        StoppingCondition stop = new StoppingCondition(20,0.0001);
+	@Override
+	public Lrf2dScanToScan createAlg() {
+		StoppingCondition stop = new StoppingCondition(20, 0.0001);
 
-        return new Lrf2dScanToScan_LocalICP(stop,50,0.2);
-    }
+		return new Lrf2dScanToScan_LocalICP(stop, 50, 0.2);
+	}
 }

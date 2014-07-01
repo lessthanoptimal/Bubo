@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -44,11 +44,11 @@ public interface PointCloudShapeFinder {
 	 * shouldn't modify the input if you care about the points returned with the output shape.
 	 * </p>
 	 *
-	 * @param cloud The point cloud which is to be searched
+	 * @param cloud       The point cloud which is to be searched
 	 * @param boundingBox Optional bounding box which is known to contain all the points.
 	 *                    If none is provided set to null.
 	 */
-	public void process( List<Point3D_F64> cloud , Cube3D_F64 boundingBox );
+	public void process(List<Point3D_F64> cloud, Cube3D_F64 boundingBox);
 
 	/**
 	 * <p>
@@ -69,7 +69,7 @@ public interface PointCloudShapeFinder {
 	 * computations and should only be called once for each call to
 	 * {@link #process(java.util.List, georegression.struct.shapes.Cube3D_F64)};
 	 * </p>
-	 *
+	 * <p/>
 	 * <p>
 	 * WARNING: All data structures returned are owned by this class.  They are subject to being modified
 	 * the next time process is called.  The points might also be references to the input point cloud.
@@ -77,7 +77,7 @@ public interface PointCloudShapeFinder {
 	 *
 	 * @param unmatched Storage for Point3D_F64 which matched the shape.
 	 */
-	public void getUnmatched( List<Point3D_F64> unmatched );
+	public void getUnmatched(List<Point3D_F64> unmatched);
 
 	/**
 	 * Returns a list of shapes that it can find
@@ -96,15 +96,22 @@ public interface PointCloudShapeFinder {
 	/**
 	 * Storage for output
 	 */
-	public static class Shape
-	{
-		/** The type of shape */
+	public static class Shape {
+		/**
+		 * The type of shape
+		 */
 		public CloudShapeTypes type;
-		/** Parameters for the shape.  See {@link CloudShapeTypes} for data structute type. */
+		/**
+		 * Parameters for the shape.  See {@link CloudShapeTypes} for data structute type.
+		 */
 		public Object parameters;
-		/** List of points that matched this shape */
+		/**
+		 * List of points that matched this shape
+		 */
 		public List<Point3D_F64> points = new ArrayList<Point3D_F64>();
-		/** Index of the point in the original cloud */
+		/**
+		 * Index of the point in the original cloud
+		 */
 		public GrowQueue_I32 indexes = new GrowQueue_I32();
 	}
 }

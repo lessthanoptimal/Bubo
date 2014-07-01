@@ -24,22 +24,22 @@ package bubo.maps.d2.grid;
  * @author Peter Abeles
  */
 public interface OccupancyGrid2D_B extends OccupancyGrid2D {
-    /**
-     * Sets the specified cell to 'value'.
-     *
-     * @param x x-coordinate of the cell.
-     * @param y y-coordinate of the cell.
-     * @param value The cell's new value.
-     */
-    public void set( int x , int y , boolean value );
+	/**
+	 * Sets the specified cell to 'value'.
+	 *
+	 * @param x     x-coordinate of the cell.
+	 * @param y     y-coordinate of the cell.
+	 * @param value The cell's new value.
+	 */
+	public void set(int x, int y, boolean value);
 
-    /**
-     * Gets the value of the cell at the specified coordinate.
-     *
-     * @param x x-coordinate of the cell.
-     * @param y y-coordinate of the cell.
-     * @return The cell's value.
-     */
-    public boolean get( int x , int y );
+	/**
+	 * Gets the value of the cell at the specified coordinate.
+	 *
+	 * @param x x-coordinate of the cell.
+	 * @param y y-coordinate of the cell.
+	 * @return The cell's value.
+	 */
+	public boolean get(int x, int y);
 
 }

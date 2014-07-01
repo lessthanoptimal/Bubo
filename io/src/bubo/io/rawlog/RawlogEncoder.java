@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,64 +31,63 @@ import java.io.OutputStream;
  */
 public class RawlogEncoder {
 
-    DataOutputStream out;
+	DataOutputStream out;
 
-    public RawlogEncoder( OutputStream out , boolean gzip ) {
-        this.out = new DataOutputStream(out);
-    }
+	public RawlogEncoder(OutputStream out, boolean gzip) {
+		this.out = new DataOutputStream(out);
+	}
 
-    public void encode( RawlogSerializable data ) throws IOException {
-        if( data instanceof RawlogSerializableStandard ) {
-            encodeStandard((RawlogSerializableStandard)data);
-        } else {
+	public static void writeClassName(OutputStream out, String string) throws IOException {
+		int length = string.length();
+		out.write(length | 0x80);
 
-        }
-    }
+		byte[] data = string.getBytes();
+		for (int i = 0; i < length; i++) {
+			out.write(data[i]);
+		}
+	}
 
-    public void close() {
-        try {
-            out.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	public static void writeString(OutputStream out, String string) throws IOException {
 
-    private void encodeStandard(RawlogSerializableStandard data ) throws IOException {
-        // class name
-        RawlogEncoder.writeClassName(out, data.getClass().getSimpleName());
-        // class version
-        out.write(data.getVersion());
+		int length = string.length();
+		LittleEndianIO.writeInt(out, length);
 
-        // output each data with reflections
-        String vars[] = data.getVariableOrder(data.getVersion());
-        for( int i = 0; i < vars.length; i++ ) {
+		byte[] data = string.getBytes();
+		for (int i = 0; i < length; i++) {
+			out.write(data[i]);
+		}
+	}
 
-        }        
+	public void encode(RawlogSerializable data) throws IOException {
+		if (data instanceof RawlogSerializableStandard) {
+			encodeStandard((RawlogSerializableStandard) data);
+		} else {
 
-        // end byte
-        out.write(0x88);
+		}
+	}
 
-    }
+	public void close() {
+		try {
+			out.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+	private void encodeStandard(RawlogSerializableStandard data) throws IOException {
+		// class name
+		RawlogEncoder.writeClassName(out, data.getClass().getSimpleName());
+		// class version
+		out.write(data.getVersion());
 
-    public static void writeClassName(OutputStream out , String string) throws IOException {
-        int length = string.length();
-        out.write(length | 0x80);
+		// output each data with reflections
+		String vars[] = data.getVariableOrder(data.getVersion());
+		for (int i = 0; i < vars.length; i++) {
 
-        byte[] data = string.getBytes();
-        for( int i = 0; i < length; i++ ) {
-            out.write(data[i]);
-        }
-    }
+		}
 
-    public static void writeString( OutputStream out , String string ) throws IOException {
+		// end byte
+		out.write(0x88);
 
-        int length = string.length();
-        LittleEndianIO.writeInt(out,length);
-
-        byte[] data = string.getBytes();
-        for( int i = 0; i < length; i++ ) {
-            out.write(data[i]);
-        }
-    }
+	}
 }

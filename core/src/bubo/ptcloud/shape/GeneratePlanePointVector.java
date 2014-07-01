@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,21 +35,17 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GeneratePlanePointVector implements ModelGeneratorCheck<PlaneGeneral3D_F64,PointVectorNN> {
-
-	// tolerance cos(angle) for vector normals
-	private double tolCosine;
-
-	// storage for difference of points
-	private Vector3D_F64 a = new Vector3D_F64();
-	private Vector3D_F64 b = new Vector3D_F64();
+public class GeneratePlanePointVector implements ModelGeneratorCheck<PlaneGeneral3D_F64, PointVectorNN> {
 
 	// normal found from 3 points
 	protected Vector3D_F64 n = new Vector3D_F64();
-
 	// just used for converting formats
 	protected PlaneNormal3D_F64 planeNormal = new PlaneNormal3D_F64();
-
+	// tolerance cos(angle) for vector normals
+	private double tolCosine;
+	// storage for difference of points
+	private Vector3D_F64 a = new Vector3D_F64();
+	private Vector3D_F64 b = new Vector3D_F64();
 	// used to accept or reject a model
 	private CheckShapeParameters<PlaneGeneral3D_F64> check = new CheckShapeAcceptAll<PlaneGeneral3D_F64>();
 
@@ -70,10 +66,10 @@ public class GeneratePlanePointVector implements ModelGeneratorCheck<PlaneGenera
 		PointVectorNN pc = dataSet.get(2);
 
 		// find the plane's normal vector
-		GeometryMath_F64.sub(pa.p,pb.p,a);
-		GeometryMath_F64.sub(pa.p,pc.p,b);
+		GeometryMath_F64.sub(pa.p, pb.p, a);
+		GeometryMath_F64.sub(pa.p, pc.p, b);
 
-		GeometryMath_F64.cross(a,b,n);
+		GeometryMath_F64.cross(a, b, n);
 		n.normalize();
 
 		if (!checkModel(pa, pb, pc))
@@ -83,19 +79,19 @@ public class GeneratePlanePointVector implements ModelGeneratorCheck<PlaneGenera
 		planeNormal.n = n;
 		planeNormal.p = pa.p;
 
-		UtilPlane3D_F64.convert(planeNormal,output);
+		UtilPlane3D_F64.convert(planeNormal, output);
 
 		return check.valid(output);
 	}
 
 	protected final boolean checkModel(PointVectorNN pa, PointVectorNN pb, PointVectorNN pc) {
-		if( Math.abs(n.dot(pa.normal)) < tolCosine)
+		if (Math.abs(n.dot(pa.normal)) < tolCosine)
 			return false;
 
-		if( Math.abs(n.dot(pb.normal)) < tolCosine)
+		if (Math.abs(n.dot(pb.normal)) < tolCosine)
 			return false;
 
-		if( Math.abs(n.dot(pc.normal)) < tolCosine)
+		if (Math.abs(n.dot(pc.normal)) < tolCosine)
 			return false;
 
 		return true;

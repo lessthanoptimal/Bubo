@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,102 +29,105 @@ import java.awt.event.ComponentListener;
  */
 public class LaserHistogram extends SpacialDisplay implements ComponentListener {
 
-    // number of range measurements
-    private int numMeas;
+	// number of range measurements
+	private int numMeas;
 
-    // measured range
-    private double ranges[] = new double[1];
+	// measured range
+	private double ranges[] = new double[1];
 
-    // the maximum allowed range
-    private double maxRange;
+	// the maximum allowed range
+	private double maxRange;
 
-    private Color colorBack = Color.WHITE;
-    private Color colorLine = Color.BLACK;
-    private Color colorInvalid = Color.CYAN;
-    private Color colorMaxRange = Color.BLUE;
+	private Color colorBack = Color.WHITE;
+	private Color colorLine = Color.BLACK;
+	private Color colorInvalid = Color.CYAN;
+	private Color colorMaxRange = Color.BLUE;
 
-    public LaserHistogram() {
-        addComponentListener(this);
-        showScale(true,60);
-    }
+	public LaserHistogram() {
+		addComponentListener(this);
+		showScale(true, 60);
+	}
 
-    public void setData( int numMeas , float[] data , float maxRange ) {
-        // adjust the scale for display
-        setPixelsPerMeter(getHeight()/maxRange);
+	public void setData(int numMeas, float[] data, float maxRange) {
+		// adjust the scale for display
+		setPixelsPerMeter(getHeight() / maxRange);
 
-        if( ranges.length < numMeas ) {
-            ranges = new double[ numMeas ];
-        }
+		if (ranges.length < numMeas) {
+			ranges = new double[numMeas];
+		}
 
-        for( int i = 0; i < numMeas; i++ ) {
-            ranges[i] = data[i];
-        }
-        this.numMeas = numMeas;
-        this.maxRange = maxRange;
+		for (int i = 0; i < numMeas; i++) {
+			ranges[i] = data[i];
+		}
+		this.numMeas = numMeas;
+		this.maxRange = maxRange;
 
-        setBackground(colorBack);
+		setBackground(colorBack);
 
-        repaint();
-    }
+		repaint();
+	}
 
-    public void setData( int numMeas , double[] data , double maxRange ) {
-        // adjust the scale for display
-        setPixelsPerMeter(getHeight()/maxRange);
+	public void setData(int numMeas, double[] data, double maxRange) {
+		// adjust the scale for display
+		setPixelsPerMeter(getHeight() / maxRange);
 
-        if( ranges.length < numMeas ) {
-            ranges = new double[ numMeas ];
-        }
+		if (ranges.length < numMeas) {
+			ranges = new double[numMeas];
+		}
 
-        System.arraycopy(data, 0, ranges, 0, numMeas);
-        
-        this.numMeas = numMeas;
-        this.maxRange = maxRange;
+		System.arraycopy(data, 0, ranges, 0, numMeas);
 
-        setBackground(colorBack);
+		this.numMeas = numMeas;
+		this.maxRange = maxRange;
 
-        repaint();
-    }
+		setBackground(colorBack);
 
-    @Override
-    public void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D)g;
+		repaint();
+	}
 
-        int width = getWidth();
-        int height = getHeight();
+	@Override
+	public void paintComponent(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
 
-        for( int i = 0; i < numMeas; i++ ) {
-            int x = i*width/numMeas;
-            int x_next = (i+1)*width/numMeas;
+		int width = getWidth();
+		int height = getHeight();
 
-            double r = ranges[i];
+		for (int i = 0; i < numMeas; i++) {
+			int x = i * width / numMeas;
+			int x_next = (i + 1) * width / numMeas;
 
-            if( Double.isNaN(r) ) {
-                g2.setColor(colorInvalid);
-                g2.fillOval(x,height-4,4,4);
-            } else if( r >= maxRange ) {
-                g2.setColor(colorMaxRange);
-                g2.fillOval(x,height-4,4,4);
-            } else {
-                int y = (int)(height*r/maxRange);
-                g2.setColor(colorLine);
-                g2.fillRect(x,height-y,(x_next-x),y);
-            }
-        }
-    }
+			double r = ranges[i];
 
-    @Override
-    public void componentResized(ComponentEvent e) {
-        if( maxRange > 0 ) {
-            setPixelsPerMeter(getHeight()/maxRange);
-        }
-    }
+			if (Double.isNaN(r)) {
+				g2.setColor(colorInvalid);
+				g2.fillOval(x, height - 4, 4, 4);
+			} else if (r >= maxRange) {
+				g2.setColor(colorMaxRange);
+				g2.fillOval(x, height - 4, 4, 4);
+			} else {
+				int y = (int) (height * r / maxRange);
+				g2.setColor(colorLine);
+				g2.fillRect(x, height - y, (x_next - x), y);
+			}
+		}
+	}
 
-    @Override
-    public void componentMoved(ComponentEvent e) { }
+	@Override
+	public void componentResized(ComponentEvent e) {
+		if (maxRange > 0) {
+			setPixelsPerMeter(getHeight() / maxRange);
+		}
+	}
 
-    @Override
-    public void componentShown(ComponentEvent e) { }
+	@Override
+	public void componentMoved(ComponentEvent e) {
+	}
 
-    @Override
-    public void componentHidden(ComponentEvent e) { }
+	@Override
+	public void componentShown(ComponentEvent e) {
+	}
+
+	@Override
+	public void componentHidden(ComponentEvent e) {
+	}
 }

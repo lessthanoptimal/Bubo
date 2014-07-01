@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -34,65 +34,65 @@ import java.util.Random;
  */
 public class ModelLrf2DBasic {
 
-    Random rand = new Random(123123);
-    LineSegmentWorld2D world;
+	Random rand = new Random(123123);
+	LineSegmentWorld2D world;
 
-    // standard deviation of noise which is added to range measurements
-    double noiseSigma = 0;
+	// standard deviation of noise which is added to range measurements
+	double noiseSigma = 0;
 
-    public ModelLrf2DBasic() {
+	public ModelLrf2DBasic() {
 
-    }
+	}
 
-    public double getNoiseSigma() {
-        return noiseSigma;
-    }
+	public double getNoiseSigma() {
+		return noiseSigma;
+	}
 
-    public void setNoiseSigma(double noiseSigma) {
-        this.noiseSigma = noiseSigma;
-    }
+	public void setNoiseSigma(double noiseSigma) {
+		this.noiseSigma = noiseSigma;
+	}
 
-    public void setWorld( LineSegmentWorld2D world ) {
-        this.world = world;
-    }
+	public void setWorld(LineSegmentWorld2D world) {
+		this.world = world;
+	}
 
-    public void updateSensor( SimStateLrf2D sensor ) {
-        List<LineSegment2D_F64> lines = world.lines;
+	public void updateSensor(SimStateLrf2D sensor) {
+		List<LineSegment2D_F64> lines = world.lines;
 
-        Se2_F64 l2p = sensor.getLocalToParent();
+		Se2_F64 l2p = sensor.getLocalToParent();
 
-        Lrf2dParam param = sensor.getSensorParam();
-        double ranges[] = sensor.getRanges();
+		Lrf2dParam param = sensor.getSensorParam();
+		double ranges[] = sensor.getRanges();
 
-        LineParametric2D_F64 ray = new LineParametric2D_F64();
-        ray.setPoint(l2p.getX(),l2p.getY());
+		LineParametric2D_F64 ray = new LineParametric2D_F64();
+		ray.setPoint(l2p.getX(), l2p.getY());
 
-        double startAngle = param.getStartAngle() + l2p.getYaw();
+		double startAngle = param.getStartAngle() + l2p.getYaw();
 
-        final double angleInc = param.getAngleIncrement();
+		final double angleInc = param.getAngleIncrement();
 
-        for( int i = 0; i < param.getNumberOfScans(); i++ ) {
-            double angle = startAngle + i*angleInc;
-            ray.setAngle(angle);
+		for (int i = 0; i < param.getNumberOfScans(); i++) {
+			double angle = startAngle + i * angleInc;
+			ray.setAngle(angle);
 
-            // find the line which
-            double closest = Double.MAX_VALUE;
+			// find the line which
+			double closest = Double.MAX_VALUE;
 
-            for( LineSegment2D_F64 l : lines ) {
-                double r = Intersection2D_F64.intersection(ray,l);
+			for (LineSegment2D_F64 l : lines) {
+				double r = Intersection2D_F64.intersection(ray, l);
 
-                if( noiseSigma > 0 ) {
-                    r += rand.nextGaussian()*noiseSigma;
-                    if( r < 0 )
-                        r = 0;
-                }
+				if (noiseSigma > 0) {
+					r += rand.nextGaussian() * noiseSigma;
+					if (r < 0)
+						r = 0;
+				}
 
-                if( r > 0 && r < closest ) {
-                    closest = r;
-                }
-            }
+				if (r > 0 && r < closest) {
+					closest = r;
+				}
+			}
 
-            ranges[i] = closest < param.getMaxRange() ? closest : param.getMaxRange();
-        }
-    }
+			ranges[i] = closest < param.getMaxRange() ? closest : param.getMaxRange();
+		}
+	}
 }

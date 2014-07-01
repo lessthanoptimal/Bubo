@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -37,7 +37,7 @@ public class StandardPredictorTests {
 	double tol;
 	double T;
 
-	public StandardPredictorTests(double tolerance ) {
+	public StandardPredictorTests(double tolerance) {
 		this.tol = tolerance;
 	}
 
@@ -46,31 +46,32 @@ public class StandardPredictorTests {
 	 * have more uncertainty and thus have a larger covariance
 	 *
 	 * @param predictor
-	 * @param T_init the smaller time.  the larger time will be 50% larger
+	 * @param T_init    the smaller time.  the larger time will be 50% larger
 	 */
-	public void checkCovarianceIncreaseWithTime(EkfPredictorTime predictor , double T_init , double ...state ) {
-		DenseMatrix64F x = new DenseMatrix64F(state.length,1,true,state);
+	public void checkCovarianceIncreaseWithTime(EkfPredictorTime predictor, double T_init, double... state) {
+		DenseMatrix64F x = new DenseMatrix64F(state.length, 1, true, state);
 		predictor.compute(x, T_init);
 
 		// Using P2 norm instead of determinant since the determinant seems to produce very small numbers
 		double Q1 = NormOps.normP2(predictor.getPlantNoise());
-		predictor.compute(x,T_init*1.5);
+		predictor.compute(x, T_init * 1.5);
 		double Q2 = NormOps.normP2(predictor.getPlantNoise());
 
-		assertTrue( Q1 < Q2 );
+		assertTrue(Q1 < Q2);
 	}
 
 	/**
 	 * Checks the projector jacobian against a numerical jacobian
+	 *
 	 * @param input
 	 */
-	public void checkStateJacobianAtPoint( EkfPredictorTime projector , boolean printResults , double T, double ...input ) {
+	public void checkStateJacobianAtPoint(EkfPredictorTime projector, boolean printResults, double T, double... input) {
 		this.projector = projector;
 		this.T = T;
 		PredictorStateJacobian j = new PredictorStateJacobian();
 		PredictorFunction f = new PredictorFunction();
 
-		if( printResults ) {
+		if (printResults) {
 			JacobianChecker.jacobianPrint(f, j, input, tol);
 		}
 		assertTrue(JacobianChecker.jacobian(f, j, input, tol));
@@ -79,17 +80,17 @@ public class StandardPredictorTests {
 	/**
 	 * Checks to see if the covariance matrix is valid
 	 */
-	public void checkValidCovariance(EkfPredictorTime predictor , double T , double ...state ) {
-		DenseMatrix64F x = new DenseMatrix64F(state.length,1,true,state);
+	public void checkValidCovariance(EkfPredictorTime predictor, double T, double... state) {
+		DenseMatrix64F x = new DenseMatrix64F(state.length, 1, true, state);
 		predictor.compute(x, T);
 		DenseMatrix64F Q = predictor.getPlantNoise();
 
 		// has all valid numbers
 		assertTrue(!MatrixFeatures.hasUncountable(Q));
 		// test positive definite
-		assertTrue(CommonOps.det(Q) >= 0 );
+		assertTrue(CommonOps.det(Q) >= 0);
 		// test symmetric
-		assertTrue(MatrixFeatures.isSymmetric(Q,tol));
+		assertTrue(MatrixFeatures.isSymmetric(Q, tol));
 	}
 
 	private class PredictorFunction implements FunctionNtoM {
@@ -106,19 +107,18 @@ public class StandardPredictorTests {
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F X = new DenseMatrix64F(3,1,true,input);
+			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
 
-			projector.compute(X,T);
+			projector.compute(X, T);
 
 			double[] found = projector.getPredictedState().data;
 
-			System.arraycopy(found,0,output,0,found.length);
+			System.arraycopy(found, 0, output, 0, found.length);
 
 		}
 	}
 
-	private class PredictorStateJacobian implements FunctionNtoMxN
-	{
+	private class PredictorStateJacobian implements FunctionNtoMxN {
 
 		@Override
 		public int getNumOfInputsN() {
@@ -132,13 +132,13 @@ public class StandardPredictorTests {
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F X = new DenseMatrix64F(3,1,true,input);
+			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
 
-			projector.compute(X,T);
+			projector.compute(X, T);
 
 			double[] found = projector.getJacobianF().data;
 
-			System.arraycopy(found,0,output,0,found.length);
+			System.arraycopy(found, 0, output, 0, found.length);
 		}
 	}
 }

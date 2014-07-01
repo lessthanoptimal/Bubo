@@ -33,36 +33,36 @@ public interface OccupancyGrid2D {
 	 */
 	public void clear();
 
-    /**
-     * Checks to see if the specified point is in bounds.
-     *
-     * @param x x-coordinate
-     * @param y y-coordinate
-     * @return If the coordinate belongs to a valid cell in the map.
-     */
-    public boolean isInBounds( int x , int y );
+	/**
+	 * Checks to see if the specified point is in bounds.
+	 *
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 * @return If the coordinate belongs to a valid cell in the map.
+	 */
+	public boolean isInBounds(int x, int y);
 
-    /**
-     * Checks to see if any information is available on the occupancy of
-     * the specified cell.
-     *
-     * @param x x-coordinate
-     * @param y y-coordinate
-     * @return true if information is available on the cell.
-     */
-    public boolean isKnown( int x , int y );
+	/**
+	 * Checks to see if any information is available on the occupancy of
+	 * the specified cell.
+	 *
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 * @return true if information is available on the cell.
+	 */
+	public boolean isKnown(int x, int y);
 
-    /**
-     * The map's width.  All valid x-coordinates are between 0 and width-1.
-     *
-     * @return maps' width.
-     */
-    public int getWidth();
+	/**
+	 * The map's width.  All valid x-coordinates are between 0 and width-1.
+	 *
+	 * @return maps' width.
+	 */
+	public int getWidth();
 
-    /**
-     * The map's height.  All valid y-coordinates are between 0 and height-1
-     *
-     * @return map's height.
-     */
-    public int getHeight();
+	/**
+	 * The map's height.  All valid y-coordinates are between 0 and height-1
+	 *
+	 * @return map's height.
+	 */
+	public int getHeight();
 }

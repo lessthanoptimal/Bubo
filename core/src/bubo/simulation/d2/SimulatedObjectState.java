@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,10 +27,10 @@ import georegression.struct.se.Se2_F64;
  */
 public class SimulatedObjectState {
 
-    // from the local to the parent reference frame
-    private Se2_F64 l2p = new Se2_F64();
+	// from the local to the parent reference frame
+	private Se2_F64 l2p = new Se2_F64();
 
-    public Se2_F64 getLocalToParent() {
-        return l2p;
-    }
+	public Se2_F64 getLocalToParent() {
+		return l2p;
+	}
 }

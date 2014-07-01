@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -34,126 +34,124 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestFindRefFramePath {
-    private static RobotComponent createComp( RobotComponent ref ) {
-        return new RobotComponent(null,new Extrinsic2D(ref,true),null,null);
-    }
+	private static RobotComponent createComp(RobotComponent ref) {
+		return new RobotComponent(null, new Extrinsic2D(ref, true), null, null);
+	}
 
-    private static void checkNode( InvertibleTransformSequence.Node n , RobotComponent comp , boolean forward )
-    {
+	private static void checkNode(InvertibleTransformSequence.Node n, RobotComponent comp, boolean forward) {
 
-        SpecialEuclidean se = ((Extrinsic2D)comp.getExtrinsic()).getTransformToParent();
+		SpecialEuclidean se = ((Extrinsic2D) comp.getExtrinsic()).getTransformToParent();
 
-        assertTrue(n.tran == se);
-        assertTrue(n.forward == forward);
-    }
+		assertTrue(n.tran == se);
+		assertTrue(n.forward == forward);
+	}
 
-    /**
-     * The two inputs are the same
-     */
-    @Test
-    public void findPath_sameNode() {
-        RobotComponent b = createComp(null);
-        RobotComponent a = createComp(b);
+	/**
+	 * The two inputs are the same
+	 */
+	@Test
+	public void findPath_sameNode() {
+		RobotComponent b = createComp(null);
+		RobotComponent a = createComp(b);
 
-        InvertibleTransformSequence path = FindRefFramePath.findPath(a,a);
+		InvertibleTransformSequence path = FindRefFramePath.findPath(a, a);
 
-        assertEquals(0,path.getPath().size());
-    }
-
-
-    /**
-     * the 'from' node is the base node and 'to' is N off
-     */
-    @Test
-    public void findPath_fromIsBase() {
-        RobotComponent base = createComp(null);
-        RobotComponent b = createComp(base);
-        RobotComponent a = createComp(b);
-
-        InvertibleTransformSequence path = FindRefFramePath.findPath(base,a);
-
-        List<InvertibleTransformSequence.Node> l = path.getPath();
-
-        assertEquals(2,l.size());
-        checkNode(l.get(0),b,false);
-        checkNode(l.get(1),a,false);
-    }
+		assertEquals(0, path.getPath().size());
+	}
 
 
+	/**
+	 * the 'from' node is the base node and 'to' is N off
+	 */
+	@Test
+	public void findPath_fromIsBase() {
+		RobotComponent base = createComp(null);
+		RobotComponent b = createComp(base);
+		RobotComponent a = createComp(b);
 
-    /**
-     * the 'to' node is the base node and 'from' is N off
-     */
-    @Test
-    public void findPath_toIsBase() {
-        RobotComponent base = createComp(null);
-        RobotComponent b = createComp(base);
-        RobotComponent a = createComp(b);
+		InvertibleTransformSequence path = FindRefFramePath.findPath(base, a);
 
-        InvertibleTransformSequence path = FindRefFramePath.findPath(a,base);
+		List<InvertibleTransformSequence.Node> l = path.getPath();
 
-        List<InvertibleTransformSequence.Node> l = path.getPath();
+		assertEquals(2, l.size());
+		checkNode(l.get(0), b, false);
+		checkNode(l.get(1), a, false);
+	}
 
-        assertEquals(2,l.size());
-        checkNode(l.get(0),a,true);
-        checkNode(l.get(1),b,true);
-    }
 
-    /**
-     * The two paths diverse some place in the middle
-     */
-    @Test
-    public void findPath_meetMiddle() {
-        RobotComponent base = createComp(null);
-        RobotComponent c = createComp(base);
-        RobotComponent b = createComp(c);
-        RobotComponent a = createComp(b);
-        RobotComponent d = createComp(c);
+	/**
+	 * the 'to' node is the base node and 'from' is N off
+	 */
+	@Test
+	public void findPath_toIsBase() {
+		RobotComponent base = createComp(null);
+		RobotComponent b = createComp(base);
+		RobotComponent a = createComp(b);
 
-        InvertibleTransformSequence path = FindRefFramePath.findPath(a,d);
+		InvertibleTransformSequence path = FindRefFramePath.findPath(a, base);
 
-        List<InvertibleTransformSequence.Node> l = path.getPath();
+		List<InvertibleTransformSequence.Node> l = path.getPath();
 
-        assertEquals(3,l.size());
-        checkNode(l.get(0),a,true);
-        checkNode(l.get(1),b,true);
-        checkNode(l.get(2),d,false);
-    }
+		assertEquals(2, l.size());
+		checkNode(l.get(0), a, true);
+		checkNode(l.get(1), b, true);
+	}
 
-    /**
-     * Create a bad graph with a cycle
-     */
-    @Test(expected=RuntimeException.class)
-    public void findPath_cycle() {
-        RobotComponent base = createComp(null);
-        RobotComponent b = createComp(base);
-        RobotComponent a = createComp(b);
-        b.setExtrinsic(new Extrinsic2D(a,true));
+	/**
+	 * The two paths diverse some place in the middle
+	 */
+	@Test
+	public void findPath_meetMiddle() {
+		RobotComponent base = createComp(null);
+		RobotComponent c = createComp(base);
+		RobotComponent b = createComp(c);
+		RobotComponent a = createComp(b);
+		RobotComponent d = createComp(c);
 
-        FindRefFramePath.findPath(a,base);
-    }
+		InvertibleTransformSequence path = FindRefFramePath.findPath(a, d);
 
-    /**
-     * Bad graph where the two have nothing in common
-     */
-    @Test(expected=RuntimeException.class)
-    public void findPath_nocommon() {
-        RobotComponent base = createComp(null);
-        RobotComponent b = createComp(null);
-        RobotComponent a = createComp(base);
+		List<InvertibleTransformSequence.Node> l = path.getPath();
 
-        FindRefFramePath.findPath(a,b);
-    }
+		assertEquals(3, l.size());
+		checkNode(l.get(0), a, true);
+		checkNode(l.get(1), b, true);
+		checkNode(l.get(2), d, false);
+	}
 
-    @Test
-    public void computeTransform_emptyPath() {
-        RobotComponent b = createComp(null);
-        RobotComponent a = createComp(b);
+	/**
+	 * Create a bad graph with a cycle
+	 */
+	@Test(expected = RuntimeException.class)
+	public void findPath_cycle() {
+		RobotComponent base = createComp(null);
+		RobotComponent b = createComp(base);
+		RobotComponent a = createComp(b);
+		b.setExtrinsic(new Extrinsic2D(a, true));
 
-        InvertibleTransformSequence path = FindRefFramePath.findPath(a,a);
+		FindRefFramePath.findPath(a, base);
+	}
 
-        Se2_F64 result = new Se2_F64();
-        path.computeTransform(result);
-    }
+	/**
+	 * Bad graph where the two have nothing in common
+	 */
+	@Test(expected = RuntimeException.class)
+	public void findPath_nocommon() {
+		RobotComponent base = createComp(null);
+		RobotComponent b = createComp(null);
+		RobotComponent a = createComp(base);
+
+		FindRefFramePath.findPath(a, b);
+	}
+
+	@Test
+	public void computeTransform_emptyPath() {
+		RobotComponent b = createComp(null);
+		RobotComponent a = createComp(b);
+
+		InvertibleTransformSequence path = FindRefFramePath.findPath(a, a);
+
+		Se2_F64 result = new Se2_F64();
+		path.computeTransform(result);
+	}
 
 }

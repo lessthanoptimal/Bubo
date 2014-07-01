@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,130 +31,128 @@ import java.util.List;
  * Also contains helper functions for computing the path from RobotComponents.
  * </p>
  *
- *
  * @author Peter Abeles
  */
 public class RefFramePath {
 
-    // used to detect bad graphs with cycles
-    public static final int MAX_ITERATIONS = 100000;
+	// used to detect bad graphs with cycles
+	public static final int MAX_ITERATIONS = 100000;
 
-    // the path
-    private List<Node> path;
+	// the path
+	private List<Node> path;
 
-    public RefFramePath(List<Node> path) {
-        this.path = path;
-    }
+	public RefFramePath(List<Node> path) {
+		this.path = path;
+	}
 
-    public List<Node> getPath() {
-        return path;
-    }
+	/**
+	 * Find the coordinate frame path between these two nodes.
+	 *
+	 * @param from Where the path will begin.
+	 * @param to   Where the path will end.
+	 * @return The path.
+	 */
+	public static RefFramePath findPath(RobotComponent from, RobotComponent to) {
+		List<Node> listFrom = findPathToRoot(from, true);
+		List<Node> listTo = findPathToRoot(to, false);
 
-    public void setPath(List<Node> path) {
-        this.path = path;
-    }
+		// find the nodes at the end which are common and remove them
+		if (listFrom.size() > 0 && listTo.size() > 0) {
+			// quick sanity check
+			// the last elements should be the final node
+			if (listFrom.get(listFrom.size() - 1).comp != listTo.get(listTo.size() - 1).comp)
+				throw new RuntimeException("Bad graph.  Last node is not the same in both lists.");
 
-    @SuppressWarnings({"unchecked"})
-    public void computeTransform( SpecialEuclidean result ) {
+			while (listFrom.size() > 0 && listTo.size() > 0) {
+				Node f = listFrom.remove(listFrom.size() - 1);
+				Node t = listTo.remove(listTo.size() - 1);
 
-        if( path.size() == 0 )
-            return;
+				if (f.comp != t.comp) {
+					listFrom.add(f);
+					listTo.add(t);
+					break;
+				}
+			}
+		}
 
-        SpecialEuclidean inv = (SpecialEuclidean)result.createInstance();
+		for (int i = listTo.size() - 1; i >= 0; i--) {
+			listFrom.add(listTo.get(i));
+		}
 
-        RefFramePath.Node n = path.get(0);
-        SpecialEuclidean nodeTran = ((Extrinsic2D)n.comp.getExtrinsic()).getTransformToParent();
+		return new RefFramePath(listFrom);
+	}
 
-        if( n.forward ) {
-            result.set(nodeTran);
-        } else {
-            nodeTran.invert(result);
-        }
+	/**
+	 * Traverses the graph until it finds the last node and return the sequence of nodes.
+	 *
+	 * @param start   First node in the search.
+	 * @param forward is the transform in the forward or backwards direction.
+	 * @return Path.
+	 */
+	public static List<Node> findPathToRoot(RobotComponent start, boolean forward) {
+		List<Node> toRoot = new ArrayList<Node>();
 
-        for( int i = 1; i < path.size(); i++ ) {
-            n = path.get(i);
-            nodeTran = ((Extrinsic2D)n.comp.getExtrinsic()).getTransformToParent();
+		RobotComponent n = start;
+		int iter = 0;
 
-            if( n.forward ) {
-                result.concat(nodeTran,result);
-            } else {
-                nodeTran.invert(inv);
-                result.concat(inv,result);
-            }
-        }
-    }
+		while (n != null) {
+			ExtrinsicParameters p = n.getExtrinsic();
+			if (p == null)
+				throw new RuntimeException("No extrinsic parameters in node " + n.getName());
+			toRoot.add(new Node(n, forward));
+			n = p.getReference();
+			if (++iter > MAX_ITERATIONS)
+				throw new RuntimeException("Max iterations exceeded.  Cycle in the graph?");
+		}
 
-    /**
-     * Find the coordinate frame path between these two nodes.
-     *
-     * @param from Where the path will begin.
-     * @param to Where the path will end.
-     * @return The path.
-     */
-    public static RefFramePath findPath( RobotComponent from , RobotComponent to ) {
-        List<Node> listFrom = findPathToRoot(from,true);
-        List<Node> listTo = findPathToRoot(to,false);
+		return toRoot;
+	}
 
-        // find the nodes at the end which are common and remove them
-        if( listFrom.size() > 0 && listTo.size() > 0 ) {
-            // quick sanity check
-            // the last elements should be the final node
-            if( listFrom.get(listFrom.size()-1).comp != listTo.get(listTo.size()-1).comp )
-                throw new RuntimeException("Bad graph.  Last node is not the same in both lists.");
+	public List<Node> getPath() {
+		return path;
+	}
 
-            while( listFrom.size() > 0 && listTo.size() > 0 ) {
-                Node f = listFrom.remove(listFrom.size()-1);
-                Node t = listTo.remove(listTo.size()-1);
+	public void setPath(List<Node> path) {
+		this.path = path;
+	}
 
-                if( f.comp != t.comp) {
-                    listFrom.add(f);
-                    listTo.add(t);
-                    break;
-                }
-            }
-        }
+	@SuppressWarnings({"unchecked"})
+	public void computeTransform(SpecialEuclidean result) {
 
-        for( int i = listTo.size()-1; i >= 0; i-- ) {
-            listFrom.add(listTo.get(i));
-        }
+		if (path.size() == 0)
+			return;
 
-        return new RefFramePath(listFrom);
-    }
+		SpecialEuclidean inv = (SpecialEuclidean) result.createInstance();
 
-    /**
-     * Traverses the graph until it finds the last node and return the sequence of nodes.
-     *
-     * @param start First node in the search.
-     * @param forward is the transform in the forward or backwards direction.
-     * @return Path.
-     */
-    public static List<Node> findPathToRoot( RobotComponent start , boolean forward ) {
-        List<Node> toRoot = new ArrayList<Node>();
+		RefFramePath.Node n = path.get(0);
+		SpecialEuclidean nodeTran = ((Extrinsic2D) n.comp.getExtrinsic()).getTransformToParent();
 
-        RobotComponent n = start;
-        int iter = 0;
+		if (n.forward) {
+			result.set(nodeTran);
+		} else {
+			nodeTran.invert(result);
+		}
 
-        while( n != null ) {
-            ExtrinsicParameters p = n.getExtrinsic();
-            if( p == null )
-                throw new RuntimeException("No extrinsic parameters in node "+n.getName());
-            toRoot.add(new Node(n,forward));
-            n = p.getReference();
-            if( ++iter > MAX_ITERATIONS )
-                throw new RuntimeException("Max iterations exceeded.  Cycle in the graph?");
-        }
+		for (int i = 1; i < path.size(); i++) {
+			n = path.get(i);
+			nodeTran = ((Extrinsic2D) n.comp.getExtrinsic()).getTransformToParent();
 
-        return toRoot;
-    }
+			if (n.forward) {
+				result.concat(nodeTran, result);
+			} else {
+				nodeTran.invert(inv);
+				result.concat(inv, result);
+			}
+		}
+	}
 
-    public static class Node
-    {
-        public RobotComponent comp;
-        public boolean forward;
+	public static class Node {
+		public RobotComponent comp;
+		public boolean forward;
 
-        public Node(RobotComponent comp,  boolean forward) {
-            this.comp = comp;
-            this.forward = forward;
-        }
-    }
+		public Node(RobotComponent comp, boolean forward) {
+			this.comp = comp;
+			this.forward = forward;
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,39 +35,39 @@ import java.awt.image.BufferedImage;
 public class ImageFile implements ImageEncoded {
 
 	Class imageType = ImageUInt8.class;
-    String fileLocation;
+	String fileLocation;
 
-    public ImageFile(String fileLocation) {
-        this.fileLocation = fileLocation;
-    }
+	public ImageFile(String fileLocation) {
+		this.fileLocation = fileLocation;
+	}
 
-    @Override
-    public byte[] getData() {
-        return null;
-    }
+	@Override
+	public byte[] getData() {
+		return null;
+	}
 
-    @Override
-    public int getDataSize() {
-        return -1;
-    }
+	@Override
+	public int getDataSize() {
+		return -1;
+	}
 
-    @Override
-    public String getFormat() {
-        return "file";
-    }
+	@Override
+	public String getFormat() {
+		return "file";
+	}
 
-    @Override
-    public <T extends ImageBase>T convertToImage() {
-        BufferedImage buffImg = convertToBuffered();
-		return (T)ConvertBufferedImage.convertFromSingle(buffImg,null,imageType);
-    }
+	@Override
+	public <T extends ImageBase> T convertToImage() {
+		BufferedImage buffImg = convertToBuffered();
+		return (T) ConvertBufferedImage.convertFromSingle(buffImg, null, imageType);
+	}
 
-    @Override
-    public BufferedImage convertToBuffered() {
-        return UtilImageIO.loadImage(fileLocation);
-    }
+	@Override
+	public BufferedImage convertToBuffered() {
+		return UtilImageIO.loadImage(fileLocation);
+	}
 
-    public String getFileLocation() {
-        return fileLocation;
-    }
+	public String getFileLocation() {
+		return fileLocation;
+	}
 }

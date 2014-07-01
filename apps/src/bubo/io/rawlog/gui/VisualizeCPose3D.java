@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,45 +30,45 @@ import javax.swing.*;
  */
 public class VisualizeCPose3D implements LogDataVisualization {
 
-    JTextArea textArea = new JTextArea();
+	JTextArea textArea = new JTextArea();
 
-    @Override
-    public void setData(Object data) {
-        setText((CPose3D)data);
-    }
+	@Override
+	public void setData(Object data) {
+		setText((CPose3D) data);
+	}
 
-    public void setText( CPose3D pose ) {
+	public void setText(CPose3D pose) {
 
-        DenseMatrix64F R = pose.getRotation();
-        double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(R,null);
+		DenseMatrix64F R = pose.getRotation();
+		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(R, null);
 
-        String str = "CPose3D\n";
-        str += "\n";
-        str += "Position "+pose.getPosition()+"\n";
-        str += "RotX "+euler[0]+"\n";
-        str += "RotY "+euler[1]+"\n";
-        str += "RotZ "+euler[2]+"\n";
+		String str = "CPose3D\n";
+		str += "\n";
+		str += "Position " + pose.getPosition() + "\n";
+		str += "RotX " + euler[0] + "\n";
+		str += "RotY " + euler[1] + "\n";
+		str += "RotZ " + euler[2] + "\n";
 
-        textArea.setText(str);
-    }
+		textArea.setText(str);
+	}
 
-    @Override
-    public Class<?> getType() {
-        return CPose3D.class;
-    }
+	@Override
+	public Class<?> getType() {
+		return CPose3D.class;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 1;
-    }
+	@Override
+	public int numDisplay() {
+		return 1;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        return textArea;
-    }
+	@Override
+	public JComponent getDisplay(int index) {
+		return textArea;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        return "Text Info";
-    }
+	@Override
+	public String getDisplayName(int index) {
+		return "Text Info";
+	}
 }

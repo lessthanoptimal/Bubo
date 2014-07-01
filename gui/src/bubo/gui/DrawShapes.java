@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -26,40 +26,39 @@ import java.awt.geom.GeneralPath;
  */
 public class DrawShapes {
 
-    /**
-     * Draws a basic arrow into the Graphics2D object.
-     *
-     * @param g2 Where the arrow is drawn.
-     * @param startX start of the arrow.  x-coordinate
-     * @param startY start of the arrow.  y-coordinate
-     * @param endX end of the arrow.  x-coordinate
-     * @param endY end of the arrow.  y-coordinate
-     * @param headLength How long the head is in front of the arrow: 10
-     * @param headAngle The angle the head lines are relative to the body lines: 0.4
-     */
-    public static void arrow( Graphics2D g2 , float startX , float startY , float endX , float endY ,
-                              float headLength , float headAngle )
-    {
-        GeneralPath shape = new GeneralPath();
+	/**
+	 * Draws a basic arrow into the Graphics2D object.
+	 *
+	 * @param g2         Where the arrow is drawn.
+	 * @param startX     start of the arrow.  x-coordinate
+	 * @param startY     start of the arrow.  y-coordinate
+	 * @param endX       end of the arrow.  x-coordinate
+	 * @param endY       end of the arrow.  y-coordinate
+	 * @param headLength How long the head is in front of the arrow: 10
+	 * @param headAngle  The angle the head lines are relative to the body lines: 0.4
+	 */
+	public static void arrow(Graphics2D g2, float startX, float startY, float endX, float endY,
+							 float headLength, float headAngle) {
+		GeneralPath shape = new GeneralPath();
 
-        shape.moveTo(startX,startY);
-        shape.lineTo(endX,endY);
+		shape.moveTo(startX, startY);
+		shape.lineTo(endX, endY);
 
-        double lineAngle = Math.atan2( endY - startY , endX - startX ) + Math.PI;
+		double lineAngle = Math.atan2(endY - startY, endX - startX) + Math.PI;
 
-        double targetX = endX + Math.cos( lineAngle + headAngle)*headLength;
-        double targetY = endY + Math.sin( lineAngle + headAngle)*headLength;
+		double targetX = endX + Math.cos(lineAngle + headAngle) * headLength;
+		double targetY = endY + Math.sin(lineAngle + headAngle) * headLength;
 
-        shape.lineTo(targetX,targetY);
-        shape.moveTo(endX,endY);
+		shape.lineTo(targetX, targetY);
+		shape.moveTo(endX, endY);
 
-        targetX = endX + Math.cos( lineAngle - headAngle)*headLength;
-        targetY = endY + Math.sin( lineAngle - headAngle)*headLength;
+		targetX = endX + Math.cos(lineAngle - headAngle) * headLength;
+		targetY = endY + Math.sin(lineAngle - headAngle) * headLength;
 
-        shape.lineTo(targetX,targetY);
+		shape.lineTo(targetX, targetY);
 
-        shape.closePath();
+		shape.closePath();
 
-        g2.draw(shape);
-    }
+		g2.draw(shape);
+	}
 }

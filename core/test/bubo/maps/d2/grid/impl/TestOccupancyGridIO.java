@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,81 +32,81 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestOccupancyGridIO {
 
-    Random rand = new Random(24234);
+	Random rand = new Random(24234);
 
-    /**
-     * Checks to see if loading and saving from an image works for ArrayGrid2D_I8
-     */
-    @Test
-    public void testImage_Load_Save_I8() {
-        OccupancyGrid2D_I map = new ArrayGrid2D_I8(10,20);
+	public static void checkIdentical(OccupancyGrid2D_I a, OccupancyGrid2D_I b) {
+		assertEquals(a.getMaxValue(), b.getMaxValue());
+		assertEquals(a.getWidth(), b.getWidth());
+		assertEquals(a.getHeight(), b.getHeight());
 
-        randomFill(map);
+		for (int y = 0; y < a.getHeight(); y++) {
+			for (int x = 0; x < a.getWidth(); x++) {
+				assertEquals(a.get(x, y), b.get(x, y));
+			}
+		}
+	}
 
-        BufferedImage image = OccupancyGridIO.render_I(map);
-        OccupancyGrid2D_I found = OccupancyGridIO.load_I8(image);
+	public static void checkIdentical(OccupancyGrid2D_F32 a, OccupancyGrid2D_F32 b, float tol) {
+		assertEquals(a.getWidth(), b.getWidth());
+		assertEquals(a.getHeight(), b.getHeight());
 
-        checkIdentical(map,found);
-    }
+		for (int y = 0; y < a.getHeight(); y++) {
+			for (int x = 0; x < a.getWidth(); x++) {
+				assertEquals(a.get(x, y), b.get(x, y), tol);
+			}
+		}
+	}
 
-    /**
-     * Checks to see if loading and saving from an image works for ArrayGrid2D_F32
-     */
-    @Test
-    public void testImage_Load_Save_F32() {
-        OccupancyGrid2D_F32 map = new ArrayGrid2D_F32(10,20);
+	/**
+	 * Checks to see if loading and saving from an image works for ArrayGrid2D_I8
+	 */
+	@Test
+	public void testImage_Load_Save_I8() {
+		OccupancyGrid2D_I map = new ArrayGrid2D_I8(10, 20);
 
-        randomFill(map);
+		randomFill(map);
 
-        BufferedImage image = OccupancyGridIO.render_F32(map,false);
-        OccupancyGrid2D_F32 found = OccupancyGridIO.load_F32(image);
+		BufferedImage image = OccupancyGridIO.render_I(map);
+		OccupancyGrid2D_I found = OccupancyGridIO.load_I8(image);
 
-        checkIdentical(map,found,(1.0f/255.0f));
-    }
+		checkIdentical(map, found);
+	}
 
-    public static void checkIdentical( OccupancyGrid2D_I a , OccupancyGrid2D_I b ) {
-        assertEquals(a.getMaxValue(),b.getMaxValue());
-        assertEquals(a.getWidth(),b.getWidth());
-        assertEquals(a.getHeight(),b.getHeight());
+	/**
+	 * Checks to see if loading and saving from an image works for ArrayGrid2D_F32
+	 */
+	@Test
+	public void testImage_Load_Save_F32() {
+		OccupancyGrid2D_F32 map = new ArrayGrid2D_F32(10, 20);
 
-        for( int y = 0; y < a.getHeight(); y++ ) {
-            for( int x = 0; x < a.getWidth(); x++ ) {
-                assertEquals(a.get(x,y),b.get(x,y));
-            }
-        }
-    }
+		randomFill(map);
 
-    public static void checkIdentical( OccupancyGrid2D_F32 a , OccupancyGrid2D_F32 b , float tol ) {
-        assertEquals(a.getWidth(),b.getWidth());
-        assertEquals(a.getHeight(),b.getHeight());
+		BufferedImage image = OccupancyGridIO.render_F32(map, false);
+		OccupancyGrid2D_F32 found = OccupancyGridIO.load_F32(image);
 
-        for( int y = 0; y < a.getHeight(); y++ ) {
-            for( int x = 0; x < a.getWidth(); x++ ) {
-                assertEquals(a.get(x,y),b.get(x,y),tol);
-            }
-        }
-    }
+		checkIdentical(map, found, (1.0f / 255.0f));
+	}
 
-    private void randomFill( OccupancyGrid2D_I map ) {
+	private void randomFill(OccupancyGrid2D_I map) {
 
-        int max = map.getMaxValue();
+		int max = map.getMaxValue();
 
-        for( int y = 0; y < map.getHeight(); y++ ) {
-            for( int x = 0; x < map.getWidth(); x++ ) {
-                int val = rand.nextInt(max);
-                map.set(x,y,val);
-            }
-        }
+		for (int y = 0; y < map.getHeight(); y++) {
+			for (int x = 0; x < map.getWidth(); x++) {
+				int val = rand.nextInt(max);
+				map.set(x, y, val);
+			}
+		}
 
-    }
+	}
 
-    private void randomFill( OccupancyGrid2D_F32 map ) {
+	private void randomFill(OccupancyGrid2D_F32 map) {
 
-        for( int y = 0; y < map.getHeight(); y++ ) {
-            for( int x = 0; x < map.getWidth(); x++ ) {
-                map.set(x,y,rand.nextFloat());
-            }
-        }
+		for (int y = 0; y < map.getHeight(); y++) {
+			for (int x = 0; x < map.getWidth(); x++) {
+				map.set(x, y, rand.nextFloat());
+			}
+		}
 
-    }
+	}
 }

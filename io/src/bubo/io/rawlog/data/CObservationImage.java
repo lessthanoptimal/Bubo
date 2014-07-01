@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,85 +32,87 @@ import java.io.OutputStream;
  */
 public class CObservationImage extends CObservation implements RawlogSerializableCustom {
 
-    /** The pose of the camera on the robot
-     */
-    private CPose3D			cameraPose;
+	/**
+	 * The pose of the camera on the robot
+	 */
+	private CPose3D cameraPose;
 
-    /** Intrinsic and distortion parameters of the camera.
-     * See the <a href="http://www.mrpt.org/Camera_Parameters">tutorial</a> for a discussion of these parameters.
-     */
-    private TCamera		cameraParams;
+	/**
+	 * Intrinsic and distortion parameters of the camera.
+	 * See the <a href="http://www.mrpt.org/Camera_Parameters">tutorial</a> for a discussion of these parameters.
+	 */
+	private TCamera cameraParams;
 
-    private CImage		image; //!< The image captured by the camera, that is, the main piece of information of this observation.
+	private CImage image; //!< The image captured by the camera, that is, the main piece of information of this observation.
 
-    @Override
-    public void customDecoding(int version, RawlogDecoder decoder) {
+	@Override
+	public void customDecoding(int version, RawlogDecoder decoder) {
 
-        try {
-            cameraPose = (CPose3D) decoder.decodeObject();
-            if( version >= 4 ) {
-                cameraParams = (TCamera) decoder.decodeObject();
-            } else {
-                CMatrix distortion = (CMatrix) decoder.decodeObject();
-                CMatrix intrinsic = (CMatrix) decoder.decodeObject();
-                
-                cameraParams = new TCamera();
-                cameraParams.setDistortion(distortion);
-                cameraParams.setIntrinsic(intrinsic);
-            }
-            image = (CImage) decoder.decodeObject();
-            if( version >= 1 )
-                setTimestamp(LittleEndianIO.readLong(decoder.getInput()));
+		try {
+			cameraPose = (CPose3D) decoder.decodeObject();
+			if (version >= 4) {
+				cameraParams = (TCamera) decoder.decodeObject();
+			} else {
+				CMatrix distortion = (CMatrix) decoder.decodeObject();
+				CMatrix intrinsic = (CMatrix) decoder.decodeObject();
 
-            if (version>=2){
-                if (version<4) {
-                    cameraParams.setFocalLengthMeters(LittleEndianIO.readDouble(decoder.getInput()));
-                }
-            } else {
-                cameraParams.setFocalLengthMeters(0.002);
-            }
+				cameraParams = new TCamera();
+				cameraParams.setDistortion(distortion);
+				cameraParams.setIntrinsic(intrinsic);
+			}
+			image = (CImage) decoder.decodeObject();
+			if (version >= 1)
+				setTimestamp(LittleEndianIO.readLong(decoder.getInput()));
 
-            if (version>=3)
-                setSensorLabel(decoder.readString());
-            else
-                setSensorLabel("");
+			if (version >= 2) {
+				if (version < 4) {
+					cameraParams.setFocalLengthMeters(LittleEndianIO.readDouble(decoder.getInput()));
+				}
+			} else {
+				cameraParams.setFocalLengthMeters(0.002);
+			}
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+			if (version >= 3)
+				setSensorLabel(decoder.readString());
+			else
+				setSensorLabel("");
 
-    @Override
-    public void customEncoding(OutputStream output) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    public CPose3D getCameraPose() {
-        return cameraPose;
-    }
+	@Override
+	public void customEncoding(OutputStream output) {
+		//To change body of implemented methods use File | Settings | File Templates.
+	}
 
-    public void setCameraPose(CPose3D cameraPose) {
-        this.cameraPose = cameraPose;
-    }
+	public CPose3D getCameraPose() {
+		return cameraPose;
+	}
 
-    public TCamera getCameraParams() {
-        return cameraParams;
-    }
+	public void setCameraPose(CPose3D cameraPose) {
+		this.cameraPose = cameraPose;
+	}
 
-    public void setCameraParams(TCamera cameraParams) {
-        this.cameraParams = cameraParams;
-    }
+	public TCamera getCameraParams() {
+		return cameraParams;
+	}
 
-    public CImage getImage() {
-        return image;
-    }
+	public void setCameraParams(TCamera cameraParams) {
+		this.cameraParams = cameraParams;
+	}
 
-    public void setImage(CImage image) {
-        this.image = image;
-    }
+	public CImage getImage() {
+		return image;
+	}
 
-    @Override
-    public int getVersion() {
-        return 4;
-    }
+	public void setImage(CImage image) {
+		this.image = image;
+	}
+
+	@Override
+	public int getVersion() {
+		return 4;
+	}
 }

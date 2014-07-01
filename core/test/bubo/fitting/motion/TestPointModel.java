@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -33,37 +33,37 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestPointModel {
 
-    Random rand = new Random(234234);
+	Random rand = new Random(234234);
 
-    /**
-     * Sees if it can find a point which perfectly matches the one in the model
-     */
-    @Test
-    public void testIdentical() {
-        List<Point3D_F64> pts = UtilPoint3D_F64.random(-10,10,30,rand);
+	/**
+	 * Sees if it can find a point which perfectly matches the one in the model
+	 */
+	@Test
+	public void testIdentical() {
+		List<Point3D_F64> pts = UtilPoint3D_F64.random(-10, 10, 30, rand);
 
-        PointModel<Point3D_F64> model = new PointModel<Point3D_F64>(pts);
+		PointModel<Point3D_F64> model = new PointModel<Point3D_F64>(pts);
 
-        Point3D_F64 found = model.findClosestPoint(pts.get(2).copy());
+		Point3D_F64 found = model.findClosestPoint(pts.get(2).copy());
 
-        assertTrue( found == pts.get(2));
-    }
+		assertTrue(found == pts.get(2));
+	}
 
-    /**
-     * Add a bit of noise and see if it finds the best match.
-     */
-    @Test
-    public void testSlightError() {
-        List<Point3D_F64> pts = UtilPoint3D_F64.random(-10,10,30,rand);
-        List<Point3D_F64> noisy = UtilPoint3D_F64.copy(pts);
-        UtilPoint3D_F64.noiseNormal(noisy,0.1,rand);
+	/**
+	 * Add a bit of noise and see if it finds the best match.
+	 */
+	@Test
+	public void testSlightError() {
+		List<Point3D_F64> pts = UtilPoint3D_F64.random(-10, 10, 30, rand);
+		List<Point3D_F64> noisy = UtilPoint3D_F64.copy(pts);
+		UtilPoint3D_F64.noiseNormal(noisy, 0.1, rand);
 
-        PointModel<Point3D_F64> model = new PointModel<Point3D_F64>(noisy);
+		PointModel<Point3D_F64> model = new PointModel<Point3D_F64>(noisy);
 
-        Point3D_F64 found = model.findClosestPoint(pts.get(2));
+		Point3D_F64 found = model.findClosestPoint(pts.get(2));
 
-        int index = noisy.indexOf(found);
+		int index = noisy.indexOf(found);
 
-        assertEquals(index,2);
-    }
+		assertEquals(index, 2);
+	}
 }

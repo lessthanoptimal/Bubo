@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,16 +25,16 @@ package bubo.io.serialization;
  * setters and getters and a no argument constructor.  A list of variable names is provided by {@link #getVariables()}
  * since many serialization processes don't specify which variable is next so the order and type are needed.
  * </p>
- * 
+ *
  * @author Peter Abeles
  */
 public interface SerializationDescription {
 
-    /**
-     * Names of variables which are to be serialized.  The order is important and specifies the order in which
-     * it is serialized.
-     *
-     * @return Ordered list of serialized class variables.
-     */
-    public String[] getVariables();
+	/**
+	 * Names of variables which are to be serialized.  The order is important and specifies the order in which
+	 * it is serialized.
+	 *
+	 * @return Ordered list of serialized class variables.
+	 */
+	public String[] getVariables();
 }

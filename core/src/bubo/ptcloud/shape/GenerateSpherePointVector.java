@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GenerateSpherePointVector implements ModelGeneratorCheck<Sphere3D_F64,PointVectorNN> {
+public class GenerateSpherePointVector implements ModelGeneratorCheck<Sphere3D_F64, PointVectorNN> {
 
 	// tolerance cos(angle) for vector normals
 	private double tolCosine;
@@ -74,46 +74,46 @@ public class GenerateSpherePointVector implements ModelGeneratorCheck<Sphere3D_F
 		lineB.slope = pb.normal;
 
 		// All points and their normal pass through the sphere's center
-		ClosestPoint3D_F64.closestPoint(lineA,lineB,output.center);
+		ClosestPoint3D_F64.closestPoint(lineA, lineB, output.center);
 
 		double ra = output.center.distance(pa.p);
 		double rb = output.center.distance(pb.p);
 		double rc = output.center.distance(pc.p);
 
 		// radius is set to average distance
-		output.radius = (ra+rb)/2.0;
+		output.radius = (ra + rb) / 2.0;
 
-		if( !check.valid(output) )
+		if (!check.valid(output))
 			return false;
 
 		// check the solution
-		if( Math.abs(ra-output.radius) > tolDistance )
+		if (Math.abs(ra - output.radius) > tolDistance)
 			return false;
-		if( Math.abs(rb-output.radius) > tolDistance )
+		if (Math.abs(rb - output.radius) > tolDistance)
 			return false;
-		if( Math.abs(rc-output.radius) > tolDistance )
+		if (Math.abs(rc - output.radius) > tolDistance)
 			return false;
 
 		return checkAngles(output, pa, pb, pc);
 	}
 
 	protected final boolean checkAngles(Sphere3D_F64 output, PointVectorNN pa, PointVectorNN pb, PointVectorNN pc) {
-		n.set( pa.p.x - output.center.x , pa.p.y - output.center.y , pa.p.z - output.center.z );
+		n.set(pa.p.x - output.center.x, pa.p.y - output.center.y, pa.p.z - output.center.z);
 		n.normalize();
 
-		if( Math.abs(n.dot(pa.normal)) < tolCosine)
+		if (Math.abs(n.dot(pa.normal)) < tolCosine)
 			return false;
 
-		n.set( pb.p.x - output.center.x , pb.p.y - output.center.y , pb.p.z - output.center.z );
+		n.set(pb.p.x - output.center.x, pb.p.y - output.center.y, pb.p.z - output.center.z);
 		n.normalize();
 
-		if( Math.abs(n.dot(pb.normal)) < tolCosine)
+		if (Math.abs(n.dot(pb.normal)) < tolCosine)
 			return false;
 
-		n.set( pc.p.x - output.center.x , pc.p.y - output.center.y , pc.p.z - output.center.z );
+		n.set(pc.p.x - output.center.x, pc.p.y - output.center.y, pc.p.z - output.center.z);
 		n.normalize();
 
-		if( Math.abs(n.dot(pc.normal)) < tolCosine)
+		if (Math.abs(n.dot(pc.normal)) < tolCosine)
 			return false;
 
 		return true;

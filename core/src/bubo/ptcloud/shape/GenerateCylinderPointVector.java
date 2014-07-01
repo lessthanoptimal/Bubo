@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class GenerateCylinderPointVector implements ModelGeneratorCheck<Cylinder3D_F64,PointVectorNN> {
+public class GenerateCylinderPointVector implements ModelGeneratorCheck<Cylinder3D_F64, PointVectorNN> {
 
 	// tolerance cos(angle) for vector normals
 	private double tolAngleCosine;
@@ -51,8 +51,8 @@ public class GenerateCylinderPointVector implements ModelGeneratorCheck<Cylinder
 	private LineParametric3D_F64 lineA = new LineParametric3D_F64(false);
 	private LineParametric3D_F64 lineB = new LineParametric3D_F64(false);
 
-	public GenerateCylinderPointVector(double tolAngle, double tolDistance ) {
-		this.tolAngleCosine = Math.cos(Math.PI/2.0-tolAngle);
+	public GenerateCylinderPointVector(double tolAngle, double tolDistance) {
+		this.tolAngleCosine = Math.cos(Math.PI / 2.0 - tolAngle);
 		this.tolDistance = tolDistance;
 	}
 
@@ -76,29 +76,29 @@ public class GenerateCylinderPointVector implements ModelGeneratorCheck<Cylinder
 
 		// With perfect data, the closest point between the two lines defined by a point and its normal
 		// will lie on the axis of the cylinder
-		ClosestPoint3D_F64.closestPoint(lineA,lineB,output.line.p);
+		ClosestPoint3D_F64.closestPoint(lineA, lineB, output.line.p);
 		// The cylinder's axis will be along the cross product of the two normal vectors
-		GeometryMath_F64.cross(pa.normal,pb.normal,output.line.slope);
+		GeometryMath_F64.cross(pa.normal, pb.normal, output.line.slope);
 
 		// take the normal of the slope so that it can detect if it has a value of zero, which happens if the
 		// two input vectors are the same
 		double n = output.line.slope.norm();
 		// n should actually always be one since the point normals are normalized to one.
-		if( n < 1e-8 )
+		if (n < 1e-8)
 			return false;
 		output.line.slope.x /= n;
 		output.line.slope.y /= n;
 		output.line.slope.z /= n;
 
 		// set the radius to be the average distance point is from the cylinder's axis
-		double ra = Distance3D_F64.distance(output.line,pa.p);
-		double rb = Distance3D_F64.distance(output.line,pb.p);
-		double rc = Distance3D_F64.distance(output.line,pc.p);
+		double ra = Distance3D_F64.distance(output.line, pa.p);
+		double rb = Distance3D_F64.distance(output.line, pb.p);
+		double rc = Distance3D_F64.distance(output.line, pc.p);
 
-		output.radius = (ra+rb)/2.0;
+		output.radius = (ra + rb) / 2.0;
 
 		// sanity check using the model parameters
-		if( !check.valid(output) )
+		if (!check.valid(output))
 			return false;
 
 		// sanity check the model using points
@@ -107,16 +107,16 @@ public class GenerateCylinderPointVector implements ModelGeneratorCheck<Cylinder
 
 	protected final boolean checkModel(Cylinder3D_F64 output, PointVectorNN pc, double ra, double rb, double rc) {
 		// check the solution
-		if( Math.abs(ra-output.radius) > tolDistance )
+		if (Math.abs(ra - output.radius) > tolDistance)
 			return false;
-		if( Math.abs(rb-output.radius) > tolDistance )
+		if (Math.abs(rb - output.radius) > tolDistance)
 			return false;
-		if( Math.abs(rc-output.radius) > tolDistance )
+		if (Math.abs(rc - output.radius) > tolDistance)
 			return false;
 
 		// only need to check to see if one angle is off since the other two are within tolerance by definition
 		double cosAngle = output.line.slope.dot(pc.normal);
-		if(Math.abs(cosAngle) > tolAngleCosine )
+		if (Math.abs(cosAngle) > tolAngleCosine)
 			return false;
 
 		return true;

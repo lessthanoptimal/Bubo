@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -52,23 +52,20 @@ import java.util.Random;
  */
 public class PointCloudShapeDetectionSchnabel2007 {
 
-	// used to randomly sample regions in the octree
-	private Random rand;
-
-	// An object must have this many points before being accepted as valid
-	private int minModelAccept;
-
 	// constructs and maintains the octree
 	protected ConstructOctreeNumPoints managerOctree;
-
+	// used to randomly sample regions in the octree
+	private Random rand;
+	// An object must have this many points before being accepted as valid
+	private int minModelAccept;
 	// the initial bounding cube of the point cloud.  used when constructing the octree
 	private Cube3D_F64 bounding = new Cube3D_F64();
 
 	// list of leafs in the Octree.  Allows quick finding of the path to the base node
-	private FastQueue<Octree> leafs = new FastQueue<Octree>(Octree.class,false);
+	private FastQueue<Octree> leafs = new FastQueue<Octree>(Octree.class, false);
 
 	// found path from leaf to base
-	private FastQueue<Octree> path = new FastQueue<Octree>(Octree.class,false);
+	private FastQueue<Octree> path = new FastQueue<Octree>(Octree.class, false);
 
 	// searches the NN graph to find points which match the model.
 	// need to use the same instance for all searches since it modified the points by marking them.
@@ -81,12 +78,12 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	private LocalFitShapeNN refineShape;
 
 	// list of found objects
-	private FastQueue<FoundShape> foundObjects = new FastQueue<FoundShape>(FoundShape.class,true);
+	private FastQueue<FoundShape> foundObjects = new FastQueue<FoundShape>(FoundShape.class, true);
 
 	// points with normal vectors
-	private FastQueue<PointVectorNN> pointsNormal = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+	private FastQueue<PointVectorNN> pointsNormal = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 	// points without normal vectors
-	private FastQueue<PointVectorNN> pointsNoNormal = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+	private FastQueue<PointVectorNN> pointsNoNormal = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 
 	// list of shapes which can be fit
 	private List<ShapeDescription> models;
@@ -99,12 +96,11 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 *
 	 * @param config Specified tuning parameters
 	 */
-	public PointCloudShapeDetectionSchnabel2007( ConfigSchnabel2007 config )
-	{
+	public PointCloudShapeDetectionSchnabel2007(ConfigSchnabel2007 config) {
 		config.checkConfig();
 
 		this.models = config.models;
-		this.refineShape = new LocalFitShapeNN(config.localFitMaxIterations,config.localFitChangeThreshold,matchFinder);
+		this.refineShape = new LocalFitShapeNN(config.localFitMaxIterations, config.localFitChangeThreshold, matchFinder);
 		this.minModelAccept = config.minModelAccept;
 		this.rand = new Random(config.randomSeed);
 		this.maximumAllowedIterations = config.maximumAllowedIterations;
@@ -113,7 +109,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 
 		// convert it into a description that RANSAC understands
 		List<RansacMulti.ObjectType> modelsRansac = new ArrayList<RansacMulti.ObjectType>();
-		for( int i = 0; i < models.size(); i++ ) {
+		for (int i = 0; i < models.size(); i++) {
 			ShapeDescription s = models.get(i);
 			RansacMulti.ObjectType o = new RansacMulti.ObjectType();
 
@@ -125,13 +121,13 @@ public class PointCloudShapeDetectionSchnabel2007 {
 			modelsRansac.add(o);
 
 			// if a check is specified, pass it along
-			if( s.modelCheck == null ) {
+			if (s.modelCheck == null) {
 				s.modelCheck = new CheckShapeAcceptAll();
 			}
 			s.modelGenerator.setCheck(s.modelCheck);
 		}
 
-		ransac = new RansacShapeDetection(config.randomSeed,config.ransacExtension*2,matchFinder,modelsRansac);
+		ransac = new RansacShapeDetection(config.randomSeed, config.ransacExtension * 2, matchFinder, modelsRansac);
 	}
 
 	/**
@@ -144,10 +140,10 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 * Searches for shapes inside the provided point cloud.  It will continue to search until the maximum
 	 * number of RANSAC iterations has been reached or all the points have been assigned ot shapes.
 	 *
-	 * @param points Points in the point cloud.  PointVectorNN.used MUST be set to false.
+	 * @param points      Points in the point cloud.  PointVectorNN.used MUST be set to false.
 	 * @param boundingBox Bonding box for use in the Octree.
 	 */
-	public void process( FastQueue<PointVectorNN> points , Cube3D_F64 boundingBox ) {
+	public void process(FastQueue<PointVectorNN> points, Cube3D_F64 boundingBox) {
 
 		// initialize data structures
 		this.bounding.set(boundingBox);
@@ -156,15 +152,15 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		pointsNoNormal.reset();
 		pointsNormal.reset();
 		matchFinder.reset();
-		for( int i = 0; i < models.size(); i++ ) {
+		for (int i = 0; i < models.size(); i++) {
 			models.get(i).reset();
 		}
 
 		// split input points into a list with and without normal vectors
-		for( int i = 0; i < points.size; i++ ) {
+		for (int i = 0; i < points.size; i++) {
 			PointVectorNN pv = points.data[i];
 			Vector3D_F64 v = pv.normal;
-			if( v.x == 0 && v.y == 0 && v.z == 0 ) {
+			if (v.x == 0 && v.y == 0 && v.z == 0) {
 				pointsNoNormal.add(pv);
 			} else {
 				pointsNormal.add(pv);
@@ -178,23 +174,23 @@ public class PointCloudShapeDetectionSchnabel2007 {
 
 		// run untill there are no more iterations or that there are not enough points left to fit an object
 		int totalIterations = 0;
-		while( totalIterations < maximumAllowedIterations &&
-				managerOctree.getTree().points.size > minModelAccept ) {
+		while (totalIterations < maximumAllowedIterations &&
+				managerOctree.getTree().points.size > minModelAccept) {
 			// select region to search for a shape inside
 			Octree sampleNode = selectSampleNode();
 
 			// create list of points which are not a member of a shape yet
 			sampleSet.clear();
 
-			for( int i = 0; i < sampleNode.points.size; i++ ) {
-				PointVectorNN pv = (PointVectorNN)sampleNode.points.get(i).data;
+			for (int i = 0; i < sampleNode.points.size; i++) {
+				PointVectorNN pv = (PointVectorNN) sampleNode.points.get(i).data;
 
-				if( !pv.used )
-					sampleSet.add( pv );
+				if (!pv.used)
+					sampleSet.add(pv);
 			}
 
 			// see if its possible to find a valid model with this data
-			if( sampleNode.points.size != sampleSet.size()) {
+			if (sampleNode.points.size != sampleSet.size()) {
 				// Update the octree since it clearly needs to since its running into trouble here and can't
 				// run RANSAC.  Next cycle this situation will be impossible
 				// By constructing the Octree here it is only constructed as needed
@@ -203,11 +199,11 @@ public class PointCloudShapeDetectionSchnabel2007 {
 			}
 
 			// use RANSAC to find a shape
-			if( ransac.process(sampleSet)) {
+			if (ransac.process(sampleSet)) {
 				List<PointVectorNN> inliers = ransac.getMatchSet();
 
 				// see if there are enough points to be a valid shape
-				if( inliers.size() >= minModelAccept ) {
+				if (inliers.size() >= minModelAccept) {
 					refineRansacShape();
 				}
 			}
@@ -226,29 +222,29 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		int whichShape = ransac.getModelIndex();
 		List<PointVectorNN> ransacInliers = ransac.getMatchSet();
 
-		ShapeDescription shapeDesc = models.get( whichShape );
+		ShapeDescription shapeDesc = models.get(whichShape);
 
 		// create a new shape for output
 		FoundShape output = foundObjects.grow();
 		output.points.clear();
-		output.modelParam =  shapeDesc.createModel();
+		output.modelParam = shapeDesc.createModel();
 		output.whichShape = ransac.getModelIndex();
 
 		// refine the model
-		shapeDesc.modelManager.copyModel(ransacParam,output.modelParam);
+		shapeDesc.modelManager.copyModel(ransacParam, output.modelParam);
 		output.points.addAll(ransacInliers);
-		refineShape.configure(shapeDesc.modelFitter,shapeDesc.modelDistance,
-				shapeDesc.modelCheck,shapeDesc.codec,shapeDesc.thresholdFit);
-		if( !refineShape.refine(output.points,output.modelParam,true) ) {
+		refineShape.configure(shapeDesc.modelFitter, shapeDesc.modelDistance,
+				shapeDesc.modelCheck, shapeDesc.codec, shapeDesc.thresholdFit);
+		if (!refineShape.refine(output.points, output.modelParam, true)) {
 			// the shape became invalid
 			foundObjects.removeTail();
-		} else if( output.points.size() < minModelAccept ) {
+		} else if (output.points.size() < minModelAccept) {
 			// see if the shape still has enough points to be accepted.  if the total number of matching points dropped
 			// it is highly likely to be a poor fit to the shape anyways
 			foundObjects.removeTail();
 		} else {
 			// mark shape points as being used
-			for( int i = 0; i < output.points.size(); i++ ) {
+			for (int i = 0; i < output.points.size(); i++) {
 				PointVectorNN p = output.points.get(i);
 				p.used = true;
 			}
@@ -268,31 +264,32 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		path.add(node);
 
 		node = node.parent;
-		while( node != null ) {
+		while (node != null) {
 			path.add(node);
 			node = node.parent;
 		}
 
 		// randomly select one of the nodes in the path
 		// TODO use a PDF
-		return path.get( rand.nextInt(path.size));
+		return path.get(rand.nextInt(path.size));
 	}
 
 	/**
 	 * Constructs an Octree for the set of points.  The initial bound box will be found from the
 	 * input points or is provided by the user.
-\	 */
+	 * \
+	 */
 	// NOTE: Could optimize by maintaining a list of points which not used the last time it
 	// was called and only search that
-	protected void constructOctree( FastQueue<PointVectorNN> points ) {
+	protected void constructOctree(FastQueue<PointVectorNN> points) {
 
 		managerOctree.initialize(bounding);
 
 		// add points to the Octree
-		for( int i = 0; i < points.size; i++ ) {
+		for (int i = 0; i < points.size; i++) {
 			PointVectorNN p = points.data[i];
 
-			if( !p.used )
+			if (!p.used)
 				managerOctree.addPoint(p.p, p);
 		}
 
@@ -307,9 +304,9 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		leafs.reset();
 
 		FastQueue<Octree> nodes = managerOctree.getAllNodes();
-		for( int i = 0; i < nodes.size; i++ ) {
+		for (int i = 0; i < nodes.size; i++) {
 			Octree n = nodes.get(i);
-			if( n.isLeaf() ) {
+			if (n.isLeaf()) {
 				leafs.add(n);
 			}
 		}
@@ -325,22 +322,23 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	/**
 	 * Searches through the points for any points which have yet to be used.  To save time only points
 	 * in the most recently constructed Octree are used. Point not in that Octree must have been used.
+	 *
 	 * @param unmatched Output. Where the unmatched points are stored.
 	 */
-	public void findUnmatchedPoints( List<PointVectorNN> unmatched ) {
+	public void findUnmatchedPoints(List<PointVectorNN> unmatched) {
 		FastQueue<Octree.Info> treePts = managerOctree.getTree().points;
 
-		for( int i = 0; i < treePts.size; i++ ) {
+		for (int i = 0; i < treePts.size; i++) {
 			Octree.Info info = treePts.data[i];
-			PointVectorNN pv = (PointVectorNN)info.data;
-			if( !pv.used ) {
+			PointVectorNN pv = (PointVectorNN) info.data;
+			if (!pv.used) {
 				unmatched.add(pv);
 			}
 		}
 		// go through list of points with no normal and see if they are matched or not
-		for( int i = 0; i < pointsNoNormal.size; i++ ) {
+		for (int i = 0; i < pointsNoNormal.size; i++) {
 			PointVectorNN pv = pointsNoNormal.data[i];
-			if( !pv.used ) {
+			if (!pv.used) {
 				unmatched.add(pv);
 			}
 		}

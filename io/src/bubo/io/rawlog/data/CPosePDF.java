@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,9 +24,9 @@ import bubo.io.rawlog.RawlogSerializable;
 /**
  * @author Peter Abeles
  */
-public class CPosePDF implements RawlogSerializable  {
-    @Override
-    public int getVersion() {
-        return 0;
-    }
+public class CPosePDF implements RawlogSerializable {
+	@Override
+	public int getVersion() {
+		return 0;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,50 +30,50 @@ import java.awt.*;
 public class DataVisualizationComponent extends JTabbedPane {
 
 
-    LogDataVisualization vis;
+	LogDataVisualization vis;
 
-    public DataVisualizationComponent() {
-        setNoTarget();
-    }
+	public DataVisualizationComponent() {
+		setNoTarget();
+	}
 
-    /**
-     * If nothing is selected then it should switch to this view.
-     */
-    public void setNoTarget() {
-        vis = null;
-        removeAll();
+	/**
+	 * If nothing is selected then it should switch to this view.
+	 */
+	public void setNoTarget() {
+		vis = null;
+		removeAll();
 
-        JLabel textLabel = new JLabel("Nothing here yet");
-        textLabel.setFont(textLabel.getFont().deriveFont(Font.ITALIC));
-        textLabel.setHorizontalAlignment(JLabel.CENTER);
+		JLabel textLabel = new JLabel("Nothing here yet");
+		textLabel.setFont(textLabel.getFont().deriveFont(Font.ITALIC));
+		textLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        addTab("Nothing",textLabel);
-    }
+		addTab("Nothing", textLabel);
+	}
 
-    /**
-     * Changes the display to the specified visualization and view
-     */
-    public void setTarget( LogDataVisualization vis , int view ) {
+	/**
+	 * Changes the display to the specified visualization and view
+	 */
+	public void setTarget(LogDataVisualization vis, int view) {
 
-        // clear the previous view
-        if( this.vis != vis ) {
-            removeAll();
+		// clear the previous view
+		if (this.vis != vis) {
+			removeAll();
 
-            for( int i = 0; i < vis.numDisplay(); i++ ) {
-                addTab(vis.getDisplayName(i),vis.getDisplay(i));
-            }
-            this.vis = vis;
-        }
+			for (int i = 0; i < vis.numDisplay(); i++) {
+				addTab(vis.getDisplayName(i), vis.getDisplay(i));
+			}
+			this.vis = vis;
+		}
 
-        setSelectedIndex(view);
+		setSelectedIndex(view);
 
-        repaint();
-    }
+		repaint();
+	}
 
-    /**
-     * Returns which view is currently active
-     */
-    public int getActiveView() {
-        return getSelectedIndex();
-    }
+	/**
+	 * Returns which view is currently active
+	 */
+	public int getActiveView() {
+		return getSelectedIndex();
+	}
 }

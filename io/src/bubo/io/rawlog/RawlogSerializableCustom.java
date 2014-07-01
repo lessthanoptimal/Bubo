@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,8 +29,8 @@ import java.io.OutputStream;
 public interface RawlogSerializableCustom extends RawlogSerializable {
 
 
-    public void customDecoding( int version , RawlogDecoder decoder );
+	public void customDecoding(int version, RawlogDecoder decoder);
 
-    public void customEncoding( OutputStream output );
+	public void customEncoding(OutputStream output);
 
 }

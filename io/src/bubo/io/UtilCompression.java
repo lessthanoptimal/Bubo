@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,65 +28,65 @@ import java.util.zip.GZIPInputStream;
  */
 public class UtilCompression {
 
-    public static boolean isGzipFile( File f ) {
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(f);
-            GZIPInputStream gs = new GZIPInputStream(fis);
-        } catch (FileNotFoundException e) {
-            return false;
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
+	public static boolean isGzipFile(File f) {
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(f);
+			GZIPInputStream gs = new GZIPInputStream(fis);
+		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
 
-    }
+	}
 
-    /**
-     * Decompresses a GZIP file and saves the output in another file.
-     *
-     * @param inputName
-     * @param outputName
-     * @return true if it worked and false if it didn't work.
-     */
-    public static boolean gzipDecompressFile( String inputName ,
-                                              String outputName  ,
-                                              int bufferSize,
-                                              ProgressMonitor monitor ) {
-        byte buffer[] = new byte[ bufferSize ];
+	/**
+	 * Decompresses a GZIP file and saves the output in another file.
+	 *
+	 * @param inputName
+	 * @param outputName
+	 * @return true if it worked and false if it didn't work.
+	 */
+	public static boolean gzipDecompressFile(String inputName,
+											 String outputName,
+											 int bufferSize,
+											 ProgressMonitor monitor) {
+		byte buffer[] = new byte[bufferSize];
 
-        int max = monitor.getMaximum();
+		int max = monitor.getMaximum();
 
-        boolean ret = false;
+		boolean ret = false;
 
-        try {
-            File f = new File(inputName);
-            FileInputStream fis = new FileInputStream(f);
-            GZIPInputStream gs = new GZIPInputStream(fis);
+		try {
+			File f = new File(inputName);
+			FileInputStream fis = new FileInputStream(f);
+			GZIPInputStream gs = new GZIPInputStream(fis);
 
-            long size = f.length();
-            long total = 0;
+			long size = f.length();
+			long total = 0;
 
-            FileOutputStream fos = new FileOutputStream(outputName);
+			FileOutputStream fos = new FileOutputStream(outputName);
 
-            int read;
-            while( (read = gs.read(buffer)) > 0 && !monitor.isCanceled()) {
-                total += read;
-                fos.write(buffer,0,read);
-                monitor.setProgress((int)((total*max)/size));
-            }
+			int read;
+			while ((read = gs.read(buffer)) > 0 && !monitor.isCanceled()) {
+				total += read;
+				fos.write(buffer, 0, read);
+				monitor.setProgress((int) ((total * max) / size));
+			}
 
 //            System.out.println("Done decompressing file");
-            fos.close();
-            fis.close();
+			fos.close();
+			fis.close();
 
-            ret = !monitor.isCanceled();
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
-        }
+			ret = !monitor.isCanceled();
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		}
 
-        monitor.close();
+		monitor.close();
 
-        return ret;
-    }
+		return ret;
+	}
 }

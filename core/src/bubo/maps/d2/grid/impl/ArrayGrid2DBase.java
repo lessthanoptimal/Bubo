@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,38 +25,38 @@ import bubo.maps.d2.grid.OccupancyGrid2D;
  *
  * @author Peter Abeles
  */
-public abstract class ArrayGrid2DBase implements OccupancyGrid2D{
+public abstract class ArrayGrid2DBase implements OccupancyGrid2D {
 
-    // the map's width
-    protected int width;
-    // the map's height
-    protected int height;
+	// the map's width
+	protected int width;
+	// the map's height
+	protected int height;
 
-    protected ArrayGrid2DBase( int width , int height ) {
-        this.width = width;
-        this.height = height;
-    }
+	protected ArrayGrid2DBase(int width, int height) {
+		this.width = width;
+		this.height = height;
+	}
 
-    @Override
-    public boolean isInBounds(int x, int y) {
-        return( x >= 0 && y >= 0 && x < width && y < height );
-    }
+	@Override
+	public boolean isInBounds(int x, int y) {
+		return (x >= 0 && y >= 0 && x < width && y < height);
+	}
 
-    @Override
-    public int getWidth() {
-        return width;
-    }
+	@Override
+	public int getWidth() {
+		return width;
+	}
 
-    @Override
-    public int getHeight() {
-        return height;
-    }
+	@Override
+	public int getHeight() {
+		return height;
+	}
 
-    protected void checkBounds( int x , int y ) {
-        if( x >= width || x < 0 )
-            throw new IllegalArgumentException("x is out of bounds. x = "+x);
+	protected void checkBounds(int x, int y) {
+		if (x >= width || x < 0)
+			throw new IllegalArgumentException("x is out of bounds. x = " + x);
 
-        if( y >= height || y < 0 )
-            throw new IllegalArgumentException("y is out of bounds.  y= "+y);
-    }
+		if (y >= height || y < 0)
+			throw new IllegalArgumentException("y is out of bounds.  y= " + y);
+	}
 }

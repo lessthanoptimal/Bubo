@@ -30,46 +30,46 @@ import org.junit.Test;
  */
 public class TestWrapOccupancy2D_I_to_F32 extends GenericMapTests {
 
-    /**
-     * Checks to see if setAll() called on the original map has the same affect as calling it through the wrapper.
-     * Also checks to see if the wrapper set the floating point value correctly
-     */
-    @Test
-    public void clear() {
-        super.clear_F32();
-    }
+	/**
+	 * Checks to see if setAll() called on the original map has the same affect as calling it through the wrapper.
+	 * Also checks to see if the wrapper set the floating point value correctly
+	 */
+	@Test
+	public void clear() {
+		super.clear_F32();
+	}
 
-    /**
-     * Sees if set and get produce the expected results
-     */
-    @Test
-    public void set_get() {
-        super.set_get_F32(2f/(float)ArrayGrid2D_I8.MAX);
-    }
+	/**
+	 * Sees if set and get produce the expected results
+	 */
+	@Test
+	public void set_get() {
+		super.set_get_F32(2f / (float) ArrayGrid2D_I8.MAX);
+	}
 
-    @Test
-    public void isValid() {
-        super.isValid_F32();
-    }
+	@Test
+	public void isValid() {
+		super.isValid_F32();
+	}
 
-    @Test
-    public void isInBounds() {
-        super.isInBounds();
-    }
+	@Test
+	public void isInBounds() {
+		super.isInBounds();
+	}
 
-    @Test
-    public void isKnown() {
-        super.isKnown_F32();
-    }
+	@Test
+	public void isKnown() {
+		super.isKnown_F32();
+	}
 
-    @Test
-    public void getWidth_getHeight() {
-        super.getWidth_getHeight();
-    }
+	@Test
+	public void getWidth_getHeight() {
+		super.getWidth_getHeight();
+	}
 
-    @Override
-    public <T extends OccupancyGrid2D> T createMap(int width, int height) {
-        OccupancyGrid2D_I orig = new ArrayGrid2D_I8(width,height);
-        return (T) new WrapOccupancy2D_I_to_F32(orig);
-    }
+	@Override
+	public <T extends OccupancyGrid2D> T createMap(int width, int height) {
+		OccupancyGrid2D_I orig = new ArrayGrid2D_I8(width, height);
+		return (T) new WrapOccupancy2D_I_to_F32(orig);
+	}
 }

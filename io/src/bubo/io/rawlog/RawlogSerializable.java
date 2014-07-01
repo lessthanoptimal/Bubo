@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -19,18 +19,17 @@
 package bubo.io.rawlog;
 
 /**
- *
  * Custom serialization can be performed using {@link RawlogSerializableCustom}.
  *
  * @author Peter Abeles
  */
 public interface RawlogSerializable {
 
-    /**
-     * Data structure's version number.
-     *
-     * @return version.
-     */
-    public int getVersion();
+	/**
+	 * Data structure's version number.
+	 *
+	 * @return version.
+	 */
+	public int getVersion();
 
 }

@@ -23,47 +23,47 @@ import bubo.maps.d2.grid.OccupancyGrid2D_F32;
 /**
  * Dense array floating point implementation of  OccupancyGrid2D_F32.
  *
- *  @author Peter Abeles
+ * @author Peter Abeles
  */
 public class ArrayGrid2D_F32 extends ArrayGrid2DBase implements OccupancyGrid2D_F32 {
 
-    // grid map in a row major format
-    private float data[];
+	// grid map in a row major format
+	private float data[];
 
-    public ArrayGrid2D_F32( int width , int height ) {
-        super(width,height);
+	public ArrayGrid2D_F32(int width, int height) {
+		super(width, height);
 
-        data = new float[ width*height ];
-    }
+		data = new float[width * height];
+	}
 
-    @Override
-    public void set(int x, int y, float value) {
-        checkBounds(x,y);
+	@Override
+	public void set(int x, int y, float value) {
+		checkBounds(x, y);
 
-        data[y*width + x] = value;
-    }
+		data[y * width + x] = value;
+	}
 
-    @Override
-    public float get(int x, int y) {
-        checkBounds(x,y);
+	@Override
+	public float get(int x, int y) {
+		checkBounds(x, y);
 
-        return data[y*width + x];
-    }
+		return data[y * width + x];
+	}
 
 	@Override
 	public void clear() {
-		for( int i = 0; i < data.length; i++ ) {
+		for (int i = 0; i < data.length; i++) {
 			data[i] = 0.5f;
 		}
 	}
 
 	@Override
-    public boolean isKnown(int x, int y) {
-        return data[y*width + x] != 0.5f;
-    }
+	public boolean isKnown(int x, int y) {
+		return data[y * width + x] != 0.5f;
+	}
 
-    @Override
-    public boolean isValid(float value) {
-        return value >= 0f && value <= 1f;
-    }
+	@Override
+	public boolean isValid(float value) {
+		return value >= 0f && value <= 1f;
+	}
 }

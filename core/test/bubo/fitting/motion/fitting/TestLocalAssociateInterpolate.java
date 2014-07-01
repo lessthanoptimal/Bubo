@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -44,32 +44,31 @@ public class TestLocalAssociateInterpolate {
 		ScanInfo scanMatch = new ScanInfo(N);
 		ScanInfo scanRef = new ScanInfo(N);
 
-		for( int i = 0; i < N; i++ ) {
-			scanMatch.pts[i] = new Point2D_F64(i,i);
-			scanRef.pts[i] = new Point2D_F64(i,i);
+		for (int i = 0; i < N; i++) {
+			scanMatch.pts[i] = new Point2D_F64(i, i);
+			scanRef.pts[i] = new Point2D_F64(i, i);
 			scanMatch.vis[i] = true;
 			scanRef.vis[i] = true;
-			scanMatch.theta[i] = param.getStartAngle() + i*param.getSweepAngle()/N;
-			scanRef.theta[i] = param.getStartAngle() + i*param.getSweepAngle()/N;
+			scanMatch.theta[i] = param.getStartAngle() + i * param.getSweepAngle() / N;
+			scanRef.theta[i] = param.getStartAngle() + i * param.getSweepAngle() / N;
 		}
 
-		DummyAssociate alg = new DummyAssociate(param,Math.PI/20,10,Math.PI/100);
+		DummyAssociate alg = new DummyAssociate(param, Math.PI / 20, 10, Math.PI / 100);
 		alg.setParam(param);
 
-		alg.associate(scanMatch,scanRef);
+		alg.associate(scanMatch, scanRef);
 
 		// should associate to the point with the same index
 		List<Point2D_F64> match = alg.getListMatch();
 		List<Point2D_F64> ref = alg.getListReference();
 
-		for( int i = 0; i < N; i++ ) {
-			assertTrue( match.get(i) == scanMatch.pts[i]);
-			assertTrue( ref.get(i).distance(scanRef.pts[i]) < 0.01 );
+		for (int i = 0; i < N; i++) {
+			assertTrue(match.get(i) == scanMatch.pts[i]);
+			assertTrue(ref.get(i).distance(scanRef.pts[i]) < 0.01);
 		}
 	}
 
-	public static class DummyAssociate extends LocalAssociateInterpolate
-	{
+	public static class DummyAssociate extends LocalAssociateInterpolate {
 
 		double angle;
 
@@ -80,17 +79,17 @@ public class TestLocalAssociateInterpolate {
 		@Override
 		public boolean interpolate(InterpolatedPoint point) {
 			// need to do some real interpolation here or else the sanity check will fail
-			int index = (int)(param.getNumberOfScans()*(point.angle - param.getStartAngle())/param.getSweepAngle());
-			if( index < 0 || index >= param.getNumberOfScans() )
+			int index = (int) (param.getNumberOfScans() * (point.angle - param.getStartAngle()) / param.getSweepAngle());
+			if (index < 0 || index >= param.getNumberOfScans())
 				return false;
-			else if( index == param.getNumberOfScans()-1 ) {
-				point.point.set( scanRef.pts[index]);
+			else if (index == param.getNumberOfScans() - 1) {
+				point.point.set(scanRef.pts[index]);
 				return true;
 			}
 
-			double frac = (point.angle - scanRef.theta[index])/(scanRef.theta[index+1] - scanRef.theta[index]);
-			double x = (1.0-frac)*scanRef.pts[index].x + frac*scanRef.pts[index+1].x;
-			double y = (1.0-frac)*scanRef.pts[index].y + frac*scanRef.pts[index+1].y;
+			double frac = (point.angle - scanRef.theta[index]) / (scanRef.theta[index + 1] - scanRef.theta[index]);
+			double x = (1.0 - frac) * scanRef.pts[index].x + frac * scanRef.pts[index + 1].x;
+			double y = (1.0 - frac) * scanRef.pts[index].y + frac * scanRef.pts[index + 1].y;
 
 			point.point.x = x;
 			point.point.y = y;
@@ -105,7 +104,7 @@ public class TestLocalAssociateInterpolate {
 
 		@Override
 		public double distToTarget(InterpolatedPoint point) {
-			return Math.abs(point.angle-angle);
+			return Math.abs(point.angle - angle);
 		}
 	}
 }

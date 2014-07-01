@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -34,7 +34,7 @@ public class TestCheckShapeCylinderRadius {
 		double threshold = 12.5;
 		CheckShapeCylinderRadius alg = new CheckShapeCylinderRadius(threshold);
 
-		Cylinder3D_F64 param = new Cylinder3D_F64(0,0,0,1,1,1,threshold);
+		Cylinder3D_F64 param = new Cylinder3D_F64(0, 0, 0, 1, 1, 1, threshold);
 
 		assertTrue(alg.valid(param));
 		param.radius = threshold + 1e-5;

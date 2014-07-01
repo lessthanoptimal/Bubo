@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -48,18 +48,16 @@ import static org.junit.Assert.assertTrue;
 public abstract class GeneralChecksPointCloudShapeFinder {
 
 	Random rand = new Random(234);
-
-	public abstract PointCloudShapeFinder createAlgorithm();
-
 	// how close to the expected set size does it need to be
 	int tolSetSize = 2;
-
 	double tolModelparam = 1e-6;
 
 	protected GeneralChecksPointCloudShapeFinder(int tolSetSize, double tolModelparam) {
 		this.tolSetSize = tolSetSize;
 		this.tolModelparam = tolModelparam;
 	}
+
+	public abstract PointCloudShapeFinder createAlgorithm();
 
 	/**
 	 * Goes through each supported shape and sees if it can detect it by itsself with perfect data
@@ -72,35 +70,35 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 		List<CloudShapeTypes> shapes = alg.getShapesList();
 
-		assertTrue(shapes.size()>1);
+		assertTrue(shapes.size() > 1);
 
 		int N = 200;
 
-		Cylinder3D_F64 cylinder = new Cylinder3D_F64(1,2,3,0.5,-0.25,0.1,3);
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,3,-0.5,0.25,1);
-		Sphere3D_F64 sphere = new Sphere3D_F64(-1,-2,-3,2.5);
+		Cylinder3D_F64 cylinder = new Cylinder3D_F64(1, 2, 3, 0.5, -0.25, 0.1, 3);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1, 2, 3, -0.5, 0.25, 1);
+		Sphere3D_F64 sphere = new Sphere3D_F64(-1, -2, -3, 2.5);
 
-		for( CloudShapeTypes shape : shapes ) {
+		for (CloudShapeTypes shape : shapes) {
 			List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
 
-			switch( shape ) {
+			switch (shape) {
 				case CYLINDER:
-					addShapeToCloud(cylinder,N,cloud);
+					addShapeToCloud(cylinder, N, cloud);
 					break;
 
 				case PLANE:
-					addShapeToCloud(plane,N,cloud);
+					addShapeToCloud(plane, N, cloud);
 					break;
 
 				case SPHERE:
-					addShapeToCloud(sphere,N,cloud);
+					addShapeToCloud(sphere, N, cloud);
 					break;
 
 				default:
-					throw new RuntimeException("Unknown type "+shape);
+					throw new RuntimeException("Unknown type " + shape);
 			}
 
-			alg.process(cloud,null);
+			alg.process(cloud, null);
 
 			List<Point3D_F64> unmatched = new ArrayList<Point3D_F64>();
 			alg.getUnmatched(unmatched);
@@ -109,21 +107,21 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 			// see if the error of the matched shape is reasonable and that the
 			// point indexes are correctly set
-			for( PointCloudShapeFinder.Shape s : found ) {
-				checkIndexes(s,cloud);
+			for (PointCloudShapeFinder.Shape s : found) {
+				checkIndexes(s, cloud);
 				double error = averageError(s);
-				assertEquals(0,error,0.1);
+				assertEquals(0, error, 0.1);
 			}
 
-			assertEquals(1,found.size());
+			assertEquals(1, found.size());
 			PointCloudShapeFinder.Shape s = found.get(0);
 
 
-			assertEquals(N,unmatched.size()+findUsedCount(cloud,found));
+			assertEquals(N, unmatched.size() + findUsedCount(cloud, found));
 			assertTrue(unmatched.size() <= tolSetSize);
 			assertTrue(Math.abs(N - s.points.size()) <= tolSetSize);
 
-			switch( shape ) {
+			switch (shape) {
 				case CYLINDER:
 					TestGenerateCylinderPointVector.checkEquivalent(cylinder, (Cylinder3D_F64) s.parameters, tolModelparam);
 					break;
@@ -137,7 +135,7 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 					break;
 
 				default:
-					throw new RuntimeException("Unknown type "+shape);
+					throw new RuntimeException("Unknown type " + shape);
 			}
 		}
 	}
@@ -147,44 +145,44 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 		PointCloudShapeFinder alg = createAlgorithm();
 
 		// see if the algorithm can find multiple shapes
-		if( !alg.isSupportMultipleObjects() )
-		    return;
+		if (!alg.isSupportMultipleObjects())
+			return;
 
 		List<CloudShapeTypes> shapes = alg.getShapesList();
 		List<CloudShapeTypes> shapesSelect = new ArrayList<CloudShapeTypes>();
 		shapesSelect.addAll(shapes);
 
-		assertTrue(shapes.size()>2);
+		assertTrue(shapes.size() > 2);
 
 		int N = 400;
 
 		// shapes should be far away from each other
-		Cylinder3D_F64 cylinder = new Cylinder3D_F64(1,2,3,0.5,-0.25,0.1,3);
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,10,0,0,1);
-		Sphere3D_F64 sphere = new Sphere3D_F64(-5,-6,-3,2.5);
+		Cylinder3D_F64 cylinder = new Cylinder3D_F64(1, 2, 3, 0.5, -0.25, 0.1, 3);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1, 2, 10, 0, 0, 1);
+		Sphere3D_F64 sphere = new Sphere3D_F64(-5, -6, -3, 2.5);
 
-		for( int i = 0; i < 20; i++ ) {
+		for (int i = 0; i < 20; i++) {
 			// construct the cloud from two random shapes
 			List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
 
-			Collections.shuffle(shapesSelect,rand);
+			Collections.shuffle(shapesSelect, rand);
 
-			for( int j = 0; j < 2; j++ ) {
-				switch( shapesSelect.get(j) ) {
+			for (int j = 0; j < 2; j++) {
+				switch (shapesSelect.get(j)) {
 					case CYLINDER:
-						addShapeToCloud(cylinder,N,cloud);
+						addShapeToCloud(cylinder, N, cloud);
 						break;
 
 					case PLANE:
-						addShapeToCloud(plane,N,cloud);
+						addShapeToCloud(plane, N, cloud);
 						break;
 
 					case SPHERE:
-						addShapeToCloud(sphere,N,cloud);
+						addShapeToCloud(sphere, N, cloud);
 						break;
 				}
 			}
-			alg.process(cloud,null);
+			alg.process(cloud, null);
 
 			List<Point3D_F64> unmatched = new ArrayList<Point3D_F64>();
 			alg.getUnmatched(unmatched);
@@ -193,26 +191,26 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 			// see if the error of the matched shape is reasonable and that the
 			// point indexes are correctly set
-			for( PointCloudShapeFinder.Shape s : found ) {
-				checkIndexes(s,cloud);
+			for (PointCloudShapeFinder.Shape s : found) {
+				checkIndexes(s, cloud);
 				double error = averageError(s);
-				assertEquals(0,error,0.1);
+				assertEquals(0, error, 0.1);
 			}
 
 			assertEquals(2, found.size());
 
-			assertEquals(N*2,unmatched.size()+findUsedCount(cloud,found));
-			assertTrue(unmatched.size() <= tolSetSize*N);
+			assertEquals(N * 2, unmatched.size() + findUsedCount(cloud, found));
+			assertTrue(unmatched.size() <= tolSetSize * N);
 
 
-			for( int j = 0; j < found.size(); j++ ) {
+			for (int j = 0; j < found.size(); j++) {
 				PointCloudShapeFinder.Shape s = found.get(j);
 
 				assertTrue(Math.abs(N - s.points.size()) <= tolSetSize);
 
-				switch( s.type ) {
+				switch (s.type) {
 					case CYLINDER:
-						TestGenerateCylinderPointVector.checkEquivalent(cylinder,(Cylinder3D_F64)s.parameters, tolModelparam);
+						TestGenerateCylinderPointVector.checkEquivalent(cylinder, (Cylinder3D_F64) s.parameters, tolModelparam);
 						break;
 
 					case PLANE:
@@ -239,55 +237,55 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 		int N = 200;
 
-		Cylinder3D_F64 cylinder = new Cylinder3D_F64(1,2,3,0.5,-0.25,0.1,3);
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,3,-0.5,0.25,1);
-		Sphere3D_F64 sphere = new Sphere3D_F64(-1,-2,-3,2.5);
-		switch( alg.getShapesList().get(0) ) {
+		Cylinder3D_F64 cylinder = new Cylinder3D_F64(1, 2, 3, 0.5, -0.25, 0.1, 3);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1, 2, 3, -0.5, 0.25, 1);
+		Sphere3D_F64 sphere = new Sphere3D_F64(-1, -2, -3, 2.5);
+		switch (alg.getShapesList().get(0)) {
 			case CYLINDER:
-				addShapeToCloud(cylinder,N,cloud);
+				addShapeToCloud(cylinder, N, cloud);
 				break;
 
 			case PLANE:
-				addShapeToCloud(plane,N,cloud);
+				addShapeToCloud(plane, N, cloud);
 				break;
 
 			case SPHERE:
-				addShapeToCloud(sphere,N,cloud);
+				addShapeToCloud(sphere, N, cloud);
 				break;
 		}
 
 		// check with a bounding box
-		alg.process(cloud,new Cube3D_F64(-10,-10,-10,10,10,10));
-		assertEquals(1,alg.getFound().size());
+		alg.process(cloud, new Cube3D_F64(-10, -10, -10, 10, 10, 10));
+		assertEquals(1, alg.getFound().size());
 		assertTrue(alg.getFound().get(0).type == alg.getShapesList().get(0));
 
-	    // let it select the bounding box
-		alg.process(cloud,null);
-		assertEquals(1,alg.getFound().size());
+		// let it select the bounding box
+		alg.process(cloud, null);
+		assertEquals(1, alg.getFound().size());
 		assertTrue(alg.getFound().get(0).type == alg.getShapesList().get(0));
 	}
 
-	private void checkIndexes( PointCloudShapeFinder.Shape shape , List<Point3D_F64> cloud ) {
-		assertEquals(shape.indexes.size,shape.points.size());
+	private void checkIndexes(PointCloudShapeFinder.Shape shape, List<Point3D_F64> cloud) {
+		assertEquals(shape.indexes.size, shape.points.size());
 		GrowQueue_I32 indexes = shape.indexes;
 
-		for( int i = 0; i < indexes.size; i++ ) {
+		for (int i = 0; i < indexes.size; i++) {
 			int found = indexes.get(i);
 			int expected = cloud.indexOf(shape.points.get(i));
-			assertEquals(found,expected);
+			assertEquals(found, expected);
 		}
 	}
 
-	private void addShapeToCloud( Object shapeParam , int N , List<Point3D_F64> cloud ) {
-		if( shapeParam instanceof Cylinder3D_F64 ) {
-			for( int i = 0; i < N; i++ )
-				cloud.add(PointCloudShapeTools.createPt((Cylinder3D_F64)shapeParam, rand.nextDouble() * 2, rand.nextDouble() * 2 * Math.PI));
-		} else if( shapeParam instanceof PlaneNormal3D_F64 ) {
-			for( int i = 0; i < N; i++ )
-				cloud.add(PointCloudShapeTools.createPt((PlaneNormal3D_F64)shapeParam, 3 * (rand.nextDouble() - 0.5), 3 * (rand.nextDouble() - 0.5)));
-		} else if( shapeParam instanceof Sphere3D_F64 ) {
-			for( int i = 0; i < N; i++ )
-				cloud.add(PointCloudShapeTools.createPt((Sphere3D_F64)shapeParam, rand.nextDouble() * 2 * Math.PI, rand.nextDouble() * 2 * Math.PI));
+	private void addShapeToCloud(Object shapeParam, int N, List<Point3D_F64> cloud) {
+		if (shapeParam instanceof Cylinder3D_F64) {
+			for (int i = 0; i < N; i++)
+				cloud.add(PointCloudShapeTools.createPt((Cylinder3D_F64) shapeParam, rand.nextDouble() * 2, rand.nextDouble() * 2 * Math.PI));
+		} else if (shapeParam instanceof PlaneNormal3D_F64) {
+			for (int i = 0; i < N; i++)
+				cloud.add(PointCloudShapeTools.createPt((PlaneNormal3D_F64) shapeParam, 3 * (rand.nextDouble() - 0.5), 3 * (rand.nextDouble() - 0.5)));
+		} else if (shapeParam instanceof Sphere3D_F64) {
+			for (int i = 0; i < N; i++)
+				cloud.add(PointCloudShapeTools.createPt((Sphere3D_F64) shapeParam, rand.nextDouble() * 2 * Math.PI, rand.nextDouble() * 2 * Math.PI));
 		} else {
 			throw new IllegalArgumentException("Unknown shape");
 		}
@@ -296,29 +294,29 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 	/**
 	 * Find the total number of points in the cloud that are used.  The same point can be matched to multiple shapes
 	 */
-	private int findUsedCount( List<Point3D_F64> cloud , List<PointCloudShapeFinder.Shape> found) {
+	private int findUsedCount(List<Point3D_F64> cloud, List<PointCloudShapeFinder.Shape> found) {
 		int total = 0;
 
-		for( Point3D_F64 p : cloud ) {
+		for (Point3D_F64 p : cloud) {
 			boolean matched = false;
-			for( int i = 0; i < found.size() && !matched; i++ ) {
-				for( Point3D_F64 c : found.get(i).points ) {
-					if( c == p ) {
+			for (int i = 0; i < found.size() && !matched; i++) {
+				for (Point3D_F64 c : found.get(i).points) {
+					if (c == p) {
 						matched = true;
 						break;
 					}
 				}
 			}
-			if( matched )
+			if (matched)
 				total++;
 		}
 
 		return total;
 	}
 
-	private double averageError( PointCloudShapeFinder.Shape shape ) {
+	private double averageError(PointCloudShapeFinder.Shape shape) {
 		DistanceFromModel function;
-		switch( shape.type ) {
+		switch (shape.type) {
 			case CYLINDER:
 				function = new DistanceCylinderToPoint3D();
 				break;
@@ -336,10 +334,10 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 		function.setModel(shape.parameters);
 		double total = 0;
-		for( int i = 0; i < shape.points.size(); i++ ) {
+		for (int i = 0; i < shape.points.size(); i++) {
 			total += function.computeDistance(shape.points.get(i));
 		}
-		return total/shape.points.size();
+		return total / shape.points.size();
 	}
 
 }

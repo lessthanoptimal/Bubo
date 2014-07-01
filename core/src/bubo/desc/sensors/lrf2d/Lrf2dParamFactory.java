@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -25,29 +25,29 @@ package bubo.desc.sensors.lrf2d;
  */
 public class Lrf2dParamFactory {
 
-    public static Lrf2dParam createSickLms200() {
-        Lrf2dParam param = new Lrf2dParam();
+	public static Lrf2dParam createSickLms200() {
+		Lrf2dParam param = new Lrf2dParam();
 
-        param.setStartAngle( -Math.PI/2.0 );
-        param.setSweepAngle( Math.PI );
-        param.setNumberOfScans( 361 );
-        param.setMaxRange( 7.5 );
+		param.setStartAngle(-Math.PI / 2.0);
+		param.setSweepAngle(Math.PI);
+		param.setNumberOfScans(361);
+		param.setMaxRange(7.5);
 
-        return param;
-    }
+		return param;
+	}
 
-    public static Lrf2dParam createHokuyo() {
-        Lrf2dParam param = new Lrf2dParam();
+	public static Lrf2dParam createHokuyo() {
+		Lrf2dParam param = new Lrf2dParam();
 
-        int frontStep = 384;
-        int initialStep = 44;
-        int finalStep = 725;
+		int frontStep = 384;
+		int initialStep = 44;
+		int finalStep = 725;
 
-        param.setNumberOfScans( finalStep - initialStep + 1);
-        param.setSweepAngle( 2.0*Math.PI*param.getNumberOfScans()/1024.0 );
-        param.setStartAngle( -param.getAngleIncrement()*(frontStep-initialStep) );
-        param.setMaxRange( 5.5 );
+		param.setNumberOfScans(finalStep - initialStep + 1);
+		param.setSweepAngle(2.0 * Math.PI * param.getNumberOfScans() / 1024.0);
+		param.setStartAngle(-param.getAngleIncrement() * (frontStep - initialStep));
+		param.setMaxRange(5.5);
 
-        return param;
-    }
+		return param;
+	}
 }

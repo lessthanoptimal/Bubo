@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -48,9 +48,9 @@ public class TestLocalFitShapeNN {
 
 	FindMatchSetPointVectorNN<PlaneGeneral3D_F64> findMatch = new FindMatchSetPointVectorNN<PlaneGeneral3D_F64>();
 
-	ModelFitter<PlaneGeneral3D_F64,PointVectorNN> modelFitter =
+	ModelFitter<PlaneGeneral3D_F64, PointVectorNN> modelFitter =
 			new ModelFitter_P_to_PVNN(new PlaneGeneralSvd_to_ModelFitter());
-	DistanceFromModel<PlaneGeneral3D_F64,PointVectorNN> modelDistance =
+	DistanceFromModel<PlaneGeneral3D_F64, PointVectorNN> modelDistance =
 			new DistanceFromModel_P_to_PVNN(new DistancePlaneToPoint3D());
 	ModelCodec<PlaneGeneral3D_F64> modelCodec = new CodecPlaneGeneral3D_F64();
 	CheckShapeParameters<PlaneGeneral3D_F64> modelCheck = new CheckShapeAcceptAll<PlaneGeneral3D_F64>();
@@ -62,26 +62,26 @@ public class TestLocalFitShapeNN {
 	@Test
 	public void perfectInitial_modelCheck() {
 
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,3,-0.5,0.25,1);
-		PlaneGeneral3D_F64 inputPlane = UtilPlane3D_F64.convert(plane,null);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1, 2, 3, -0.5, 0.25, 1);
+		PlaneGeneral3D_F64 inputPlane = UtilPlane3D_F64.convert(plane, null);
 
 		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
-		for( int i = 0; i < 100; i++ ) {
-			double x = (rand.nextDouble()-0.5)*5;
-			double y = (rand.nextDouble()-0.5)*5;
+		for (int i = 0; i < 100; i++) {
+			double x = (rand.nextDouble() - 0.5) * 5;
+			double y = (rand.nextDouble() - 0.5) * 5;
 			pts.add(TestGeneratePlanePointVector.createPt(plane, x, y, 1));
 		}
 
 		createGraph(pts);
 
 		findMatch.reset();
-		LocalFitShapeNN<PlaneGeneral3D_F64> alg = new LocalFitShapeNN<PlaneGeneral3D_F64>(100,1e-8,findMatch);
+		LocalFitShapeNN<PlaneGeneral3D_F64> alg = new LocalFitShapeNN<PlaneGeneral3D_F64>(100, 1e-8, findMatch);
 
-		alg.configure(modelFitter,modelDistance,modelCheck,modelCodec,0.3);
+		alg.configure(modelFitter, modelDistance, modelCheck, modelCodec, 0.3);
 
 		assertTrue(alg.refine(pts, inputPlane, true));
 
-		assertEquals(100,pts.size());
+		assertEquals(100, pts.size());
 		TestGeneratePlanePointVector.checkPlanes(plane, inputPlane, 1e-8);
 
 		// now give it a model check which will always fail and see if it fails
@@ -97,42 +97,42 @@ public class TestLocalFitShapeNN {
 	 */
 	@Test
 	public void withRandomPoints_sameInstance() {
-		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1,2,3,-0.5,0.25,1);
-		PlaneGeneral3D_F64 planeFound = UtilPlane3D_F64.convert(plane,null);
+		PlaneNormal3D_F64 plane = new PlaneNormal3D_F64(1, 2, 3, -0.5, 0.25, 1);
+		PlaneGeneral3D_F64 planeFound = UtilPlane3D_F64.convert(plane, null);
 		// make the initial estimate slightly off
 		planeFound.A = 1.01;
 
 		// create a mixture of perfect and noisy points
 		List<PointVectorNN> pts = new ArrayList<PointVectorNN>();
-		for( int i = 0; i < 100; i++ ) {
-			double x = (rand.nextDouble()-0.5)*5;
-			double y = (rand.nextDouble()-0.5)*5;
-			pts.add(TestGeneratePlanePointVector.createPt(plane,x,y,1));
+		for (int i = 0; i < 100; i++) {
+			double x = (rand.nextDouble() - 0.5) * 5;
+			double y = (rand.nextDouble() - 0.5) * 5;
+			pts.add(TestGeneratePlanePointVector.createPt(plane, x, y, 1));
 		}
-		for( int i = 0; i < 15; i++ ) {
-			double x = (rand.nextDouble()-0.5)*5;
-			double y = (rand.nextDouble()-0.5)*5;
-			PointVectorNN pv = TestGeneratePlanePointVector.createPt(plane,x,y,1);
+		for (int i = 0; i < 15; i++) {
+			double x = (rand.nextDouble() - 0.5) * 5;
+			double y = (rand.nextDouble() - 0.5) * 5;
+			PointVectorNN pv = TestGeneratePlanePointVector.createPt(plane, x, y, 1);
 
 			// make the points really far away from the plane
-			pv.p.x += rand.nextGaussian()*3+5;
-			pv.p.y += rand.nextGaussian()*3+5;
-			pv.p.z += rand.nextGaussian()*3+5;
+			pv.p.x += rand.nextGaussian() * 3 + 5;
+			pv.p.y += rand.nextGaussian() * 3 + 5;
+			pv.p.z += rand.nextGaussian() * 3 + 5;
 			pts.add(pv);
 		}
 
 		// this is the set of initial points which is passed in
 		List<PointVectorNN> guessPts = new ArrayList<PointVectorNN>();
-		for( int i = 0; i < 30; i++ ) {
-			guessPts.add( pts.get(i) );
+		for (int i = 0; i < 30; i++) {
+			guessPts.add(pts.get(i));
 		}
 
 		createGraph(pts);
 
 		findMatch.reset();
-		LocalFitShapeNN<PlaneGeneral3D_F64> alg = new LocalFitShapeNN<PlaneGeneral3D_F64>(100,1e-8,findMatch);
+		LocalFitShapeNN<PlaneGeneral3D_F64> alg = new LocalFitShapeNN<PlaneGeneral3D_F64>(100, 1e-8, findMatch);
 
-		alg.configure(modelFitter,modelDistance,modelCheck, modelCodec,0.3);
+		alg.configure(modelFitter, modelDistance, modelCheck, modelCodec, 0.3);
 
 		assertTrue(alg.refine(guessPts, planeFound, true));
 
@@ -144,13 +144,13 @@ public class TestLocalFitShapeNN {
 	/**
 	 * Create a NN graph from the points
 	 */
-	private void createGraph( List<PointVectorNN> cloud ) {
+	private void createGraph(List<PointVectorNN> cloud) {
 		NearestNeighbor<PointVectorNN> nn = FactoryNearestNeighbor.kdtree();
 
 		List<double[]> pointsD = new ArrayList<double[]>();
 
 		// convert the point cloud into the NN format
-		for( int i = 0; i < cloud.size(); i++ ) {
+		for (int i = 0; i < cloud.size(); i++) {
 			PointVectorNN p = cloud.get(i);
 
 			double[] d = new double[3];
@@ -163,20 +163,20 @@ public class TestLocalFitShapeNN {
 		}
 
 		nn.init(3);
-		nn.setPoints(pointsD,cloud);
+		nn.setPoints(pointsD, cloud);
 
-		FastQueue<NnData<PointVectorNN>> neighbors = new FastQueue<NnData<PointVectorNN>>((Class)NnData.class,true);
+		FastQueue<NnData<PointVectorNN>> neighbors = new FastQueue<NnData<PointVectorNN>>((Class) NnData.class, true);
 
-		for( int i = 0; i < cloud.size(); i++ ) {
+		for (int i = 0; i < cloud.size(); i++) {
 			PointVectorNN p = cloud.get(i);
 			double[] d = pointsD.get(i);
 
 			neighbors.reset();
-			nn.findNearest(d,2,8,neighbors);
+			nn.findNearest(d, 2, 8, neighbors);
 
-			for( int j = 0; j < neighbors.size; j++ ) {
+			for (int j = 0; j < neighbors.size; j++) {
 				PointVectorNN pv = neighbors.get(j).data;
-				if( pv == p )
+				if (pv == p)
 					continue;
 				p.neighbors.add(pv);
 			}

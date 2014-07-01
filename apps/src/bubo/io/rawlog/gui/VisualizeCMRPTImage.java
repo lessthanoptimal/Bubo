@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -33,84 +33,84 @@ import java.awt.image.BufferedImage;
  */
 public class VisualizeCMRPTImage implements LogDataVisualization {
 
-    CMRPTImage obs;
+	CMRPTImage obs;
 
-    // display the image
-    JPanel imageComponent = new JPanel();
-    // displays text information about the image
-    JTextArea infoComponent = new JTextArea();
+	// display the image
+	JPanel imageComponent = new JPanel();
+	// displays text information about the image
+	JTextArea infoComponent = new JTextArea();
 
-    // components that go inside imageComponent
-    JLabel imageText = new JLabel("Not Set!");
-    BufferedImageComponent imageDisplay = new BufferedImageComponent(null);
+	// components that go inside imageComponent
+	JLabel imageText = new JLabel("Not Set!");
+	BufferedImageComponent imageDisplay = new BufferedImageComponent(null);
 
 
-    RawlogViewer.Config config;
+	RawlogViewer.Config config;
 
-    public VisualizeCMRPTImage(RawlogViewer.Config config) {
-        this.config = config;
-        imageComponent.add(new JLabel("Not set"));
-    }
+	public VisualizeCMRPTImage(RawlogViewer.Config config) {
+		this.config = config;
+		imageComponent.add(new JLabel("Not set"));
+	}
 
-    @Override
-    public void setData(Object data) {
-        this.obs = (CMRPTImage)data;
+	@Override
+	public void setData(Object data) {
+		this.obs = (CMRPTImage) data;
 
-        ImageEncoded encoded = obs.getImage();
+		ImageEncoded encoded = obs.getImage();
 
-        BufferedImage img;
-        String imageInfo;
+		BufferedImage img;
+		String imageInfo;
 
-        if( encoded instanceof ImageFile) {
-            imageInfo = config.directory+"/Images/"+((ImageFile)encoded).getFileLocation();
-            img = UtilImageIO.loadImage(imageInfo);
-            imageInfo = "File Name: "+imageInfo;
-        } else {
-            img = encoded.convertToBuffered();
-            imageInfo = "Format: "+encoded.getFormat();
-        }
+		if (encoded instanceof ImageFile) {
+			imageInfo = config.directory + "/Images/" + ((ImageFile) encoded).getFileLocation();
+			img = UtilImageIO.loadImage(imageInfo);
+			imageInfo = "File Name: " + imageInfo;
+		} else {
+			img = encoded.convertToBuffered();
+			imageInfo = "Format: " + encoded.getFormat();
+		}
 
-        imageComponent.removeAll();
-        if( img == null ) {
-            imageText.setText("No Image Loaded: "+imageInfo);
-            imageComponent.add(imageText);
-        } else {
-            imageDisplay.setImage(img);
-            imageComponent.add(imageDisplay);
-        }
+		imageComponent.removeAll();
+		if (img == null) {
+			imageText.setText("No Image Loaded: " + imageInfo);
+			imageComponent.add(imageText);
+		} else {
+			imageDisplay.setImage(img);
+			imageComponent.add(imageDisplay);
+		}
 
-        String text = "ImageType = "+encoded.getClass().getSimpleName()+"\n";
-        text += imageInfo;
+		String text = "ImageType = " + encoded.getClass().getSimpleName() + "\n";
+		text += imageInfo;
 
-        infoComponent.setText(text);
-    }
+		infoComponent.setText(text);
+	}
 
-    @Override
-    public Class<?> getType() {
-        return CMRPTImage.class;
-    }
+	@Override
+	public Class<?> getType() {
+		return CMRPTImage.class;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 2;
-    }
+	@Override
+	public int numDisplay() {
+		return 2;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        if( index == 0 )
-            return infoComponent;
-        else if( index == 1 )
-            return imageComponent;
+	@Override
+	public JComponent getDisplay(int index) {
+		if (index == 0)
+			return infoComponent;
+		else if (index == 1)
+			return imageComponent;
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        if( index == 0 )
-            return "Info";
-        else if( index == 1 )
-            return "Image";
-        return null;
-    }
+	@Override
+	public String getDisplayName(int index) {
+		if (index == 0)
+			return "Info";
+		else if (index == 1)
+			return "Image";
+		return null;
+	}
 }

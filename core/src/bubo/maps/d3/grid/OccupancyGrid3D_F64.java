@@ -28,11 +28,11 @@ public interface OccupancyGrid3D_F64 {
 	/**
 	 * Sets the specified cell to 'value'.
 	 *
-	 * @param x x-coordinate of the cell.
-	 * @param y y-coordinate of the cell.
+	 * @param x     x-coordinate of the cell.
+	 * @param y     y-coordinate of the cell.
 	 * @param value The cell's new value.
 	 */
-	public void set( int x , int y , int z , double value );
+	public void set(int x, int y, int z, double value);
 
 	/**
 	 * Gets the value of the cell at the specified coordinate.
@@ -41,7 +41,7 @@ public interface OccupancyGrid3D_F64 {
 	 * @param y y-coordinate of the cell.
 	 * @return The cell's value.
 	 */
-	public double get( int x , int y , int z );
+	public double get(int x, int y, int z);
 
 	/**
 	 * Checks to see if the provided value is within the valid range.
@@ -49,5 +49,5 @@ public interface OccupancyGrid3D_F64 {
 	 * @param value the value being tested
 	 * @return if it is valid or not
 	 */
-	public boolean isValid( double value );
+	public boolean isValid(double value);
 }

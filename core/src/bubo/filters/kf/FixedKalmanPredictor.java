@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -45,6 +45,10 @@ public class FixedKalmanPredictor implements KalmanPredictor {
 		return G;
 	}
 
+	public void setControlTransition(DenseMatrix64F G) {
+		this.G = G;
+	}
+
 	@Override
 	public DenseMatrix64F getPlantNoise() {
 		return Q;
@@ -53,10 +57,6 @@ public class FixedKalmanPredictor implements KalmanPredictor {
 	@Override
 	public int getNumStates() {
 		return Q.numCols;
-	}
-
-	public void setControlTransition(DenseMatrix64F G) {
-		this.G = G;
 	}
 
 	@Override

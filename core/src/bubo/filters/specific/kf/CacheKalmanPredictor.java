@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,10 +27,10 @@ import org.ejml.data.DenseMatrix64F;
  */
 public abstract class CacheKalmanPredictor implements KalmanCdtExpPredictor {
 
-	private double prevDeltaTime = -1;
 	protected DenseMatrix64F tran;
 	protected DenseMatrix64F control;
 	protected DenseMatrix64F plant;
+	private double prevDeltaTime = -1;
 
 	public CacheKalmanPredictor(int stateDimen, int controlDimen) {
 		tran = new DenseMatrix64F(stateDimen, stateDimen);

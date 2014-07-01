@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,7 +31,7 @@ import georegression.struct.se.Se2_F64;
  * (LRF) using rigid body motion.  Works by using ICP {@link IterativeClosestPoint} and a range matching technique
  * to find the translation and rotation.
  * </p>
- *
+ * <p/>
  * <p>
  * Association is performed by considering a local search based on scan angle.  The search window decays with each
  * iteration.  Interpolation is performed between scan points based upon the angle.  Interpolation is performed
@@ -40,20 +40,20 @@ import georegression.struct.se.Se2_F64;
  * the latter at estimating angular changes.  Thus the outputted motion takes the translation from Cartesian association
  * and rotation from range association.
  * </p>
- *
+ * <p/>
  * <p>
  * Scan points are ignored if they are invalid measurements (e.g. at the max range) or can not be seen from the new
  * point of view being considered.  This is done by searching for scan angles that are out of sequence.  Unlike in the
  * original paper no change is done to see if a scan is blocked from view by another scan as a new view is considered.
  * </p>
- *
+ * <p/>
  * <p>
  * NOTE: Range based association is prone to ambiguous association.  For example, when viewing the corner of a room two equally
  * score hypotheses exist and one will be randomly selected.  This is some what mitigated by only searching a local
  * area, but when the robot is right up against the corner the local search will not be enough.  The end result is that
  * under some fairly common situations this produces a worse estimate than ICP.
  * </p>
- *
+ * <p/>
  * <p>
  * Based upon: Feng Lu and Evangelos Milios, "Robot Pose Estimation in Unknown Environments by Matching 2D Range Scans"
  * Journal of Intelligent and Robotics Systems, 18: 249-275, 1997.
@@ -85,7 +85,7 @@ public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 	}
 
 	@Override
-	public void setSensorParam(Lrf2dParam param ) {
+	public void setSensorParam(Lrf2dParam param) {
 		super.setSensorParam(param);
 
 		assocCartesian.setParam(param);
@@ -103,7 +103,7 @@ public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 	 * again by associating with measured range.  The final output found by using the estimated translation
 	 * from Euclidean distance association and angular change from range association.
 	 * </p>
-	 *
+	 * <p/>
 	 * <p>
 	 * Local association is performed with interpolation.  The association search window decays with each iteration.
 	 * </p>
@@ -113,7 +113,7 @@ public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 	@Override
 	protected Se2_F64 estimateMotion() {
 		// reduce the search window size for each iteration
-		double windowRadius = searchNeighborhood*Math.exp(-windowDecayConstant *stop.getIteration());
+		double windowRadius = searchNeighborhood * Math.exp(-windowDecayConstant * stop.getIteration());
 		assocCartesian.setSearchNeighborhood(windowRadius);
 		assocRange.setSearchNeighborhood(windowRadius);
 
@@ -128,48 +128,47 @@ public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 		m = computeMotion(assocRange);
 //        System.out.println(m);
 
-		m.set(dx,dy,m.getYaw());
+		m.set(dx, dy, m.getYaw());
 
 		return m;
 	}
 
 	/**
 	 * Associates using Euclidean distance between two points.  This is supposed to be better at estimating the translation.
-	 *
+	 * <p/>
 	 * Range is set to NaN since it isn't used and should blow up if it is.
 	 */
-	protected class AssociateDistance extends LocalAssociateInterpolate
-	{
+	protected class AssociateDistance extends LocalAssociateInterpolate {
 		Point2D_F64 from;
 
 		@Override
 		public boolean interpolate(InterpolatedPoint point) {
 			final int N = param.getNumberOfScans();
 
-			int index = (int)(N*(point.angle - param.getStartAngle())/param.getSweepAngle());
+			int index = (int) (N * (point.angle - param.getStartAngle()) / param.getSweepAngle());
 
-			if( index >= N-1 || index < 0 )
+			if (index >= N - 1 || index < 0)
 				return false;
 
-			if( scanRef.vis[index] && scanRef.vis[index+1]) {
+			if (scanRef.vis[index] && scanRef.vis[index + 1]) {
 				double before = param.computeAngle(index);
-				double after = param.computeAngle(index+1);
+				double after = param.computeAngle(index + 1);
 
 				Point2D_F64 b = scanRef.pts[index];
-				Point2D_F64 a = scanRef.pts[index+1];
+				Point2D_F64 a = scanRef.pts[index + 1];
 
-				double frac = (point.angle - before)/(after-before);
-				point.point.x = frac*(a.x-b.x)+b.x;
-				point.point.y = frac*(a.y-b.y)+b.y;
+				double frac = (point.angle - before) / (after - before);
+				point.point.x = frac * (a.x - b.x) + b.x;
+				point.point.y = frac * (a.y - b.y) + b.y;
 				point.range = Double.NaN;
 
 				return true;
-			} else if( scanRef.vis[index] ) {
-				point.point.set( scanRef.pts[index]);
+			} else if (scanRef.vis[index]) {
+				point.point.set(scanRef.pts[index]);
 				point.range = Double.NaN;
 				return true;
-			} else if( scanRef.vis[index+1] ) {
-				point.point.set( scanRef.pts[index+1]);
+			} else if (scanRef.vis[index + 1]) {
+				point.point.set(scanRef.pts[index + 1]);
 				point.range = Double.NaN;
 				return true;
 			}
@@ -192,40 +191,39 @@ public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 	 * Associate by range.  This is supposed to be better at estimating the angular change the by Euclidean distance.
 	 * However it is more prone to ambiguous associations.
 	 */
-	protected class AssociateRange extends LocalAssociateInterpolate
-	{
+	protected class AssociateRange extends LocalAssociateInterpolate {
 		double reference;
 
 		@Override
 		public boolean interpolate(InterpolatedPoint point) {
 			final int N = param.getNumberOfScans();
 
-			int index = (int)(N*(point.angle - param.getStartAngle())/param.getSweepAngle());
+			int index = (int) (N * (point.angle - param.getStartAngle()) / param.getSweepAngle());
 
-			if( index >= N || index < 0 )
+			if (index >= N || index < 0)
 				return false;
-			else if( index == N-1 ) {
+			else if (index == N - 1) {
 				point.range = scanRef.range[index];
 			} else {
-				if( scanRef.vis[index] && scanRef.vis[index+1]) {
+				if (scanRef.vis[index] && scanRef.vis[index + 1]) {
 					double o1 = param.computeAngle(index);
-					double o2 = param.computeAngle(index+1);
+					double o2 = param.computeAngle(index + 1);
 
 					double r1 = scanRef.range[index];
-					double r2 = scanRef.range[index+1];
+					double r2 = scanRef.range[index + 1];
 
-					point.range = (r1*r2*(o2-o1))/(r1*(point.angle-o1) + r2*(o2-point.angle));
-				} else if( scanRef.vis[index] ) {
+					point.range = (r1 * r2 * (o2 - o1)) / (r1 * (point.angle - o1) + r2 * (o2 - point.angle));
+				} else if (scanRef.vis[index]) {
 					point.range = scanRef.range[index];
-				} else if( scanRef.vis[index+1] ) {
-					point.range = scanRef.range[index+1];
+				} else if (scanRef.vis[index + 1]) {
+					point.range = scanRef.range[index + 1];
 				} else {
 					return false;
 				}
 			}
 
-			point.point.x = Math.cos(point.angle)*point.range;
-			point.point.y = Math.sin(point.angle)*point.range;
+			point.point.x = Math.cos(point.angle) * point.range;
+			point.point.y = Math.sin(point.angle) * point.range;
 
 			return true;
 		}
@@ -237,8 +235,8 @@ public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 
 		@Override
 		public double distToTarget(InterpolatedPoint point) {
-			double d = point.range-reference;
-			return d*d;
+			double d = point.range - reference;
+			return d * d;
 		}
 	}
 }

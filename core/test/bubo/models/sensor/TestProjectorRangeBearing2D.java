@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -40,26 +40,26 @@ public class TestProjectorRangeBearing2D extends StandardProjectorTests {
 	public void checkProjection() {
 		// easy cases first
 		double sqrt2 = Math.sqrt(2);
-		checkProjection(0,0,0,1,0,1,0);
-		checkProjection(0,0,0,0,1,1,Math.PI/2.0);
-		checkProjection(1,-1,0,0,0,sqrt2,3*Math.PI/4.0);
+		checkProjection(0, 0, 0, 1, 0, 1, 0);
+		checkProjection(0, 0, 0, 0, 1, 1, Math.PI / 2.0);
+		checkProjection(1, -1, 0, 0, 0, sqrt2, 3 * Math.PI / 4.0);
 
 		// try a boundary condition
-		checkProjection(2,-1,0,0,-1,2,Math.PI);
+		checkProjection(2, -1, 0, 0, -1, 2, Math.PI);
 
 		// try a non-zero angle
-		checkProjection(2,-1,0.1,0,-1,2,Math.PI-0.1);
+		checkProjection(2, -1, 0.1, 0, -1, 2, Math.PI - 0.1);
 	}
 
-	private void checkProjection( double robotX , double robotY , double theta , double x , double y ,
-								  double d , double bearings ) {
+	private void checkProjection(double robotX, double robotY, double theta, double x, double y,
+								 double d, double bearings) {
 
 		alg.setLandmarkLocation(x, y);
-		alg.compute( new DenseMatrix64F(3,1,true,robotX,robotY,theta));
+		alg.compute(new DenseMatrix64F(3, 1, true, robotX, robotY, theta));
 
 		DenseMatrix64F z = alg.getProjected();
 
-		assertEquals(d,z.get(0,0),1e-8);
+		assertEquals(d, z.get(0, 0), 1e-8);
 		assertTrue(UtilAngle.dist(bearings, z.get(1, 0)) <= 1e-8);
 	}
 
@@ -71,8 +71,8 @@ public class TestProjectorRangeBearing2D extends StandardProjectorTests {
 
 		alg.setLandmarkLocation(5, -3.5);
 
-		checkProjectorAtPoint(alg,false,1,2,-0.1);
-		checkProjectorAtPoint(alg,false,1,-3.5,-0.1);
+		checkProjectorAtPoint(alg, false, 1, 2, -0.1);
+		checkProjectorAtPoint(alg, false, 1, -3.5, -0.1);
 
 		// below is a pathological situation and the numerical solution will be incorrect
 		// manually inspect as a sanity check

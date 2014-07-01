@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -44,38 +44,33 @@ public class Ransac_to_PointCloudShapeFinder implements PointCloudShapeFinder {
 	ApproximateSurfaceNormals surfaceNormals;
 	List<CloudShapeTypes> shapeList;
 
-	FastQueue<PointVectorNN> pointNormList = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
-
-	// the minimum number of points a shape needs for it to be accepted
-	private int minimumPoints;
-
+	FastQueue<PointVectorNN> pointNormList = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
 	// reference to cloud data
 	List<Point3D_F64> cloud;
 	// mark which points are inliers and which are not
 	GrowQueue_B marks = new GrowQueue_B();
-
 	// storage for the matched shape
-	FastQueue<Shape> output = new FastQueue<Shape>(Shape.class,true);
-
+	FastQueue<Shape> output = new FastQueue<Shape>(Shape.class, true);
 	// optimizes the fit parameters to the inlier set
-	List<ModelFitter<Object,PointVectorNN>> fitters;
-
+	List<ModelFitter<Object, PointVectorNN>> fitters;
 	// storage for optimized parameters
 	List<Object> models = new ArrayList<Object>();
+	// the minimum number of points a shape needs for it to be accepted
+	private int minimumPoints;
 
 	/**
 	 * Specifies internal algorithms.
 	 *
 	 * @param surfaceNormals Algorithm used to compute surface normals
-	 * @param ransac RANSAC configured with the models its matching
-	 * @param minimumPoints The minimum number of points it will need to match
-	 * @param shapeList List of shapes matching the RANSAC configuration
+	 * @param ransac         RANSAC configured with the models its matching
+	 * @param minimumPoints  The minimum number of points it will need to match
+	 * @param shapeList      List of shapes matching the RANSAC configuration
 	 */
 	public Ransac_to_PointCloudShapeFinder(ApproximateSurfaceNormals surfaceNormals,
 										   RansacMulti<PointVectorNN> ransac,
 										   List<ModelManager> modelManagers,
-										   List<ModelFitter<Object,PointVectorNN>> fitters,
-										   int minimumPoints ,
+										   List<ModelFitter<Object, PointVectorNN>> fitters,
+										   int minimumPoints,
 										   List<CloudShapeTypes> shapeList) {
 		this.surfaceNormals = surfaceNormals;
 		this.ransac = ransac;
@@ -83,7 +78,7 @@ public class Ransac_to_PointCloudShapeFinder implements PointCloudShapeFinder {
 		this.minimumPoints = minimumPoints;
 		this.shapeList = shapeList;
 
-		for( int i = 0; i < modelManagers.size(); i++ ) {
+		for (int i = 0; i < modelManagers.size(); i++) {
 			models.add(modelManagers.get(i).createModelInstance());
 		}
 	}
@@ -93,30 +88,30 @@ public class Ransac_to_PointCloudShapeFinder implements PointCloudShapeFinder {
 		this.cloud = cloud;
 		output.reset();
 		pointNormList.reset();
-		surfaceNormals.process(cloud,pointNormList);
+		surfaceNormals.process(cloud, pointNormList);
 
 		// run ransac and if it failed just give up
-		if( !ransac.process(pointNormList.toList()) )
+		if (!ransac.process(pointNormList.toList()))
 			return;
 
 		List<PointVectorNN> inliers = ransac.getMatchSet();
-		if( inliers.size() < minimumPoints )
+		if (inliers.size() < minimumPoints)
 			return;
 
-		ModelFitter<Object,PointVectorNN> fitter = fitters.get( ransac.getModelIndex());
-		Object shapeParam = models.get( ransac.getModelIndex() );
+		ModelFitter<Object, PointVectorNN> fitter = fitters.get(ransac.getModelIndex());
+		Object shapeParam = models.get(ransac.getModelIndex());
 
-		fitter.fitModel(inliers,ransac.getModelParameters(),shapeParam);
+		fitter.fitModel(inliers, ransac.getModelParameters(), shapeParam);
 
 		// convert the results into output format
 		Shape os = output.grow();
 		os.parameters = shapeParam;
-		os.type = shapeList.get( ransac.getModelIndex() );
+		os.type = shapeList.get(ransac.getModelIndex());
 		os.points.clear();
 		os.indexes.reset();
 
 		// add the points to it
-		for( int j = 0; j < inliers.size(); j++ ) {
+		for (int j = 0; j < inliers.size(); j++) {
 			PointVectorNN pv = inliers.get(j);
 			os.points.add(pv.p);
 			os.indexes.add(pv.index);
@@ -131,19 +126,19 @@ public class Ransac_to_PointCloudShapeFinder implements PointCloudShapeFinder {
 	@Override
 	public void getUnmatched(List<Point3D_F64> unmatched) {
 		marks.resize(cloud.size());
-		for( int i = 0; i < cloud.size(); i++ ) {
+		for (int i = 0; i < cloud.size(); i++) {
 			marks.data[i] = false;
 		}
 
 		List<PointVectorNN> inliers = ransac.getMatchSet();
-		for( int j = 0; j < inliers.size(); j++ ) {
+		for (int j = 0; j < inliers.size(); j++) {
 			PointVectorNN pv = inliers.get(j);
 			marks.data[pv.index] = true;
 		}
 
-		for( int i = 0; i < cloud.size(); i++ ) {
-			if( !marks.data[i] ) {
-				unmatched.add( cloud.get(i) );
+		for (int i = 0; i < cloud.size(); i++) {
+			if (!marks.data[i]) {
+				unmatched.add(cloud.get(i));
 			}
 		}
 	}

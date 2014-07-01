@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -43,23 +43,23 @@ public class TestSimulatedPredictorModel2D {
 	public void checkUpdate() {
 		double T = 0.5;
 
-		DenseMatrix64F x = new DenseMatrix64F(3,1,true,1,2,0.5);
+		DenseMatrix64F x = new DenseMatrix64F(3, 1, true, 1, 2, 0.5);
 
 		Dummy control0 = new Dummy();
 		Dummy control1 = new Dummy();
 
-		SimulatedPredictorModel2D alg = new ImplAlg(control1,T);
+		SimulatedPredictorModel2D alg = new ImplAlg(control1, T);
 
-		control0.compute(x,T);
+		control0.compute(x, T);
 
 		DenseMatrix64F expected = control0.getPredictedState();
-		alg.setPose(new Se2_F64(x.data[0],x.data[1],x.data[2]));
+		alg.setPose(new Se2_F64(x.data[0], x.data[1], x.data[2]));
 		alg.update();
 		Se2_F64 found = alg.getPose();
 
-		assertEquals(expected.data[0],found.T.x,1e-8);
-		assertEquals(expected.data[1],found.T.y,1e-8);
-		assertEquals(expected.data[2],found.getYaw(),1e-8);
+		assertEquals(expected.data[0], found.T.x, 1e-8);
+		assertEquals(expected.data[1], found.T.y, 1e-8);
+		assertEquals(expected.data[2], found.getYaw(), 1e-8);
 	}
 
 	private class ImplAlg extends SimulatedPredictorModel2D {
@@ -69,7 +69,8 @@ public class TestSimulatedPredictorModel2D {
 		}
 
 		@Override
-		protected void drawControlNoise() {}
+		protected void drawControlNoise() {
+		}
 
 		@Override
 		public double[] getControlRequested() {
@@ -85,8 +86,8 @@ public class TestSimulatedPredictorModel2D {
 	private class Dummy implements EkfPredictorTime {
 
 		DenseMatrix64F F = CommonOps.identity(3);
-		DenseMatrix64F x = new DenseMatrix64F(3,1);
-		DenseMatrix64F u = new DenseMatrix64F(3,1);
+		DenseMatrix64F x = new DenseMatrix64F(3, 1);
+		DenseMatrix64F u = new DenseMatrix64F(3, 1);
 
 		public Dummy() {
 			u.data[0] = controlX;
@@ -96,8 +97,8 @@ public class TestSimulatedPredictorModel2D {
 
 		@Override
 		public void compute(DenseMatrix64F mean, double T) {
-			for( int i = 0; i < 3; i++ )
-				x.data[i] = mean.data[i] + u.data[i]*T;
+			for (int i = 0; i < 3; i++)
+				x.data[i] = mean.data[i] + u.data[i] * T;
 		}
 
 		@Override

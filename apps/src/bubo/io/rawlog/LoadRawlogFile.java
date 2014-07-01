@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -39,127 +39,124 @@ import java.util.List;
  */
 public class LoadRawlogFile extends SwingWorker implements LogFileReader.Listener {
 
-    // list of all the different data types
-    private List<Class<?>> allTypes = new ArrayList<Class<?>>();
-    // list of all the different data sources
-    private List<String> allSources  = new ArrayList<String>();
+	// object that's reading the log file
+	LogFileReader reader;
+	// list of all the different data types
+	private List<Class<?>> allTypes = new ArrayList<Class<?>>();
+	// list of all the different data sources
+	private List<String> allSources = new ArrayList<String>();
+	// show the reading status
+	private ProgressMonitor processMonitor;
 
-    // object that's reading the log file
-    LogFileReader reader;
+	// a way to tell another process that it is done
+	private Listener listener;
 
-    // show the reading status
-    private ProgressMonitor processMonitor;
+	// The component that spawned this process
+	private Component mainWindow;
 
-    // a way to tell another process that it is done
-    private Listener listener;
+	// the file being read
+	private File file;
 
-    // The component that spawned this process
-    private Component mainWindow;
+	public LoadRawlogFile(Component mainWindow, Listener listener) {
+		this.mainWindow = mainWindow;
+		this.listener = listener;
+	}
 
-    // the file being read
-    private File file;
+	public void startRead(String fileName) {
+		allTypes.clear();
+		allSources.clear();
 
-    public LoadRawlogFile(Component mainWindow , Listener listener )  {
-        this.mainWindow = mainWindow;
-        this.listener = listener;
-    }
+		// first try reading it as a gzip file
 
-    public void startRead( String fileName ) {
-        allTypes.clear();
-        allSources.clear();
+		file = new File(fileName);
 
-        // first try reading it as a gzip file
+		execute();
+	}
 
-        file = new File(fileName);
+	public LogFileReader getReader() {
+		return reader;
+	}
 
-        execute();
-    }
+	@Override
+	protected Object doInBackground() throws Exception {
 
-    public LogFileReader getReader() {
-        return reader;
-    }
+		if (file.getName().endsWith(".index")) {
+			loadMemory(new RawlogFileIndexedReader());
+		} else if (UtilCompression.isGzipFile(file)) {
+			loadMemory(new RawlogFileMemoryReader(true));
+		} else {
+			loadMemory(new RawlogFileMemoryReader(false));
+		}
 
-    @Override
-    protected Object doInBackground() throws Exception {
+		return null;
+	}
 
-        if( file.getName().endsWith(".index")) {
-            loadMemory(new RawlogFileIndexedReader());
-        } else if(UtilCompression.isGzipFile(file)) {
-            loadMemory(new RawlogFileMemoryReader(true));
-        } else {
-            loadMemory(new RawlogFileMemoryReader(false));
-        }
+	private void loadMemory(LogFileReader reader) {
+		this.reader = reader;
+		reader.setListener(this);
 
-        return null;
-    }
+		processMonitor = new ProgressMonitor(mainWindow, "Opening Log File", "", 0, 1000);
+		processMonitor.setProgress(0);
 
-    private void loadMemory( LogFileReader reader ) {
-        this.reader = reader;
-        reader.setListener(this);
+		if (reader.load(file.getAbsolutePath())) {
+			List<LogFileObjectRef> refs = reader.getReferences();
 
-        processMonitor = new ProgressMonitor(mainWindow,"Opening Log File","",0,1000);
-        processMonitor.setProgress(0);
+			processMonitor.setNote("Extracting source and type information...");
+			processMonitor.setProgress(0);
+			for (LogFileObjectRef r : refs) {
+				// reduces the amount of memory used to store equivalent strings
+				// by saving the reference to the string in the list
+				if (!allTypes.contains(r.getDataType())) {
+					// unique instances of Class are provided for each object by java
+					allTypes.add(r.getDataType());
+				}
+				r.source = UtilStrings.checkAddString(allSources, r.getSource());
+			}
+			processMonitor.setProgress(processMonitor.getMaximum());
 
-        if( reader.load(file.getAbsolutePath()) ) {
-            List<LogFileObjectRef> refs = reader.getReferences();
+		} else {
+			// failed to read the file
+			this.reader = null;
+		}
+		processMonitor.close();
+		if (listener != null)
+			listener.loadFileComplete();
+	}
 
-            processMonitor.setNote("Extracting source and type information...");
-            processMonitor.setProgress(0);
-            for( LogFileObjectRef r : refs ) {
-                // reduces the amount of memory used to store equivalent strings
-                // by saving the reference to the string in the list
-                if( !allTypes.contains(r.getDataType())) {
-                    // unique instances of Class are provided for each object by java
-                    allTypes.add(r.getDataType());
-                }
-                r.source = UtilStrings.checkAddString(allSources,r.getSource());
-            }
-            processMonitor.setProgress(processMonitor.getMaximum());
+	public boolean isSuccessful() {
+		return reader != null;
+	}
 
-        } else {
-            // failed to read the file
-            this.reader = null;
-        }
-        processMonitor.close();
-        if( listener != null )
-            listener.loadFileComplete();
-    }
+	public List<Class<?>> getAllTypes() {
+		return allTypes;
+	}
 
-    public boolean isSuccessful() {
-        return reader != null;
-    }
+	public List<String> getAllSources() {
+		return allSources;
+	}
 
-    public List<Class<?>> getAllTypes() {
-        return allTypes;
-    }
-
-    public List<String> getAllSources() {
-        return allSources;
-    }
-
-    @Override
-    public void logLoadProcess( String message , double fractionRead) {
-        if( processMonitor.isCanceled() ) {
-            reader.cancelLoadRequest();
-        } else {
+	@Override
+	public void logLoadProcess(String message, double fractionRead) {
+		if (processMonitor.isCanceled()) {
+			reader.cancelLoadRequest();
+		} else {
 
 //        System.out.println("message = "+message+"  "+fractionRead);
-            int max = processMonitor.getMaximum();
+			int max = processMonitor.getMaximum();
 
-            int value = (int)(fractionRead*max);
+			int value = (int) (fractionRead * max);
 
-            if( message != null )
-                processMonitor.setNote(message);
-            processMonitor.setProgress(value);
-        }
-    }
+			if (message != null)
+				processMonitor.setNote(message);
+			processMonitor.setProgress(value);
+		}
+	}
 
-    public File getFile() {
-        return file;
-    }
+	public File getFile() {
+		return file;
+	}
 
-    public static interface Listener
-    {
-        public void loadFileComplete();
-    }
+	public static interface Listener {
+		public void loadFileComplete();
+	}
 }

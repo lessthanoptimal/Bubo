@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,21 +24,20 @@ package bubo.desc.sensors.laser2d;
  * Range observations from a planar ladar.  The angular components for each scan is described
  * by the PlanarLadarParam associated with the sensor at the time the observations were made.
  * </p>
- *
+ * <p/>
  * <p>
  * The number of measurements is provided to make it easier to reuse the same object for
  * different sources that have different number of range measurements and for transmitting this
  * information.
  * </p>
  *
- *
  * @author Peter Abeles
  */
 public class PlanarLadarData {
 
-    // range measurements in standard units (e.g. meters)
-    public double meas[];
-    // number of valid measurements in this data.
-    public int numMeas;
+	// range measurements in standard units (e.g. meters)
+	public double meas[];
+	// number of valid measurements in this data.
+	public int numMeas;
 
 }

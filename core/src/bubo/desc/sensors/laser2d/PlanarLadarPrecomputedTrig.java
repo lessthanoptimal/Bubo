@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,35 +30,35 @@ import georegression.struct.point.Point2D_F64;
 // todo move out of the desc package?
 public class PlanarLadarPrecomputedTrig {
 
-    public double c[];
-    public double s[];
+	public double c[];
+	public double s[];
 
-    // end point of ladar
-    public double x;
-    public double y;
+	// end point of ladar
+	public double x;
+	public double y;
 
-    public PlanarLadarPrecomputedTrig( final PlanarLadarParam config ) {
-        double theta = config.getStartAngle();
-        double delta = config.getAngleIncrement();
+	public PlanarLadarPrecomputedTrig(final PlanarLadarParam config) {
+		double theta = config.getStartAngle();
+		double delta = config.getAngleIncrement();
 
-        final int N = config.getNumberOfScans();
+		final int N = config.getNumberOfScans();
 
-        c = new double[ N ];
-        s = new double[ N ];
+		c = new double[N];
+		s = new double[N];
 
-        for( int i = 0; i < N; i++ , theta += delta) {
-            c[i] = Math.cos(theta);
-            s[i] = Math.sin(theta);
-        }
-    }
+		for (int i = 0; i < N; i++, theta += delta) {
+			c[i] = Math.cos(theta);
+			s[i] = Math.sin(theta);
+		}
+	}
 
-    public void computeEndPoint( int index , double range ) {
-        x = c[index]*range;
-        y = s[index]*range;
-    }
+	public void computeEndPoint(int index, double range) {
+		x = c[index] * range;
+		y = s[index] * range;
+	}
 
-    public void computeEndPoint( int index , double range , Point2D_F64 pt ) {
-        pt.x = c[index]*range;
-        pt.y = s[index]*range;
-    }
+	public void computeEndPoint(int index, double range, Point2D_F64 pt) {
+		pt.x = c[index] * range;
+		pt.y = s[index] * range;
+	}
 }

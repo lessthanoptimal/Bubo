@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,112 +31,112 @@ import javax.swing.*;
  */
 public class VisualizeCObservation2DRangeScan implements LogDataVisualization {
 
-    // display basic numerical information on the range data
-    JTextArea textArea = new JTextArea();
-    LadarComponent laserArea = new LadarComponent();
-    LaserHistogram laserHist = new LaserHistogram();
+	// display basic numerical information on the range data
+	JTextArea textArea = new JTextArea();
+	LadarComponent laserArea = new LadarComponent();
+	LaserHistogram laserHist = new LaserHistogram();
 
-    public VisualizeCObservation2DRangeScan() {
-        laserArea.setAutoRescale(true);
-    }
+	public VisualizeCObservation2DRangeScan() {
+		laserArea.setAutoRescale(true);
+	}
 
-    @Override
-    public void setData(Object data) {
-        CObservation2DRangeScan info = (CObservation2DRangeScan)data;
+	@Override
+	public void setData(Object data) {
+		CObservation2DRangeScan info = (CObservation2DRangeScan) data;
 
-        setUpTextArea(info);
+		setUpTextArea(info);
 
-        setupScanImage(info);
+		setupScanImage(info);
 
-        laserArea.repaint();
-    }
+		laserArea.repaint();
+	}
 
-    private void setupScanImage(CObservation2DRangeScan info) {
-        int N = info.getScan().length;
+	private void setupScanImage(CObservation2DRangeScan info) {
+		int N = info.getScan().length;
 
-        double offsetAngle = info.getDeltaPitch();
-        double angDelta = info.getAperture()/N;
-        if( !info.isRightToLeft() )
-            angDelta = -angDelta;
-        // I'm guessing that its symmetric
-        double startAngle = offsetAngle-angDelta*N/2.0;
-        laserArea.configure(startAngle,angDelta,info.getMaxRange(),N);
+		double offsetAngle = info.getDeltaPitch();
+		double angDelta = info.getAperture() / N;
+		if (!info.isRightToLeft())
+			angDelta = -angDelta;
+		// I'm guessing that its symmetric
+		double startAngle = offsetAngle - angDelta * N / 2.0;
+		laserArea.configure(startAngle, angDelta, info.getMaxRange(), N);
 
-        float[] foundRanges = info.getScan();
-        double[] ranges = laserArea.getRanges();
-        byte[] valid = info.getValidRange();
+		float[] foundRanges = info.getScan();
+		double[] ranges = laserArea.getRanges();
+		byte[] valid = info.getValidRange();
 
-        // manually copy the range measurements over into the components window
-        for( int i = 0; i < N; i++ ) {
-            // see if the laser had a valid measurement at this angle
-            if( valid[i] != 0 &&  foundRanges[i] < info.getMaxRange() ) {
-                ranges[i] = foundRanges[i];
-            } else {
-                ranges[i] = 0;
-            }
-        }
-        laserHist.setData(N,ranges,info.getMaxRange());
-        laserHist.repaint();
-        laserArea.repaint();
-    }
+		// manually copy the range measurements over into the components window
+		for (int i = 0; i < N; i++) {
+			// see if the laser had a valid measurement at this angle
+			if (valid[i] != 0 && foundRanges[i] < info.getMaxRange()) {
+				ranges[i] = foundRanges[i];
+			} else {
+				ranges[i] = 0;
+			}
+		}
+		laserHist.setData(N, ranges, info.getMaxRange());
+		laserHist.repaint();
+		laserArea.repaint();
+	}
 
-    private void setUpTextArea( CObservation2DRangeScan info ) {
-        String text = VisualizeCObservationImage.basicObservationText(info);
-        text += "Sensor Position:\n";
-        text += info.getSensorPose().toReadableText();
-        text += "\n";
-        text += "Aperture:       "+info.getAperture()+"\n";
-        text += "Num Scans:      "+info.getScan().length+"\n";
-        text += "Right to Left:  "+info.isRightToLeft()+"\n";
-        text += "Beam Aperture:  "+info.getBeamAperture()+"\n";
-        text += "Delta Pitch:    "+info.getDeltaPitch()+"\n";
-        text += "Max Range (m):  "+info.getMaxRange()+"\n";
-        text += "Std Error:      "+info.getStdError()+"\n";
+	private void setUpTextArea(CObservation2DRangeScan info) {
+		String text = VisualizeCObservationImage.basicObservationText(info);
+		text += "Sensor Position:\n";
+		text += info.getSensorPose().toReadableText();
+		text += "\n";
+		text += "Aperture:       " + info.getAperture() + "\n";
+		text += "Num Scans:      " + info.getScan().length + "\n";
+		text += "Right to Left:  " + info.isRightToLeft() + "\n";
+		text += "Beam Aperture:  " + info.getBeamAperture() + "\n";
+		text += "Delta Pitch:    " + info.getDeltaPitch() + "\n";
+		text += "Max Range (m):  " + info.getMaxRange() + "\n";
+		text += "Std Error:      " + info.getStdError() + "\n";
 
-        textArea.setText(text);
-    }
+		textArea.setText(text);
+	}
 
-    @Override
-    public Class<?> getType() {
-        return CObservation2DRangeScan.class;
-    }
+	@Override
+	public Class<?> getType() {
+		return CObservation2DRangeScan.class;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 3;
-    }
+	@Override
+	public int numDisplay() {
+		return 3;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-       switch( index ) {
-           case 0:
-               return textArea;
+	@Override
+	public JComponent getDisplay(int index) {
+		switch (index) {
+			case 0:
+				return textArea;
 
-           case 1:
-               return laserArea;
+			case 1:
+				return laserArea;
 
-           case 2:
-               return laserHist;
+			case 2:
+				return laserHist;
 
-           default:
-               throw new RuntimeException("Unknown");
-       }
-    }
+			default:
+				throw new RuntimeException("Unknown");
+		}
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-       switch( index ) {
-           case 0:
-               return "Info";
+	@Override
+	public String getDisplayName(int index) {
+		switch (index) {
+			case 0:
+				return "Info";
 
-           case 1:
-               return "Scan";
+			case 1:
+				return "Scan";
 
-           case 2:
-               return "Histogram";
+			case 2:
+				return "Histogram";
 
-           default:
-               throw new RuntimeException("Unknown");
-       }
-    }
+			default:
+				throw new RuntimeException("Unknown");
+		}
+	}
 }

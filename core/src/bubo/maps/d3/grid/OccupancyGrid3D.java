@@ -40,7 +40,7 @@ public interface OccupancyGrid3D {
 	 * @param y y-coordinate
 	 * @return If the coordinate belongs to a valid cell in the map.
 	 */
-	public boolean isInBounds( int x , int y , int z );
+	public boolean isInBounds(int x, int y, int z);
 
 	/**
 	 * Checks to see if any information is available on the occupancy of
@@ -50,7 +50,7 @@ public interface OccupancyGrid3D {
 	 * @param y y-coordinate
 	 * @return true if information is available on the cell.
 	 */
-	public boolean isKnown( int x , int y , int z );
+	public boolean isKnown(int x, int y, int z);
 
 	/**
 	 * Length along x-axis.  All valid y-coordinates are between 0 and getSizeX()-1

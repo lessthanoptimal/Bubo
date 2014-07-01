@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -32,34 +32,34 @@ import java.awt.image.BufferedImage;
  */
 public class ImageStandard implements ImageEncoded {
 
-    ImageBase image;
+	ImageBase image;
 
-    public ImageStandard(ImageBase image) {
-        this.image = image;
-    }
+	public ImageStandard(ImageBase image) {
+		this.image = image;
+	}
 
-    @Override
-    public byte[] getData() {
-        return null;
-    }
+	@Override
+	public byte[] getData() {
+		return null;
+	}
 
-    @Override
-    public int getDataSize() {
-        return -1;
-    }
+	@Override
+	public int getDataSize() {
+		return -1;
+	}
 
-    @Override
-    public String getFormat() {
-        return "standard";
-    }
+	@Override
+	public String getFormat() {
+		return "standard";
+	}
 
-    @Override
-    public <T extends ImageBase>T convertToImage() {
-        return (T)image;
-    }
+	@Override
+	public <T extends ImageBase> T convertToImage() {
+		return (T) image;
+	}
 
-    @Override
-    public BufferedImage convertToBuffered() {
-        return null;
-    }
+	@Override
+	public BufferedImage convertToBuffered() {
+		return null;
+	}
 }

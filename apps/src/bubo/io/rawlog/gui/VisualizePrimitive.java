@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,51 +28,51 @@ import javax.swing.*;
  */
 public class VisualizePrimitive implements LogDataVisualization {
 
-    JTextArea textArea = new JTextArea();
-    Class<?> type;
+	JTextArea textArea = new JTextArea();
+	Class<?> type;
 
-    public VisualizePrimitive(Class<?> type) {
-        this.type = type;
-    }
+	public VisualizePrimitive(Class<?> type) {
+		this.type = type;
+	}
 
-    @Override
-    public void setData(Object data) {
-        if( data == null ) {
-            textArea.setText("NULL");
-        } else {
-            String text = "";
+	@Override
+	public void setData(Object data) {
+		if (data == null) {
+			textArea.setText("NULL");
+		} else {
+			String text = "";
 
-            if( data.getClass().isEnum() ) {
-                text = "Enum: "+data.getClass().getSimpleName()+"\n";
-            } else {
-                text = "Class: "+data.getClass().getSimpleName()+"\n";
-            }
+			if (data.getClass().isEnum()) {
+				text = "Enum: " + data.getClass().getSimpleName() + "\n";
+			} else {
+				text = "Class: " + data.getClass().getSimpleName() + "\n";
+			}
 
-            text += "toString():\n";
-            text += data.toString();
-            textArea.setText(text);
-        }
+			text += "toString():\n";
+			text += data.toString();
+			textArea.setText(text);
+		}
 
-    }
+	}
 
 
-    @Override
-    public Class<?> getType() {
-        return type;
-    }
+	@Override
+	public Class<?> getType() {
+		return type;
+	}
 
-    @Override
-    public int numDisplay() {
-        return 1;
-    }
+	@Override
+	public int numDisplay() {
+		return 1;
+	}
 
-    @Override
-    public JComponent getDisplay(int index) {
-        return textArea;
-    }
+	@Override
+	public JComponent getDisplay(int index) {
+		return textArea;
+	}
 
-    @Override
-    public String getDisplayName(int index) {
-        return "Text Info";
-    }
+	@Override
+	public String getDisplayName(int index) {
+		return "Text Info";
+	}
 }

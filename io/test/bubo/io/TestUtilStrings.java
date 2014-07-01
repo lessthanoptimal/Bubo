@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,22 +30,22 @@ import static org.junit.Assert.assertTrue;
  * @author Peter Abeles
  */
 public class TestUtilStrings {
-    @SuppressWarnings({"StringEquality"})
-    @Test
-    public void checkAddString() {
+	@SuppressWarnings({"StringEquality"})
+	@Test
+	public void checkAddString() {
 
-        String a = "a";
-        String b = "b";
-        String c = "c";
-        String aa = "a";
+		String a = "a";
+		String b = "b";
+		String c = "c";
+		String aa = "a";
 
-        List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<String>();
 
-        assertTrue(a==UtilStrings.checkAddString(list,a));
-        assertTrue(b==UtilStrings.checkAddString(list,b));
-        assertTrue(c==UtilStrings.checkAddString(list,c));
-        // pass in a string which has the same value as one already in the list
-        // it should return an instance of the one in the list already
-        assertTrue(a==UtilStrings.checkAddString(list,aa));
-    }
+		assertTrue(a == UtilStrings.checkAddString(list, a));
+		assertTrue(b == UtilStrings.checkAddString(list, b));
+		assertTrue(c == UtilStrings.checkAddString(list, c));
+		// pass in a string which has the same value as one already in the list
+		// it should return an instance of the one in the list already
+		assertTrue(a == UtilStrings.checkAddString(list, aa));
+	}
 }

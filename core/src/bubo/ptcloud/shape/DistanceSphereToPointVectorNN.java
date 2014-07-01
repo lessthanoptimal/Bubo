@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,18 +28,16 @@ import java.util.List;
 
 /**
  * Euclidean distance from a {@link georegression.struct.plane.PlaneGeneral3D_F64} for use with {@link bubo.ptcloud.alg.PointCloudShapeDetectionSchnabel2007}.
- *
+ * <p/>
  * todo comment
  *
  * @author Peter Abeles
  */
-public class DistanceSphereToPointVectorNN implements DistanceFromModel<Sphere3D_F64,PointVectorNN> {
-
-	// tolerance cos(angle) for vector normals
-	private double tolAngleCosine;
+public class DistanceSphereToPointVectorNN implements DistanceFromModel<Sphere3D_F64, PointVectorNN> {
 
 	Sphere3D_F64 model;
-
+	// tolerance cos(angle) for vector normals
+	private double tolAngleCosine;
 	// storage for vector from center to a point
 	private Vector3D_F64 n = new Vector3D_F64();
 
@@ -54,10 +52,10 @@ public class DistanceSphereToPointVectorNN implements DistanceFromModel<Sphere3D
 
 	@Override
 	public double computeDistance(PointVectorNN pv) {
-		n.set( pv.p.x - model.center.x , pv.p.y - model.center.y , pv.p.z - model.center.z );
+		n.set(pv.p.x - model.center.x, pv.p.y - model.center.y, pv.p.z - model.center.z);
 		n.normalize();
 
-		if( Math.abs(n.dot(pv.normal)) < tolAngleCosine)
+		if (Math.abs(n.dot(pv.normal)) < tolAngleCosine)
 			return Double.MAX_VALUE;
 
 		return Math.abs(Distance3D_F64.distance(model, pv.p));
@@ -65,7 +63,7 @@ public class DistanceSphereToPointVectorNN implements DistanceFromModel<Sphere3D
 
 	@Override
 	public void computeDistance(List<PointVectorNN> points, double[] distance) {
-		for( int i = 0; i < points.size(); i++ ) {
+		for (int i = 0; i < points.size(); i++) {
 			distance[i] = computeDistance(points.get(i));
 		}
 	}

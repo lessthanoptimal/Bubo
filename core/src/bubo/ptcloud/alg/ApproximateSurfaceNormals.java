@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -66,10 +66,10 @@ public class ApproximateSurfaceNormals {
 	private Stack<double[]> usedNnData = new Stack<double[]>();
 
 	// point normal data which is stored in the graph
-	private FastQueue<PointVectorNN> listPointVector = new FastQueue<PointVectorNN>(PointVectorNN.class,true);
+	private FastQueue<PointVectorNN> listPointVector = new FastQueue<PointVectorNN>(PointVectorNN.class, true);
 
 	// results of NN search
-	private FastQueue<NnData<PointVectorNN>> resultsNN = new FastQueue<NnData<PointVectorNN>>((Class)NnData.class,true);
+	private FastQueue<NnData<PointVectorNN>> resultsNN = new FastQueue<NnData<PointVectorNN>>((Class) NnData.class, true);
 
 	// storage for distances the neighbors are.  Used to select the closest ones
 	private double[] distance;
@@ -85,21 +85,21 @@ public class ApproximateSurfaceNormals {
 	/**
 	 * Configures approximation algorithm
 	 *
-	 * @param nn Which nearest-neighbor algorithm to use
-	 * @param numPlane Number of closest neighbors it will use to estimate the plane
-	 * @param maxDistancePlane The maximum distance a point can be from the focus to be included in the plane calculation
-	 * @param numNeighbors Number of neighbors it will find
+	 * @param nn                  Which nearest-neighbor algorithm to use
+	 * @param numPlane            Number of closest neighbors it will use to estimate the plane
+	 * @param maxDistancePlane    The maximum distance a point can be from the focus to be included in the plane calculation
+	 * @param numNeighbors        Number of neighbors it will find
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
-	public ApproximateSurfaceNormals( NearestNeighbor<PointVectorNN> nn ,
-									  int numPlane, double maxDistancePlane,
-									  int numNeighbors , double maxDistanceNeighbor) {
-		if( numPlane <= 2 )
+	public ApproximateSurfaceNormals(NearestNeighbor<PointVectorNN> nn,
+									 int numPlane, double maxDistancePlane,
+									 int numNeighbors, double maxDistanceNeighbor) {
+		if (numPlane <= 2)
 			throw new IllegalArgumentException("Can't compute the plane from less than 2 points");
-		if( numNeighbors < numPlane )
+		if (numNeighbors < numPlane)
 			throw new IllegalArgumentException("The number of neighbors found must be at least the number used to" +
 					"compute the plane");
-		if( maxDistanceNeighbor < maxDistancePlane )
+		if (maxDistanceNeighbor < maxDistancePlane)
 			throw new IllegalArgumentException("Maximum distance for the plane needs to be less than maxDistanceNeighbor");
 
 		this.numPlane = numPlane;
@@ -107,15 +107,15 @@ public class ApproximateSurfaceNormals {
 		this.numNeighbors = numNeighbors;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
 		this.nn = nn;
-		this.distance = new double[ numNeighbors+1 ];
+		this.distance = new double[numNeighbors + 1];
 	}
 
 	/**
 	 * Configures approximation algorithm and uses a K-D tree by default.
 	 *
-	 * @param numPlane Number of closest neighbors it will use to estimate the plane
-	 * @param maxDistancePlane The maximum distance a point can be from the focus to be included in the plane calculation
-	 * @param numNeighbors Number of neighbors it will use to approximate normal
+	 * @param numPlane            Number of closest neighbors it will use to estimate the plane
+	 * @param maxDistancePlane    The maximum distance a point can be from the focus to be included in the plane calculation
+	 * @param numNeighbors        Number of neighbors it will use to approximate normal
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
 	public ApproximateSurfaceNormals(int numPlane, double maxDistancePlane, int numNeighbors, double maxDistanceNeighbor) {
@@ -123,7 +123,7 @@ public class ApproximateSurfaceNormals {
 		this.maxDistancePlane = maxDistancePlane;
 		this.numNeighbors = numNeighbors;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
-		this.distance = new double[ numNeighbors+1 ];
+		this.distance = new double[numNeighbors + 1];
 
 		nn = FactoryNearestNeighbor.kdtree();
 	}
@@ -132,17 +132,17 @@ public class ApproximateSurfaceNormals {
 	 * Process point cloud and finds the shape's normals.  If a normal could not be estimated for the point
 	 * its vector is set to (0,0,0).  A normal cannot be found for points with 1 or less neighbors.
 	 *
-	 * @param cloud Input: 3D point cloud
+	 * @param cloud  Input: 3D point cloud
 	 * @param output Output: Storage for the point cloud with normals. Must set declareInstances to false.
 	 */
-	public void process( List<Point3D_F64> cloud , FastQueue<PointVectorNN> output  ) {
+	public void process(List<Point3D_F64> cloud, FastQueue<PointVectorNN> output) {
 
 		// convert the point cloud into a format that the NN algorithm can recognize
 		setupNearestNeighbor(cloud);
 
 		// declare the output data for creating the NN graph
 		listPointVector.reset();
-		for( int i = 0; i < cloud.size(); i++ ) {
+		for (int i = 0; i < cloud.size(); i++) {
 			PointVectorNN p = listPointVector.grow();
 			p.reset();
 			p.p = cloud.get(i);
@@ -152,23 +152,23 @@ public class ApproximateSurfaceNormals {
 		// find the nearest-neighbor for each point in the cloud
 		nn.setPoints(usedNnData, listPointVector.toList());
 
-		for( int i = 0; i < listPointVector.size; i++ ) {
+		for (int i = 0; i < listPointVector.size; i++) {
 			// find the nearest-neighbors
 			resultsNN.reset();
 
 			double[] targetPt = usedNnData.get(i);
 			// numNeighbors+1 since the target node will also be returned and is removed
-			nn.findNearest(targetPt,maxDistanceNeighbor,numNeighbors+1,resultsNN);
+			nn.findNearest(targetPt, maxDistanceNeighbor, numNeighbors + 1, resultsNN);
 
 			PointVectorNN p = listPointVector.get(i);
 
 			// save the results
 			p.neighbors.reset();
-			for( int j = 0; j < resultsNN.size; j++ ) {
+			for (int j = 0; j < resultsNN.size; j++) {
 				NnData<PointVectorNN> n = resultsNN.get(j);
 
 				// don't add the point to its own list of neighbors list
-				if( n.point != targetPt) {
+				if (n.point != targetPt) {
 					p.neighbors.add(n.data);
 				}
 			}
@@ -184,28 +184,28 @@ public class ApproximateSurfaceNormals {
 	 */
 	protected void computeSurfaceNormal(PointVectorNN point) {
 		// need 3 points to compute a plane.  which means you need two neighbors and 'point'
-		if( point.neighbors.size >= 2 ) {
+		if (point.neighbors.size >= 2) {
 			fitList.clear();
 
 			// the NN algorithm's neighbor list includes the targeted point
-			if(  resultsNN.size <= numPlane ) {
-				for( int i = 0; i < resultsNN.size; i++ ) {
+			if (resultsNN.size <= numPlane) {
+				for (int i = 0; i < resultsNN.size; i++) {
 					NnData<PointVectorNN> n = resultsNN.get(i);
-					if( n.distance < maxDistanceNeighbor ) {
-						fitList.add( n.data.p );
+					if (n.distance < maxDistanceNeighbor) {
+						fitList.add(n.data.p);
 					}
 				}
 			} else {
-				for( int i = 0; i < resultsNN.size; i++ ) {
+				for (int i = 0; i < resultsNN.size; i++) {
 					NnData<PointVectorNN> n = resultsNN.get(i);
 					distance[i] = n.distance;
 				}
 				double threshold = QuickSelectArray.select(distance, numPlane - 1, resultsNN.size);
-				threshold = Math.min(threshold,maxDistanceNeighbor);
-				for( int i = 0; i < resultsNN.size; i++ ) {
+				threshold = Math.min(threshold, maxDistanceNeighbor);
+				for (int i = 0; i < resultsNN.size; i++) {
 					NnData<PointVectorNN> n = resultsNN.get(i);
-					if( n.distance <= threshold )
-						fitList.add( n.data.p );
+					if (n.distance <= threshold)
+						fitList.add(n.data.p);
 				}
 			}
 			fitPlane.svd(fitList, center, point.normal);
@@ -229,11 +229,11 @@ public class ApproximateSurfaceNormals {
 		usedNnData.clear();
 
 		// convert the point cloud into the NN format
-		for( int i = 0; i < cloud.size(); i++ ) {
+		for (int i = 0; i < cloud.size(); i++) {
 			Point3D_F64 p = cloud.get(i);
 
 			double[] d;
-			if( unusedNnData.isEmpty() ) {
+			if (unusedNnData.isEmpty()) {
 				d = new double[3];
 			} else {
 				d = unusedNnData.pop();

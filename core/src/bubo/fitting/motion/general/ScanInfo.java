@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -28,24 +28,24 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class ScanInfo {
-    // location of points in 2D cartesian space
-    public Point2D_F64 pts[];
-    // if the points are "visible"
-    public boolean vis[];
-    // raw range measurements
-    public double range[];
-    // the angle of each measurement
-    // this changes when a scan is projected onto a new view point
-    public double theta[];
+	// location of points in 2D cartesian space
+	public Point2D_F64 pts[];
+	// if the points are "visible"
+	public boolean vis[];
+	// raw range measurements
+	public double range[];
+	// the angle of each measurement
+	// this changes when a scan is projected onto a new view point
+	public double theta[];
 
-    public ScanInfo( int N ) {
-        pts = new Point2D_F64[ N ];
-        vis = new boolean[ N ];
-        range = new double[ N ];
-        theta = new double[ N ];
+	public ScanInfo(int N) {
+		pts = new Point2D_F64[N];
+		vis = new boolean[N];
+		range = new double[N];
+		theta = new double[N];
 
-        for( int i = 0; i < N; i++ ) {
-            pts[i] = new Point2D_F64();
-        }
-    }
+		for (int i = 0; i < N; i++) {
+			pts[i] = new Point2D_F64();
+		}
+	}
 }

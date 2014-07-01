@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -33,22 +33,22 @@ public class TestFixedTrajectoryVel2D {
 	 */
 	@Test
 	public void checkControlNoise() {
-		FixedTrajectoryVel2D alg = new FixedTrajectoryVel2D(1,2,0.1,0.2,1,3453453);
+		FixedTrajectoryVel2D alg = new FixedTrajectoryVel2D(1, 2, 0.1, 0.2, 1, 3453453);
 
 		alg.drawControlNoise();
 
 		double[] request = alg.getControlRequested();
 		double[] actual = alg.getControlTruth();
 
-		assertEquals(actual[0],1,1e-8);
-		assertEquals(actual[1],2,1e-8);
+		assertEquals(actual[0], 1, 1e-8);
+		assertEquals(actual[1], 2, 1e-8);
 
 		// they should not be the same
 		assertTrue(actual[0] != request[0]);
 		assertTrue(actual[1] != request[1]);
 
 		// make sure only a bit of noise was added
-		assertEquals(request[0],1,0.5);
-		assertEquals(request[1],2,1);
+		assertEquals(request[0], 1, 0.5);
+		assertEquals(request[1], 2, 1);
 	}
 }

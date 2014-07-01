@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -37,11 +37,11 @@ public class TestConstructOctreeCellSize {
 	 */
 	@Test
 	public void addPoint_data() {
-		Point3D_F64 p = new Point3D_F64(1,2,3);
+		Point3D_F64 p = new Point3D_F64(1, 2, 3);
 		Integer d = 1;
 
 		ConstructOctreeCellSize alg = new ConstructOctreeCellSize(0.01);
-		alg.addPoint(p,d);
+		alg.addPoint(p, d);
 
 		Octree.Info a = alg.getTree().points.get(0);
 		assertTrue(a.point == p);
@@ -54,12 +54,12 @@ public class TestConstructOctreeCellSize {
 	@Test
 	public void addPoint_multipleSameNode() {
 		ConstructOctreeCellSize alg = new ConstructOctreeCellSize(0.01);
-		alg.initialize( new Cube3D_F64(-50,-50,-50,100,100,100));
+		alg.initialize(new Cube3D_F64(-50, -50, -50, 100, 100, 100));
 
 		// all of them should have the same node
-		Octree node = alg.addPoint(new Point3D_F64(1,2,3),new Integer(1));
+		Octree node = alg.addPoint(new Point3D_F64(1, 2, 3), new Integer(1));
 		assertTrue(node == alg.addPoint(new Point3D_F64(1.0001, 2, 3), new Integer(2)));
-		assertTrue( node == alg.addPoint(new Point3D_F64(1,2.0001,3),new Integer(3)));
+		assertTrue(node == alg.addPoint(new Point3D_F64(1, 2.0001, 3), new Integer(3)));
 
 		assertTrue(node.isLeaf());
 		assertTrue(node.space.getLengthX() <= 0.01);
@@ -78,20 +78,20 @@ public class TestConstructOctreeCellSize {
 		double r = 0.01;
 
 		ConstructOctreeCellSize alg = new ConstructOctreeCellSize(r);
-		alg.initialize( new Cube3D_F64(-50,-50,-50,100,100,100));
+		alg.initialize(new Cube3D_F64(-50, -50, -50, 100, 100, 100));
 
-		for( int i = 0; i < 20; i++ ) {
+		for (int i = 0; i < 20; i++) {
 
-			double x = rand.nextDouble()*150-50;
-			double y = rand.nextDouble()*150-50;
-			double z = rand.nextDouble()*150-50;
+			double x = rand.nextDouble() * 150 - 50;
+			double y = rand.nextDouble() * 150 - 50;
+			double z = rand.nextDouble() * 150 - 50;
 
-			Point3D_F64 p = new Point3D_F64(x,y,z);
+			Point3D_F64 p = new Point3D_F64(x, y, z);
 
-			Octree node = alg.addPoint(p,null);
+			Octree node = alg.addPoint(p, null);
 			assertTrue(node.isLeaf());
 			assertTrue(Intersection3D_F64.contained(node.space, p));
-			assertTrue(node.points.size()>=1);
+			assertTrue(node.points.size() >= 1);
 			assertTrue(node.space.getLengthX() <= r);
 			assertTrue(node.space.getLengthY() <= r);
 			assertTrue(node.space.getLengthZ() <= r);
@@ -105,20 +105,20 @@ public class TestConstructOctreeCellSize {
 		double r = 0.01;
 
 		ConstructOctreeCellSize alg = new ConstructOctreeCellSize(r);
-		alg.initialize( new Cube3D_F64(-50,-50,-50,100,100,100));
+		alg.initialize(new Cube3D_F64(-50, -50, -50, 100, 100, 100));
 
-		for( int i = 0; i < 20; i++ ) {
+		for (int i = 0; i < 20; i++) {
 
-			double x = rand.nextDouble()*150-50;
-			double y = rand.nextDouble()*150-50;
-			double z = rand.nextDouble()*150-50;
+			double x = rand.nextDouble() * 150 - 50;
+			double y = rand.nextDouble() * 150 - 50;
+			double z = rand.nextDouble() * 150 - 50;
 
-			Point3D_F64 p = new Point3D_F64(x,y,z);
+			Point3D_F64 p = new Point3D_F64(x, y, z);
 
 			Octree node = alg.addLeaf(p);
 			assertTrue(node.isLeaf());
 			assertTrue(Intersection3D_F64.contained(node.space, p));
-			assertTrue(node.points.size()==0);
+			assertTrue(node.points.size() == 0);
 			assertTrue(node.space.getLengthX() <= r);
 			assertTrue(node.space.getLengthY() <= r);
 			assertTrue(node.space.getLengthZ() <= r);
@@ -130,18 +130,18 @@ public class TestConstructOctreeCellSize {
 		double r = 1;
 
 		ConstructOctreeCellSize alg = new ConstructOctreeCellSize(r);
-		alg.initialize( new Cube3D_F64(0,0,0,100,100,100));
+		alg.initialize(new Cube3D_F64(0, 0, 0, 100, 100, 100));
 
-		Octree node = alg.addLeaf(new Point3D_F64(0.1,0.1,0.1));
+		Octree node = alg.addLeaf(new Point3D_F64(0.1, 0.1, 0.1));
 
-		Octree foundA = alg.findLeaf(new Point3D_F64(0.1,0.1,0.1));
+		Octree foundA = alg.findLeaf(new Point3D_F64(0.1, 0.1, 0.1));
 		assertTrue(node == foundA);
 
-		Octree foundB = alg.findLeaf(new Point3D_F64(10,10,10));
+		Octree foundB = alg.findLeaf(new Point3D_F64(10, 10, 10));
 		assertTrue(null == foundB);
 
 		// just a quick sanity check to make sure there isn't a bug elsewhere
-		Octree foundC = alg.getTree().findDeepest(new Point3D_F64(10,10,10));
+		Octree foundC = alg.getTree().findDeepest(new Point3D_F64(10, 10, 10));
 		assertTrue(foundC != null);
 		assertTrue(foundC != alg.getTree());
 	}

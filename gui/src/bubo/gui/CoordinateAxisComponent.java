@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -31,121 +31,121 @@ import java.awt.geom.Rectangle2D;
  */
 public class CoordinateAxisComponent extends JComponent {
 
-    // label of each axis
-    private String labelY = "Y"; // vertical axis
-    private String labelX = "X"; // horizontal axis
+	// label of each axis
+	private String labelY = "Y"; // vertical axis
+	private String labelX = "X"; // horizontal axis
 
-    // is the vertical axis positive in the upwards direction
-    private boolean positiveUp = true;
-    // is the horizontal axis positive to the right
-    private boolean positiveRight = true;
+	// is the vertical axis positive in the upwards direction
+	private boolean positiveUp = true;
+	// is the horizontal axis positive to the right
+	private boolean positiveRight = true;
 
-    // default value for a buffer between stuff being drawn
-    private int space = 5;
+	// default value for a buffer between stuff being drawn
+	private int space = 5;
 
-    // stuff that can change the appearance of the coordinate frame axis.
-    private Font font = new Font("Helvetica",Font.BOLD, 14);
-    private Color c = Color.BLACK;
-    private Stroke stroke = new BasicStroke(2.0f);
+	// stuff that can change the appearance of the coordinate frame axis.
+	private Font font = new Font("Helvetica", Font.BOLD, 14);
+	private Color c = Color.BLACK;
+	private Stroke stroke = new BasicStroke(2.0f);
 
-    public CoordinateAxisComponent() {
-        setSize(50,50);
-        setPreferredSize(getSize());
-        setMinimumSize(getSize());
-    }
+	public CoordinateAxisComponent() {
+		setSize(50, 50);
+		setPreferredSize(getSize());
+		setMinimumSize(getSize());
+	}
 
-    /**
-     * Sets the labels for each axis and the direction of each axis.
-     *
-     * @param labelVert Label for vertical axis.
-     * @param positiveUp If the vertical axis is pointing up or down.
-     * @param labelHoriz Label for horizontal axis.
-     * @param positiveRight  If the horizontal axis is pointing left or right.
-     */
-    public void configureAxis( String labelVert , boolean positiveUp ,
-                               String labelHoriz , boolean positiveRight ) {
-        labelY = labelVert;
-        labelX = labelHoriz;
-        this.positiveUp = positiveUp;
-        this.positiveRight = positiveRight;
-    }
+	/**
+	 * Sets the labels for each axis and the direction of each axis.
+	 *
+	 * @param labelVert     Label for vertical axis.
+	 * @param positiveUp    If the vertical axis is pointing up or down.
+	 * @param labelHoriz    Label for horizontal axis.
+	 * @param positiveRight If the horizontal axis is pointing left or right.
+	 */
+	public void configureAxis(String labelVert, boolean positiveUp,
+							  String labelHoriz, boolean positiveRight) {
+		labelY = labelVert;
+		labelX = labelHoriz;
+		this.positiveUp = positiveUp;
+		this.positiveRight = positiveRight;
+	}
 
-    @Override
-    public void paintComponent(Graphics g) {
+	@Override
+	public void paintComponent(Graphics g) {
 
-        Graphics2D g2 = (Graphics2D)g;
+		Graphics2D g2 = (Graphics2D) g;
 
-        g2.setColor(c);
-        g2.setStroke(stroke);
+		g2.setColor(c);
+		g2.setStroke(stroke);
 
-        FontRenderContext frc = g2.getFontRenderContext();
-        TextLayout tlX = new TextLayout(labelX,font,frc);
-        TextLayout tlY = new TextLayout(labelY,font,frc);
+		FontRenderContext frc = g2.getFontRenderContext();
+		TextLayout tlX = new TextLayout(labelX, font, frc);
+		TextLayout tlY = new TextLayout(labelY, font, frc);
 
-        Rectangle2D boundsX = tlX.getBounds();
-        Rectangle2D boundsY = tlY.getBounds();
+		Rectangle2D boundsX = tlX.getBounds();
+		Rectangle2D boundsY = tlY.getBounds();
 
-        int width = getWidth();
-        int height = getHeight();
+		int width = getWidth();
+		int height = getHeight();
 
-        float originX = positiveRight ? (float)boundsY.getWidth()+space : width - (float)boundsY.getWidth() - space;
-        float originY = positiveUp ? height - (float)boundsX.getHeight()-space : space+(float)boundsX.getHeight();
+		float originX = positiveRight ? (float) boundsY.getWidth() + space : width - (float) boundsY.getWidth() - space;
+		float originY = positiveUp ? height - (float) boundsX.getHeight() - space : space + (float) boundsX.getHeight();
 
-        float endY = positiveUp ? space : height - space;
-        float endX = positiveRight ? width - space : space;
+		float endY = positiveUp ? space : height - space;
+		float endX = positiveRight ? width - space : space;
 
-        // draw tha coordinate frame axis
-        DrawShapes.arrow(g2,originX,originY,originX,endY,10f,0.4f);
-        DrawShapes.arrow(g2,originX,originY,endX,originY,10f,0.4f);
+		// draw tha coordinate frame axis
+		DrawShapes.arrow(g2, originX, originY, originX, endY, 10f, 0.4f);
+		DrawShapes.arrow(g2, originX, originY, endX, originY, 10f, 0.4f);
 
-        // draw each label in the middle of their respective axis
-        if( positiveRight )
-            tlY.draw(g2,0f,
-                    (endY+originY)/2.0f+ (float)(boundsY.getHeight()/2.0));
-        else
-            tlY.draw(g2,originX+space,
-                    (endY+originY)/2.0f+ (float)(boundsY.getHeight()/2.0));
+		// draw each label in the middle of their respective axis
+		if (positiveRight)
+			tlY.draw(g2, 0f,
+					(endY + originY) / 2.0f + (float) (boundsY.getHeight() / 2.0));
+		else
+			tlY.draw(g2, originX + space,
+					(endY + originY) / 2.0f + (float) (boundsY.getHeight() / 2.0));
 
-        if( positiveUp )
-            tlX.draw(g2,(endX+originX)/2.0f-(float)(boundsX.getWidth()/2.0),
-                    originY+(float)boundsX.getHeight()+space);
-        else
-            tlX.draw(g2,(endX+originX)/2.0f-(float)(boundsX.getWidth()/2.0),
-                    (float)boundsX.getHeight());
-    }
+		if (positiveUp)
+			tlX.draw(g2, (endX + originX) / 2.0f - (float) (boundsX.getWidth() / 2.0),
+					originY + (float) boundsX.getHeight() + space);
+		else
+			tlX.draw(g2, (endX + originX) / 2.0f - (float) (boundsX.getWidth() / 2.0),
+					(float) boundsX.getHeight());
+	}
 
-    public Stroke getStroke() {
-        return stroke;
-    }
+	public Stroke getStroke() {
+		return stroke;
+	}
 
-    /**
-     * Sets the stroke that the lines in the arrows are drawn with
-     */
-    public void setStroke(Stroke stroke) {
-        this.stroke = stroke;
-    }
+	/**
+	 * Sets the stroke that the lines in the arrows are drawn with
+	 */
+	public void setStroke(Stroke stroke) {
+		this.stroke = stroke;
+	}
 
-    public Color getC() {
-        return c;
-    }
+	public Color getC() {
+		return c;
+	}
 
-    /**
-     * Sets the color of everything being drawn.
-     *
-     * @param c
-     */
-    public void setC(Color c) {
-        this.c = c;
-    }
+	/**
+	 * Sets the color of everything being drawn.
+	 *
+	 * @param c
+	 */
+	public void setC(Color c) {
+		this.c = c;
+	}
 
-    public Font getFont() {
-        return font;
-    }
+	public Font getFont() {
+		return font;
+	}
 
-    /**
-     * Sets the font the axis labels are drawn with.
-     */
-    public void setFont(Font font) {
-        this.font = font;
-    }
+	/**
+	 * Sets the font the axis labels are drawn with.
+	 */
+	public void setFont(Font font) {
+		this.font = font;
+	}
 }

@@ -29,50 +29,51 @@ package bubo.maps.d2.grid;
  */
 public interface OccupancyGrid2D_I extends OccupancyGrid2D {
 
-    /**
-     * Sets the specified cell to 'value'.
-     *
-     * @param x x-coordinate of the cell.
-     * @param y y-coordinate of the cell.
-     * @param value The cell's new value.
-     */
-    public void set( int x , int y , int value );
+	/**
+	 * Sets the specified cell to 'value'.
+	 *
+	 * @param x     x-coordinate of the cell.
+	 * @param y     y-coordinate of the cell.
+	 * @param value The cell's new value.
+	 */
+	public void set(int x, int y, int value);
 
-    /**
-     * Gets the value of the cell at the specified coordinate.
-     *
-     * @param x x-coordinate of the cell.
-     * @param y y-coordinate of the cell.
-     * @return The cell's value.
-     */
-    public int get( int x , int y );
+	/**
+	 * Gets the value of the cell at the specified coordinate.
+	 *
+	 * @param x x-coordinate of the cell.
+	 * @param y y-coordinate of the cell.
+	 * @return The cell's value.
+	 */
+	public int get(int x, int y);
 
-    /**
-     * The largest value a cell can have.
-     *
-     * @return Largest value.
-     */
-    public int getMaxValue();
+	/**
+	 * The largest value a cell can have.
+	 *
+	 * @return Largest value.
+	 */
+	public int getMaxValue();
 
 	/**
 	 * The value which means there is equal probability of it being occupied/unoccupied
+	 *
 	 * @return value of unknown
 	 */
 	public int getUnknown();
 
-    /**
-     * Checks to see if the provided value is within the valid range.
-     *
-     * @param value the value being tested
-     * @return if it is valid or not
-     */
-    public boolean isValid( int value );
+	/**
+	 * Checks to see if the provided value is within the valid range.
+	 *
+	 * @param value the value being tested
+	 * @return if it is valid or not
+	 */
+	public boolean isValid(int value);
 
-    /**
-     * Creates an exact copy of 'this' map.
-     *
-     * @return A copy of 'this' map
-     */
-    public OccupancyGrid2D_I copy();
+	/**
+	 * Creates an exact copy of 'this' map.
+	 *
+	 * @return A copy of 'this' map
+	 */
+	public OccupancyGrid2D_I copy();
 
 }

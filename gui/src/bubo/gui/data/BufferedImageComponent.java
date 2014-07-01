@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -29,40 +29,39 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
-public class BufferedImageComponent extends InfoDisplay
-{
-    // the image that is being displayed
-    BufferedImage img;
+public class BufferedImageComponent extends InfoDisplay {
+	// the image that is being displayed
+	BufferedImage img;
 
-    public BufferedImageComponent( BufferedImage img ) {
-        setImage(img);
-    }
+	public BufferedImageComponent(BufferedImage img) {
+		setImage(img);
+	}
 
-    private void changeSize(BufferedImage img) {
-        setPreferredSize(new Dimension(img.getWidth(),img.getHeight()));
-        setMinimumSize(getPreferredSize());
-        setMaximumSize(getPreferredSize());
-    }
+	private void changeSize(BufferedImage img) {
+		setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
+		setMinimumSize(getPreferredSize());
+		setMaximumSize(getPreferredSize());
+	}
 
-    /**
-     * Changes the image being displayed.
-     *
-     * @param img
-     */
-    public void setImage(BufferedImage img) {
-        this.img = img;
-        if( img != null )
-            changeSize(img);
-    }
+	/**
+	 * Changes the image being displayed.
+	 *
+	 * @param img
+	 */
+	public void setImage(BufferedImage img) {
+		this.img = img;
+		if (img != null)
+			changeSize(img);
+	}
 
-    @Override
-    public void paintComponent(Graphics g) {
-        // save the reference locally to avoid the obscure chance that the image is changed while
-        // this is being drawn
-        BufferedImage img = this.img;
+	@Override
+	public void paintComponent(Graphics g) {
+		// save the reference locally to avoid the obscure chance that the image is changed while
+		// this is being drawn
+		BufferedImage img = this.img;
 
-        //draw the image
-        if( img != null)
-            g.drawImage(img,0,0, this);
-    }
+		//draw the image
+		if (img != null)
+			g.drawImage(img, 0, 0, this);
+	}
 }
