@@ -206,7 +206,7 @@ public class GridMapBasicDisplay extends SpacialDisplay {
 
                 if( map.isInBounds(x,y) ) {
                     if( colorUnknown < 0 || map.isKnown(x,y)) {
-                        int val = 255-(int)(map.get(x,y)*255.0f);
+                        int val = (int)(map.get(x,y)*255.0f);
                         imageData[imageIndex] = val << 16 | val << 8 | val;
                     } else {
                         imageData[imageIndex] = colorUnknown;
@@ -236,7 +236,7 @@ public class GridMapBasicDisplay extends SpacialDisplay {
 
                 if( map.isInBounds(x,y) ) {
                     if( colorUnknown < 0 || map.isKnown(x,y)) {
-                        int val = 255-(int)(map.get(x,y)*255);
+                        int val = (int)(map.get(x,y)*255);
                         rendered.setRGB(j,i, val << 16 | val << 8 | val);
                     } else {
                         rendered.setRGB(j,i, colorUnknown );

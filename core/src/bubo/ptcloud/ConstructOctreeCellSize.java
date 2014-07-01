@@ -34,7 +34,7 @@ public class ConstructOctreeCellSize extends ConstructOctree {
 	/**
 	 * Specifies graph construction parameters
 	 *
-	 * @param maximumCellSize Create a new node with the number of points exceeds this threshold
+	 * @param maximumCellSize The maximum size a leaf node can be.
 	 */
 	public ConstructOctreeCellSize(double maximumCellSize) {
 		this.maximumCellSize = maximumCellSize;

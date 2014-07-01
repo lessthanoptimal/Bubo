@@ -54,8 +54,11 @@ public class ScrollableSpacialPane extends JComponent implements ActionListener,
     // the minimum number of pixels per meter allowed
     private double minimumPixelsPerMeter =0.0001;
 
+	// the tool bar used to display buttons
+	protected JToolBar toolbar;
 
-    public ScrollableSpacialPane() {
+
+	public ScrollableSpacialPane() {
 
         setLayout(new BorderLayout());
         addToolbar();
@@ -109,7 +112,7 @@ public class ScrollableSpacialPane extends JComponent implements ActionListener,
     }
 
     private void addToolbar() {
-        JToolBar toolbar = new JToolBar("Grid Map Tools");
+        toolbar = new JToolBar("Grid Map Tools");
 
         bReset = new JButton("Reset");
         bReset.addActionListener(this);

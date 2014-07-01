@@ -35,26 +35,45 @@ public class GridMapSpacialInfo {
     // bottom left corner of the map in the global frame
     Point2D_F64 bl;
 
-    public GridMapSpacialInfo(double cellSize, Point2D_F64 bl) {
+	/**
+	 *
+	 * @param cellSize Size of a map cell
+	 * @param bottomLeft Bottom left coordinate of the map
+	 */
+    public GridMapSpacialInfo(double cellSize, Point2D_F64 bottomLeft) {
         this.cellSize = cellSize;
-        this.bl = bl.copy();
+        this.bl = bottomLeft.copy();
     }
 
-    public GridMapSpacialInfo(double cellSize, double x , double y ) {
+	/**
+	 *
+	 * @param cellSize Size of a map cell
+	 * @param bl_x Bottom left of the map.  x-coordinate
+	 * @param bl_y Bottom left of the map.  y-coordinate
+	 */
+    public GridMapSpacialInfo(double cellSize, double bl_x , double bl_y ) {
         this.cellSize = cellSize;
-        this.bl = new Point2D_F64(x,y);
+        this.bl = new Point2D_F64(bl_x,bl_y);
     }
 
     public GridMapSpacialInfo() {
     }
 
-    public void globalToLocal( Point2D_F64 global , Point2D_F64 local ) {
-
+	/**
+	 * Convert from global coordinates into map cell coordinates.
+	 */
+    public void globalToMap( Point2D_F64 global , Point2D_F64 map ) {
+		map.x = (global.x - bl.x)/cellSize;
+		map.y = (global.y - bl.y)/cellSize;
     }
 
-    public void localToGlobal( Point2D_F64 global , Point2D_F64 local ) {
-
-    }
+	/**
+	 * Convert from map cell coordinates into global coordinates
+	 */
+    public void mapToGlobal( Point2D_F64 map , Point2D_F64 global ) {
+		global.x = map.x*cellSize + bl.x;
+		global.y = map.y*cellSize + bl.y;
+	}
 
     public double getCellSize() {
         return cellSize;

@@ -140,18 +140,14 @@ subprojects {
 }
 
 // list of projects for creating javadoc and jars
-def mainProjects = [
-        ':apps',
-        ':core',
-        ':gui',
-        ':io'
-]
+def mainProjects = [':apps',':core',':gui',':io']
 
 // Creates a directory with all the compiled BoofCV jars and the dependencies for main
 task createLibraryDirectory( dependsOn: mainProjects.collect{ it+":jar"}+mainProjects.collect{ it+":sourcesJar"} ) << {
 
     // dependencies for main and their own jars
     ext.list = files(mainProjects.collect{ project(it).tasks.jar.archivePath })
+    ext.listSource = files(mainProjects.collect{ project(it).tasks.sourcesJar.archivePath })
 
     file('libraries').deleteDir()
     file('libraries').mkdir()
@@ -159,6 +155,7 @@ task createLibraryDirectory( dependsOn: mainProjects.collect{ it+":jar"}+mainPro
 
     copy {
         from ext.list
+        from ext.listSource
         into 'libraries'
 
         // append on BoofCV so it's clear which jars are part of BoofCV and which are not
@@ -166,6 +163,18 @@ task createLibraryDirectory( dependsOn: mainProjects.collect{ it+":jar"}+mainPro
             "BUBO-" + fileName
         }
     }
+}
+
+task oneJar( type: Jar , dependsOn: mainProjects.collect{ it+":compileJava"}) {
+    baseName = 'ProjectBUBO'
+
+    from files(mainProjects.collect{ project(it).sourceSets.main.output })
+}
+
+task oneJarSrc( type: Jar ) {
+    baseName = 'ProjectBUBO-src'
+
+    from files(mainProjects.collect{ project(it).sourceSets.main.allSource })
 }
 
 task alljavadoc(type: Javadoc) {

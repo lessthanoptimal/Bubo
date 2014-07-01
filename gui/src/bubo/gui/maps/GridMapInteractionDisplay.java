@@ -18,14 +18,11 @@
 
 package bubo.gui.maps;
 
-import boofcv.io.image.UtilImageIO;
 import bubo.gui.ScrollableSpacialPane;
-import bubo.gui.UtilDisplayBubo;
 import bubo.maps.d2.grid.GridMapSpacialInfo;
 import bubo.maps.d2.grid.OccupancyGrid2D_F32;
-import bubo.maps.d2.grid.impl.OccupancyGridIO;
 
-import java.awt.image.BufferedImage;
+import java.awt.*;
 
 /**
  * A display component for OccupancyGrid2D_F32 that allows the user to scroll around, zoom in and out, and displays
@@ -57,15 +54,16 @@ public class GridMapInteractionDisplay extends ScrollableSpacialPane {
         return mapDisplay;
     }
 
-    public static void main( String args[] ) {
-        String fileName = "/home/pja/greatfalls.jpg";
-        BufferedImage image = UtilImageIO.loadImage(fileName);
-        OccupancyGrid2D_F32 map = OccupancyGridIO.load_F32(image);
-        GridMapSpacialInfo spacial = new GridMapSpacialInfo(0.1,0,0);
-
-        GridMapInteractionDisplay comp = new GridMapInteractionDisplay();
-        comp.setMap(spacial,map);
-
-        UtilDisplayBubo.show(comp,"Occupancy Grid Interaction",false,0,0,200,200);
-    }
+	/**
+	 * Updates the preferred, minimum, and maximum size using the mapDisplay
+	 */
+	public void resizeToFitMap() {
+		// there is bound to be a better way to do this.  Solutions I found searching online didn't seem to work
+		Dimension dmap = mapDisplay.getPreferredSize();
+		Dimension dtool = toolbar.getPreferredSize();
+		setPreferredSize(new Dimension(dmap.width+5,dtool.height+dmap.height+5));
+		setMinimumSize(getPreferredSize());
+		setMaximumSize(getPreferredSize());
+		revalidate();
+	}
 }

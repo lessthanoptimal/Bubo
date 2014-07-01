@@ -31,7 +31,7 @@ import java.util.List;
  * <p>
  * Reads a series of classes from a {@link ReadCsv CSV} file.  All classes are encoded on a single line.  Which variables
  * are read is specified in the constructor and each variable must have a setter that follows the naming scheme defined
- * in {@link UtilReflections#createAccessorName(String, boolean, boolean).  In addition, if the variable is an array, it
+ * in {@link UtilReflections#createAccessorName(String, boolean, boolean)}.  In addition, if the variable is an array, it
  *
  * UPDATE THIS TO INCLUDE ARRAYS
  * </p>

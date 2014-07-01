@@ -82,8 +82,8 @@ public class DataDefinition {
     /**
      * Creates a new instance of the class whose value is initialized using the provided data and the classes
      * own accessors.
-     * @param data
-     * @return
+     * @param data Constructor arguments
+     * @return New instance
      */
     public <T> T createInstance( Object... data ) {
         if( data.length != variableNames.length )
