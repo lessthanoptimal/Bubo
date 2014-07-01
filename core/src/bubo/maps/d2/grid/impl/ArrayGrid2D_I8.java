@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -39,12 +39,12 @@ public class ArrayGrid2D_I8 extends ArrayGrid2DBase implements OccupancyGrid2D_I
         data = new byte[ width*height ];
     }
 
-    @Override
-    public void setAll(int value) {
-        for( int i = 0; i < data.length; i++ ) {
-            data[i] = (byte)value;
-        }
-    }
+	@Override
+	public void clear() {
+		for( int i = 0; i < data.length; i++ ) {
+			data[i] = UNKNOWN;
+		}
+	}
 
     @Override
     public void set(int x, int y, int value) {
@@ -66,7 +66,12 @@ public class ArrayGrid2D_I8 extends ArrayGrid2DBase implements OccupancyGrid2D_I
         return MAX;
     }
 
-    @Override
+	@Override
+	public int getUnknown() {
+		return UNKNOWN & 0xFF;
+	}
+
+	@Override
     public boolean isValid(int value) {
         return value >= 0 && value <= 256;
     }

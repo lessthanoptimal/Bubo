@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -20,31 +20,34 @@ package bubo.maps.d2.grid.impl;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.util.Random;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
  */
 public class TestArrayGrid2D_I8 {
 
+	Random rand = new Random(234);
+
     @Test
-    public void setAll() {
-        ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5,7);
+    public void clear() {
+		ArrayGrid2D_I8 map = new ArrayGrid2D_I8(5,7);
 
-        for( int i = 0; i < map.getHeight(); i++ ) {
-            for( int j = 0; j < map.getWidth(); j++ ) {
-                assertTrue( 12 != map.get(j,i));
-            }
-        }
+		for (int y = 0; y < map.getHeight(); y++) {
+			for (int x = 0; x < map.getWidth(); x++) {
+				map.set(x, y, rand.nextInt(map.getMaxValue()));
+			}
+		}
 
-        map.setAll(12);
+		map.clear();
 
-        for( int i = 0; i < map.getHeight(); i++ ) {
-            for( int j = 0; j < map.getWidth(); j++ ) {
-                assertTrue( 12 == map.get(j,i));
-            }
-        }
+		for (int y = 0; y < map.getHeight(); y++) {
+			for (int x = 0; x < map.getWidth(); x++) {
+				assertEquals(map.getUnknown(), map.get(x, y), 1e-4);
+			}
+		}
     }
 
     @Test

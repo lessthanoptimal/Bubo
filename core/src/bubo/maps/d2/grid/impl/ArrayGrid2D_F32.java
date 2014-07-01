@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -37,13 +37,6 @@ public class ArrayGrid2D_F32 extends ArrayGrid2DBase implements OccupancyGrid2D_
     }
 
     @Override
-    public void setAll(float value) {
-        for( int i = 0; i < data.length; i++ ) {
-            data[i] = value;
-        }
-    }
-
-    @Override
     public void set(int x, int y, float value) {
         checkBounds(x,y);
 
@@ -57,7 +50,14 @@ public class ArrayGrid2D_F32 extends ArrayGrid2DBase implements OccupancyGrid2D_
         return data[y*width + x];
     }
 
-    @Override
+	@Override
+	public void clear() {
+		for( int i = 0; i < data.length; i++ ) {
+			data[i] = 0.5f;
+		}
+	}
+
+	@Override
     public boolean isKnown(int x, int y) {
         return data[y*width + x] != 0.5f;
     }

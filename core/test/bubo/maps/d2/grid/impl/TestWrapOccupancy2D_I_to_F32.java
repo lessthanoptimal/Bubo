@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,8 +35,8 @@ public class TestWrapOccupancy2D_I_to_F32 extends GenericMapTests {
      * Also checks to see if the wrapper set the floating point value correctly
      */
     @Test
-    public void setAll() {
-        super.setAll_F32(2f/(float)ArrayGrid2D_I8.MAX);
+    public void clear() {
+        super.clear_F32();
     }
 
     /**

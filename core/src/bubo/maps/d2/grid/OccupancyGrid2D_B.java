@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -24,14 +24,6 @@ package bubo.maps.d2.grid;
  * @author Peter Abeles
  */
 public interface OccupancyGrid2D_B extends OccupancyGrid2D {
-
-    /**
-     * Sets every cell in the map to the specified value.
-     *
-     * @param value The new value of each cell in the map.
-     */
-    public void setAll( boolean value );
-
     /**
      * Sets the specified cell to 'value'.
      *

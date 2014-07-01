@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -47,7 +47,11 @@ public class TestArrayGrid2DBase extends GenericMapTests {
             super(width, height);
         }
 
-        @Override
+		@Override
+		public void clear() {
+		}
+
+		@Override
         public boolean isKnown(int x, int y) {
             return false;
         }

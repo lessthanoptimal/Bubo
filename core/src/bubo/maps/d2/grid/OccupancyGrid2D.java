@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,6 +27,12 @@ package bubo.maps.d2.grid;
  * @author Peter Abeles
  */
 public interface OccupancyGrid2D {
+
+	/**
+	 * Discards all map information and sets all cells to unknown.
+	 */
+	public void clear();
+
     /**
      * Checks to see if the specified point is in bounds.
      *

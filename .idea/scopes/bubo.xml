@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="bubo" pattern="src:*..*||test:*..*" />
+</component>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -21,6 +21,8 @@ package bubo.maps.d2.grid.impl;
 import bubo.maps.d2.grid.OccupancyGrid2D;
 import bubo.maps.d2.grid.OccupancyGrid2D_F32;
 
+import java.util.Random;
+
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -33,26 +35,27 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class GenericMapTests {
 
+	Random rand = new Random(24);
+
     public abstract <T extends OccupancyGrid2D> T createMap( int width , int height );
 
+	public void clear_F32() {
+		ArrayGrid2D_F32 map = new ArrayGrid2D_F32(5,7);
 
-    public void setAll_F32( float value ) {
-        ArrayGrid2D_F32 map = new ArrayGrid2D_F32(5,7);
+		for (int y = 0; y < map.getHeight(); y++) {
+			for (int x = 0; x < map.getWidth(); x++) {
+				map.set(x,y,rand.nextFloat());
+			}
+		}
 
-        for( int i = 0; i < map.getHeight(); i++ ) {
-            for( int j = 0; j < map.getWidth(); j++ ) {
-                assertTrue( value != map.get(j,i));
-            }
-        }
+		map.clear();
 
-        map.setAll(value);
-
-        for( int i = 0; i < map.getHeight(); i++ ) {
-            for( int j = 0; j < map.getWidth(); j++ ) {
-                assertTrue( value == map.get(j,i));
-            }
-        }
-    }
+		for (int y = 0; y < map.getHeight(); y++) {
+			for (int x = 0; x < map.getWidth(); x++) {
+				assertEquals(0.5f, map.get(x, y), 1e-4);
+			}
+		}
+	}
 
     public void set_get_F32( float value ) {
         OccupancyGrid2D_F32 map = new ArrayGrid2D_F32(5,7);

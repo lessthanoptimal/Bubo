@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -30,13 +30,6 @@ package bubo.maps.d2.grid;
 public interface OccupancyGrid2D_I extends OccupancyGrid2D {
 
     /**
-     * Sets every cell in the map to the specified value.
-     *
-     * @param value The new value of each cell in the map.
-     */
-    public void setAll( int value );
-
-    /**
      * Sets the specified cell to 'value'.
      *
      * @param x x-coordinate of the cell.
@@ -60,6 +53,12 @@ public interface OccupancyGrid2D_I extends OccupancyGrid2D {
      * @return Largest value.
      */
     public int getMaxValue();
+
+	/**
+	 * The value which means there is equal probability of it being occupied/unoccupied
+	 * @return value of unknown
+	 */
+	public int getUnknown();
 
     /**
      * Checks to see if the provided value is within the valid range.

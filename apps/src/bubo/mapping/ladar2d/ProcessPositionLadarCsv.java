@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -112,10 +112,9 @@ public class ProcessPositionLadarCsv implements ActionListener {
             double bl_x = data.getPosition().getX() - map.getWidth()*cellSize/2.0;
             double bl_y = data.getPosition().getY() - map.getHeight()*cellSize/2.0;
 
-            mapSpacial =
-                    new GridMapSpacialInfo(cellSize,new Point2D_F64(bl_x,bl_y));
+            mapSpacial = new GridMapSpacialInfo(cellSize,new Point2D_F64(bl_x,bl_y));
 
-            map.setAll(0.5f);
+            map.clear();
 
             mapBuilder.init(param,map,mapSpacial);
 

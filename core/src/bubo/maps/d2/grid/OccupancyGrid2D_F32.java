@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -20,18 +20,11 @@ package bubo.maps.d2.grid;
 
 /**
  * Interface for 32bit floating point occupancy grid.  An occupancy grid stores the probability of a square region
- * being occupied by an obstacle or not.  A value of 1 means 100% and 0 means 0%, 50% is known or equal probability.
+ * being occupied by an obstacle or not.  A value of 1 means 100% and 0 means 0%, 50% is unknown or equal probability.
  *
  * @author Peter Abeles
  */
 public interface OccupancyGrid2D_F32 extends OccupancyGrid2D {
-
-    /**
-     * Sets every cell in the map to the specified value.
-     *
-     * @param value The new value of each cell in the map.
-     */
-    public void setAll( float value );
 
     /**
      * Sets the specified cell to 'value'.

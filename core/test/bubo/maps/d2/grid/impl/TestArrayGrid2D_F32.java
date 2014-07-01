@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -27,8 +27,8 @@ import org.junit.Test;
 public class TestArrayGrid2D_F32 extends GenericMapTests {
 
     @Test
-    public void setAll() {
-        super.setAll_F32(5.6f);
+    public void clear() {
+        super.clear_F32();
     }
 
     @Test

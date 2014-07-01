@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
  *
  * This file is part of Project BUBO.
  *
@@ -35,11 +35,6 @@ public class WrapOccupancy2D_I_to_F32 implements OccupancyGrid2D_F32{
     }
 
     @Override
-    public void setAll(float value) {
-        map.setAll(floatToInt(value));
-    }
-
-    @Override
     public void set(int x, int y, float value) {
         map.set(x,y,floatToInt(value));
     }
@@ -54,7 +49,12 @@ public class WrapOccupancy2D_I_to_F32 implements OccupancyGrid2D_F32{
         return value >= 0f && value <= 1.0f ;
     }
 
-    @Override
+	@Override
+	public void clear() {
+		map.clear();
+	}
+
+	@Override
     public boolean isInBounds(int x, int y) {
         return map.isInBounds(x,y);
     }
