@@ -28,6 +28,19 @@ import java.awt.event.ComponentListener;
  */
 public class UtilDisplayBubo {
 
+	public static FactoryVisualization3D createVisualize3D() {
+		try {
+			Class factory = Class.forName("bubo.gui.jme.JmeFactoryVisualization3D");
+			return (FactoryVisualization3D)factory.newInstance();
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static JFrame show(JComponent comp, String windowName, boolean hasScrollBars, int x, int y, int width, int height) {
 		JFrame frame = new JFrame(windowName);
 

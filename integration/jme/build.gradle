@@ -1,0 +1,51 @@
+repositories {
+
+}
+
+// TODO disable if libs isn't set up correctly
+
+ext.disableJme = file('libs').exists() && file('libs/jME-lwjgl.jar').exists()
+
+if( ext.disableJme ) {
+    println "Can't find JME!  Disabling compilation of JME package"
+    sourcesJar.enabled = false
+    javadocJar.enabled = false
+    jar.enabled = false
+    uploadArchives.enabled = false
+    install.enabled = false
+    compileJava.enabled = false
+    compileTestJava.enabled = false
+}
+
+dependencies {
+    compile project(':core')
+    compile project(':io')
+    compile project(':gui')
+
+    compile fileTree(dir: 'libs', include: '*.jar')
+}
+
+// gradle -PlocationJme=/path/to/jme  copyFromJme
+task copyFromJme() {
+
+    if (hasProperty('locationJme')) {
+        println "file = $locationJme"
+
+        file('libs').deleteDir()
+        file('libs').mkdir()
+
+        doLast {
+            copy {
+                from fileTree(dir: "$locationJme/jmonkeyplatform/libs", include: '*.jar')
+                into 'libs'
+            }
+        }
+    }
+}
+
+
+idea {
+    module {
+        name = "BUBO JME"
+    }
+}
