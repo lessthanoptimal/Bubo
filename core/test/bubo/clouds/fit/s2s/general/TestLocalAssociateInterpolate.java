@@ -25,12 +25,19 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 /**
  * @author Peter Abeles
  */
 public class TestLocalAssociateInterpolate {
+
+	@Test
+	public void updateCode() {
+		fail("Once there is some new data update this algorithm");
+	}
+
 	/**
 	 * Very basis test that only tests basic functionality
 	 */

@@ -16,27 +16,21 @@
  * limitations under the License.
  */
 
-package bubo.desc.sensors.laser2d;
+package bubo.desc.sensors.lrf2d;
 
 
 /**
- * <p>
- * Range observations from a planar ladar.  The angular components for each scan is described
- * by the PlanarLadarParam associated with the sensor at the time the observations were made.
- * </p>
- * <p/>
- * <p>
- * The number of measurements is provided to make it easier to reuse the same object for
- * different sources that have different number of range measurements and for transmitting this
- * information.
- * </p>
+ * LADAR data that's specifies the range and angle for each measurement.  More general
+ * purpose than {@link Lrf2dMeasurement} but can't precompute trigonometric operations.
  *
  * @author Peter Abeles
  */
-public class PlanarLadarData {
+public class Lrf2dMeasurement2 {
 
 	// range measurements in standard units (e.g. meters)
 	public double meas[];
+	// the angle of each measurement in radians
+	public double angle[];
 	// number of valid measurements in this data.
 	public int numMeas;
 

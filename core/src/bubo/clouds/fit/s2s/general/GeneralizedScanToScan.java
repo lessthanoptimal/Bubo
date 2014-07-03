@@ -100,7 +100,7 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 		for (int i = 0; i < N; i++) {
 			double r = scan[i];
 
-			if (r <= maxRange) {
+			if (r <= maxRange) { // todo less than range?
 				lrf2pt.computeEndPoint(i, r, pts[i]);
 			}
 		}
@@ -128,7 +128,7 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 		} else
 			motion.set(0, 0, 0);
 
-		setVisibleByRange(scanTo);
+		setVisibleByRange(scanTo); // todo could just do this when end point is computed
 
 		stop.reset();
 		while (true) {

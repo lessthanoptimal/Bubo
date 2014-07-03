@@ -67,7 +67,6 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 	public LocalAssociateInterpolate() {
 	}
 
-
 	@Override
 	public void associate(ScanInfo scanMatch, ScanInfo scanRef) {
 		if (samplePeriod == 0)
@@ -88,17 +87,21 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 				continue;
 			}
 
-			// TODO this won't handle a 360 degree sensor
-			double minTheta = scanMatch.theta[i] - searchNeighborhood;
-			double maxTheta = scanMatch.theta[i] + searchNeighborhood;
+			// TODO Change the algorithm a bit
+			// Define search radius using an integer neighborhood
+			// Interpolate using a local curve with the middle index given to it
+
+			// define the local area being search
+			double startTheta = scanMatch.theta[i] - searchNeighborhood;
 			int numSamples = (int) Math.ceil(2.0 * searchNeighborhood / samplePeriod);
 
 			setTarget(i);
 
 			double bestDist = Double.MAX_VALUE;
 
+			// TODO this won't handle a 360 degree sensor
 			for (int j = 0; j <= numSamples; j++) {
-				interp.angle = minTheta + samplePeriod * j;
+				interp.angle = startTheta + samplePeriod * j;
 				if (!interpolate(interp))
 					continue;
 
@@ -144,7 +147,7 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 
 	/**
 	 * Returns the LRF hit at the specified point.  It can be assumed that the requested angles are
-	 * mono-tonically increasing or decreasing depending on the LRF's definition.
+	 * monotonically increasing or decreasing depending on the LRF's definition.
 	 *
 	 * @param point Data structure specifying where it should interpolate and where the interpolation
 	 *              is written to.

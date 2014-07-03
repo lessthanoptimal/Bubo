@@ -36,7 +36,7 @@ public class Lrf2dParam implements IntrinsicParameters {
 	 */
 	private double startAngle;
 	/**
-	 * How wide of an area is scanned, in radians
+	 * Angle which the laser sweeps from startAngle.  Positive indicates CCW rotation and negative CW rotation.
 	 */
 	private double sweepAngle;
 	/**
@@ -44,7 +44,7 @@ public class Lrf2dParam implements IntrinsicParameters {
 	 */
 	private int numberOfScans;
 	/**
-	 * How far can the LADAR see objects
+	 * How far can the LADAR see objects.  A value > maxRange is considered to be a miss.
 	 */
 	private double maxRange;
 	/**

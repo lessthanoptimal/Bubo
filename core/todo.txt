@@ -18,3 +18,8 @@ point cloud
 - struct
 
 some structures used for detection are also should be in fitting?
+
+Simulator
+-----------------
+Line based world.
+LRF sensor
