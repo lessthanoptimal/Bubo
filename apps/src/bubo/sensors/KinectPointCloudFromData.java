@@ -19,10 +19,14 @@
 package bubo.sensors;
 
 import boofcv.alg.depth.VisualDepthOps;
+import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.image.ImageUInt16;
+import bubo.gui.FactoryVisualization3D;
+import bubo.gui.UtilDisplayBubo;
+import bubo.gui.d3.PointCloudPanel;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -34,13 +38,17 @@ import java.util.List;
  */
 public class KinectPointCloudFromData {
 	public static void main(String[] args) throws IOException {
-		VisualDepthParameters intrinsic = UtilIO.loadXML("data/kinect/intrinsic.xml");
-
 		List<Point3D_F64> cloudA = loadPointCloud("01");
 		List<Point3D_F64> cloudB = loadPointCloud("02");
 
+		FactoryVisualization3D factory = UtilDisplayBubo.createVisualize3D();
 
+		PointCloudPanel gui =  factory.displayPointCloud();
 
+		gui.addPoints(cloudA,0xFF0000,1);
+		gui.addPoints(cloudB,0x00FF00,1);
+
+		ShowImages.showWindow(gui,"Two point clouds");
 	}
 
 	public static List<Point3D_F64> loadPointCloud( String which ) throws IOException {

@@ -18,17 +18,17 @@
 
 package bubo.mapping.ladar2d.update;
 
+import bubo.clouds.fit.Lrf2dScanToScan;
+import bubo.clouds.fit.s2s.Lrf2dScanToScan_LocalICP;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
-import bubo.fitting.StoppingCondition;
-import bubo.fitting.motion.Lrf2dScanToScan;
-import bubo.fitting.motion.Lrf2dScanToScan_LocalICP;
 import bubo.mapping.ladar2d.LineGridGenericUpdate;
 import bubo.mapping.ladar2d.LineRangeGaussian;
 import bubo.mapping.ladar2d.LineRangeProbability;
 import bubo.mapping.ladar2d.PositionRangeArrayData;
 import bubo.maps.d2.grid.GridMapSpacialInfo;
 import bubo.maps.d2.grid.OccupancyGrid2D_F32;
+import bubo.struct.StoppingCondition;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;

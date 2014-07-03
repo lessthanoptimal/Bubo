@@ -4,10 +4,15 @@ repositories {
 
 // TODO disable if libs isn't set up correctly
 
-ext.disableJme = file('libs').exists() && file('libs/jME-lwjgl.jar').exists()
+ext.disableJme = !file('libs').exists() || !file('libs/jME3-lwjgl.jar').exists()
 
-if( ext.disableJme ) {
+if( ext.disableJme && !hasProperty('locationJme') ) {
     println "Can't find JME!  Disabling compilation of JME package"
+    println "  To copy the JME jars into the appropriate location you need to:"
+    println "  1) Install JME"
+    println "  2) gradle -PlocationJme=/path/to/jme  copyFromJme"
+    println "  3) Run gradle again and this message should go away"
+
     sourcesJar.enabled = false
     javadocJar.enabled = false
     jar.enabled = false
@@ -28,16 +33,20 @@ dependencies {
 // gradle -PlocationJme=/path/to/jme  copyFromJme
 task copyFromJme() {
 
-    if (hasProperty('locationJme')) {
-        println "file = $locationJme"
+    if (project.hasProperty('locationJme')) {
+        if( !file(locationJme).exists() || !file(locationJme+"/jmonkeyplatform").exists() ) {
+            println "Can't find JME directory at "+locationJme
+        } else {
+            println "file = $locationJme"
 
-        file('libs').deleteDir()
-        file('libs').mkdir()
+            file('libs').deleteDir()
+            file('libs').mkdir()
 
-        doLast {
-            copy {
-                from fileTree(dir: "$locationJme/jmonkeyplatform/libs", include: '*.jar')
-                into 'libs'
+            doLast {
+                copy {
+                    from fileTree(dir: "$locationJme/jmonkeyplatform/libs", include: '*.jar')
+                    into 'libs'
+                }
             }
         }
     }
