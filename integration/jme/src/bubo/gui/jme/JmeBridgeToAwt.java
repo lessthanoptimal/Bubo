@@ -58,5 +58,6 @@ public class JmeBridgeToAwt extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		flyCam.setDragToRotate(true);
+		flyCam.setMoveSpeed(5);
 	}
 }

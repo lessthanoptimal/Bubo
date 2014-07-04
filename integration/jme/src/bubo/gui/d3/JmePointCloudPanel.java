@@ -38,13 +38,12 @@ import java.util.concurrent.Callable;
 // TODO get point size working
 public class JmePointCloudPanel extends PointCloudPanel {
 
-	JmeBridgeToAwt bridge;
+	final JmeBridgeToAwt bridge;
 
 	public JmePointCloudPanel(JmeBridgeToAwt bridge) {
 		this.bridge = bridge;
 		add(bridge.getCanvas());
 	}
-
 
 	@Override
 	public void setFov(double angle) {
@@ -142,8 +141,9 @@ public class JmePointCloudPanel extends PointCloudPanel {
 	}
 
 	@Override
-	public void stopRendering() {
-		bridge.stop();
+	public void shutdownVisualize() {
+		// wait for it to finish shutting down
+		bridge.stop(true);
 	}
 
 	private float[] convertPointsToArray(List<Point3D_F64> points) {

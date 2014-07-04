@@ -62,6 +62,9 @@ public class IterativeClosestPoint<SE extends InvertibleTransform, P extends Geo
 	// transform from the original point location to their current one
 	private SE foundModelToPoints;
 
+	// number of points which were matched
+	private int totalMatched;
+
 	public IterativeClosestPoint(StoppingCondition stop,
 								 MotionTransformPoint<SE, P> motion) {
 		this.stop = stop.copy();
@@ -95,10 +98,10 @@ public class IterativeClosestPoint<SE extends InvertibleTransform, P extends Geo
 	 *
 	 * @param points Points which are to matched to a model.  Their state is modified to the optimal fit location.
 	 */
-	public void process(List<P> points) {
+	public boolean process(List<P> points) {
 		foundModelToPoints.reset();
 		if (points.isEmpty()) {
-			return;
+			return false;
 		}
 
 		int dof = points.get(0).getDimension();
@@ -108,6 +111,7 @@ public class IterativeClosestPoint<SE extends InvertibleTransform, P extends Geo
 
 		boolean first = true;
 		stop.reset();
+		totalMatched = 0;
 		while (true) {
 			// find correspondences
 			modelPts.clear();
@@ -120,8 +124,12 @@ public class IterativeClosestPoint<SE extends InvertibleTransform, P extends Geo
 				}
 			}
 
+			totalMatched = points.size();
+
 			// from the optimal transform
-			motion.process(modelPts, dstPts);
+			if( !motion.process(modelPts, dstPts) ) {
+				return false;
+			}
 
 			if (dof == 2) {
 				transform2D((List<Point2D_F64>) points);
@@ -146,6 +154,8 @@ public class IterativeClosestPoint<SE extends InvertibleTransform, P extends Geo
 			if (stop.isFinished(foundError))
 				break;
 		}
+
+		return true;
 	}
 
 	private double computeMeanSquaredError(List<P> fromPts, List<P> toPts) {
@@ -174,5 +184,9 @@ public class IterativeClosestPoint<SE extends InvertibleTransform, P extends Geo
 		for (Point2D_F64 p : points) {
 			SePointOps_F64.transform(m, p, p);
 		}
+	}
+
+	public int getTotalMatched() {
+		return totalMatched;
 	}
 }

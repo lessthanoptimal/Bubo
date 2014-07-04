@@ -18,10 +18,14 @@
 
 package bubo.gui;
 
+import bubo.gui.d3.PointCloudPanel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * @author Peter Abeles
@@ -39,6 +43,28 @@ public class UtilDisplayBubo {
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static JFrame createWindow(final JPanel gui, final PointCloudPanel panel, String name ) {
+		final JFrame frame = new JFrame(name);
+
+		// TODO make this part of the API
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				panel.shutdownVisualize();
+			}
+		});
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				frame.add(gui, BorderLayout.CENTER);
+				frame.pack();
+				frame.setVisible(true);
+			}
+		});
+		return frame;
 	}
 
 	public static JFrame show(JComponent comp, String windowName, boolean hasScrollBars, int x, int y, int width, int height) {

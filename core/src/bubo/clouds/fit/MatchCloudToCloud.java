@@ -29,6 +29,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+// TODO add accessors to number of points matched in source list
 public interface MatchCloudToCloud<SE extends InvertibleTransform, T extends GeoTuple_F64> {
 
 	/**
@@ -36,7 +37,7 @@ public interface MatchCloudToCloud<SE extends InvertibleTransform, T extends Geo
 	 *
 	 * <p>WARNING: Do not modify the passed in list until after processing has finished.</p>
 	 *
-	 * @param points Point cloud.  Not modified.
+	 * @param points Point cloud.  Call {@link #isModifiedSource()} to see if the list is modified.
 	 */
 	public void setSource( List<T> points );
 
@@ -62,5 +63,19 @@ public interface MatchCloudToCloud<SE extends InvertibleTransform, T extends Geo
 	 * @return transform
 	 */
 	public SE getSourceToDestination();
+
+	/**
+	 * If true then the input list to source is modified.
+	 * @return true if source list is modified, false if not modified
+	 */
+	public boolean isModifiedSource();
+
+	/**
+	 * Returns the number of points from the source list which were matched to to points in the destination list.
+	 * Depending on the algorithm this may or may not be a good measure fit goodness.
+	 *
+	 * @return Number of matched points.
+	 */
+	public int getMatchedSourcePoints();
 
 }

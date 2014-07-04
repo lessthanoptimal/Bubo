@@ -67,6 +67,9 @@ public abstract class MatchCloudToCloudIcp<SE extends InvertibleTransform, P ext
 	// number of dimension on the point
 	int dimen;
 
+	// total number of matched points
+	int totalMatched;
+
 	/**
 	 * Configures ICP
 	 *
@@ -114,10 +117,7 @@ public abstract class MatchCloudToCloudIcp<SE extends InvertibleTransform, P ext
 
 	@Override
 	public boolean compute() {
-
-		icp.process(source);
-
-		return true;
+		return icp.process(source);
 	}
 
 	@Override
@@ -139,6 +139,16 @@ public abstract class MatchCloudToCloudIcp<SE extends InvertibleTransform, P ext
 				return null;
 			}
 		}
+	}
+
+	@Override
+	public boolean isModifiedSource() {
+		return true;
+	}
+
+	@Override
+	public int getMatchedSourcePoints() {
+		return icp.getTotalMatched();
 	}
 
 	/**

@@ -27,7 +27,10 @@ package bubo.struct;
 public class StoppingCondition {
 
 	int maxIterations;
+	// stop iterating if the error threshold drops below this amount
 	double errorThreshold;
+	// stop iterating if the relative change in error is less than this amount
+	double errorRelativeChange = 1e-8;
 
 	int iteration;
 	double previousError;
@@ -35,6 +38,12 @@ public class StoppingCondition {
 	public StoppingCondition(int maxIterations, double errorThreshold) {
 		this.maxIterations = maxIterations;
 		this.errorThreshold = errorThreshold;
+	}
+
+	public StoppingCondition(int maxIterations, double errorThreshold, double errorRelativeChange) {
+		this.maxIterations = maxIterations;
+		this.errorThreshold = errorThreshold;
+		this.errorRelativeChange = errorRelativeChange;
 	}
 
 	public void reset() {
@@ -48,7 +57,7 @@ public class StoppingCondition {
 
 		if (iteration++ > 0) {
 			// see if its at a minimum
-			if (Math.abs(previousError - foundError) <= 1e-10)
+			if (Math.abs(previousError - foundError)/previousError <= errorRelativeChange)
 				return true;
 		}
 		previousError = foundError;
@@ -57,7 +66,7 @@ public class StoppingCondition {
 	}
 
 	public StoppingCondition copy() {
-		return new StoppingCondition(maxIterations, errorThreshold);
+		return new StoppingCondition(maxIterations, errorThreshold,errorRelativeChange);
 	}
 
 	public int getIteration() {

@@ -22,24 +22,57 @@ import boofcv.alg.depth.VisualDepthOps;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.calib.VisualDepthParameters;
+import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.image.ImageUInt16;
+import bubo.clouds.FactoryFitting;
+import bubo.clouds.fit.MatchCloudToCloud;
 import bubo.gui.FactoryVisualization3D;
 import bubo.gui.UtilDisplayBubo;
 import bubo.gui.d3.PointCloudPanel;
+import bubo.struct.StoppingCondition;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.se.Se3_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Peter Abeles
  */
 public class KinectPointCloudFromData {
+
+	public static final double MAX_DISTANCE = 1.5;
+
 	public static void main(String[] args) throws IOException {
 		List<Point3D_F64> cloudA = loadPointCloud("01");
 		List<Point3D_F64> cloudB = loadPointCloud("02");
+
+		MatchCloudToCloud<Se3_F64,Point3D_F64> fit = FactoryFitting.cloudIcp3D(1,new StoppingCondition(100,1e-4,1e-6));
+
+		List<Point3D_F64> originA = new ArrayList<Point3D_F64>();
+		for (int i = 0; i < cloudA.size(); i++) {
+			originA.add(cloudA.get(i).copy());
+		}
+
+		fit.setSource(cloudA);
+		fit.setDestination(cloudB);
+
+		System.out.println("Start fitting");
+		if( !fit.compute() )
+			throw new RuntimeException("Matching failed!");
+
+		Se3_F64 srcToDst = fit.getSourceToDestination();
+
+		System.out.println(srcToDst);
+
+		for (int i = 0; i < originA.size(); i++) {
+			Point3D_F64 a = originA.get(i);
+			SePointOps_F64.transform(srcToDst, a, cloudA.get(i));
+		}
+		System.out.println("Done fitting");
 
 		FactoryVisualization3D factory = UtilDisplayBubo.createVisualize3D();
 
@@ -47,12 +80,13 @@ public class KinectPointCloudFromData {
 
 		gui.addPoints(cloudA,0xFF0000,1);
 		gui.addPoints(cloudB,0x00FF00,1);
+		gui.addPoints(originA,0x0000FF,1);
 
 		ShowImages.showWindow(gui,"Two point clouds");
 	}
 
 	public static List<Point3D_F64> loadPointCloud( String which ) throws IOException {
-		VisualDepthParameters intrinsic = UtilIO.loadXML("data/kinect/intrinsic.xml");
+		IntrinsicParameters intrinsic = UtilIO.loadXML("data/kinect/trashcan/intrinsic.xml");
 
 		String nameDepth = "data/kinect/trashcan/depth"+which+".depth";
 
@@ -62,8 +96,28 @@ public class KinectPointCloudFromData {
 
 		FastQueue<Point3D_F64> cloud = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
 
-		VisualDepthOps.depthTo3D(intrinsic.visualParam, depth, cloud);
+		VisualDepthOps.depthTo3D(intrinsic, depth, cloud);
 
-		return cloud.toList();
+		List<Point3D_F64> out = new ArrayList<Point3D_F64>();
+
+		for (int i = 0; i < cloud.size(); i++) {
+			Point3D_F64 p = cloud.get(i);
+			p.scale(1.0/1000.0);
+
+			double r = p.x*p.x + p.y*p.y + p.z*p.z;
+
+			double x = -p.x;
+			double y = -p.y;
+			double z = p.z;
+			p.set(x,y,z);
+
+			if( r <= MAX_DISTANCE*MAX_DISTANCE ) {
+				out.add(p);
+			}
+		}
+
+		System.out.println("Total points "+cloud.size()+"  out "+out.size());
+
+		return out;
 	}
 }

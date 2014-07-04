@@ -18,12 +18,12 @@
 
 package bubo.gui.jme;
 
+import bubo.gui.UtilDisplayBubo;
 import bubo.gui.d3.PointCloudPanel;
 import georegression.struct.point.Point3D_F64;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class VisualCheckPointCloudsApp {
 		panel.setPreferredSize(new Dimension(640,480));
 		gui.add(BorderLayout.CENTER,panel);
 
-		JFrame frame = createWindow(gui,panel,"Cloud 1");
+		JFrame frame = UtilDisplayBubo.createWindow(gui, panel, "Cloud 1");
 
 		System.out.println("Mono color point cloud");
 		panel.addPoints(createRandomCloud(0, N, rand),0x00FF00,1);
@@ -76,7 +76,7 @@ public class VisualCheckPointCloudsApp {
 		panel = factory.displayPointCloud();
 		panel.setPreferredSize(new Dimension(640,480));
 		gui.add(BorderLayout.CENTER,panel);
-		createWindow(gui,panel,"Cloud 1");
+		UtilDisplayBubo.createWindow(gui, panel, "Cloud 1");
 
 		System.out.println("New point cloud");
 		panel.addPoints(createRandomCloud(0, N, rand),0xFF0000,1);
@@ -86,27 +86,6 @@ public class VisualCheckPointCloudsApp {
 
 		System.out.println("Finished");
 		System.exit(0);
-	}
-
-	private static JFrame createWindow(final JPanel gui, final PointCloudPanel panel, String name ) {
-		final JFrame frame = new JFrame(name);
-
-		// TODO make this part of the API
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosed(WindowEvent e) {
-				panel.stopRendering();
-			}
-		});
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				frame.add(gui, BorderLayout.CENTER);
-				frame.pack();
-				frame.setVisible(true);
-			}
-		});
-		return frame;
 	}
 
 	private static void sleep(long time) {

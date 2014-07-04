@@ -43,6 +43,6 @@ public abstract class PointCloudPanel extends JPanel {
 
 	public abstract void addPoints( List<Point3D_F64> points , int[] colors , float size );
 
-	public abstract void stopRendering();
+	public abstract void shutdownVisualize();
 
 }
