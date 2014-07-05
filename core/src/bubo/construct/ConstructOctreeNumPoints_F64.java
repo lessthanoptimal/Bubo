@@ -27,7 +27,7 @@ import georegression.struct.point.Point3D_F64;
  *
  * @author Peter Abeles
  */
-public class ConstructOctreeNumPoints extends ConstructOctree {
+public class ConstructOctreeNumPoints_F64 extends ConstructOctree_F64 {
 
 	// create a new node in the graph when the number of points exceeds
 	private int divideThreshold;
@@ -38,7 +38,7 @@ public class ConstructOctreeNumPoints extends ConstructOctree {
 	 *
 	 * @param divideThreshold Create a new node with the number of points exceeds this threshold
 	 */
-	public ConstructOctreeNumPoints(int divideThreshold) {
+	public ConstructOctreeNumPoints_F64(int divideThreshold) {
 		this.divideThreshold = divideThreshold;
 	}
 
@@ -49,13 +49,13 @@ public class ConstructOctreeNumPoints extends ConstructOctree {
 	 * @return The node which contains the point
 	 */
 	@Override
-	public Octree addPoint(Point3D_F64 point, Object data) {
+	public Octree_F64 addPoint(Point3D_F64 point, Object data) {
 		// declare the structure which stores the point and data
-		Octree.Info info = storageInfo.grow();
+		Octree_F64.Info info = storageInfo.grow();
 		info.point = point;
 		info.data = data;
 
-		Octree node = tree;
+		Octree_F64 node = tree;
 		tree.points.add(info);
 
 		while (true) {
@@ -67,11 +67,11 @@ public class ConstructOctreeNumPoints extends ConstructOctree {
 
 					// create a new child for point to go into
 					int index = node.getChildIndex(point);
-					Octree child = checkAddChild(node, index, info);
+					Octree_F64 child = checkAddChild(node, index, info);
 
 					// Create new children where appropriate for all points in node, but 'point'
 					for (int i = 0; i < node.points.size - 1; i++) {
-						Octree.Info infoP = node.points.get(i);
+						Octree_F64.Info<Point3D_F64> infoP = node.points.get(i);
 						int indexP = node.getChildIndex(infoP.point);
 
 						// see if the node exists
@@ -102,7 +102,7 @@ public class ConstructOctreeNumPoints extends ConstructOctree {
 	/**
 	 * If all the points are identical it will recurse forever since it can't split them.
 	 */
-	private boolean checkPathological(Octree node) {
+	private boolean checkPathological(Octree_F64 node) {
 
 		boolean pathological = true;
 		Point3D_F64 first = node.points.data[0].point;

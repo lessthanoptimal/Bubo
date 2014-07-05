@@ -18,9 +18,7 @@
 
 package bubo.construct;
 
-import georegression.metric.Intersection3D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.GeoTuple;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
@@ -46,26 +44,23 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class Octree {
-	/**
-	 * Defines the space in which this node is contained
-	 */
-	public Cube3D_F64 space = new Cube3D_F64();
+@SuppressWarnings("unchecked")
+public abstract class Octree< O extends Octree, P extends GeoTuple> {
 	/**
 	 * The control point used to segment the space out into 8 children.  This is commonly the center
 	 * of the cube.
 	 */
-	public Point3D_F64 divider = new Point3D_F64();
+	public P divider;
 
 	/**
 	 * Children of the node.  If a leaf then the children will be null.
 	 */
-	public Octree children[];
+	public O children[];
 
 	/**
 	 * The parent of this node
 	 */
-	public Octree parent;
+	public O parent;
 
 	/**
 	 * Can be used as a reference to user provided data;
@@ -76,7 +71,7 @@ public class Octree {
 	 * Points contained inside this node.  Depending on how it was constructed, all the points might be
 	 * contained in the leafs or not.  New points are not declared by the FastQueue, just the storage array
 	 */
-	public FastQueue<Info> points = new FastQueue<Info>(Info.class, false);
+	public FastQueue<Info<P>> points = new FastQueue<Info<P>>((Class)Info.class, false);
 
 	/**
 	 * Returns true if it is a leaf node or false if it is not
@@ -93,11 +88,11 @@ public class Octree {
 	 * @param point (Input) Point which is being searched for
 	 * @param path  (Output) All the nodes which contain point.  Order will be from general to specific.
 	 */
-	public void findPathToPoint(Point3D_F64 point, List<Octree> path) {
+	public void findPathToPoint(P point, List<Octree> path) {
 		Octree node = this;
 
 		// see if it is inside this space
-		if (!Intersection3D_F64.contained(space, point))
+		if (!contained(point))
 			return;
 
 		while (node != null) {
@@ -116,19 +111,19 @@ public class Octree {
 	 * @param point Point in which the leaf is contained.
 	 * @return The deepest node which contains the point.  null if it's not bounded by the Octree.
 	 */
-	public Octree findDeepest(Point3D_F64 point) {
+	public O findDeepest(P point) {
 		// see if it is inside this space
-		if (!Intersection3D_F64.contained(space, point))
+		if (!contained(point))
 			return null;
 
-		Octree node = this;
+		O node = (O)this;
 
 		while (true) {
 			if (node.isLeaf()) {
 				return node;
 			} else {
 				int index = node.getChildIndex(point);
-				Octree next = node.children[index];
+				O next = (O)node.children[index];
 				if (next == null)
 					return node;
 				else
@@ -138,33 +133,19 @@ public class Octree {
 	}
 
 	/**
+	 * Returns true if the specified point is contained inside the space occupied by this name.
+	 * @param point A point
+	 * @return true if the point is contained inside and false if not
+	 */
+	public abstract boolean contained( P point );
+
+	/**
 	 * Given a point inside the cube, return which child it belongs in.
 	 *
 	 * @param point A Point in space
 	 * @return index of the child which contains it.
 	 */
-	public int getChildIndex(Point3D_F64 point) {
-		int quad;
-
-		if (point.x < divider.x) {
-			if (point.y < divider.y) {
-				quad = 0;
-			} else {
-				quad = 1;
-			}
-		} else {
-			if (point.y < divider.y) {
-				quad = 2;
-			} else {
-				quad = 3;
-			}
-		}
-		if (point.z >= divider.z) {
-			quad += 4;
-		}
-
-		return quad;
-	}
+	public abstract int getChildIndex(P point);
 
 	public <T> T getUserData() {
 		return (T) userData;
@@ -174,8 +155,8 @@ public class Octree {
 		this.userData = userData;
 	}
 
-	public static class Info {
-		public Point3D_F64 point;
+	public static class Info<P extends GeoTuple> {
+		public P point;
 		public Object data;
 	}
 }

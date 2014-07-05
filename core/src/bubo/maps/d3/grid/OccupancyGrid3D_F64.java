@@ -24,7 +24,7 @@ package bubo.maps.d3.grid;
  *
  * @author Peter Abeles
  */
-public interface OccupancyGrid3D_F64 {
+public interface OccupancyGrid3D_F64 extends OccupancyGrid3D {
 	/**
 	 * Sets the specified cell to 'value'.
 	 *

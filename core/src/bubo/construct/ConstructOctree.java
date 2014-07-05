@@ -18,10 +18,10 @@
 
 package bubo.construct;
 
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.GeoTuple;
 import org.ddogleg.struct.FastQueue;
 
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Stack;
 
@@ -31,76 +31,27 @@ import java.util.Stack;
  *
  * @author Peter Abeles
  */
-public abstract class ConstructOctree {
+@SuppressWarnings("unchecked")
+public abstract class ConstructOctree< O extends Octree, P extends GeoTuple> {
 
 	// the Octree that it modifies
-	protected Octree tree;
+	protected O tree;
 
 	// save references to all data structures declared to create the tree
-	protected FastQueue<Octree.Info> storageInfo = new FastQueue<Octree.Info>(Octree.Info.class, true);
+	protected FastQueue<Octree.Info<P>> storageInfo = new FastQueue<Octree_F64.Info<P>>((Class)Octree.Info.class, true);
 	// Contains all nodes in the tree
-	protected FastQueue<Octree> storageNodes = new FastQueue<Octree>(Octree.class, true);
-	protected Stack<Octree[]> storageChildren = new Stack<Octree[]>();
+	protected FastQueue<O> storageNodes;
+	protected Stack<O[]> storageChildren = new Stack<O[]>();
 
+	protected Class<O> octreeType;
 	/**
 	 * Specifies graph construction parameters
 	 */
-	public ConstructOctree() {
+	public ConstructOctree( Class<O> octreeType ) {
+		this.octreeType = octreeType;
+		storageNodes = new FastQueue<O>(octreeType, true);
+
 		this.tree = storageNodes.grow();
-	}
-
-	/**
-	 * Sets the divider to the center of space
-	 */
-	public static void computeDivider(Cube3D_F64 space, Point3D_F64 divider) {
-
-		divider.x = (space.p0.x + space.p1.x) / 2.0;
-		divider.y = (space.p0.y + space.p1.y) / 2.0;
-		divider.z = (space.p0.z + space.p1.z) / 2.0;
-	}
-
-	public static void setChildSpace(Cube3D_F64 parentSpace, Point3D_F64 parentDivider, int index,
-									 Cube3D_F64 childSpace) {
-
-		childSpace.p0.set(parentSpace.p0);
-
-		// no change for index 0
-		if (index == 1) {
-			childSpace.p0.y = parentDivider.y;
-		} else if (index == 2) {
-			childSpace.p0.x = parentDivider.x;
-		} else if (index == 3) {
-			childSpace.p0.x = parentDivider.x;
-			childSpace.p0.y = parentDivider.y;
-		} else if (index == 4) {
-			childSpace.p0.z = parentDivider.z;
-		} else if (index == 5) {
-			childSpace.p0.y = parentDivider.y;
-			childSpace.p0.z = parentDivider.z;
-		} else if (index == 6) {
-			childSpace.p0.x = parentDivider.x;
-			childSpace.p0.z = parentDivider.z;
-		} else if (index == 7) {
-			childSpace.p0.x = parentDivider.x;
-			childSpace.p0.y = parentDivider.y;
-			childSpace.p0.z = parentDivider.z;
-		}
-
-		childSpace.p1.x = childSpace.p0.x + parentSpace.getLengthX() / 2.0;
-		childSpace.p1.y = childSpace.p0.y + parentSpace.getLengthY() / 2.0;
-		childSpace.p1.z = childSpace.p0.z + parentSpace.getLengthZ() / 2.0;
-
-	}
-
-	/**
-	 * Initializes the Octree.  The space contained by the Octree is specified by the passed in cube.
-	 * {@link #reset} is automatically called by this function
-	 *
-	 * @param cube Space which is contained by the Octree.
-	 */
-	public void initialize(Cube3D_F64 cube) {
-		reset();
-		tree.space.set(cube);
 	}
 
 	/**
@@ -117,13 +68,13 @@ public abstract class ConstructOctree {
 		storageInfo.reset();
 
 		for (int i = 0; i < storageNodes.size; i++) {
-			Octree o = storageNodes.data[i];
+			O o = storageNodes.data[i];
 			if (o.children != null) {
 				for (int j = 0; j < 8; j++) {
 					o.children[j] = null;
 				}
 
-				storageChildren.add(o.children);
+				storageChildren.add((O[])o.children);
 			}
 			o.parent = null;
 			o.children = null;
@@ -140,7 +91,7 @@ public abstract class ConstructOctree {
 	 *
 	 * @param points List of points to add
 	 */
-	public void addPoints(List<Point3D_F64> points) {
+	public void addPoints(List<P> points) {
 		int N = points.size();
 		for (int i = 0; i < N; i++) {
 			addPoint(points.get(i), null);
@@ -153,7 +104,7 @@ public abstract class ConstructOctree {
 	 * @param point The point which is to be added
 	 * @return The node which contains the point
 	 */
-	public abstract Octree addPoint(Point3D_F64 point, Object data);
+	public abstract O addPoint(P point, Object data);
 
 	/**
 	 * A node was just split then it was realized that it should not have been split.  Undoes the split
@@ -161,9 +112,9 @@ public abstract class ConstructOctree {
 	 *
 	 * @param node Node which needs to become a leaf again.
 	 */
-	protected void undoSplit(Octree node) {
+	protected void undoSplit(O node) {
 		for (int i = 0; i < 8; i++) {
-			Octree o = node.children[i];
+			O o = (O)node.children[i];
 			if (o != null) {
 				// the order might be different, but the N most recent will be recycled
 				storageNodes.removeTail();
@@ -173,7 +124,7 @@ public abstract class ConstructOctree {
 				node.children[i] = null;
 			}
 		}
-		storageChildren.add(node.children);
+		storageChildren.add((O[])node.children);
 		node.children = null;
 	}
 
@@ -181,8 +132,8 @@ public abstract class ConstructOctree {
 	 * Checks to see if the child already exists.  If not it creates the child.  Info is added to
 	 * the child's points.
 	 */
-	protected Octree checkAddChild(Octree node, int index, Octree.Info info) {
-		Octree child = checkAddChild(node, index);
+	protected O checkAddChild(O node, int index, Octree.Info info) {
+		O child = checkAddChild(node, index);
 		child.points.add(info);
 		return child;
 	}
@@ -190,23 +141,31 @@ public abstract class ConstructOctree {
 	/**
 	 * Checks to see if the child already exists.  If not it creates the child
 	 */
-	protected Octree checkAddChild(Octree node, int index) {
-		Octree child = node.children[index];
+	protected O checkAddChild(O node, int index) {
+		O child = (O)node.children[index];
 		if (child == null) {
-			child = node.children[index] = storageNodes.grow();
+			node.children[index] = child = storageNodes.grow();
 			child.parent = node;
-			setChildSpace(node.space, node.divider, index, child.space);
+			setChildSpace(node, index, child);
 			// no points to add to child since none of the previous ones belong to it
 		}
 		return child;
 	}
 
 	/**
+	 * Sets the space the child occupies based on its parent and which child it is.
+	 * @param parent Parent node.
+	 * @param index Which child on the parent
+	 * @param child The child.
+	 */
+	public abstract void setChildSpace(O parent, int index, O child );
+
+	/**
 	 * Returns an array of Octree of length 8 with null elements.
 	 */
-	protected Octree[] getChildrenArray() {
+	protected O[] getChildrenArray() {
 		if (storageChildren.isEmpty()) {
-			return new Octree[8];
+			return (O[])Array.newInstance(octreeType,8);
 		} else {
 			return storageChildren.pop();
 		}
@@ -215,21 +174,21 @@ public abstract class ConstructOctree {
 	/**
 	 * Returns the Octree it has constructed
 	 */
-	public Octree getTree() {
+	public O getTree() {
 		return tree;
 	}
 
 	/**
 	 * List of all nodes in use
 	 */
-	public FastQueue<Octree> getAllNodes() {
+	public FastQueue<O> getAllNodes() {
 		return storageNodes;
 	}
 
 	/**
 	 * List of all points and associated data passed to the tree
 	 */
-	public FastQueue<Octree.Info> getAllPoints() {
+	public FastQueue<Octree.Info<P>> getAllPoints() {
 		return storageInfo;
 	}
 }

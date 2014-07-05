@@ -18,12 +18,11 @@
 
 package bubo.construct;
 
-import georegression.metric.Intersection3D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
 import org.junit.Test;
 
 import java.util.Random;
+import java.util.Stack;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -66,7 +65,6 @@ public class TestConstructOctree {
 	public void reset() {
 		// use a specific instrance for testing purposes
 		ConstructOctree alg = new Dummy();
-		alg.initialize(new Cube3D_F64(-100, -100, -100, 200, 200, 200));
 
 		// randomly construct a tree with 100 points
 		for (int i = 0; i < 100; i++) {
@@ -92,18 +90,18 @@ public class TestConstructOctree {
 		assertEquals(expectedNode - numLeafs, alg.storageChildren.size());
 
 		// check the structures to see that they have been reset correctly
-		for (Octree[] children : alg.storageChildren) {
+		for (Octree[] children : (Stack<Octree[]>)alg.storageChildren) {
 			assertEquals(8, children.length);
 			for (int i = 0; i < children.length; i++) {
 				assertTrue(children[i] == null);
 			}
 		}
-		for (Octree n : alg.storageNodes.data) {
+		for (Octree n : (Octree[])alg.storageNodes.data) {
 			assertTrue(n.parent == null);
 			assertTrue(n.children == null);
 			assertTrue(n.points.size() == 0);
 		}
-		for (Octree.Info n : alg.storageInfo.data) {
+		for (Octree.Info n : (Octree.Info[])alg.storageInfo.data) {
 			assertTrue(n.point == null);
 			assertTrue(n.data == null);
 		}
@@ -116,7 +114,6 @@ public class TestConstructOctree {
 	@Test
 	public void checkParent() {
 		ConstructOctree alg = new Dummy();
-		alg.initialize(new Cube3D_F64(-100, -100, -100, 200, 200, 200));
 
 		for (int i = 0; i < 100; i++) {
 			Point3D_F64 a = new Point3D_F64();
@@ -129,7 +126,7 @@ public class TestConstructOctree {
 
 		int numNull = 0;
 		for (int index = 0; index < alg.storageNodes.size; index++) {
-			Octree n = alg.storageNodes.data[index];
+			Octree n = (Octree)alg.storageNodes.data[index];
 			Octree p = n.parent;
 			if (p == null) {
 				numNull++;
@@ -148,65 +145,21 @@ public class TestConstructOctree {
 		assertEquals(1, numNull);
 	}
 
-	@Test
-	public void computeDivider() {
-		Cube3D_F64 cube = new Cube3D_F64(10, 20, 30, 60, 80, 100);
-		Point3D_F64 p = new Point3D_F64();
-		ConstructOctree.computeDivider(cube, p);
-
-		assertEquals(10 + 25, p.x, 1e-8);
-		assertEquals(20 + 30, p.y, 1e-8);
-		assertEquals(30 + 35, p.z, 1e-8);
-	}
-
-	@Test
-	public void setChildSpace() {
-		Cube3D_F64 cube = new Cube3D_F64(-50, -50, -50, 50, 50, 50);
-		Point3D_F64 divider = new Point3D_F64();
-
-		Cube3D_F64 child = new Cube3D_F64();
-
-		Point3D_F64 testPt = new Point3D_F64();
-
-		for (int i = 0; i < 8; i++) {
-			ConstructOctree.setChildSpace(cube, divider, i, child);
-			assertEquals(50, child.getLengthX(), 1e-8);
-			assertEquals(50, child.getLengthY(), 1e-8);
-			assertEquals(50, child.getLengthZ(), 1e-8);
-
-			if (i == 0) {
-				testPt.set(-1, -1, -1);
-			} else if (i == 1) {
-				testPt.set(-1, 1, -1);
-			} else if (i == 2) {
-				testPt.set(1, -1, -1);
-			} else if (i == 3) {
-				testPt.set(1, 1, -1);
-			} else if (i == 4) {
-				testPt.set(-1, -1, 1);
-			} else if (i == 5) {
-				testPt.set(-1, 1, 1);
-			} else if (i == 6) {
-				testPt.set(1, -1, 1);
-			} else if (i == 7) {
-				testPt.set(1, 1, 1);
-			}
-
-			assertTrue(Intersection3D_F64.contained(child, testPt));
-		}
-	}
-
-	public static class Dummy extends ConstructOctree {
+	public static class Dummy extends ConstructOctree<Octree_F64,Point3D_F64> {
 		Random rand = new Random(234);
 
-		@Override
-		public Octree addPoint(Point3D_F64 point, Object data) {
+		public Dummy() {
+			super(Octree_F64.class);
+		}
 
-			Octree.Info info = storageInfo.grow();
+		@Override
+		public Octree_F64 addPoint(Point3D_F64 point, Object data) {
+
+			Octree_F64.Info info = storageInfo.grow();
 			info.data = data;
 			info.point = point;
 
-			Octree node = tree;
+			Octree_F64 node = tree;
 
 			while (rand.nextDouble() > 0.7) {
 				if (node.children == null) {
@@ -216,6 +169,11 @@ public class TestConstructOctree {
 			}
 
 			return node;
+		}
+
+		@Override
+		public void setChildSpace(Octree_F64 parent, int index, Octree_F64 child) {
+
 		}
 	}
 

@@ -21,8 +21,8 @@ package bubo.clouds.detect.alg;
 import bubo.clouds.detect.CloudShapeTypes;
 import bubo.clouds.detect.shape.TestGeneratePlanePointVector;
 import bubo.clouds.detect.shape.TestGenerateSpherePointVector;
-import bubo.construct.ConstructOctreeNumPoints;
-import bubo.construct.Octree;
+import bubo.construct.ConstructOctreeNumPoints_F64;
+import bubo.construct.Octree_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
@@ -121,17 +121,17 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 	public void findLeafs() {
 		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007();
 
-		ConstructOctreeNumPoints tree = alg.managerOctree = new ConstructOctreeNumPoints(10);
+		ConstructOctreeNumPoints_F64 tree = alg.managerOctree = new ConstructOctreeNumPoints_F64(10);
 
-		Octree prev = tree.getTree();
+		Octree_F64 prev = tree.getTree();
 
 		for (int i = 0; i < 10; i++) {
-			Octree o1 = tree.getAllNodes().grow();
+			Octree_F64 o1 = tree.getAllNodes().grow();
 			o1.parent = prev;
-			Octree o2 = tree.getAllNodes().grow();
+			Octree_F64 o2 = tree.getAllNodes().grow();
 			o2.parent = prev;
 
-			prev.children = new Octree[8];
+			prev.children = new Octree_F64[8];
 			prev.children[0] = o1;
 			prev.children[1] = o2;
 
@@ -140,7 +140,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 		alg.findLeafs();
 
-		FastQueue<Octree> leafs = alg.getLeafs();
+		FastQueue<Octree_F64> leafs = alg.getLeafs();
 		assertEquals(10 + 1, leafs.size);
 	}
 

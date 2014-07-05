@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 /**
  * @author Peter Abeles
  */
-public class TestConstructOctreeNumPoints {
+public class TestConstructOctreeNumPoints_F64 {
 
 	/**
 	 * Makes sure the point and data are correctly associated to each other
@@ -37,18 +37,18 @@ public class TestConstructOctreeNumPoints {
 		Point3D_F64 p = new Point3D_F64(1, 2, 3);
 		Integer d = 1;
 
-		ConstructOctreeNumPoints alg = new ConstructOctreeNumPoints(10);
+		ConstructOctreeNumPoints_F64 alg = new ConstructOctreeNumPoints_F64(10);
 		alg.addPoint(p, d);
 
-		Octree.Info a = alg.getTree().points.get(0);
+		Octree_F64.Info a = alg.getTree().points.get(0);
 		assertTrue(a.point == p);
 		assertTrue(a.data == d);
 	}
 
 	@Test
 	public void addPoint_singleNode() {
-		ConstructOctreeNumPoints alg = new ConstructOctreeNumPoints(10);
-		Octree tree = alg.getTree();
+		ConstructOctreeNumPoints_F64 alg = new ConstructOctreeNumPoints_F64(10);
+		Octree_F64 tree = alg.getTree();
 		tree.space = new Cube3D_F64(-50, -50, -50, 100, 100, 100);
 		tree.divider = new Point3D_F64();
 
@@ -60,16 +60,16 @@ public class TestConstructOctreeNumPoints {
 
 	@Test
 	public void addPoint_multipleNodes() {
-		ConstructOctreeNumPoints alg = new ConstructOctreeNumPoints(10);
+		ConstructOctreeNumPoints_F64 alg = new ConstructOctreeNumPoints_F64(10);
 
 		Point3D_F64 p = new Point3D_F64(1, 1, 1);
 
-		Octree tree = alg.getTree();
+		Octree_F64 tree = alg.getTree();
 		tree.space = new Cube3D_F64(-50, -50, -50, 100, 100, 100);
 		tree.divider = new Point3D_F64();
-		tree.children = new Octree[8];
+		tree.children = new Octree_F64[8];
 
-		Octree node = new Octree();
+		Octree_F64 node = new Octree_F64();
 		tree.children[tree.getChildIndex(p)] = node;
 
 		alg.addPoint(p, null);
@@ -80,9 +80,9 @@ public class TestConstructOctreeNumPoints {
 
 	@Test
 	public void addPoint_createNode() {
-		ConstructOctreeNumPoints alg = new ConstructOctreeNumPoints(10);
+		ConstructOctreeNumPoints_F64 alg = new ConstructOctreeNumPoints_F64(10);
 
-		Octree tree = alg.getTree();
+		Octree_F64 tree = alg.getTree();
 		tree.space = new Cube3D_F64(-50, -50, -50, 50, 50, 50);
 		tree.divider = new Point3D_F64();
 
@@ -94,8 +94,8 @@ public class TestConstructOctreeNumPoints {
 		assertEquals(18, tree.points.size());
 		assertFalse(tree.isLeaf());
 
-		Octree node0 = tree.children[tree.getChildIndex(new Point3D_F64(1, 1, 1))];
-		Octree node1 = tree.children[tree.getChildIndex(new Point3D_F64(-1, -1, -1))];
+		Octree_F64 node0 = tree.children[tree.getChildIndex(new Point3D_F64(1, 1, 1))];
+		Octree_F64 node1 = tree.children[tree.getChildIndex(new Point3D_F64(-1, -1, -1))];
 
 		assertTrue(node0 != node1);
 
@@ -112,7 +112,7 @@ public class TestConstructOctreeNumPoints {
 	 */
 	@Test
 	public void numerousIdenticalPoints() {
-		ConstructOctreeNumPoints alg = new ConstructOctreeNumPoints(10);
+		ConstructOctreeNumPoints_F64 alg = new ConstructOctreeNumPoints_F64(10);
 		alg.initialize(new Cube3D_F64(-100, -100, -100, 200, 200, 200));
 
 		for (int i = 0; i < 100; i++) {
@@ -122,19 +122,19 @@ public class TestConstructOctreeNumPoints {
 		}
 
 		// if there is no way to split the points then don't split the points
-		Octree root = alg.getTree();
+		Octree_F64 root = alg.getTree();
 		assertTrue(root.isLeaf());
 
 		// make sure all unused data was correctly reset
 		assertEquals(1, alg.getAllNodes().size);
 		for (int i = alg.storageInfo.size; i < alg.storageInfo.data.length; i++) {
-			Octree.Info info = alg.storageInfo.data[i];
+			Octree_F64.Info info = alg.storageInfo.data[i];
 
 			assertTrue(info.point == null);
 			assertTrue(info.data == null);
 		}
 		for (int i = alg.storageNodes.size; i < alg.storageNodes.data.length; i++) {
-			Octree o = alg.storageNodes.data[i];
+			Octree_F64 o = alg.storageNodes.data[i];
 
 			assertTrue(o.children == null);
 			assertTrue(o.parent == null);
@@ -142,7 +142,7 @@ public class TestConstructOctreeNumPoints {
 		}
 
 		for (int i = 0; i < alg.storageChildren.size(); i++) {
-			Octree[] o = alg.storageChildren.get(i);
+			Octree_F64[] o = alg.storageChildren.get(i);
 
 			for (int j = 0; j < o.length; j++) {
 				assertTrue(o[j] == null);

@@ -19,8 +19,10 @@
 package bubo.clouds.detect.alg;
 
 import bubo.clouds.detect.shape.CheckShapeAcceptAll;
-import bubo.construct.ConstructOctreeNumPoints;
+import bubo.construct.ConstructOctreeNumPoints_F64;
 import bubo.construct.Octree;
+import bubo.construct.Octree_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.Cube3D_F64;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
@@ -53,7 +55,7 @@ import java.util.Random;
 public class PointCloudShapeDetectionSchnabel2007 {
 
 	// constructs and maintains the octree
-	protected ConstructOctreeNumPoints managerOctree;
+	protected ConstructOctreeNumPoints_F64 managerOctree;
 	// used to randomly sample regions in the octree
 	private Random rand;
 	// An object must have this many points before being accepted as valid
@@ -62,10 +64,10 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	private Cube3D_F64 bounding = new Cube3D_F64();
 
 	// list of leafs in the Octree.  Allows quick finding of the path to the base node
-	private FastQueue<Octree> leafs = new FastQueue<Octree>(Octree.class, false);
+	private FastQueue<Octree_F64> leafs = new FastQueue<Octree_F64>(Octree_F64.class, false);
 
 	// found path from leaf to base
-	private FastQueue<Octree> path = new FastQueue<Octree>(Octree.class, false);
+	private FastQueue<Octree_F64> path = new FastQueue<Octree_F64>(Octree_F64.class, false);
 
 	// searches the NN graph to find points which match the model.
 	// need to use the same instance for all searches since it modified the points by marking them.
@@ -105,7 +107,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		this.rand = new Random(config.randomSeed);
 		this.maximumAllowedIterations = config.maximumAllowedIterations;
 
-		managerOctree = new ConstructOctreeNumPoints(config.octreeSplit);
+		managerOctree = new ConstructOctreeNumPoints_F64(config.octreeSplit);
 
 		// convert it into a description that RANSAC understands
 		List<RansacMulti.ObjectType> modelsRansac = new ArrayList<RansacMulti.ObjectType>();
@@ -177,7 +179,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		while (totalIterations < maximumAllowedIterations &&
 				managerOctree.getTree().points.size > minModelAccept) {
 			// select region to search for a shape inside
-			Octree sampleNode = selectSampleNode();
+			Octree_F64 sampleNode = selectSampleNode();
 
 			// create list of points which are not a member of a shape yet
 			sampleSet.clear();
@@ -257,8 +259,8 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 *
 	 * @return Node it should draw samples from
 	 */
-	protected Octree selectSampleNode() {
-		Octree node = leafs.get(rand.nextInt(leafs.size));
+	protected Octree_F64 selectSampleNode() {
+		Octree_F64 node = leafs.get(rand.nextInt(leafs.size));
 
 		path.reset();
 		path.add(node);
@@ -303,9 +305,9 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		// create a list of leafs
 		leafs.reset();
 
-		FastQueue<Octree> nodes = managerOctree.getAllNodes();
+		FastQueue<Octree_F64> nodes = managerOctree.getAllNodes();
 		for (int i = 0; i < nodes.size; i++) {
-			Octree n = nodes.get(i);
+			Octree_F64 n = nodes.get(i);
 			if (n.isLeaf()) {
 				leafs.add(n);
 			}
@@ -326,10 +328,10 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 * @param unmatched Output. Where the unmatched points are stored.
 	 */
 	public void findUnmatchedPoints(List<PointVectorNN> unmatched) {
-		FastQueue<Octree.Info> treePts = managerOctree.getTree().points;
+		FastQueue<Octree.Info<Point3D_F64>> treePts = managerOctree.getTree().points;
 
 		for (int i = 0; i < treePts.size; i++) {
-			Octree.Info info = treePts.data[i];
+			Octree_F64.Info info = treePts.data[i];
 			PointVectorNN pv = (PointVectorNN) info.data;
 			if (!pv.used) {
 				unmatched.add(pv);
@@ -352,11 +354,11 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		return bounding;
 	}
 
-	public FastQueue<Octree> getLeafs() {
+	public FastQueue<Octree_F64> getLeafs() {
 		return leafs;
 	}
 
-	public ConstructOctreeNumPoints getManagerOctree() {
+	public ConstructOctreeNumPoints_F64 getManagerOctree() {
 		return managerOctree;
 	}
 }
