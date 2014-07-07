@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of Project BUBO.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package bubo.maps.d3.grid.impl;
 
 import bubo.construct.ConstructOctreeLeaf_I32;
@@ -8,6 +26,8 @@ import georegression.struct.point.Point3D_I32;
 import georegression.struct.shapes.Cube3D_I32;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.List;
+
 /**
  * Creates a 3D map using an Octree.  This is a sparse data structure which is in most situations much more
  * efficient at storing 3D maps than a raw 3D array.  The price paid is that reading and writing to the
@@ -16,6 +36,9 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
+
+	// value of cells with no information
+	double unknownValue = 0.5;
 
 	// constructs and maintains the octree
 	ConstructOctreeLeaf_I32 construct;
@@ -32,7 +55,10 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	/**
 	 * Creates a new map based on the users request.  The actual map size is adjusted to ensure
 	 * that the leaf cells are the specified size
-
+	 *
+	 * @param lengthX Number of map cells along x-axis
+	 * @param lengthY Number of map cells along y-axis
+	 * @param lengthZ Number of map cells along z-axis
 	 */
 	public OctreeGridMap_F64( int lengthX , int lengthY , int lengthZ ) {
 		this.region = new Cube3D_I32(0,0,0,lengthX,lengthY,lengthZ);
@@ -41,7 +67,35 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 		construct.initialize(region);
 	}
 
-	// todo add blur function
+	/**
+	 * Applies the kernel to the map while taking advantage of its sparsity.
+	 * @param kernel
+	 * @param blurred
+	 */
+	public void blur( Kernel3D_F64 kernel , OctreeGridMap_F64 blurred ) {
+		// TODO make sure it's the same size
+		blurred.clear();
+
+		// find all cells in this map
+
+		// for each leaf find all the surrounding leafs in the blurred map
+
+		// add the blurred value and weight to each cell
+
+		// go through all leafs in the blurred map and normalize cell values
+
+	}
+
+	public static void findMapCells( OctreeGridMap_F64 map , List<Octree_I32> cells ) {
+		FastQueue<Octree_I32> all = map.getConstruct().getAllNodes();
+
+		for (int i = 0; i < all.size; i++) {
+			Octree_I32 node = all.get(i);
+			if( node.isLeaf() && node.isSmallest() ) {
+				cells.add(node);
+			}
+		}
+	}
 
 	@Override
 	public void set(int x, int y, int z, double value) {
@@ -62,7 +116,7 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 		temp.set(x,y,z);
 		Octree_I32 node = construct.getTree().findDeepest(temp);
 		if( node == null || !node.isLeaf() || !node.isSmallest())
-			return 0.5;
+			return unknownValue;
 		else
 			return ((MapInfo)node.userData).value;
 	}
@@ -105,5 +159,9 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	@Override
 	public int getSizeZ() {
 		return region.getLengthZ();
+	}
+
+	public ConstructOctreeLeaf_I32 getConstruct() {
+		return construct;
 	}
 }

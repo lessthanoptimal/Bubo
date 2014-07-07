@@ -23,8 +23,7 @@ import georegression.struct.point.Point3D_I32;
 import georegression.struct.shapes.Cube3D_I32;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -94,6 +93,31 @@ public class TestConstructOctree_I32 {
 		assertEquals(1,child.getLengthX());
 		assertEquals(1,child.getLengthY());
 		assertEquals(1,child.getLengthZ());
+	}
+
+	@Test
+	public void isSpaceValid() {
+		ConstructOctree_I32 alg = new Dummy();
+
+		Octree_I32 node = new Octree_I32();
+		node.space = new Cube3D_I32(0,0,0,1,1,1);
+
+		assertTrue(alg.isSpaceValid(node));
+
+		node.space = new Cube3D_I32(1,0,0,1,1,1);
+		assertFalse(alg.isSpaceValid(node));
+		node.space = new Cube3D_I32(0,1,0,1,1,1);
+		assertFalse(alg.isSpaceValid(node));
+		node.space = new Cube3D_I32(0,0,1,1,1,1);
+		assertFalse(alg.isSpaceValid(node));
+	}
+
+	private static class Dummy extends ConstructOctree_I32 {
+
+		@Override
+		public Octree_I32 addPoint(Point3D_I32 point, Object data) {
+			return null;
+		}
 	}
 
 }

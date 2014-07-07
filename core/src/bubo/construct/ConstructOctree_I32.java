@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of Project BUBO.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package bubo.construct;
 
 import georegression.struct.point.Point3D_I32;
@@ -73,9 +91,16 @@ public abstract class ConstructOctree_I32 extends ConstructOctree<Octree_I32,Poi
 			childSpace.p0.z = parentDivider.z;
 			childSpace.p1.y = parentDivider.y;
 		} else if (index == 7) {
-			childSpace.p0.x = parentDivider.x;
-			childSpace.p0.y = parentDivider.y;
-			childSpace.p0.z = parentDivider.z;
+			childSpace.p0.set(parentDivider);
 		}
+	}
+
+	/**
+	 * Checks to see if the provided cube has a non-zero positive volume.
+	 */
+	@Override
+	public boolean isSpaceValid( Octree_I32 node ) {
+		Cube3D_I32 space = node.space;
+		return space.p0.x < space.p1.x && space.p0.y < space.p1.y && space.p0.z < space.p1.z;
 	}
 }

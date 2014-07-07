@@ -175,6 +175,9 @@ public class TestConstructOctree {
 		public void setChildSpace(Octree_F64 parent, int index, Octree_F64 child) {
 
 		}
+
+		@Override
+		public boolean isSpaceValid(Octree_F64 node) {return true;}
 	}
 
 }

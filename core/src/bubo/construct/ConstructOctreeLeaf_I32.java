@@ -1,6 +1,29 @@
+/*
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of Project BUBO.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package bubo.construct;
 
+import georegression.metric.Intersection3D_I32;
 import georegression.struct.point.Point3D_I32;
+import georegression.struct.shapes.Cube3D_I32;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Constructs an octree by adding points to the smallest possible leaf which contains
@@ -59,5 +82,52 @@ public class ConstructOctreeLeaf_I32 extends ConstructOctree_I32 {
 				node = checkAddChild(node, index);
 			}
 		}
+	}
+
+	/**
+	 * Finds and creates all leaf nodes which intersect the provided region.  If desired,
+	 * external storage can be provided to avoid declaring new memory.
+	 *
+	 * @param region The which which is being tested for intersection
+	 * @param output (Optional) Storage for list containing leafs.  Is cleared.
+	 * @param workspace (Optional) Storage for internal book keeping. Is cleared.
+	 * @return List of all the leaves inside the region..
+	 */
+	public List<Octree_I32> addLeafsIntersect( Cube3D_I32 region , List<Octree_I32> output ,
+											   List<Octree_I32> workspace) {
+		if( output == null )
+			output = new ArrayList<Octree_I32>();
+		if( workspace == null )
+			workspace = new ArrayList<Octree_I32>();
+
+		List<Octree_I32> open = workspace;
+		open.clear();
+		output.clear();
+
+		open.add(tree);
+
+		while( !open.isEmpty() ) {
+			Octree_I32 node = open.remove(open.size()-1);
+
+			if( node.isLeaf() ) {
+				if( node.isSmallest() ) {
+					output.add(node);
+					continue;
+				} else {
+					node.children = getChildrenArray();
+					computeDivider(node.space, node.divider);
+				}
+			}
+
+			// add all children which are contained inside the region
+			for (int i = 0; i < 8; i++) {
+				Octree_I32 child = checkAddChild(node, i);
+				if( child != null && Intersection3D_I32.intersect(region,child.space)) {
+					open.add(child);
+				}
+			}
+		}
+
+		return output;
 	}
 }

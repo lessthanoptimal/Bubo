@@ -18,14 +18,32 @@
 
 package bubo.simulation.d2;
 
+import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
+import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import georegression.struct.se.Se2_F64;
 
 /**
+ * Provides access to simulated robot control and sensors.
+ *
  * @author Peter Abeles
  */
-public class CircularRobot2D {
-	Se2_F64 pose;
-	double radius;
-	double velocity;
-	double angularVelocity;
+public interface RobotInterface {
+
+	/**
+	 * All control should be done when this function is called.  This allows the output to be
+	 * deterministic.
+	 */
+	public void doControl();
+
+	public void sendControl( double velocity , double anglularVelocity );
+
+	public Se2_F64 _truthRobotToWorld();
+
+	public Lrf2dParam getDescriptionLadar();
+
+	public Se2_F64 getLadarToRobot();
+
+	public void odometry( long timeStamp , Se2_F64 robotToWorld );
+
+	public void ladar( long timeStamp , Lrf2dMeasurement measurement );
 }

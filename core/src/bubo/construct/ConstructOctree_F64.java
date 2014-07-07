@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2013-2014, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of Project BUBO.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package bubo.construct;
 
 import georegression.struct.point.Point3D_F64;
@@ -70,6 +88,14 @@ public abstract class ConstructOctree_F64 extends ConstructOctree<Octree_F64,Poi
 		childSpace.p1.x = childSpace.p0.x + parentSpace.getLengthX() / 2.0;
 		childSpace.p1.y = childSpace.p0.y + parentSpace.getLengthY() / 2.0;
 		childSpace.p1.z = childSpace.p0.z + parentSpace.getLengthZ() / 2.0;
+	}
 
+	/**
+	 * Always returns true since the divisor can never be the same as any of the corners.  Unless
+	 * someone really screwed up.
+	 */
+	@Override
+	public boolean isSpaceValid(Octree_F64 node) {
+		return true;
 	}
 }

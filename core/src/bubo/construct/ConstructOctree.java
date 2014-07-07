@@ -139,7 +139,8 @@ public abstract class ConstructOctree< O extends Octree, P extends GeoTuple> {
 	}
 
 	/**
-	 * Checks to see if the child already exists.  If not it creates the child
+	 * Checks to see if the child already exists.  If not it creates the child.  If the
+	 * child won't occupy a physically possible space then null is returned.
 	 */
 	protected O checkAddChild(O node, int index) {
 		O child = (O)node.children[index];
@@ -148,6 +149,11 @@ public abstract class ConstructOctree< O extends Octree, P extends GeoTuple> {
 			child.parent = node;
 			setChildSpace(node, index, child);
 			// no points to add to child since none of the previous ones belong to it
+			if( !isSpaceValid(child)) {
+				// remove this child
+				storageNodes.removeTail();
+				node.children[index] = child = null;
+			}
 		}
 		return child;
 	}
@@ -191,4 +197,10 @@ public abstract class ConstructOctree< O extends Octree, P extends GeoTuple> {
 	public FastQueue<Octree.Info<P>> getAllPoints() {
 		return storageInfo;
 	}
+
+	/**
+	 * Checks to see if the provided cube has a non-zero positive volume.  If the divisor is the
+	 * same as one of the corners then physically impossible spaces can be constructed.
+	 */
+	public abstract boolean isSpaceValid( O node );
 }

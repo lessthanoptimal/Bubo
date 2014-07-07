@@ -16,13 +16,15 @@
  * limitations under the License.
  */
 
-package bubo.maps.d3.grid.impl;
+package bubo.maps;
+
+import bubo.maps.d3.grid.OccupancyGrid3D;
 
 /**
  * @author Peter Abeles
  */
-public class MapInfo {
-	double value;
-	// temp value used when blurring
-	double weight;
+public class UtilMaps {
+	public static boolean sameShape( OccupancyGrid3D a , OccupancyGrid3D b ) {
+		return a.getSizeX() == b.getSizeX() && a.getSizeY() == b.getSizeY() & a.getSizeZ() == b.getSizeZ();
+	}
 }

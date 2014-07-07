@@ -43,6 +43,10 @@ public abstract class PointCloudPanel extends JPanel {
 
 	public abstract void addPoints( List<Point3D_F64> points , int[] colors , float size );
 
+	public abstract void addBox( double sizeX , double sizeY , double sizeZ ,
+								 Se3_F64 boxToWorld ,
+								 int color );
+
 	public abstract void shutdownVisualize();
 
 }

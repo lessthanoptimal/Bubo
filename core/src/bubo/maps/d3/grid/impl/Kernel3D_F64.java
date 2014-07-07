@@ -21,8 +21,14 @@ package bubo.maps.d3.grid.impl;
 /**
  * @author Peter Abeles
  */
-public class MapInfo {
-	double value;
-	// temp value used when blurring
-	double weight;
+public class Kernel3D_F64 {
+	public double data[];
+	public int radius;
+
+	public Kernel3D_F64(int radius) {
+		this.radius = radius;
+		int width = radius*2+1;
+
+		data = new double[width*width*width];
+	}
 }
