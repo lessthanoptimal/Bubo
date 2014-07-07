@@ -16,13 +16,18 @@
  * limitations under the License.
  */
 
-package bubo.maps.d3.grid.impl;
+package bubo.maps.d3.grid;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class MapInfo {
-	public double value;
-	// temp value used when blurring
-	public double weight;
+public class TestGridMapSpacialInfo3D {
+	@Test
+	public void foo() {
+		fail("Implement");
+	}
 }

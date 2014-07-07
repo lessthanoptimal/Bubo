@@ -18,6 +18,8 @@
 
 package bubo.maps.d3.grid;
 
+import java.util.Iterator;
+
 /**
  * Interface for 64bit floating point 3D occupancy grid.  An occupancy grid stores the probability of a square region
  * being occupied by an obstacle or not.  A value of 1 means 100% and 0 means 0%, 50% is unknown or equal probability.
@@ -50,4 +52,10 @@ public interface OccupancyGrid3D_F64 extends OccupancyGrid3D {
 	 * @return if it is valid or not
 	 */
 	public boolean isValid(double value);
+
+	/**
+	 * Returns an iterator through all maps cells which are not assigned a value of unknown
+	 * @return Iterator for map cells
+	 */
+	public Iterator<CellProbability_F64> iteratorKnown();
 }

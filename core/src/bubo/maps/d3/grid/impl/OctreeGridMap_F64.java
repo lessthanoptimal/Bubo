@@ -19,13 +19,16 @@
 package bubo.maps.d3.grid.impl;
 
 import bubo.construct.ConstructOctreeLeaf_I32;
+import bubo.construct.OctreeOps;
 import bubo.construct.Octree_I32;
+import bubo.maps.d3.grid.CellProbability_F64;
 import bubo.maps.d3.grid.OccupancyGrid3D_F64;
 import georegression.metric.Intersection3D_I32;
 import georegression.struct.point.Point3D_I32;
 import georegression.struct.shapes.Cube3D_I32;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -86,17 +89,6 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 
 	}
 
-	public static void findMapCells( OctreeGridMap_F64 map , List<Octree_I32> cells ) {
-		FastQueue<Octree_I32> all = map.getConstruct().getAllNodes();
-
-		for (int i = 0; i < all.size; i++) {
-			Octree_I32 node = all.get(i);
-			if( node.isLeaf() && node.isSmallest() ) {
-				cells.add(node);
-			}
-		}
-	}
-
 	@Override
 	public void set(int x, int y, int z, double value) {
 		temp.set(x,y,z);
@@ -105,6 +97,7 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 		MapInfo info;
 		if( leaf.userData == null ) {
 			info = this.info.grow();
+			leaf.userData = info;
 		} else {
 			info = (MapInfo)leaf.userData;
 		}
@@ -126,6 +119,10 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 		return value >= 0 && value <= 1;
 	}
 
+	@Override
+	public Iterator<CellProbability_F64> iteratorKnown() {
+		return new OctIterator();
+	}
 
 	@Override
 	public void clear() {
@@ -163,5 +160,61 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 
 	public ConstructOctreeLeaf_I32 getConstruct() {
 		return construct;
+	}
+
+	/**
+	 * Returns all grid cells as {@link bubo.construct.Octree_I32} nodes.
+	 * @return List of all occupied cells
+	 */
+	public List<Octree_I32> getGridCells() {
+		return OctreeOps.findAllSmallest(construct.getAllNodes().toList(),null);
+	}
+
+	private class OctIterator implements Iterator<CellProbability_F64> {
+
+		FastQueue<Octree_I32> nodes = construct.getAllNodes();
+		int index;
+
+		Octree_I32 next;
+		CellProbability_F64 storage = new CellProbability_F64();
+
+		public OctIterator() {
+			searchNext();
+		}
+
+		@Override
+		public boolean hasNext() {
+			return next != null;
+		}
+
+		@Override
+		public CellProbability_F64 next() {
+			Octree_I32 prev = next;
+			searchNext();
+			MapInfo info = prev.getUserData();
+			storage.set( prev.space.p0 );
+			storage.probability = info.value;
+
+			return storage;
+		}
+
+		protected void searchNext() {
+			next = null;
+			while( index < nodes.size() ) {
+				Octree_I32 o = nodes.get(index++);
+				if( o.isSmallest() ) {
+					MapInfo info = o.getUserData();
+					if (info != null && info.value != 0.5f) {
+						next = o;
+						break;
+					}
+				}
+			}
+		}
+
+		@Override
+		public void remove() {
+			throw new RuntimeException("Remove is not supported");
+		}
 	}
 }

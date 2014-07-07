@@ -52,7 +52,8 @@ public class ConstructOctreeLeaf_I32 extends ConstructOctree_I32 {
 		info.data = data;
 
 		Octree_I32 leaf = addLeaf(point);
-		leaf.points.add(info);
+		if( leaf != null )
+			leaf.points.add(info);
 
 		return leaf;
 	}

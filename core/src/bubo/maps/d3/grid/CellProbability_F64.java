@@ -16,13 +16,19 @@
  * limitations under the License.
  */
 
-package bubo.maps.d3.grid.impl;
+package bubo.maps.d3.grid;
+
+import georegression.struct.point.Point3D_I32;
 
 /**
+ * Provides the location and probability of a cell in a 3D occupancy grid.
+ *
  * @author Peter Abeles
  */
-public class MapInfo {
-	public double value;
-	// temp value used when blurring
-	public double weight;
+public class CellProbability_F64 extends Point3D_I32 {
+	public double probability;
+
+	public double getProbability() {
+		return probability;
+	}
 }

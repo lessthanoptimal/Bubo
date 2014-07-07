@@ -16,13 +16,32 @@
  * limitations under the License.
  */
 
-package bubo.maps.d3.grid.impl;
+package bubo.construct;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public class MapInfo {
-	public double value;
-	// temp value used when blurring
-	public double weight;
+public class OctreeOps {
+
+	/**
+	 * Finds all nodes in the list which are the smallest possible size, e.g. 1x1x1.
+	 */
+	public static List<Octree_I32> findAllSmallest( List<Octree_I32> allNodes, List<Octree_I32> output ) {
+
+		if( output == null ) {
+			output = new ArrayList<Octree_I32>();
+		}
+
+		for (int i = 0; i < allNodes.size(); i++) {
+			Octree_I32 n = allNodes.get(i);
+			if( n.isSmallest() ) {
+				output.add(n);
+			}
+		}
+
+		return output;
+	}
 }

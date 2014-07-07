@@ -18,11 +18,15 @@
 
 package bubo.maps.d3.grid.impl;
 
+import bubo.maps.d3.grid.OccupancyGrid3D_F64;
+
 /**
  * @author Peter Abeles
  */
-public class MapInfo {
-	public double value;
-	// temp value used when blurring
-	public double weight;
+public class TestOctreeGridMap_F64 extends GenericOccupancyGrid3DChecks{
+
+	@Override
+	public OccupancyGrid3D_F64 createOccupancyGrid(int sizeX, int sizeY, int sizeZ) {
+		return new OctreeGridMap_F64(sizeX,sizeY,sizeZ);
+	}
 }

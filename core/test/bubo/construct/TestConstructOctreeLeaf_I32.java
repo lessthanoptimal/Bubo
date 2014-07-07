@@ -35,6 +35,26 @@ import static org.junit.Assert.assertTrue;
 public class TestConstructOctreeLeaf_I32 {
 
 	/**
+	 * Add a point outside and see if it blows up
+	 */
+	@Test
+	public void addPoint_outside() {
+		ConstructOctree_I32 alg = new ConstructOctreeLeaf_I32();
+		alg.initialize(new Cube3D_I32(0,0,0,10,10,10));
+		assertTrue(null == alg.addPoint(new Point3D_I32(100, 200, 300), null));
+	}
+
+	@Test
+	public void addPoint_inside() {
+		ConstructOctree_I32 alg = new ConstructOctreeLeaf_I32();
+		alg.initialize(new Cube3D_I32(0,0,0,10,10,10));
+		Octree_I32 n = alg.addPoint(new Point3D_I32(1, 2, 3), null);
+		assertEquals(n.space.p0.x,1);
+		assertEquals(n.space.p0.y,2);
+		assertEquals(n.space.p0.z,3);
+	}
+
+	/**
 	 * Add points to a cube where each axis is a power of two.  That means it will always
 	 * be evenly divisible
 	 */

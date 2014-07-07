@@ -163,7 +163,7 @@ task createLibraryDirectory(dependsOn: mainProjects.collect { it + ":jar" } + ma
     }
 }
 
-task oneJar(type: Jar, dependsOn: mainProjects.collect { it + ":compileJava" }) {
+task oneJarBin(type: Jar, dependsOn: mainProjects.collect { it + ":compileJava" }) {
     baseName = 'ProjectBUBO'
 
     from files(mainProjects.collect { project(it).sourceSets.main.output })
@@ -173,6 +173,9 @@ task oneJarSrc(type: Jar) {
     baseName = 'ProjectBUBO-src'
 
     from files(mainProjects.collect { project(it).sourceSets.main.allSource })
+}
+task oneJar( dependsOn: [oneJarBin,oneJarSrc]) {
+
 }
 
 task alljavadoc(type: Javadoc) {
@@ -197,6 +200,20 @@ idea {
     project {
         jdkName = '1.6 (64bit)'
         languageLevel = '1.6'
+    }
+}
+
+// Disable the creation of jars for distribution.  If you don't do this it will crash
+[':integration'].each {String a ->
+    project(a) {
+        if( project.hasProperty('ossrhUsername') ) {
+            signArchives.enabled = false
+        }
+        sourcesJar.enabled = false
+        javadocJar.enabled = false
+        jar.enabled = false
+        uploadArchives.enabled = false
+        install.enabled = false
     }
 }
 
