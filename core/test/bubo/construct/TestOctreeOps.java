@@ -20,7 +20,11 @@ package bubo.construct;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -28,7 +32,24 @@ import static org.junit.Assert.fail;
 public class TestOctreeOps {
 
 	@Test
-	public void findAllSmallest() {
-		fail("Implement");
+	public void findUsedLeafs() {
+		List<Octree_I32> input = new ArrayList<Octree_I32>();
+
+		input.add( new Octree_I32());
+		input.add( new Octree_I32());
+		input.add( new Octree_I32());
+		input.add( new Octree_I32());
+
+		input.get(1).space.set(2,2,2,3,3,3);
+		input.get(1).userData = 1;
+		input.get(2).space.set(2,2,2,3,3,3);
+		input.get(2).userData = 1;
+		input.get(3).space.set(2,2,2,3,3,3);
+
+		List<Octree_I32> filtered = OctreeOps.findUsedLeafs(input, null);
+
+		assertEquals(2,filtered.size());
+		assertTrue(filtered.get(0) == input.get(1));
+		assertTrue(filtered.get(1) == input.get(2));
 	}
 }

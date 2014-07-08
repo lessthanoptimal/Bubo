@@ -24,6 +24,12 @@ import bubo.maps.d3.grid.OccupancyGrid3D;
  * @author Peter Abeles
  */
 public class UtilMaps {
+	/**
+	 * Checks to see if the maps are the same shape.
+	 * @param a map
+	 * @param b map
+	 * @return true if they are the same shape or false if not
+	 */
 	public static boolean sameShape( OccupancyGrid3D a , OccupancyGrid3D b ) {
 		return a.getSizeX() == b.getSizeX() && a.getSizeY() == b.getSizeY() & a.getSizeZ() == b.getSizeZ();
 	}

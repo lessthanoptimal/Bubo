@@ -62,7 +62,7 @@ public abstract class ConstructOctree< O extends Octree, P extends GeoTuple> {
 		// remove references to external data
 		for (int i = 0; i < storageInfo.size; i++) {
 			Octree.Info info = storageInfo.data[i];
-			info.data = null;
+			info.userData = null;
 			info.point = null;
 		}
 		storageInfo.reset();
@@ -76,6 +76,7 @@ public abstract class ConstructOctree< O extends Octree, P extends GeoTuple> {
 
 				storageChildren.add((O[])o.children);
 			}
+			o.userData = null;
 			o.parent = null;
 			o.children = null;
 			o.points.reset();

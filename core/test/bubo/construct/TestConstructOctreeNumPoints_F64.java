@@ -42,7 +42,7 @@ public class TestConstructOctreeNumPoints_F64 {
 
 		Octree_F64.Info a = alg.getTree().points.get(0);
 		assertTrue(a.point == p);
-		assertTrue(a.data == d);
+		assertTrue(a.userData == d);
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class TestConstructOctreeNumPoints_F64 {
 			Octree_F64.Info info = alg.storageInfo.data[i];
 
 			assertTrue(info.point == null);
-			assertTrue(info.data == null);
+			assertTrue(info.userData == null);
 		}
 		for (int i = alg.storageNodes.size; i < alg.storageNodes.data.length; i++) {
 			Octree_F64 o = alg.storageNodes.data[i];

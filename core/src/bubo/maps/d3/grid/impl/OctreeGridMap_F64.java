@@ -47,7 +47,7 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	ConstructOctreeLeaf_I32 construct;
 
 	// storage for map info which is placed in each leaf
-	FastQueue<MapInfo> info = new FastQueue<MapInfo>(MapInfo.class,true);
+	FastQueue<MapLeaf> info = new FastQueue<MapLeaf>(MapLeaf.class,true);
 
 	// used to temporarily store a point's value when looking things up
 	Point3D_I32 temp = new Point3D_I32();
@@ -70,38 +70,19 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 		construct.initialize(region);
 	}
 
-	/**
-	 * Applies the kernel to the map while taking advantage of its sparsity.
-	 * @param kernel
-	 * @param blurred
-	 */
-	public void blur( Kernel3D_F64 kernel , OctreeGridMap_F64 blurred ) {
-		// TODO make sure it's the same size
-		blurred.clear();
-
-		// find all cells in this map
-
-		// for each leaf find all the surrounding leafs in the blurred map
-
-		// add the blurred value and weight to each cell
-
-		// go through all leafs in the blurred map and normalize cell values
-
-	}
-
 	@Override
 	public void set(int x, int y, int z, double value) {
 		temp.set(x,y,z);
 
 		Octree_I32 leaf = construct.addLeaf(temp);
-		MapInfo info;
+		MapLeaf info;
 		if( leaf.userData == null ) {
 			info = this.info.grow();
 			leaf.userData = info;
 		} else {
-			info = (MapInfo)leaf.userData;
+			info = (MapLeaf)leaf.userData;
 		}
-		info.value = value;
+		info.probability = value;
 	}
 
 	@Override
@@ -111,12 +92,17 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 		if( node == null || !node.isLeaf() || !node.isSmallest())
 			return unknownValue;
 		else
-			return ((MapInfo)node.userData).value;
+			return ((MapLeaf)node.userData).probability;
 	}
 
 	@Override
 	public boolean isValid(double value) {
 		return value >= 0 && value <= 1;
+	}
+
+	@Override
+	public double getUnknownValue() {
+		return unknownValue;
 	}
 
 	@Override
@@ -140,7 +126,11 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	public boolean isKnown(int x, int y, int z) {
 		temp.set(x,y,z);
 		Octree_I32 node = construct.getTree().findDeepest(temp);
-		return( node != null && node.isLeaf() && node.isSmallest() );
+		if( node != null && node.isLeaf() && node.isSmallest() ) {
+			MapLeaf info = node.getUserData();
+			return info.probability != unknownValue;
+		}
+		return false;
 	}
 
 	@Override
@@ -163,13 +153,17 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	}
 
 	/**
-	 * Returns all grid cells as {@link bubo.construct.Octree_I32} nodes.
+	 * Returns all grid cells which have been assigned values as {@link bubo.construct.Octree_I32} nodes.
 	 * @return List of all occupied cells
 	 */
 	public List<Octree_I32> getGridCells() {
-		return OctreeOps.findAllSmallest(construct.getAllNodes().toList(),null);
+		return OctreeOps.findUsedLeafs(construct.getAllNodes().toList(), null);
 	}
 
+	/**
+	 * Iterator which will go through all the map cells.  This is defined as nodes in the graph which are
+	 * the smallest size possible and have been assigned a probability
+	 */
 	private class OctIterator implements Iterator<CellProbability_F64> {
 
 		FastQueue<Octree_I32> nodes = construct.getAllNodes();
@@ -191,9 +185,9 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 		public CellProbability_F64 next() {
 			Octree_I32 prev = next;
 			searchNext();
-			MapInfo info = prev.getUserData();
+			MapLeaf info = prev.getUserData();
 			storage.set( prev.space.p0 );
-			storage.probability = info.value;
+			storage.probability = info.probability;
 
 			return storage;
 		}
@@ -203,8 +197,8 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 			while( index < nodes.size() ) {
 				Octree_I32 o = nodes.get(index++);
 				if( o.isSmallest() ) {
-					MapInfo info = o.getUserData();
-					if (info != null && info.value != 0.5f) {
+					MapLeaf info = o.getUserData();
+					if (info != null && info.probability != 0.5f) {
 						next = o;
 						break;
 					}

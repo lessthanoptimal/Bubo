@@ -63,7 +63,7 @@ public abstract class Octree< O extends Octree, P extends GeoTuple> {
 	public O parent;
 
 	/**
-	 * Can be used as a reference to user provided data;
+	 * Reference to user specified data
 	 */
 	public Object userData;
 
@@ -156,7 +156,13 @@ public abstract class Octree< O extends Octree, P extends GeoTuple> {
 	}
 
 	public static class Info<P extends GeoTuple> {
+		/**
+		 * The point which was added to the Octree
+		 */
 		public P point;
-		public Object data;
+		/**
+		 * User specified data
+		 */
+		public Object userData;
 	}
 }

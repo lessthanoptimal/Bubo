@@ -53,7 +53,7 @@ public class ConstructOctreeNumPoints_F64 extends ConstructOctree_F64 {
 		// declare the structure which stores the point and data
 		Octree_F64.Info info = storageInfo.grow();
 		info.point = point;
-		info.data = data;
+		info.userData = data;
 
 		Octree_F64 node = tree;
 		tree.points.add(info);

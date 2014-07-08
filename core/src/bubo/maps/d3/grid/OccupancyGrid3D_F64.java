@@ -54,7 +54,13 @@ public interface OccupancyGrid3D_F64 extends OccupancyGrid3D {
 	public boolean isValid(double value);
 
 	/**
-	 * Returns an iterator through all maps cells which are not assigned a value of unknown
+	 * Returns the value of grid cells which have no information
+	 * @return value of unknown grid cells
+	 */
+	public double getUnknownValue();
+
+	/**
+	 * Returns an iterator, which will iterate through all maps cells which are not assigned a value of unknown.
 	 * @return Iterator for map cells
 	 */
 	public Iterator<CellProbability_F64> iteratorKnown();

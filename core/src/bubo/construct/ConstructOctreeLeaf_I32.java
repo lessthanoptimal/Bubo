@@ -49,7 +49,7 @@ public class ConstructOctreeLeaf_I32 extends ConstructOctree_I32 {
 		// declare the structure which stores the point and data
 		Octree.Info<Point3D_I32> info = storageInfo.grow();
 		info.point = point;
-		info.data = data;
+		info.userData = data;
 
 		Octree_I32 leaf = addLeaf(point);
 		if( leaf != null )
@@ -89,10 +89,10 @@ public class ConstructOctreeLeaf_I32 extends ConstructOctree_I32 {
 	 * Finds and creates all leaf nodes which intersect the provided region.  If desired,
 	 * external storage can be provided to avoid declaring new memory.
 	 *
-	 * @param region The which which is being tested for intersection
+	 * @param region The region which is being tested for intersection
 	 * @param output (Optional) Storage for list containing leafs.  Is cleared.
 	 * @param workspace (Optional) Storage for internal book keeping. Is cleared.
-	 * @return List of all the leaves inside the region..
+	 * @return List of all the leaves inside the region.
 	 */
 	public List<Octree_I32> addLeafsIntersect( Box3D_I32 region , List<Octree_I32> output ,
 											   List<Octree_I32> workspace) {
@@ -123,6 +123,51 @@ public class ConstructOctreeLeaf_I32 extends ConstructOctree_I32 {
 			// add all children which are contained inside the region
 			for (int i = 0; i < 8; i++) {
 				Octree_I32 child = checkAddChild(node, i);
+				if( child != null && Intersection3D_I32.intersect(region,child.space)) {
+					open.add(child);
+				}
+			}
+		}
+
+		return output;
+	}
+
+	/**
+	 * Searches for all leafs which are of the smallest size within the region.  The
+	 * tree will not be modified by this operation and no new leafs are added.
+	 *
+	 * @param region The region which is being tested for intersection
+	 * @param output (Optional) Storage for list containing leafs.  Is cleared.
+	 * @param workspace (Optional) Storage for internal book keeping. Is cleared.
+	 * @return List of all the leaves inside the region.
+	 */
+	public List<Octree_I32> findLeafsIntersect( Box3D_I32 region , List<Octree_I32> output ,
+												List<Octree_I32> workspace) {
+		if( output == null )
+			output = new ArrayList<Octree_I32>();
+		if( workspace == null )
+			workspace = new ArrayList<Octree_I32>();
+
+		List<Octree_I32> open = workspace;
+		open.clear();
+		output.clear();
+
+		open.add(tree);
+
+		while( !open.isEmpty() ) {
+			Octree_I32 node = open.remove(open.size()-1);
+
+			if( node.isLeaf() ) {
+				if( node.isSmallest() ) {
+					output.add(node);
+
+				}
+				continue;
+			}
+
+			// add all children which are contained inside the region
+			for (int i = 0; i < 8; i++) {
+				Octree_I32 child = node.children[i];
 				if( child != null && Intersection3D_I32.intersect(region,child.space)) {
 					open.add(child);
 				}

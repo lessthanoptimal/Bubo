@@ -185,7 +185,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 			sampleSet.clear();
 
 			for (int i = 0; i < sampleNode.points.size; i++) {
-				PointVectorNN pv = (PointVectorNN) sampleNode.points.get(i).data;
+				PointVectorNN pv = (PointVectorNN) sampleNode.points.get(i).userData;
 
 				if (!pv.used)
 					sampleSet.add(pv);
@@ -332,7 +332,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 
 		for (int i = 0; i < treePts.size; i++) {
 			Octree_F64.Info info = treePts.data[i];
-			PointVectorNN pv = (PointVectorNN) info.data;
+			PointVectorNN pv = (PointVectorNN) info.userData;
 			if (!pv.used) {
 				unmatched.add(pv);
 			}

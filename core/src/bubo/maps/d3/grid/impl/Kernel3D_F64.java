@@ -24,11 +24,62 @@ package bubo.maps.d3.grid.impl;
 public class Kernel3D_F64 {
 	public double data[];
 	public int radius;
+	public int width;
 
 	public Kernel3D_F64(int radius) {
 		this.radius = radius;
-		int width = radius*2+1;
+		this.width = radius*2+1;
 
 		data = new double[width*width*width];
+	}
+
+	public double get( int i , int j , int k ) {
+		return data[ i*width*width + j*width + k];
+	}
+
+	public int getRadius() {
+		return radius;
+	}
+
+	public int getTotalElements() {
+		return data.length;
+	}
+
+	/**
+	 * Creates a kernel with a symmetric normal distribution
+	 * @param sigma standard deviation of the distribution
+	 * @param radius Radius in array elements
+	 * @return the kernel
+	 */
+	public static Kernel3D_F64 gaussian( double sigma, int radius ) {
+
+		Kernel3D_F64 ret = new Kernel3D_F64(radius);
+
+		int index = 0;
+		int w = radius*2 + 1;
+		double total = 0;
+		for (int i = 0; i < w; i++) {
+			int disti = i-radius;
+			for (int j = 0; j < w; j++) {
+				int distj = j-radius;
+				for (int k = 0; k < w; k++, index++) {
+					int distk = k-radius;
+
+					double d = Math.sqrt(disti*disti + distj*distj + distk*distk);
+					total += ret.data[index] = Math.exp(-d*d/(2.0*sigma*sigma));
+				}
+			}
+		}
+
+		// the sum should add up to one
+		for (int i = 0; i < ret.data.length; i++) {
+			ret.data[i] /= total;
+		}
+
+		return ret;
+	}
+
+	public int getWidth() {
+		return width;
 	}
 }

@@ -16,33 +16,44 @@
  * limitations under the License.
  */
 
-package bubo.construct;
+package bubo.maps.d3.grid.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class OctreeOps {
+public class TestBlurOctreeGridMap_F64 {
+	@Test
+	public void apply() {
+		fail("Implement");
+	}
+
+	@Test
+	public void applyConvolution() {
+		fail("Implement");
+	}
 
 	/**
-	 * Finds all nodes in the list which are the smallest possible size, e.g. 1x1x1, and have
-	 * user assigned data to them.
+	 * Applies the convolution along the map's border
 	 */
-	public static List<Octree_I32> findUsedLeafs(List<Octree_I32> allNodes, List<Octree_I32> output) {
+	@Test
+	public void applyConvolution_border() {
+		fail("Implement");
+	}
 
-		if( output == null ) {
-			output = new ArrayList<Octree_I32>();
-		}
+	/**
+	 * Applies the convolution with unknown cells inside the region
+	 */
+	@Test
+	public void applyConvolution_unknown() {
+		fail("Implement");
+	}
 
-		for (int i = 0; i < allNodes.size(); i++) {
-			Octree_I32 n = allNodes.get(i);
-			if( n.isSmallest() && n.userData != null ) {
-				output.add(n);
-			}
-		}
-
-		return output;
+	@Test
+	public void createBlurredCells() {
+		fail("Implement");
 	}
 }

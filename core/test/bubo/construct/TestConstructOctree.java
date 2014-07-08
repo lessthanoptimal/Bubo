@@ -64,11 +64,12 @@ public class TestConstructOctree {
 	@Test
 	public void reset() {
 		// use a specific instrance for testing purposes
-		ConstructOctree alg = new Dummy();
+		ConstructOctree<Octree_F64,Point3D_F64> alg = new Dummy();
 
 		// randomly construct a tree with 100 points
 		for (int i = 0; i < 100; i++) {
-			alg.addPoint(new Point3D_F64(), null);
+			Octree_F64 o = alg.addPoint(new Point3D_F64(), null);
+			o.userData = 1;
 		}
 
 		// see if it declared the expected amount of data
@@ -90,20 +91,21 @@ public class TestConstructOctree {
 		assertEquals(expectedNode - numLeafs, alg.storageChildren.size());
 
 		// check the structures to see that they have been reset correctly
-		for (Octree[] children : (Stack<Octree[]>)alg.storageChildren) {
+		for (Octree[] children : (Stack<Octree[]>)(Object)alg.storageChildren) {
 			assertEquals(8, children.length);
 			for (int i = 0; i < children.length; i++) {
 				assertTrue(children[i] == null);
 			}
 		}
 		for (Octree n : (Octree[])alg.storageNodes.data) {
+			assertTrue(n.userData == null);
 			assertTrue(n.parent == null);
 			assertTrue(n.children == null);
 			assertTrue(n.points.size() == 0);
 		}
 		for (Octree.Info n : (Octree.Info[])alg.storageInfo.data) {
 			assertTrue(n.point == null);
-			assertTrue(n.data == null);
+			assertTrue(n.userData == null);
 		}
 
 	}
@@ -156,7 +158,7 @@ public class TestConstructOctree {
 		public Octree_F64 addPoint(Point3D_F64 point, Object data) {
 
 			Octree_F64.Info info = storageInfo.grow();
-			info.data = data;
+			info.userData = data;
 			info.point = point;
 
 			Octree_F64 node = tree;
