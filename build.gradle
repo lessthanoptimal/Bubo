@@ -63,7 +63,6 @@ subprojects {
     jar {
         manifest { // the manifest of the default jar is of type OsgiManifest
             instruction 'Bundle-Vendor', 'Project BUBO'
-//            instruction 'Bundle-Description', 'BoofCV'
             instruction 'Bundle-DocURL', 'http://projectbubo.org'
         }
     }
@@ -102,7 +101,7 @@ subprojects {
                     }
 
                     pom.project {
-                        name 'BoofCV'
+                        name 'ProjectBUBO'
                         packaging 'pom'
                         // optionally artifactId can be defined here
                         description 'Project BUBO is a library for robotic localization and mapping'
@@ -138,7 +137,7 @@ subprojects {
 // list of projects for creating javadoc and jars
 def mainProjects = [':apps', ':core', ':gui', ':io']
 
-// Creates a directory with all the compiled BoofCV jars and the dependencies for main
+// Creates a directory with all the compiled jars and the dependencies for main
 task createLibraryDirectory(dependsOn: mainProjects.collect { it + ":jar" } + mainProjects.collect {
     it + ":sourcesJar"
 }) << {
@@ -156,7 +155,6 @@ task createLibraryDirectory(dependsOn: mainProjects.collect { it + ":jar" } + ma
         from ext.listSource
         into 'libraries'
 
-        // append on BoofCV so it's clear which jars are part of BoofCV and which are not
         rename { String fileName ->
             "BUBO-" + fileName
         }
