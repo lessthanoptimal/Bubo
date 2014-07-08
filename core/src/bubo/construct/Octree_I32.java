@@ -48,6 +48,14 @@ public class Octree_I32 extends Octree<Octree_I32,Point3D_I32>{
 		return space.getLengthX() == 1 && space.getLengthY() == 1 && space.getLengthZ() == 1;
 	}
 
+	/**
+	 * Returns the coordinate of the node.  This is only valid if {@link #isSmallest()} is true.
+	 * @return Coordinate of the node.
+	 */
+	public Point3D_I32 getLocation() {
+		return space.getP0();
+	}
+
 	@Override
 	public boolean contained(Point3D_I32 point) {
 		return Intersection3D_I32.contained(space, point);
