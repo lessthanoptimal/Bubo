@@ -26,21 +26,26 @@ import georegression.transform.se.SePointOps_F64;
 /**
  * Description of the 3D grid map's spacial information and its location in the global frame.
  * All cells have a constant size.  The origin of the map is at (0,0,0) grid cell.  The physical
- * space occupied by the grid cell at the origin is from (0,0,0) to (c,c,c), where c is the map's cell size.
+ * space occupied by the grid cell at the origin is from (0,0,0) to (c,c,c), where c is the map's
+ * cell size.  There are no negative coordinates along any axis in the map reference frame.
+ *
+ * For convenience, a coordinate transform is attached to this class which can be used
+ * to convert coordinates to a more reasonable reference system.  For example, the canonical
+ * could be a robot centered reference frame.
  *
  * @author Peter Abeles
  */
 public class GridMapSpacialInfo3D {
 
 	// size of a grid cell in global units
-	double cellSize;
+	private double cellSize;
 
 	// transform from the center of the map to world
-	Se3_F64 mapToWorld = new Se3_F64();
+	private Se3_F64 mapToCanonical = new Se3_F64();
 
-	public GridMapSpacialInfo3D(double cellSize, Se3_F64 mapToWorld) {
+	public GridMapSpacialInfo3D(double cellSize, Se3_F64 mapToCanonical) {
 		this.cellSize = cellSize;
-		this.mapToWorld.set(mapToWorld);
+		this.mapToCanonical.set(mapToCanonical);
 	}
 
 	public GridMapSpacialInfo3D() {
@@ -68,22 +73,30 @@ public class GridMapSpacialInfo3D {
 	/**
 	 * Convert from global coordinates into map cell coordinates.
 	 */
-	public void globalToMap(Point3D_F64 global, Point3D_F64 map) {
-		SePointOps_F64.transformReverse(mapToWorld,global,map);
+	public void canonicalToMap(Point3D_F64 canonical, Point3D_F64 map) {
+		SePointOps_F64.transformReverse(mapToCanonical,canonical,map);
 	}
 
 	/**
 	 * Convert from map cell coordinates into global coordinates
 	 */
-	public void mapToGlobal(Point3D_F64 map, Point3D_F64 global) {
-		SePointOps_F64.transform(mapToWorld, map, global);
+	public void mapToCanonical(Point3D_F64 map, Point3D_F64 global) {
+		SePointOps_F64.transform(mapToCanonical, map, global);
 	}
 
 	public double getCellSize() {
 		return cellSize;
 	}
 
-	public Se3_F64 getMapToWorld() {
-		return mapToWorld;
+	public Se3_F64 getMapToCanonical() {
+		return mapToCanonical;
+	}
+
+	public void setCellSize(double cellSize) {
+		this.cellSize = cellSize;
+	}
+
+	public void setMapToCanonical(Se3_F64 mapToCanonical) {
+		this.mapToCanonical = mapToCanonical;
 	}
 }

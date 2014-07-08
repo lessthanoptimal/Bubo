@@ -142,4 +142,29 @@ public class TestConstructOctreeLeaf_I32 {
 			assertTrue(Intersection3D_I32.contained(target,o.space.p0));
 		}
 	}
+
+	@Test
+	public void findLeafsIntersect() {
+		ConstructOctreeLeaf_I32 alg = new ConstructOctreeLeaf_I32();
+
+		alg.initialize(new Box3D_I32(0, 0, 0, 10, 10, 10));
+
+		List<Octree_I32> output = new ArrayList<Octree_I32>();
+		Box3D_I32 target = new Box3D_I32(2,3,4,5,5,5);
+		alg.findLeafsIntersect(target, output, null);
+
+		assertEquals(0,output.size());
+		assertEquals(1,alg.getAllNodes().size());
+
+		alg.addLeaf(new Point3D_I32(3,3,4));
+		alg.findLeafsIntersect(target, output, null);
+
+		assertEquals(1,output.size());
+
+		for( Octree_I32 o : output ) {
+			assertTrue(o.isSmallest());
+			assertTrue(o.isLeaf());
+			assertTrue(Intersection3D_I32.contained(target,o.space.p0));
+		}
+	}
 }

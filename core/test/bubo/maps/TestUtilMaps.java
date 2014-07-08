@@ -18,16 +18,24 @@
 
 package bubo.maps;
 
+import bubo.maps.d3.grid.impl.OctreeGridMap_F64;
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 public class TestUtilMaps {
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void sameShape_grid3d() {
+
+		OctreeGridMap_F64 mapA = new OctreeGridMap_F64(2,3,4);
+
+		assertTrue(UtilMaps.sameShape(mapA,new OctreeGridMap_F64(2,3,4)));
+		assertFalse(UtilMaps.sameShape(mapA,new OctreeGridMap_F64(3,3,4)));
+		assertFalse(UtilMaps.sameShape(mapA, new OctreeGridMap_F64(2, 4, 4)));
+		assertFalse(UtilMaps.sameShape(mapA, new OctreeGridMap_F64(2, 3, 5)));
 	}
 }

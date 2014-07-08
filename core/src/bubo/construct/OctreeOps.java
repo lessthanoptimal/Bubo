@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Various operations related to Octrees.
+ *
  * @author Peter Abeles
  */
 public class OctreeOps {

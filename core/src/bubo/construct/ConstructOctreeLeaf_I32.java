@@ -28,9 +28,11 @@ import java.util.List;
 /**
  * Constructs an octree by adding points to the smallest possible leaf which contains
  * the point.  The smallest possible leaf is 1x1x1 wide and will thus have the same coordinate
- * as the point which is added to it.
+ * as the point which was added to it.
  *
- * When a new point is added it is only added to the leaf node and not any of the nodes on the way.
+ * When a new point is added it is only added to the leaf node and not any of the other nodes on the
+ * path from the root to the leaf.  This constructor is geared towards maps, where all the information
+ * of interest can be found in leafs which are the smallest possible size.
  *
  * @author Peter Abeles
  */
@@ -59,10 +61,10 @@ public class ConstructOctreeLeaf_I32 extends ConstructOctree_I32 {
 	}
 
 	/**
-	 * Finds the leaf at this point.  If none exist then a new one is created.  New nodes in
+	 * Finds the smallest leaf at this point.  If none exist then a new one is created.  New nodes in
 	 * the graph are created as it searches.  A reference to the leaf is returned.
-	 * @param point Point being searched for.
-	 * @return Leaf at that point.
+	 * @param point Point which is contained by the desired smallest leaf.
+	 * @return Smallest possible leaf at that point.
 	 */
 	public Octree_I32 addLeaf( Point3D_I32 point ) {
 		if( !tree.contained(point) )
@@ -160,7 +162,6 @@ public class ConstructOctreeLeaf_I32 extends ConstructOctree_I32 {
 			if( node.isLeaf() ) {
 				if( node.isSmallest() ) {
 					output.add(node);
-
 				}
 				continue;
 			}

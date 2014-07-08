@@ -36,6 +36,12 @@ import java.util.List;
  * efficient at storing 3D maps than a raw 3D array.  The price paid is that reading and writing to the
  * octree is more expensive.
  *
+ * Internally, the probability is stored in {@link MapLeaf} in the {@link bubo.construct.Octree_I32}'s user
+ * data parameter.  If a graph node doesn't exist or has no user data assigned to it then it is assumed to
+ * have the value of the 'unknownValue' parameter.
+ *
+ * @see ConstructOctreeLeaf_I32
+ *
  * @author Peter Abeles
  */
 public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {

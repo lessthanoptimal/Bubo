@@ -23,7 +23,9 @@ import georegression.struct.point.Point3D_I32;
 import georegression.struct.shapes.Box3D_I32;
 
 /**
- * {@link Octree} implementation for integers.
+ * {@link Octree} implementation for integers.  If the space this Octree node takes up has an area
+ * of 1 then it is the smallest possible node and {@link #isSmallest()} will return true.  The
+ * coordinate on such a node can be found by accessing 'space.p0'.
  *
  * @author Peter Abeles
  */
