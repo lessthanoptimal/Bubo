@@ -19,7 +19,7 @@
 package bubo.clouds.detect;
 
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public interface PointCloudShapeFinder {
 	 * @param boundingBox Optional bounding box which is known to contain all the points.
 	 *                    If none is provided set to null.
 	 */
-	public void process(List<Point3D_F64> cloud, Cube3D_F64 boundingBox);
+	public void process(List<Point3D_F64> cloud, Box3D_F64 boundingBox);
 
 	/**
 	 * <p>
@@ -67,7 +67,7 @@ public interface PointCloudShapeFinder {
 	 * <p>
 	 * A list of points which were not matched to any shape.  Calling this function can result in additional
 	 * computations and should only be called once for each call to
-	 * {@link #process(java.util.List, georegression.struct.shapes.Cube3D_F64)};
+	 * {@link #process(java.util.List, georegression.struct.shapes.Box3D_F64)};
 	 * </p>
 	 * <p/>
 	 * <p>

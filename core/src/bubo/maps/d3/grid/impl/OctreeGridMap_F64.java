@@ -25,7 +25,7 @@ import bubo.maps.d3.grid.CellProbability_F64;
 import bubo.maps.d3.grid.OccupancyGrid3D_F64;
 import georegression.metric.Intersection3D_I32;
 import georegression.struct.point.Point3D_I32;
-import georegression.struct.shapes.Cube3D_I32;
+import georegression.struct.shapes.Box3D_I32;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.Iterator;
@@ -53,7 +53,7 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	Point3D_I32 temp = new Point3D_I32();
 
 	// describes the area which the map is contained inside of
-	Cube3D_I32 region;
+	Box3D_I32 region;
 
 	/**
 	 * Creates a new map based on the users request.  The actual map size is adjusted to ensure
@@ -64,7 +64,7 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	 * @param lengthZ Number of map cells along z-axis
 	 */
 	public OctreeGridMap_F64( int lengthX , int lengthY , int lengthZ ) {
-		this.region = new Cube3D_I32(0,0,0,lengthX,lengthY,lengthZ);
+		this.region = new Box3D_I32(0,0,0,lengthX,lengthY,lengthZ);
 
 		construct = new ConstructOctreeLeaf_I32();
 		construct.initialize(region);

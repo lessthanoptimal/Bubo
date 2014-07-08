@@ -19,7 +19,7 @@
 package bubo.construct;
 
 import georegression.struct.point.Point3D_I32;
-import georegression.struct.shapes.Cube3D_I32;
+import georegression.struct.shapes.Box3D_I32;
 
 /**
  * Base class for constructing {@link Octree_I32}.
@@ -38,7 +38,7 @@ public abstract class ConstructOctree_I32 extends ConstructOctree<Octree_I32,Poi
 	 *
 	 * @param cube Space which is contained by the Octree.
 	 */
-	public void initialize(Cube3D_I32 cube) {
+	public void initialize(Box3D_I32 cube) {
 		reset();
 		tree.space.set(cube);
 	}
@@ -51,15 +51,15 @@ public abstract class ConstructOctree_I32 extends ConstructOctree<Octree_I32,Poi
 	/**
 	 * Sets the divider to the center of space
 	 */
-	public static void computeDivider(Cube3D_I32 space, Point3D_I32 divider) {
+	public static void computeDivider(Box3D_I32 space, Point3D_I32 divider) {
 
 		divider.x = (space.p0.x + space.p1.x) / 2;
 		divider.y = (space.p0.y + space.p1.y) / 2;
 		divider.z = (space.p0.z + space.p1.z) / 2;
 	}
 
-	public static void setChildSpace(Cube3D_I32 parentSpace, Point3D_I32 parentDivider, int index,
-									 Cube3D_I32 childSpace) {
+	public static void setChildSpace(Box3D_I32 parentSpace, Point3D_I32 parentDivider, int index,
+									 Box3D_I32 childSpace) {
 
 		childSpace.p0.set(parentSpace.p0);
 		childSpace.p1.set(parentSpace.p1);
@@ -100,7 +100,7 @@ public abstract class ConstructOctree_I32 extends ConstructOctree<Octree_I32,Poi
 	 */
 	@Override
 	public boolean isSpaceValid( Octree_I32 node ) {
-		Cube3D_I32 space = node.space;
+		Box3D_I32 space = node.space;
 		return space.p0.x < space.p1.x && space.p0.y < space.p1.y && space.p0.z < space.p1.z;
 	}
 }

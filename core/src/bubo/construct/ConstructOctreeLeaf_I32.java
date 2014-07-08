@@ -20,7 +20,7 @@ package bubo.construct;
 
 import georegression.metric.Intersection3D_I32;
 import georegression.struct.point.Point3D_I32;
-import georegression.struct.shapes.Cube3D_I32;
+import georegression.struct.shapes.Box3D_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +94,7 @@ public class ConstructOctreeLeaf_I32 extends ConstructOctree_I32 {
 	 * @param workspace (Optional) Storage for internal book keeping. Is cleared.
 	 * @return List of all the leaves inside the region..
 	 */
-	public List<Octree_I32> addLeafsIntersect( Cube3D_I32 region , List<Octree_I32> output ,
+	public List<Octree_I32> addLeafsIntersect( Box3D_I32 region , List<Octree_I32> output ,
 											   List<Octree_I32> workspace) {
 		if( output == null )
 			output = new ArrayList<Octree_I32>();

@@ -24,7 +24,7 @@ import bubo.construct.Octree;
 import bubo.construct.Octree_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 import org.ddogleg.struct.FastQueue;
 
@@ -61,7 +61,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	// An object must have this many points before being accepted as valid
 	private int minModelAccept;
 	// the initial bounding cube of the point cloud.  used when constructing the octree
-	private Cube3D_F64 bounding = new Cube3D_F64();
+	private Box3D_F64 bounding = new Box3D_F64();
 
 	// list of leafs in the Octree.  Allows quick finding of the path to the base node
 	private FastQueue<Octree_F64> leafs = new FastQueue<Octree_F64>(Octree_F64.class, false);
@@ -145,7 +145,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 * @param points      Points in the point cloud.  PointVectorNN.used MUST be set to false.
 	 * @param boundingBox Bonding box for use in the Octree.
 	 */
-	public void process(FastQueue<PointVectorNN> points, Cube3D_F64 boundingBox) {
+	public void process(FastQueue<PointVectorNN> points, Box3D_F64 boundingBox) {
 
 		// initialize data structures
 		this.bounding.set(boundingBox);
@@ -350,7 +350,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		return refineShape;
 	}
 
-	public Cube3D_F64 getBounding() {
+	public Box3D_F64 getBounding() {
 		return bounding;
 	}
 

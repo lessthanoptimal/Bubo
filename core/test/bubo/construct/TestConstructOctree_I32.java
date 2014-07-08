@@ -20,7 +20,7 @@ package bubo.construct;
 
 import georegression.metric.Intersection3D_I32;
 import georegression.struct.point.Point3D_I32;
-import georegression.struct.shapes.Cube3D_I32;
+import georegression.struct.shapes.Box3D_I32;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -32,7 +32,7 @@ public class TestConstructOctree_I32 {
 
 	@Test
 	public void computeDivider() {
-		Cube3D_I32 cube = new Cube3D_I32(10, 20, 30, 60, 80, 100);
+		Box3D_I32 cube = new Box3D_I32(10, 20, 30, 60, 80, 100);
 		Point3D_I32 p = new Point3D_I32();
 		ConstructOctree_I32.computeDivider(cube, p);
 
@@ -43,10 +43,10 @@ public class TestConstructOctree_I32 {
 
 	@Test
 	public void setChildSpace() {
-		Cube3D_I32 cube = new Cube3D_I32(-50, -50, -50, 50, 50, 50);
+		Box3D_I32 cube = new Box3D_I32(-50, -50, -50, 50, 50, 50);
 		Point3D_I32 divider = new Point3D_I32();
 
-		Cube3D_I32 child = new Cube3D_I32();
+		Box3D_I32 child = new Box3D_I32();
 
 		Point3D_I32 testPt = new Point3D_I32();
 
@@ -83,10 +83,10 @@ public class TestConstructOctree_I32 {
 	 */
 	@Test
 	public void setChildSpace_neverZero() {
-		Cube3D_I32 cube = new Cube3D_I32(2, 2,2,3,3,3);
+		Box3D_I32 cube = new Box3D_I32(2, 2,2,3,3,3);
 		Point3D_I32 divider = new Point3D_I32(2,2,2);
 
-		Cube3D_I32 child = new Cube3D_I32();
+		Box3D_I32 child = new Box3D_I32();
 
 		ConstructOctree_I32.setChildSpace(cube, divider, 7, child);
 
@@ -100,15 +100,15 @@ public class TestConstructOctree_I32 {
 		ConstructOctree_I32 alg = new Dummy();
 
 		Octree_I32 node = new Octree_I32();
-		node.space = new Cube3D_I32(0,0,0,1,1,1);
+		node.space = new Box3D_I32(0,0,0,1,1,1);
 
 		assertTrue(alg.isSpaceValid(node));
 
-		node.space = new Cube3D_I32(1,0,0,1,1,1);
+		node.space = new Box3D_I32(1,0,0,1,1,1);
 		assertFalse(alg.isSpaceValid(node));
-		node.space = new Cube3D_I32(0,1,0,1,1,1);
+		node.space = new Box3D_I32(0,1,0,1,1,1);
 		assertFalse(alg.isSpaceValid(node));
-		node.space = new Cube3D_I32(0,0,1,1,1,1);
+		node.space = new Box3D_I32(0,0,1,1,1,1);
 		assertFalse(alg.isSpaceValid(node));
 	}
 

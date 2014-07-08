@@ -25,7 +25,7 @@ import bubo.clouds.detect.tools.PointCloudShapeTools;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 import georegression.struct.shapes.Cylinder3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
@@ -255,7 +255,7 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 		}
 
 		// check with a bounding box
-		alg.process(cloud, new Cube3D_F64(-10, -10, -10, 10, 10, 10));
+		alg.process(cloud, new Box3D_F64(-10, -10, -10, 10, 10, 10));
 		assertEquals(1, alg.getFound().size());
 		assertTrue(alg.getFound().get(0).type == alg.getShapesList().get(0));
 

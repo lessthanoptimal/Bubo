@@ -23,7 +23,7 @@ import bubo.clouds.detect.PointCloudShapeFinder;
 import bubo.clouds.detect.alg.ApproximateSurfaceNormals;
 import bubo.clouds.detect.alg.PointVectorNN;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
@@ -84,7 +84,7 @@ public class Ransac_to_PointCloudShapeFinder implements PointCloudShapeFinder {
 	}
 
 	@Override
-	public void process(List<Point3D_F64> cloud, Cube3D_F64 boundingBox) {
+	public void process(List<Point3D_F64> cloud, Box3D_F64 boundingBox) {
 		this.cloud = cloud;
 		output.reset();
 		pointNormList.reset();

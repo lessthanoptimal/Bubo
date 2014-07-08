@@ -23,7 +23,7 @@ import bubo.clouds.detect.PointCloudShapeFinder;
 import bubo.clouds.detect.alg.*;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 
 	FastQueue<Shape> output = new FastQueue<Shape>(Shape.class, true);
 
-	Cube3D_F64 boundingBox = new Cube3D_F64();
+	Box3D_F64 boundingBox = new Box3D_F64();
 
 	List<PointVectorNN> unmatchePV = new ArrayList<PointVectorNN>();
 
@@ -65,12 +65,12 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 	}
 
 	@Override
-	public void process(List<Point3D_F64> cloud, Cube3D_F64 boundingBox) {
+	public void process(List<Point3D_F64> cloud, Box3D_F64 boundingBox) {
 		pointNormList.reset();
 		surfaceNormals.process(cloud, pointNormList);
 
 		if (boundingBox == null) {
-			UtilPoint3D_F64.boundingCube(cloud, this.boundingBox);
+			UtilPoint3D_F64.boundingBox(cloud, this.boundingBox);
 		} else {
 			this.boundingBox.set(boundingBox);
 		}

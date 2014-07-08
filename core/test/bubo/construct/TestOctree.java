@@ -19,7 +19,7 @@
 package bubo.construct;
 
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class TestOctree {
 
 		Octree_F64 tree = new Octree_F64();
 		tree.divider = new Point3D_F64(20, 30, 40);
-		tree.space = new Cube3D_F64(-100, -100, -100, 200, 200, 200);
+		tree.space = new Box3D_F64(-100, -100, -100, 200, 200, 200);
 
 		Octree node0 = new Octree_F64();
 		tree.divider = new Point3D_F64(5, -10, 50);
@@ -69,7 +69,7 @@ public class TestOctree {
 
 		Octree_F64 tree = new Octree_F64();
 		tree.divider = new Point3D_F64(20, 30, 40);
-		tree.space = new Cube3D_F64(-100, -100, -100, 200, 200, 200);
+		tree.space = new Box3D_F64(-100, -100, -100, 200, 200, 200);
 
 		Octree node0 = new Octree_F64();
 		tree.divider = new Point3D_F64(5, -10, 50);

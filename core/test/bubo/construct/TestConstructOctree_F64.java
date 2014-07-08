@@ -20,7 +20,7 @@ package bubo.construct;
 
 import georegression.metric.Intersection3D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +33,7 @@ public class TestConstructOctree_F64 {
 
 	@Test
 	public void computeDivider() {
-		Cube3D_F64 cube = new Cube3D_F64(10, 20, 30, 60, 80, 100);
+		Box3D_F64 cube = new Box3D_F64(10, 20, 30, 60, 80, 100);
 		Point3D_F64 p = new Point3D_F64();
 		ConstructOctree_F64.computeDivider(cube, p);
 
@@ -44,10 +44,10 @@ public class TestConstructOctree_F64 {
 
 	@Test
 	public void setChildSpace() {
-		Cube3D_F64 cube = new Cube3D_F64(-50, -50, -50, 50, 50, 50);
+		Box3D_F64 cube = new Box3D_F64(-50, -50, -50, 50, 50, 50);
 		Point3D_F64 divider = new Point3D_F64();
 
-		Cube3D_F64 child = new Cube3D_F64();
+		Box3D_F64 child = new Box3D_F64();
 
 		Point3D_F64 testPt = new Point3D_F64();
 

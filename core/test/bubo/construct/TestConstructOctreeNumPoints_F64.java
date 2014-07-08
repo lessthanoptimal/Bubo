@@ -19,7 +19,7 @@
 package bubo.construct;
 
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -49,7 +49,7 @@ public class TestConstructOctreeNumPoints_F64 {
 	public void addPoint_singleNode() {
 		ConstructOctreeNumPoints_F64 alg = new ConstructOctreeNumPoints_F64(10);
 		Octree_F64 tree = alg.getTree();
-		tree.space = new Cube3D_F64(-50, -50, -50, 100, 100, 100);
+		tree.space = new Box3D_F64(-50, -50, -50, 100, 100, 100);
 		tree.divider = new Point3D_F64();
 
 
@@ -65,7 +65,7 @@ public class TestConstructOctreeNumPoints_F64 {
 		Point3D_F64 p = new Point3D_F64(1, 1, 1);
 
 		Octree_F64 tree = alg.getTree();
-		tree.space = new Cube3D_F64(-50, -50, -50, 100, 100, 100);
+		tree.space = new Box3D_F64(-50, -50, -50, 100, 100, 100);
 		tree.divider = new Point3D_F64();
 		tree.children = new Octree_F64[8];
 
@@ -83,7 +83,7 @@ public class TestConstructOctreeNumPoints_F64 {
 		ConstructOctreeNumPoints_F64 alg = new ConstructOctreeNumPoints_F64(10);
 
 		Octree_F64 tree = alg.getTree();
-		tree.space = new Cube3D_F64(-50, -50, -50, 50, 50, 50);
+		tree.space = new Box3D_F64(-50, -50, -50, 50, 50, 50);
 		tree.divider = new Point3D_F64();
 
 		for (int i = 0; i < 9; i++) {
@@ -113,7 +113,7 @@ public class TestConstructOctreeNumPoints_F64 {
 	@Test
 	public void numerousIdenticalPoints() {
 		ConstructOctreeNumPoints_F64 alg = new ConstructOctreeNumPoints_F64(10);
-		alg.initialize(new Cube3D_F64(-100, -100, -100, 200, 200, 200));
+		alg.initialize(new Box3D_F64(-100, -100, -100, 200, 200, 200));
 
 		for (int i = 0; i < 100; i++) {
 			Point3D_F64 a = new Point3D_F64(1, 1, 1);

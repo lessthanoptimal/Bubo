@@ -20,7 +20,7 @@ package bubo.construct;
 
 import georegression.metric.Intersection3D_I32;
 import georegression.struct.point.Point3D_I32;
-import georegression.struct.shapes.Cube3D_I32;
+import georegression.struct.shapes.Box3D_I32;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -40,14 +40,14 @@ public class TestConstructOctreeLeaf_I32 {
 	@Test
 	public void addPoint_outside() {
 		ConstructOctree_I32 alg = new ConstructOctreeLeaf_I32();
-		alg.initialize(new Cube3D_I32(0,0,0,10,10,10));
+		alg.initialize(new Box3D_I32(0,0,0,10,10,10));
 		assertTrue(null == alg.addPoint(new Point3D_I32(100, 200, 300), null));
 	}
 
 	@Test
 	public void addPoint_inside() {
 		ConstructOctree_I32 alg = new ConstructOctreeLeaf_I32();
-		alg.initialize(new Cube3D_I32(0,0,0,10,10,10));
+		alg.initialize(new Box3D_I32(0,0,0,10,10,10));
 		Octree_I32 n = alg.addPoint(new Point3D_I32(1, 2, 3), null);
 		assertEquals(n.space.p0.x,1);
 		assertEquals(n.space.p0.y,2);
@@ -76,7 +76,7 @@ public class TestConstructOctreeLeaf_I32 {
 	private void exhaustiveCheck( int w , int h , int d) {
 		ConstructOctreeLeaf_I32 alg = new ConstructOctreeLeaf_I32();
 
-		alg.initialize(new Cube3D_I32(0,0,0,w,h,d));
+		alg.initialize(new Box3D_I32(0,0,0,w,h,d));
 
 		// fill the whole space
 		int total = 0;
@@ -128,10 +128,10 @@ public class TestConstructOctreeLeaf_I32 {
 	public void addLeafsIntersect() {
 		ConstructOctreeLeaf_I32 alg = new ConstructOctreeLeaf_I32();
 
-		alg.initialize(new Cube3D_I32(0, 0, 0, 10, 10, 10));
+		alg.initialize(new Box3D_I32(0, 0, 0, 10, 10, 10));
 
 		List<Octree_I32> output = new ArrayList<Octree_I32>();
-		Cube3D_I32 target = new Cube3D_I32(2,3,4,5,5,5);
+		Box3D_I32 target = new Box3D_I32(2,3,4,5,5,5);
 		alg.addLeafsIntersect(target,output,null);
 
 		assertEquals(3*2*1,output.size());

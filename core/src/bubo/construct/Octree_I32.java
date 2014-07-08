@@ -20,7 +20,7 @@ package bubo.construct;
 
 import georegression.metric.Intersection3D_I32;
 import georegression.struct.point.Point3D_I32;
-import georegression.struct.shapes.Cube3D_I32;
+import georegression.struct.shapes.Box3D_I32;
 
 /**
  * {@link Octree} implementation for integers.
@@ -31,7 +31,7 @@ public class Octree_I32 extends Octree<Octree_I32,Point3D_I32>{
 	/**
 	 * Defines the space in which this node is contained
 	 */
-	public Cube3D_I32 space = new Cube3D_I32();
+	public Box3D_I32 space = new Box3D_I32();
 	/**
 	 * The control point used to segment the space out into 8 children.  This is commonly the center
 	 * of the cube.

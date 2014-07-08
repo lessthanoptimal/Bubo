@@ -25,7 +25,7 @@ import bubo.construct.ConstructOctreeNumPoints_F64;
 import bubo.construct.Octree_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 		PointCloudShapeDetectionSchnabel2007 alg = createAlgorithm();
 
-		alg.process(list, new Cube3D_F64(-100, -100, -100, 200, 200, 200));
+		alg.process(list, new Box3D_F64(-100, -100, -100, 200, 200, 200));
 
 		FastQueue<FoundShape> found = alg.getFoundObjects();
 
@@ -80,7 +80,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 		PointCloudShapeDetectionSchnabel2007 alg = createAlgorithm();
 
-		alg.process(list, new Cube3D_F64(-100, -100, -100, 200, 200, 200));
+		alg.process(list, new Box3D_F64(-100, -100, -100, 200, 200, 200));
 
 		FastQueue<FoundShape> found = alg.getFoundObjects();
 

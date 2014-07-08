@@ -19,7 +19,7 @@
 package bubo.construct;
 
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.shapes.Cube3D_F64;
+import georegression.struct.shapes.Box3D_F64;
 
 /**
  * Base class for constructing {@link bubo.construct.Octree_F64}.
@@ -38,7 +38,7 @@ public abstract class ConstructOctree_F64 extends ConstructOctree<Octree_F64,Poi
 	 *
 	 * @param cube Space which is contained by the Octree.
 	 */
-	public void initialize(Cube3D_F64 cube) {
+	public void initialize(Box3D_F64 cube) {
 		reset();
 		tree.space.set(cube);
 	}
@@ -51,15 +51,15 @@ public abstract class ConstructOctree_F64 extends ConstructOctree<Octree_F64,Poi
 	/**
 	 * Sets the divider to the center of space
 	 */
-	public static void computeDivider(Cube3D_F64 space, Point3D_F64 divider) {
+	public static void computeDivider(Box3D_F64 space, Point3D_F64 divider) {
 
 		divider.x = (space.p0.x + space.p1.x) / 2.0;
 		divider.y = (space.p0.y + space.p1.y) / 2.0;
 		divider.z = (space.p0.z + space.p1.z) / 2.0;
 	}
 
-	public static void setChildSpace(Cube3D_F64 parentSpace, Point3D_F64 parentDivider, int index,
-									 Cube3D_F64 childSpace) {
+	public static void setChildSpace(Box3D_F64 parentSpace, Point3D_F64 parentDivider, int index,
+									 Box3D_F64 childSpace) {
 
 		childSpace.p0.set(parentSpace.p0);
 
