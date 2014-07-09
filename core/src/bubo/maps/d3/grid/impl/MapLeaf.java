@@ -26,4 +26,11 @@ package bubo.maps.d3.grid.impl;
  */
 public class MapLeaf {
 	public double probability;
+
+	public MapLeaf(double probability) {
+		this.probability = probability;
+	}
+
+	public MapLeaf() {
+	}
 }

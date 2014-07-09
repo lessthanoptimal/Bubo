@@ -23,6 +23,7 @@ import bubo.maps.d3.grid.OccupancyGrid3D_F64;
 import org.junit.Test;
 
 import java.util.Iterator;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
@@ -48,10 +49,14 @@ public abstract class GenericOccupancyGrid3DChecks {
 
 	@Test
 	public void set_and_get() {
-		OccupancyGrid3D_F64 map = createOccupancyGrid(2,3,4);
+		OccupancyGrid3D_F64 map = createOccupancyGrid(3,4,5);
 
 		map.set(1,2,3,0.9);
 		assertEquals(0.9,map.get(1,2,3),1e-8);
+
+		assertEquals(map.getUnknownValue(),map.get(2,2,3),1e-8);
+		assertEquals(map.getUnknownValue(),map.get(0,2,3),1e-8);
+		assertEquals(map.getUnknownValue(),map.get(2,3,4),1e-8);
 	}
 
 	@Test
@@ -75,5 +80,29 @@ public abstract class GenericOccupancyGrid3DChecks {
 		assertTrue(iter.hasNext());
 		iter.next();
 		assertFalse(iter.hasNext());
+	}
+
+	@Test
+	public void copy() {
+		Random rand = new Random(234);
+		OccupancyGrid3D_F64 map = createOccupancyGrid(10,12,14);
+		for (int i = 0; i < 100; i++) {
+			int x = rand.nextInt(map.getSizeX());
+			int y = rand.nextInt(map.getSizeY());
+			int z = rand.nextInt(map.getSizeZ());
+			double p = rand.nextDouble();
+			map.set(x,y,z,p);
+		}
+
+		OccupancyGrid3D_F64 copy = map.copy();
+		for (int i = 0; i < map.getSizeX(); i++) {
+			for (int j = 0; j < map.getSizeY(); j++) {
+				for (int k = 0; k < map.getSizeZ(); k++) {
+					double found = copy.get(i,j,k);
+					double expected = map.get(i,j,k);
+					assertTrue(expected==found);
+				}
+			}
+		}
 	}
 }

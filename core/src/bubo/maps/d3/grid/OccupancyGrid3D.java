@@ -72,4 +72,10 @@ public interface OccupancyGrid3D {
 	 * @return Length along z-axis.
 	 */
 	public int getSizeZ();
+
+	/**
+	 * Creates a copy of this map
+	 * @return copy of the map
+	 */
+	public OccupancyGrid3D copy();
 }

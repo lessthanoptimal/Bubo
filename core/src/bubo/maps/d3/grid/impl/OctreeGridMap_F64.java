@@ -95,7 +95,7 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	public double get(int x, int y, int z) {
 		temp.set(x,y,z);
 		Octree_I32 node = construct.getTree().findDeepest(temp);
-		if( node == null || !node.isLeaf() || !node.isSmallest())
+		if( node == null || node.userData == null )
 			return unknownValue;
 		else
 			return ((MapLeaf)node.userData).probability;
@@ -114,6 +114,19 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	@Override
 	public Iterator<CellProbability_F64> iteratorKnown() {
 		return new OctIterator();
+	}
+
+	@Override
+	public OccupancyGrid3D_F64 copy() {
+		OccupancyGrid3D_F64 ret = new OctreeGridMap_F64(getSizeX(),getSizeY(),getSizeZ());
+
+		Iterator<CellProbability_F64> iter = iteratorKnown();
+		while( iter.hasNext() ) {
+			CellProbability_F64 p = iter.next();
+			ret.set(p.x,p.y,p.z,p.probability);
+		}
+
+		return ret;
 	}
 
 	@Override

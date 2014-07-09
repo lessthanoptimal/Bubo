@@ -27,6 +27,14 @@ public class SumData {
 	double total;
 	double weight;
 
+	public SumData(double total, double weight) {
+		this.total = total;
+		this.weight = weight;
+	}
+
+	public SumData() {
+	}
+
 	public void reset() {
 		total = weight = 0;
 	}

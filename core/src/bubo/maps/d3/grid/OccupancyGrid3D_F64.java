@@ -64,4 +64,10 @@ public interface OccupancyGrid3D_F64 extends OccupancyGrid3D {
 	 * @return Iterator for map cells
 	 */
 	public Iterator<CellProbability_F64> iteratorKnown();
+
+	/**
+	 * Creates a copy of this map
+	 * @return copy of the map
+	 */
+	public OccupancyGrid3D_F64 copy();
 }

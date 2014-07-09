@@ -50,4 +50,10 @@ public interface OccupancyGrid3D_F32 extends OccupancyGrid3D {
 	 * @return if it is valid or not
 	 */
 	public boolean isValid(float value);
+
+	/**
+	 * Creates a copy of this map
+	 * @return copy of the map
+	 */
+	public OccupancyGrid3D_F32 copy();
 }
