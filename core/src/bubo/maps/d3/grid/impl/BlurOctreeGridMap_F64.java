@@ -36,13 +36,13 @@ import java.util.List;
  *
  * <p>
  * It is assumed that most of the neighbor nodes surrounding a 'known' node in the input have
- * a value of unknown.  This type of sparse structure is taken advantage of by having each node with
+ * a value of 'defaultValue'.  This type of sparse structure is taken advantage of by having each node with
  * a known value push its information on to its neighbors.  This is a re-ordering of the usual convolution
  * computation.
  * </p>
  * <p>
  * NOTE: If a cell is along the map's border cells outside the map will be treated as having a value
- * of unknown.  A better way would be to reweigh it based on the cells which are inside the image.
+ * of 'defaultValue'.  A better way would be to reweigh it based on the cells which are inside the image.
  * </p>
  * @author Peter Abeles
  */
@@ -79,8 +79,8 @@ public class BlurOctreeGridMap_F64 {
 	}
 
 	/**
-	 * Creates grid map cells in the blurred image around map cells in the input image which
-	 * have been assigned a value other than unknown
+	 * Creates grid map cells in the blurred image around the coordinates of map cells in the input map which
+	 * have been assigned a value other than 'defaultValue'
 	 */
 	protected void createBlurredCells(OctreeGridMap_F64 input, Kernel3D_F64 kernel, OctreeGridMap_F64 blurred) {
 		FastQueue<Octree_I32> list = input.getConstruct().getAllNodes();
@@ -113,7 +113,7 @@ public class BlurOctreeGridMap_F64 {
 	 * Apply the probability to all the neighbors of 'o' in the blurred image.  The weight given
 	 * to each neighbor is the weight from the kernel centered around it.  This is more efficient
 	 * that picking a point and convolving around it since only a few points actually have
-	 * values which aren't 'unknown'.
+	 * values which aren't 'defaultValue'.
 	 */
 	protected void applyToNeighbors(Kernel3D_F64 kernel, Octree_I32 o) {
 
@@ -145,7 +145,7 @@ public class BlurOctreeGridMap_F64 {
 	/**
 	 * Now that all off the non-unknown nodes have applied their probabilities to their neighbors,
 	 * compute the probability for each non-unknown cell in the blurred image.  This takes in
-	 * account that all cells which did not contribute to the convolution will have a value of 'unknown'
+	 * account that all cells which did not contribute to the convolution will have a value of 'defaultValue'
 	 */
 	protected static void computeProbability(OctreeGridMap_F64 blurred) {
 		FastQueue<Octree_I32> list = blurred.getConstruct().getAllNodes();
@@ -160,10 +160,10 @@ public class BlurOctreeGridMap_F64 {
 				throw new RuntimeException("BUG!!  Weight should be <= 1");
 
 			// take in account all the unknown cells surrounding it
-			// NOTE: This will effectively treat cells outside the map as having a value of unknown
+			// NOTE: This will effectively treat cells outside the map as having a value of 'defaultValue'
 			// the kernel is normalized so that it's sum will be one
 			MapLeaf data = blurred.info.grow();
-			data.probability = blur.total + blurred.getUnknownValue()*(1.0-blur.weight);
+			data.probability = blur.total + blurred.getDefaultValue()*(1.0-blur.weight);
 			// replace the  blur data with the usual data structure
 			o.userData = data;
 		}

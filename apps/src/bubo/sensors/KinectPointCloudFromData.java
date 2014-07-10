@@ -57,16 +57,22 @@ public class KinectPointCloudFromData {
 			originA.add(cloudA.get(i).copy());
 		}
 
+		long time0 = System.currentTimeMillis();
 		fit.setSource(cloudA);
 		fit.setDestination(cloudB);
+		long time1 = System.currentTimeMillis();
+		System.out.println("Set cloud time: "+(time1-time0)/1000.0);
 
 		System.out.println("Start fitting");
 		if( !fit.compute() )
 			throw new RuntimeException("Matching failed!");
 
 		Se3_F64 srcToDst = fit.getSourceToDestination();
+		long time2 = System.currentTimeMillis();
+		System.out.println("Register time: "+(time2-time1)/1000.0);
 
 		System.out.println(srcToDst);
+
 
 		for (int i = 0; i < originA.size(); i++) {
 			Point3D_F64 a = originA.get(i);
@@ -104,7 +110,7 @@ public class KinectPointCloudFromData {
 			Point3D_F64 p = cloud.get(i);
 			p.scale(1.0/1000.0);
 
-			double r = p.x*p.x + p.y*p.y + p.z*p.z;
+			double r = p.normSq();
 
 			double x = -p.x;
 			double y = -p.y;
@@ -116,7 +122,7 @@ public class KinectPointCloudFromData {
 			}
 		}
 
-		System.out.println("Total points "+cloud.size()+"  out "+out.size());
+		System.out.println("Total points "+cloud.size()+"  after pruning "+out.size());
 
 		return out;
 	}

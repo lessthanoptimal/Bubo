@@ -54,9 +54,9 @@ public abstract class GenericOccupancyGrid3DChecks {
 		map.set(1,2,3,0.9);
 		assertEquals(0.9,map.get(1,2,3),1e-8);
 
-		assertEquals(map.getUnknownValue(),map.get(2,2,3),1e-8);
-		assertEquals(map.getUnknownValue(),map.get(0,2,3),1e-8);
-		assertEquals(map.getUnknownValue(),map.get(2,3,4),1e-8);
+		assertEquals(map.getDefaultValue(),map.get(2,2,3),1e-8);
+		assertEquals(map.getDefaultValue(),map.get(0,2,3),1e-8);
+		assertEquals(map.getDefaultValue(),map.get(2,3,4),1e-8);
 	}
 
 	@Test

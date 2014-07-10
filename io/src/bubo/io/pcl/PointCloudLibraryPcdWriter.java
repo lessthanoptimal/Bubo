@@ -25,6 +25,8 @@ import java.io.PrintStream;
 import java.util.List;
 
 /**
+ * Outputs data in PCL compatible file formats
+ *
  * @author Peter Abeles
  */
 public class PointCloudLibraryPcdWriter {
@@ -53,6 +55,34 @@ public class PointCloudLibraryPcdWriter {
 			Point3D_F64 p = cloud.get(i);
 
 			out.printf("%f %f %f\n",p.x,p.y,p.z);
+		}
+		out.close();
+	}
+
+	/**
+	 * Saves a point cloud with color information in PCD format
+	 */
+	public static void save( List<Point3D_F64> cloud ,  int[] rgb ,  String fileName ) throws FileNotFoundException {
+
+		PrintStream out = new PrintStream(fileName);
+
+		out.println(
+				"# .PCD v.7 - Point Cloud Data file format\n" +
+						"VERSION .7\n" +
+						"FIELDS x y z rgb\n" +
+						"SIZE 4 4 4 4\n" +
+						"TYPE F F F F\n" +
+						"COUNT 1 1 1 1\n" +
+						"WIDTH "+cloud.size()+"\n" +
+						"HEIGHT 1\n" +
+						"VIEWPOINT 0 0 0 1 0 0 0\n" +
+						"POINTS "+cloud.size()+"\n" +
+						"DATA ascii");
+
+		for (int i = 0; i < cloud.size(); i++) {
+			Point3D_F64 p = cloud.get(i);
+
+			out.printf("%f %f %f %f\n",p.x,p.y,p.z,(float)rgb[i]);
 		}
 		out.close();
 	}

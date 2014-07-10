@@ -38,7 +38,7 @@ import java.util.List;
  *
  * Internally, the probability is stored in {@link MapLeaf} in the {@link bubo.construct.Octree_I32}'s user
  * data parameter.  If a graph node doesn't exist or has no user data assigned to it then it is assumed to
- * have the value of the 'unknownValue' parameter.
+ * have the value of the 'defaultValue' parameter.
  *
  * @see ConstructOctreeLeaf_I32
  *
@@ -47,7 +47,7 @@ import java.util.List;
 public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 
 	// value of cells with no information
-	double unknownValue = 0.5;
+	double defaultValue = 0.5;
 
 	// constructs and maintains the octree
 	ConstructOctreeLeaf_I32 construct;
@@ -96,7 +96,7 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 		temp.set(x,y,z);
 		Octree_I32 node = construct.getTree().findDeepest(temp);
 		if( node == null || node.userData == null )
-			return unknownValue;
+			return defaultValue;
 		else
 			return ((MapLeaf)node.userData).probability;
 	}
@@ -107,8 +107,13 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	}
 
 	@Override
-	public double getUnknownValue() {
-		return unknownValue;
+	public double getDefaultValue() {
+		return defaultValue;
+	}
+
+	@Override
+	public void setDefaultValue(double value) {
+		defaultValue = value;
 	}
 
 	@Override
@@ -142,12 +147,12 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	}
 
 	@Override
-	public boolean isKnown(int x, int y, int z) {
+	public boolean isDefault(int x, int y, int z) {
 		temp.set(x,y,z);
 		Octree_I32 node = construct.getTree().findDeepest(temp);
 		if( node != null && node.isLeaf() && node.isSmallest() ) {
 			MapLeaf info = node.getUserData();
-			return info.probability != unknownValue;
+			return info.probability != defaultValue;
 		}
 		return false;
 	}
@@ -176,7 +181,7 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	 * @return List of all occupied cells
 	 */
 	public List<Octree_I32> getGridCells() {
-		return OctreeOps.findUsedLeafs(construct.getAllNodes().toList(), null);
+		return OctreeOps.findLeafsWithData(construct.getAllNodes().toList(), null);
 	}
 
 	/**

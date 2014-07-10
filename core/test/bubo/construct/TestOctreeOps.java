@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 public class TestOctreeOps {
 
 	@Test
-	public void findUsedLeafs() {
+	public void findLeafsWithData() {
 		List<Octree_I32> input = new ArrayList<Octree_I32>();
 
 		input.add( new Octree_I32());
@@ -46,7 +46,29 @@ public class TestOctreeOps {
 		input.get(2).userData = 1;
 		input.get(3).space.set(2,2,2,3,3,3);
 
-		List<Octree_I32> filtered = OctreeOps.findUsedLeafs(input, null);
+		List<Octree_I32> filtered = OctreeOps.findLeafsWithData(input, null);
+
+		assertEquals(2,filtered.size());
+		assertTrue(filtered.get(0) == input.get(1));
+		assertTrue(filtered.get(1) == input.get(2));
+	}
+
+	@Test
+	public void findLeafsWithPoints() {
+		List<Octree_I32> input = new ArrayList<Octree_I32>();
+
+		input.add( new Octree_I32());
+		input.add( new Octree_I32());
+		input.add( new Octree_I32());
+		input.add( new Octree_I32());
+
+		input.get(1).space.set(2,2,2,3,3,3);
+		input.get(1).points.grow();
+		input.get(2).space.set(2,2,2,3,3,3);
+		input.get(2).points.grow();
+		input.get(3).space.set(2,2,2,3,3,3);
+
+		List<Octree_I32> filtered = OctreeOps.findLeafsWithPoints(input, null);
 
 		assertEquals(2,filtered.size());
 		assertTrue(filtered.get(0) == input.get(1));

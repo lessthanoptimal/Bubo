@@ -32,7 +32,7 @@ public class OctreeOps {
 	 * Finds all nodes in the list which are the smallest possible size, e.g. 1x1x1, and have
 	 * user assigned data to them.
 	 */
-	public static List<Octree_I32> findUsedLeafs(List<Octree_I32> allNodes, List<Octree_I32> output) {
+	public static List<Octree_I32> findLeafsWithData(List<Octree_I32> allNodes, List<Octree_I32> output) {
 
 		if( output == null ) {
 			output = new ArrayList<Octree_I32>();
@@ -41,6 +41,26 @@ public class OctreeOps {
 		for (int i = 0; i < allNodes.size(); i++) {
 			Octree_I32 n = allNodes.get(i);
 			if( n.isSmallest() && n.userData != null ) {
+				output.add(n);
+			}
+		}
+
+		return output;
+	}
+
+	/**
+	 * Finds all nodes in the list which are the smallest possible size, e.g. 1x1x1, and have
+	 * user assigned data to them.
+	 */
+	public static List<Octree_I32> findLeafsWithPoints(List<Octree_I32> allNodes, List<Octree_I32> output) {
+
+		if( output == null ) {
+			output = new ArrayList<Octree_I32>();
+		}
+
+		for (int i = 0; i < allNodes.size(); i++) {
+			Octree_I32 n = allNodes.get(i);
+			if( n.points.size != 0 && n.isLeaf() ) {
 				output.add(n);
 			}
 		}

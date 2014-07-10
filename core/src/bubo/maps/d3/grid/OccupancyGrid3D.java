@@ -38,22 +38,23 @@ public interface OccupancyGrid3D {
 	 *
 	 * @param x x-coordinate
 	 * @param y y-coordinate
-	 * @return If the coordinate belongs to a valid cell in the map.
+	 * @param z z-coordinate
+	 * @return true if the coordinate belongs to a valid cell in the map.
 	 */
 	public boolean isInBounds(int x, int y, int z);
 
 	/**
-	 * Checks to see if any information is available on the occupancy of
-	 * the specified cell.
+	 * Checks to see if the specified location has the default value or not
 	 *
 	 * @param x x-coordinate
 	 * @param y y-coordinate
+	 * @param z z-coordinate
 	 * @return true if information is available on the cell.
 	 */
-	public boolean isKnown(int x, int y, int z);
+	public boolean isDefault(int x, int y, int z);
 
 	/**
-	 * Length along x-axis.  All valid y-coordinates are between 0 and getSizeX()-1
+	 * Length along x-axis.  All valid x-coordinates are between 0 and getSizeX()-1
 	 *
 	 * @return Length along x-axis.
 	 */
@@ -67,7 +68,7 @@ public interface OccupancyGrid3D {
 	public int getSizeY();
 
 	/**
-	 * Length along z-axis.  All valid y-coordinates are between 0 and getSizeZ()-1
+	 * Length along z-axis.  All valid z-coordinates are between 0 and getSizeZ()-1
 	 *
 	 * @return Length along z-axis.
 	 */

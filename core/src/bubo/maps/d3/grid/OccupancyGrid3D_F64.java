@@ -24,6 +24,10 @@ import java.util.Iterator;
  * Interface for 64bit floating point 3D occupancy grid.  An occupancy grid stores the probability of a square region
  * being occupied by an obstacle or not.  A value of 1 means 100% and 0 means 0%, 50% is unknown or equal probability.
  *
+ * The default value assigned to cells, which have not be explicitly assigned a value, is, by default, 0.5.  0.5 was
+ * selected because it means it is not known if it is occupied or not.  The user can override this behavior by
+ * calling {@link #setDefaultValue}.
+ *
  * @author Peter Abeles
  */
 public interface OccupancyGrid3D_F64 extends OccupancyGrid3D {
@@ -54,10 +58,26 @@ public interface OccupancyGrid3D_F64 extends OccupancyGrid3D {
 	public boolean isValid(double value);
 
 	/**
-	 * Returns the value of grid cells which have no information
+	 * Returns the value of grid cells which have not been explicitly assigned a value.
+	 *
 	 * @return value of unknown grid cells
 	 */
-	public double getUnknownValue();
+	public double getDefaultValue();
+
+	/**
+	 * <p>
+	 * Sets the default value used in the map.
+	 * </p>
+	 *
+	 * <p>
+	 * WARNING: How this affects the current map is undefined.  Depending on the data structure
+	 * it might have an immediate effect or none at all.  To put the map back into a known state invoke
+	 * {@link #clear()} which sets all elements in the grid to the default.
+	 * </p>
+	 *
+	 * @param value The new value of unknown.
+	 */
+	public void setDefaultValue(double value);
 
 	/**
 	 * Returns an iterator, which will iterate through all maps cells which are not assigned a value of unknown.

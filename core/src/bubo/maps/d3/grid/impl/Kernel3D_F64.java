@@ -19,6 +19,8 @@
 package bubo.maps.d3.grid.impl;
 
 /**
+ * A 3D convolution kernel for doubles.
+ *
  * @author Peter Abeles
  */
 public class Kernel3D_F64 {
@@ -33,14 +35,23 @@ public class Kernel3D_F64 {
 		data = new double[width*width*width];
 	}
 
+	/**
+	 * Returns the element at coordinate (i,j,k) in the kernel
+	 */
 	public double get( int i , int j , int k ) {
 		return data[ i*width*width + j*width + k];
 	}
 
+	/**
+	 * The radius of the kernel.
+	 */
 	public int getRadius() {
 		return radius;
 	}
 
+	/**
+	 * Total number of elements in the kernel.
+	 */
 	public int getTotalElements() {
 		return data.length;
 	}
@@ -77,6 +88,16 @@ public class Kernel3D_F64 {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * Creates a Gaussian kernel using a sigma computed
+	 * @param radius Radius in array elements
+	 * @return the kernel
+	 */
+	public static Kernel3D_F64 gaussian( int radius ) {
+		double sigma = (radius* 2.0 + 1.0 ) / 5.0;
+		return gaussian(sigma,radius);
 	}
 
 	public int getWidth() {
