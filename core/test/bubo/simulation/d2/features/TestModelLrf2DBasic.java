@@ -36,7 +36,7 @@ public class TestModelLrf2DBasic {
 	 */
 	@Test
 	public void lineInFront() {
-		LineSegmentWorld2D world = new LineSegmentWorld2D();
+		LineSegmentWorld world = new LineSegmentWorld();
 		world.lines.add(new LineSegment2D_F64(-1, 2, 1, 2));
 
 
@@ -64,7 +64,7 @@ public class TestModelLrf2DBasic {
 	 */
 	@Test
 	public void lineBehind() {
-		LineSegmentWorld2D world = new LineSegmentWorld2D();
+		LineSegmentWorld world = new LineSegmentWorld();
 		world.lines.add(new LineSegment2D_F64(-1, -2, 1, -2));
 
 
@@ -90,7 +90,7 @@ public class TestModelLrf2DBasic {
 	 */
 	@Test
 	public void lineBlockView() {
-		LineSegmentWorld2D world = new LineSegmentWorld2D();
+		LineSegmentWorld world = new LineSegmentWorld();
 		world.lines.add(new LineSegment2D_F64(-1, 2, 1, 2));
 		world.lines.add(new LineSegment2D_F64(-1, 2.5, 1, 2.5));
 
@@ -119,7 +119,7 @@ public class TestModelLrf2DBasic {
 	 */
 	@Test
 	public void lineInFront_noise() {
-		LineSegmentWorld2D world = new LineSegmentWorld2D();
+		LineSegmentWorld world = new LineSegmentWorld();
 		world.lines.add(new LineSegment2D_F64(-1, 2, 1, 2));
 
 

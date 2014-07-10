@@ -33,15 +33,11 @@ public interface RobotInterface {
 	 * All control should be done when this function is called.  This allows the output to be
 	 * deterministic.
 	 */
-	public void doControl();
+	public void doControl( long timeStamp );
 
-	public void sendControl( double velocity , double anglularVelocity );
+	public void setControlListener( ControlListener listener );
 
-	public Se2_F64 _truthRobotToWorld();
-
-	public Lrf2dParam getDescriptionLadar();
-
-	public Se2_F64 getLadarToRobot();
+	public void setIntrinsic(Se2_F64 ladarToRobot , Lrf2dParam param );
 
 	public void odometry( long timeStamp , Se2_F64 robotToWorld );
 

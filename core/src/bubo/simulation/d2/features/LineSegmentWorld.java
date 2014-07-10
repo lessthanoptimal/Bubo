@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 2D world in which the environmental constraints are described using line segments.
+ *
  * @author Peter Abeles
  */
-public class LineSegmentWorld2D {
+public class LineSegmentWorld {
 
 	public List<LineSegment2D_F64> lines = new ArrayList<LineSegment2D_F64>();
 }

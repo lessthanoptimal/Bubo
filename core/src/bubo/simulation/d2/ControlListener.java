@@ -21,22 +21,10 @@ package bubo.simulation.d2;
 import georegression.struct.se.Se2_F64;
 
 /**
- * Given a set of controls update the robot's true pose.
- *
  * @author Peter Abeles
  */
-public interface SimulatedRobotTrajectory {
+public interface ControlListener {
+	public void sendControl( double velocity , double anglularVelocity );
 
-	/**
-	 * Updates the robot's pose
-	 */
-	public void update();
-
-	public Se2_F64 getPose();
-
-	public void setPose(Se2_F64 pose);
-
-	public double[] getControlRequested();
-
-	public double[] getControlTruth();
+	public Se2_F64 _truthRobotToWorld();
 }

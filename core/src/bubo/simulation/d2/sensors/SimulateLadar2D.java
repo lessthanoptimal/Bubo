@@ -21,7 +21,7 @@ package bubo.simulation.d2.sensors;
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
-import bubo.simulation.d2.features.LineSegmentWorld2D;
+import bubo.simulation.d2.features.LineSegmentWorld;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -30,15 +30,35 @@ import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
 
 /**
+ * Simulates LRF scans in a simulated line world
+ *
  * @author Peter Abeles
  */
 public class SimulateLadar2D {
 	Lrf2dParam param;
 	Lrf2dMeasurement measurement;
 	Lrf2dPrecomputedTrig trig;
-	Se2_F64 ladarToRobot;
 
-	public void update( Se2_F64 sensorToWorld , LineSegmentWorld2D world ) {
+	public SimulateLadar2D(Lrf2dParam param) {
+		this.param = param;
+		this.trig = new Lrf2dPrecomputedTrig(param);
+		this.measurement = new Lrf2dMeasurement(param.getNumberOfScans());
+	}
+
+	public Lrf2dMeasurement getMeasurement() {
+		return measurement;
+	}
+
+	public Lrf2dParam getParam() {
+		return param;
+	}
+
+	/**
+	 * Given the world model, computes the range measurements
+	 * @param sensorToWorld
+	 * @param world
+	 */
+	public void update( Se2_F64 sensorToWorld , LineSegmentWorld world ) {
 
 		Vector2D_F64 T = sensorToWorld.getTranslation();
 
@@ -56,7 +76,7 @@ public class SimulateLadar2D {
 
 			// intersect with all the lines in the world and see if there are any collisions
 			// if there is a collision save the distance of the closest
-			double best = Double.MAX_VALUE;
+			double best = param.getMaxRange()*param.getMaxRange();
 			for (int j = 0; j < world.lines.size(); j++) {
 				LineSegment2D_F64 worldLine = world.lines.get(j);
 
@@ -69,7 +89,7 @@ public class SimulateLadar2D {
 			}
 
 			// save the results.  Mark values which didn't hit anything as having a value larger than the max range
-			measurement.meas[i] = best >= param.getMaxRange() ? param.getMaxRange()+1 : best;
+			measurement.meas[i] = Math.sqrt(best);
 		}
 
 	}

@@ -24,8 +24,13 @@ import georegression.struct.se.Se2_F64;
  * @author Peter Abeles
  */
 public class CircularRobot2D {
-	Se2_F64 pose;
+	Se2_F64 robotToWorld = new Se2_F64();
+	Se2_F64 sensorToRobot = new Se2_F64();
 	double radius;
 	double velocity;
 	double angularVelocity;
+
+	public CircularRobot2D(double radius) {
+		this.radius = radius;
+	}
 }

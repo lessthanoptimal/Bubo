@@ -40,4 +40,11 @@ public class Lrf2dMeasurement {
 	// number of valid measurements in this data.
 	public int numMeas;
 
+	public Lrf2dMeasurement(int numMeas) {
+		this.numMeas = numMeas;
+		meas = new double[numMeas];
+	}
+
+	public Lrf2dMeasurement() {
+	}
 }

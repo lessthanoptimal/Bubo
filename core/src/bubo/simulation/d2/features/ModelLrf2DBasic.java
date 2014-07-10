@@ -28,14 +28,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Basic sensor model for 2D laser rangefinders (LRF) in a {@link LineSegmentWorld2D}.
+ * Basic sensor model for 2D laser rangefinders (LRF) in a {@link LineSegmentWorld}.
  *
  * @author Peter Abeles
  */
 public class ModelLrf2DBasic {
 
 	Random rand = new Random(123123);
-	LineSegmentWorld2D world;
+	LineSegmentWorld world;
 
 	// standard deviation of noise which is added to range measurements
 	double noiseSigma = 0;
@@ -52,7 +52,7 @@ public class ModelLrf2DBasic {
 		this.noiseSigma = noiseSigma;
 	}
 
-	public void setWorld(LineSegmentWorld2D world) {
+	public void setWorld(LineSegmentWorld world) {
 		this.world = world;
 	}
 

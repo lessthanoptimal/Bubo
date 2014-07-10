@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package bubo.simulation.d2.point;
+package bubo.simulation.d2.sensors;
 
-import bubo.simulation.d2.sensors.SimRangeBearingMeasurement;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import org.junit.Test;
