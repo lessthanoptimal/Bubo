@@ -22,12 +22,17 @@ import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.simulation.d2.ControlListener;
 import bubo.simulation.d2.RobotInterface;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 
 import java.util.List;
 
 /**
+ * Robot which uses ground truth to mindlessly follow a set of waypoints.  How fast it travels and turns is set
+ * by the user.  If it needs to turn it does a point turn.  If there is an obstacle in its way it will just
+ * keep on crashing into it.
+ *
  * @author Peter Abeles
  */
 public class FollowPathCheatingRobot implements RobotInterface {
@@ -37,11 +42,15 @@ public class FollowPathCheatingRobot implements RobotInterface {
 
 	ControlListener listener;
 	double velocity;
+	double angularVelocity;
 
 	long timePrev;
+	boolean turning;
 
-	public FollowPathCheatingRobot(double velocity, List<Point2D_F64> waypoints) {
+	public FollowPathCheatingRobot(double velocity, double angularVelocity ,
+								   List<Point2D_F64> waypoints) {
 		this.velocity = velocity;
+		this.angularVelocity = angularVelocity;
 		this.waypoints = waypoints;
 	}
 
@@ -49,6 +58,7 @@ public class FollowPathCheatingRobot implements RobotInterface {
 	public void doControl(long timeStamp) {
 		if( timePrev == 0 || target >= waypoints.size()) {
 			timePrev = timeStamp;
+			turning = false;
 			return;
 		}
 
@@ -71,15 +81,31 @@ public class FollowPathCheatingRobot implements RobotInterface {
 			Se2_F64 pose = new Se2_F64(wp.x,wp.y,robotToWorld.getYaw());
 			listener.setPose(pose);
 		} else {
+			Se2_F64 pose;
 			double dx = (wp.x-x.x)/d;
 			double dy = (wp.y-x.y)/d;
 
-			double xx = robotToWorld.getX() + dx*travel;
-			double yy = robotToWorld.getY() + dy*travel;
+			double desired = Math.atan2( dy,dx);
+			double actual = robotToWorld.getYaw();
+			// see if it's facing the correct direction
+			double angDist = UtilAngle.dist(desired,actual);
+			if(angDist > 1e-4 ) {
+				// turn towards the correct direction without moving
+				double maxTurn = T*angularVelocity;
+				if( maxTurn < angDist ) {
+					if( UtilAngle.distanceCCW(actual,desired) <= Math.PI )
+						desired = actual + maxTurn;
+					else
+						desired = actual - maxTurn;
+				}
+				pose = new Se2_F64(x.x,x.y,desired);
+			} else {
+				double xx = robotToWorld.getX() + dx*travel;
+				double yy = robotToWorld.getY() + dy*travel;
 
+				pose = new Se2_F64(xx,yy,desired);
+			}
 
-			double theta = Math.atan2( dy,dx);
-			Se2_F64 pose = new Se2_F64(xx,yy,theta);
 			listener.setPose(pose);
 		}
 

@@ -41,7 +41,11 @@ public class Simulation2DPanel extends LineMapDisplay {
 	final double maxRange;
 
 
-	Se2_F64 lrfToWorld = new Se2_F64();
+	Se2_F64 lrfToCenter = new Se2_F64();
+
+	// work space
+	Se2_F64 robotToCenter = new Se2_F64();
+	Se2_F64 worldToCenter = new Se2_F64();
 
 	public Simulation2DPanel(Lrf2dParam param) {
 		this.trig = new Lrf2dPrecomputedTrig(param);
@@ -67,36 +71,34 @@ public class Simulation2DPanel extends LineMapDisplay {
 
 		Graphics2D g2 = (Graphics2D)g;
 
-		int centerX = getWidth()/2;
-		int centerY = getHeight()/2;
-
 		synchronized ( robot ) {
 			g2.setColor(Color.BLACK);
 			Se2_F64 robotToWorld = robot.getRobotToWorld();
+			centerToWorld.invert(worldToCenter);
+			robotToWorld.concat(worldToCenter,robotToCenter);
 
-			int robotX = (int)(robotToWorld.T.x*metersToPixels+0.5) + centerX;
-			int robotY = (int)(robotToWorld.T.y*metersToPixels+0.5) + centerY;
-			int pradius = (int)(robot.getRadius()*metersToPixels+0.5);
-			int pwidth = (int)(2*robot.getRadius()*metersToPixels+0.5);
+			int robotX = (int)Math.round(robotToCenter.T.x*metersToPixels);
+			int robotY = (int)Math.round(robotToCenter.T.y*metersToPixels);
+			int pradius = (int)Math.round(robot.getRadius()*metersToPixels);
+			int pwidth = (int)Math.round(2*robot.getRadius()*metersToPixels);
 
 			// create a line indicating where the robot is facing
 			Point2D_F64 x = new Point2D_F64(robot.getRadius(),0);
-			SePointOps_F64.transform(robotToWorld,x,x);
+			SePointOps_F64.transform(robotToCenter,x,x);
 
-			int dirX = (int)(x.x*metersToPixels+0.5) + centerX;
-			int dirY = (int)(x.y*metersToPixels+0.5) + centerY;
+			int dirX = (int)Math.round(x.x*metersToPixels);
+			int dirY = (int)Math.round(x.y*metersToPixels);
 
-			g2.drawOval(robotX-pradius,robotY-pradius,pwidth,pwidth);
-			g2.drawLine(robotX,robotY,dirX,dirY);
+			drawOval(g2, robotX - pradius, robotY - pradius, pwidth, pwidth);
+			drawLine(g2, robotX, robotY, dirX, dirY);
 
-			robot.getSensorToRobot().concat(robotToWorld,lrfToWorld);
+			robot.getSensorToRobot().concat(robotToCenter, lrfToCenter);
 		}
 
 		synchronized ( measurement ) {
-
 			g2.setColor(Color.BLUE);
-			int lrfX = (int)(lrfToWorld.T.x*metersToPixels+0.5) + centerX;
-			int lrfY = (int)(lrfToWorld.T.y*metersToPixels+0.5) + centerY;
+			int lrfX = (int)Math.round(lrfToCenter.T.x*metersToPixels);
+			int lrfY = (int)Math.round(lrfToCenter.T.y*metersToPixels);
 
 			Point2D_F64 x = new Point2D_F64();
 			for (int i = 0; i < measurement.numMeas; i++) {
@@ -104,11 +106,11 @@ public class Simulation2DPanel extends LineMapDisplay {
 				if( r == maxRange )
 					continue;
 				trig.computeEndPoint(i, measurement.meas[i], x);
-				SePointOps_F64.transform(lrfToWorld,x,x);
-				int scanX = (int)(x.x*metersToPixels+0.5) + centerX;
-				int scanY = (int)(x.y*metersToPixels+0.5) + centerY;
+				SePointOps_F64.transform(lrfToCenter,x,x);
+				int scanX = (int)Math.round(x.x * metersToPixels);
+				int scanY = (int)Math.round(x.y * metersToPixels);
 
-				g2.drawLine(lrfX,lrfY,scanX,scanY);
+				drawLine(g2, lrfX, lrfY, scanX, scanY);
 			}
 
 		}

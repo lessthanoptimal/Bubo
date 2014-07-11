@@ -38,7 +38,7 @@ public class LineMapDisplay extends SpacialDisplay {
 	LineSegmentMap map;
 
 	// transform from map center to world
-	Se2_F64 centerToWorld = new Se2_F64();
+	protected Se2_F64 centerToWorld = new Se2_F64();
 
 	public LineMapDisplay() {
 		showCoordinateAxis("Y", true, "X", true);
@@ -60,10 +60,9 @@ public class LineMapDisplay extends SpacialDisplay {
 	public void autoPreferredSize() {
 		Rectangle2D_F64 bounds = map.computeBoundingRectangle();
 
-		double width = bounds.getWidth()*1.1;
-		double height = bounds.getHeight()*1.1;
-
-		System.out.println("width "+width+" h "+height);
+		double buffer = Math.max(bounds.getWidth(),bounds.getHeight())*0.1;
+		double width = bounds.getWidth()+buffer;
+		double height = bounds.getHeight()+buffer;
 
 		setPreferredSize(new Dimension((int) (width * metersToPixels), (int) (height * metersToPixels)));
 	}
@@ -75,24 +74,39 @@ public class LineMapDisplay extends SpacialDisplay {
 
 		Graphics2D g2 = (Graphics2D)g;
 
-		int centerX = getWidth()/2;
-		int centerY = getHeight()/2;
-
 		Point2D_F64 a = new Point2D_F64();
 		Point2D_F64 b = new Point2D_F64();
 
 		for (int i = 0; i < map.getLines().size(); i++) {
 			LineSegment2D_F64 l = map.getLines().get(i);
 
-			SePointOps_F64.transformReverse(centerToWorld,l.a,a);
+			SePointOps_F64.transformReverse(centerToWorld, l.a, a);
 			SePointOps_F64.transformReverse(centerToWorld, l.b, b);
 
-			int x0 = (int)(a.x*metersToPixels) + centerX;
-			int y0 = (int)(a.y*metersToPixels) + centerY;
-			int x1 = (int)(b.x*metersToPixels) + centerX;
-			int y1 = (int)(b.y*metersToPixels) + centerY;
+			int x0 = (int)Math.round(a.x*metersToPixels);
+			int y0 = (int)Math.round(a.y*metersToPixels);
+			int x1 = (int)Math.round(b.x*metersToPixels);
+			int y1 = (int)Math.round(b.y*metersToPixels);
 
-			g2.drawLine(x0,y0,x1,y1);
+			drawLine(g2, x0, y0, x1, y1);
 		}
+	}
+
+	protected void drawLine( Graphics2D g2 , int x0 , int y0 , int x1 , int y1 ) {
+		int centerX = getWidth()/2;
+		int centerY = getHeight()/2;
+
+		int h = getHeight()-1;
+		g2.drawLine(x0+centerX,h-y0-centerY,x1+centerX,h-y1-centerY);
+	}
+
+	protected void drawOval( Graphics2D g2 , int x, int y, int width, int height ) {
+		int centerX = getWidth()/2;
+		int centerY = getHeight()/2;
+
+		int w = getWidth()-1;
+		int h = getHeight()-1;
+		int y1 = y+height-1;
+		g2.drawOval(x+centerX,h-y1-centerY,width,height);
 	}
 }

@@ -25,6 +25,7 @@ import bubo.simulation.d2.CircularRobot2D;
 import bubo.simulation.d2.Simulation2D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
+import georegression.struct.shapes.Rectangle2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,6 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-// TODO have cheating robot turn gradually
-// TODO make +y go up in the image
 // TODO stick the map in the center by adjusting its transform
 // TODO provide controls for the user zooming and translating
 // TODO Follow robot mode?
@@ -49,6 +48,8 @@ public class DisplaySimulationApp {
 		map.add(-10,4,-10,-4);
 		map.add(-10,-4,10,-4);
 		map.add(10,-4,10,4);
+		map.add(-2,-1.5,-2,0.3);
+		map.add(-3,1.6,0.5,0.5);
 
 		List<Point2D_F64> waypoints = new ArrayList<Point2D_F64>();
 		waypoints.add( new Point2D_F64(8,2));
@@ -57,7 +58,7 @@ public class DisplaySimulationApp {
 		waypoints.add( new Point2D_F64(8,-2));
 		waypoints.add( new Point2D_F64(8,2));
 
-		FollowPathCheatingRobot planner = new FollowPathCheatingRobot(1,waypoints);
+		FollowPathCheatingRobot planner = new FollowPathCheatingRobot(1,0.4,waypoints);
 
 		Lrf2dParam param = new Lrf2dParam(null,Math.PI/2.0,-Math.PI,180,5,0,0);
 
@@ -65,11 +66,11 @@ public class DisplaySimulationApp {
 		robot.getSensorToRobot().T.set(0.15,0);
 
 		sim = new Simulation2D(planner,map,param,robot);
-		sim.setPeriods(0.005,0.03,0.03,0.03);
+		sim.setPeriods(0.005,0.01,100,0.01);
 
-		Point2D_F64 center = map.computeCenter();
+		Rectangle2D_F64 r = map.computeBoundingRectangle();
 		Se2_F64 centerToWorld = new Se2_F64();
-		centerToWorld.T.set(center.x,center.y);
+		centerToWorld.T.set(r.getX()+r.width/2,r.getY()+r.height/2);
 
 		gui = new Simulation2DPanel(param);
 		gui.setMap(map);
