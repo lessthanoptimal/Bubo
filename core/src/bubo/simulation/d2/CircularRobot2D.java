@@ -33,4 +33,35 @@ public class CircularRobot2D {
 	public CircularRobot2D(double radius) {
 		this.radius = radius;
 	}
+
+	public CircularRobot2D() {
+	}
+
+	public void set( CircularRobot2D orig ) {
+		robotToWorld.set( orig.robotToWorld );
+		sensorToRobot.set( orig.sensorToRobot );
+		radius = orig.radius;
+		velocity = orig.velocity;
+		angularVelocity = orig.angularVelocity;
+	}
+
+	public Se2_F64 getRobotToWorld() {
+		return robotToWorld;
+	}
+
+	public Se2_F64 getSensorToRobot() {
+		return sensorToRobot;
+	}
+
+	public double getRadius() {
+		return radius;
+	}
+
+	public double getVelocity() {
+		return velocity;
+	}
+
+	public double getAngularVelocity() {
+		return angularVelocity;
+	}
 }

@@ -135,7 +135,7 @@ subprojects {
 }
 
 // list of projects for creating javadoc and jars
-def mainProjects = [':apps', ':core', ':gui', ':io']
+def mainProjects = [':apps', ':core', ':gui', ':io', ':integration:jme']
 
 // Creates a directory with all the compiled jars and the dependencies for main
 task createLibraryDirectory(dependsOn: mainProjects.collect { it + ":jar" } + mainProjects.collect {

@@ -19,7 +19,7 @@
 package bubo.simulation.d2;
 
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
-import bubo.simulation.d2.features.LineSegmentWorld;
+import bubo.maps.d2.lines.LineSegmentMap;
 import bubo.simulation.d2.sensors.SimulateLadar2D;
 import georegression.metric.ClosestPoint2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
@@ -37,7 +37,7 @@ public class Simulation2D implements ControlListener {
 
 	// simulation and control models
 	RobotInterface user;
-	LineSegmentWorld world;
+	LineSegmentMap world;
 	CircularRobot2D robot;
 	SimulateLadar2D sensor;
 
@@ -61,12 +61,12 @@ public class Simulation2D implements ControlListener {
 	Se2_F64 temp = new Se2_F64();
 
 	public Simulation2D(RobotInterface user,
-						LineSegmentWorld world,
+						LineSegmentMap world,
 						Lrf2dParam sensorParam,
-						double robotRadius) {
+						CircularRobot2D robot ) {
 		this.user = user;
 		this.world = world;
-		this.robot = new CircularRobot2D(robotRadius);
+		this.robot = robot;
 		sensor = new SimulateLadar2D(sensorParam);
 	}
 
@@ -82,17 +82,13 @@ public class Simulation2D implements ControlListener {
 	}
 
 	/**
-	 * Runs the simulation for the specified amount of time
-	 *
-	 * @param lengthOfTime How long the simulation is run for
+	 * Sets up the simulation to run
 	 */
-	public void run( double lengthOfTime ) {
+	public void initialize() {
+		user.setControlListener(this);
 		user.setIntrinsic(robot.sensorToRobot,sensor.getParam());
 		this.time = 0;
 		this.lastOdometry = this.lastLidar = this.lastControl = 0;
-		while( time <= lengthOfTime ) {
-			doStep();
-		}
 	}
 
 	/**
@@ -182,6 +178,11 @@ public class Simulation2D implements ControlListener {
 	}
 
 	@Override
+	public void setPose(Se2_F64 robotToWorld) {
+		robot.getRobotToWorld().set(robotToWorld);
+	}
+
+	@Override
 	public Se2_F64 _truthRobotToWorld() {
 		return robot.robotToWorld;
 	}
@@ -192,5 +193,29 @@ public class Simulation2D implements ControlListener {
 
 	public double getTime() {
 		return time;
+	}
+
+	public CircularRobot2D getRobot() {
+		return robot;
+	}
+
+	public SimulateLadar2D getSimulatedLadar() {
+		return sensor;
+	}
+
+	public double getPeriodControl() {
+		return periodControl;
+	}
+
+	public double getPeriodOdometry() {
+		return periodOdometry;
+	}
+
+	public double getPeriodLidar() {
+		return periodLidar;
+	}
+
+	public double getPeriodSimulation() {
+		return periodSimulation;
 	}
 }

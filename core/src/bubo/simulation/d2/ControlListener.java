@@ -26,5 +26,7 @@ import georegression.struct.se.Se2_F64;
 public interface ControlListener {
 	public void sendControl( double velocity , double anglularVelocity );
 
+	public void setPose( Se2_F64 robotToWorld );
+
 	public Se2_F64 _truthRobotToWorld();
 }

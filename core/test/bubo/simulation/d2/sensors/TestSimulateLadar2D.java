@@ -20,7 +20,7 @@ package bubo.simulation.d2.sensors;
 
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
-import bubo.simulation.d2.features.LineSegmentWorld;
+import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.se.Se2_F64;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class TestSimulateLadar2D {
 
 		Lrf2dParam param = new Lrf2dParam(null,Math.PI/2.0,-Math.PI,180,10,0,0);
 
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add( new LineSegment2D_F64(2,-1,2,1));
 
 		SimulateLadar2D alg = new SimulateLadar2D(param);
@@ -72,7 +72,7 @@ public class TestSimulateLadar2D {
 	public void coordinateSystem() {
 		Lrf2dParam param = new Lrf2dParam(null,Math.PI/2.0,-Math.PI,180,10,0,0);
 
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add( new LineSegment2D_F64(-1,2,1,2));
 
 		SimulateLadar2D alg = new SimulateLadar2D(param);

@@ -20,7 +20,7 @@ package bubo.clouds.fit.s2s;
 
 import bubo.clouds.fit.Lrf2dScanToScan;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
-import bubo.simulation.d2.features.LineSegmentWorld;
+import bubo.maps.d2.lines.LineSegmentMap;
 import bubo.simulation.d2.features.ModelLrf2DBasic;
 import bubo.simulation.d2.features.SimStateLrf2D;
 import georegression.misc.test.GeometryUnitTest;
@@ -69,7 +69,7 @@ public abstract class StandardTestsScanToScan {
 	}
 
 	public void setupSimulation() {
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		// two perpendicular lines so that the position can be uniquely localized
 		world.lines.add(new LineSegment2D_F64(-2, 4, 2, 0));
 		world.lines.add(new LineSegment2D_F64(-2, -4, 2, 0));

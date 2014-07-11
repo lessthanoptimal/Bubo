@@ -19,6 +19,7 @@
 package bubo.simulation.d2.features;
 
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
+import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.struct.line.LineSegment2D_F64;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ public class TestModelLrf2DBasic {
 	 */
 	@Test
 	public void lineInFront() {
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(-1, 2, 1, 2));
 
 
@@ -64,7 +65,7 @@ public class TestModelLrf2DBasic {
 	 */
 	@Test
 	public void lineBehind() {
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(-1, -2, 1, -2));
 
 
@@ -90,7 +91,7 @@ public class TestModelLrf2DBasic {
 	 */
 	@Test
 	public void lineBlockView() {
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(-1, 2, 1, 2));
 		world.lines.add(new LineSegment2D_F64(-1, 2.5, 1, 2.5));
 
@@ -119,7 +120,7 @@ public class TestModelLrf2DBasic {
 	 */
 	@Test
 	public void lineInFront_noise() {
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(-1, 2, 1, 2));
 
 

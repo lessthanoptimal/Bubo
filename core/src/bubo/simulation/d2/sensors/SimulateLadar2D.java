@@ -21,7 +21,7 @@ package bubo.simulation.d2.sensors;
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
-import bubo.simulation.d2.features.LineSegmentWorld;
+import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -58,7 +58,7 @@ public class SimulateLadar2D {
 	 * @param sensorToWorld
 	 * @param world
 	 */
-	public void update( Se2_F64 sensorToWorld , LineSegmentWorld world ) {
+	public void update( Se2_F64 sensorToWorld , LineSegmentMap world ) {
 
 		Vector2D_F64 T = sensorToWorld.getTranslation();
 

@@ -20,7 +20,7 @@ package bubo.simulation.d2;
 
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
-import bubo.simulation.d2.features.LineSegmentWorld;
+import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.se.Se2_F64;
 import org.junit.Test;
@@ -37,10 +37,10 @@ public class TestSimulation2D {
 	@Test
 	public void doStep() {
 		User user = new User();
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(2, -1, 2, 1));
 
-		Simulation2D alg = new Simulation2D(user,world,param,0.5);
+		Simulation2D alg = new Simulation2D(user,world,param,new CircularRobot2D(0.5));
 		alg.setPeriods(0.01,0.1,0.2,0.3);
 		for( int i = 0; i < 200; i++ ) {
 			alg.doStep();
@@ -53,10 +53,10 @@ public class TestSimulation2D {
 
 	@Test
 	public void moveRobot() {
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(2, -1, 2, 1));
 
-		Simulation2D alg = new Simulation2D(null,world,param,0.5);
+		Simulation2D alg = new Simulation2D(null,world,param,new CircularRobot2D(0.5));
 		alg.setLocation(1.75, 0, 0);
 		alg.sendControl(0,Math.PI/2);
 		alg.moveRobot(1);
@@ -72,10 +72,10 @@ public class TestSimulation2D {
 
 	@Test
 	public void handleCollisions() {
-		LineSegmentWorld world = new LineSegmentWorld();
+		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(2, -1, 2, 1));
 
-		Simulation2D alg = new Simulation2D(null,world,param,0.5);
+		Simulation2D alg = new Simulation2D(null,world,param,new CircularRobot2D(0.5));
 		alg.setLocation(1.75,0,0);
 
 		alg.handleCollisions();

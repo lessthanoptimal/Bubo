@@ -50,8 +50,8 @@ public class DisplayPointCloudApp {
 				if (p == null)
 					break;
 				else {
-					if( p.normSq() > 25 )
-						continue;
+//					if( p.normSq() > 25 )
+//						continue;
 					p.y = -p.y;
 					p.x = -p.x;
 					p.z = -p.z;

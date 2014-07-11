@@ -19,6 +19,7 @@
 package bubo.simulation.d2.features;
 
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
+import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
@@ -28,14 +29,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Basic sensor model for 2D laser rangefinders (LRF) in a {@link LineSegmentWorld}.
+ * Basic sensor model for 2D laser rangefinders (LRF) in a {@link bubo.maps.d2.lines.LineSegmentMap}.
  *
  * @author Peter Abeles
  */
 public class ModelLrf2DBasic {
 
 	Random rand = new Random(123123);
-	LineSegmentWorld world;
+	LineSegmentMap world;
 
 	// standard deviation of noise which is added to range measurements
 	double noiseSigma = 0;
@@ -52,7 +53,7 @@ public class ModelLrf2DBasic {
 		this.noiseSigma = noiseSigma;
 	}
 
-	public void setWorld(LineSegmentWorld world) {
+	public void setWorld(LineSegmentMap world) {
 		this.world = world;
 	}
 

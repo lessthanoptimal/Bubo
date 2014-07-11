@@ -47,4 +47,8 @@ public class Lrf2dMeasurement {
 
 	public Lrf2dMeasurement() {
 	}
+
+	public void setMeasurements( Lrf2dMeasurement src ) {
+		System.arraycopy(src.meas,0,meas,0,numMeas);
+	}
 }
