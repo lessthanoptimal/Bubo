@@ -33,7 +33,6 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-// TODO stick the map in the center by adjusting its transform
 // TODO provide controls for the user zooming and translating
 // TODO Follow robot mode?
 public class DisplaySimulationApp {
