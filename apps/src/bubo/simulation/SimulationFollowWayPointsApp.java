@@ -20,14 +20,18 @@ package bubo.simulation;
 
 import boofcv.gui.image.ShowImages;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
+import bubo.gui.Simulation2DPanel;
+import bubo.io.maps.MapIO;
 import bubo.maps.d2.lines.LineSegmentMap;
 import bubo.simulation.d2.CircularRobot2D;
 import bubo.simulation.d2.Simulation2D;
+import com.thoughtworks.xstream.XStream;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -35,37 +39,33 @@ import java.util.List;
  */
 // TODO provide controls for the user zooming and translating
 // TODO Follow robot mode?
-public class DisplaySimulationApp {
+public class SimulationFollowWayPointsApp {
 
 	Simulation2D sim;
 	Simulation2DPanel gui;
+	FollowPathCheatingRobot planner;
 
-	public DisplaySimulationApp() {
-		LineSegmentMap map = new LineSegmentMap();
+	public SimulationFollowWayPointsApp(String mapName, String pathName) throws IOException {
+		LineSegmentMap map = MapIO.loadLineSegmentMap(mapName);
+		List<Point2D_F64> wayPoints = (List<Point2D_F64>)new XStream().fromXML(new File(pathName));
 
-		map.add(-10,4,10,4);
-		map.add(-10,4,-10,-4);
-		map.add(-10,-4,10,-4);
-		map.add(10,-4,10,4);
-		map.add(-2,-1.5,-2,0.3);
-		map.add(-3,1.6,0.5,0.5);
+//		planner = new FollowPathCheatingRobot(1,0.4,wayPoints);
+		planner = new FollowPathLoggingRobot(1,0.4,wayPoints);
 
-		List<Point2D_F64> waypoints = new ArrayList<Point2D_F64>();
-		waypoints.add( new Point2D_F64(8,2));
-		waypoints.add( new Point2D_F64(-8,2));
-		waypoints.add( new Point2D_F64(-8,-2));
-		waypoints.add( new Point2D_F64(8,-2));
-		waypoints.add( new Point2D_F64(8,2));
-
-		FollowPathCheatingRobot planner = new FollowPathCheatingRobot(1,0.4,waypoints);
-
+		// SICK like sensor
 		Lrf2dParam param = new Lrf2dParam(null,Math.PI/2.0,-Math.PI,180,5,0,0);
 
+		// put the robot at the initial location facing the second way point
+		Point2D_F64 p0 = wayPoints.get(0);
+		Point2D_F64 p1 = wayPoints.get(1);
+		double yaw = Math.atan2(p1.y-p0.y,p1.x-p0.x);
+
 		CircularRobot2D robot = new CircularRobot2D(0.2);
+		robot.getRobotToWorld().set(p0.x, p0.y, yaw);
 		robot.getSensorToRobot().T.set(0.15,0);
 
 		sim = new Simulation2D(planner,map,param,robot);
-		sim.setPeriods(0.005,0.01,100,0.01);
+		sim.setPeriods(0.005,0.03,100,0.03);
 
 		Rectangle2D_F64 r = map.computeBoundingRectangle();
 		Se2_F64 centerToWorld = new Se2_F64();
@@ -84,20 +84,23 @@ public class DisplaySimulationApp {
 		sim.initialize();
 
 		long sleepTime = Math.max(1,(int)(sim.getPeriodSimulation()*1000));
-		while( sim.getTime() < 100 ) {
+		while( sim.getTime() < 1000 && !planner.isDone() ) {
 			sim.doStep();
 			gui.updateRobot(sim.getRobot());
 			gui.updateLidar(sim.getSimulatedLadar().getMeasurement());
 			gui.repaint();
 
-			try {
-				Thread.sleep(sleepTime);
-			} catch (InterruptedException ignore) {}
+//			try {
+//				Thread.sleep(sleepTime);
+//			} catch (InterruptedException ignore) {}
 		}
 	}
 
-	public static void main(String[] args) {
-		DisplaySimulationApp app = new DisplaySimulationApp();
+	public static void main(String[] args) throws IOException {
+		String mapName = "map.csv";
+		String wayPointsName = "path.xml";
+
+		SimulationFollowWayPointsApp app = new SimulationFollowWayPointsApp(mapName,wayPointsName);
 		app.process();
 	}
 

@@ -98,7 +98,7 @@ public class ReadCsv {
 		while (true) {
 			lineNumber++;
 			String line = in.readLine();
-			if (line == null) {
+			if (line == null || line.length() == 0) {
 				return null;
 			}
 

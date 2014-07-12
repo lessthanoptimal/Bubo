@@ -130,4 +130,9 @@ public class FollowPathCheatingRobot implements RobotInterface {
 	public void ladar(long timeStamp, Lrf2dMeasurement measurement) {
 
 	}
+
+	@Override
+	public boolean isDone() {
+		return target >= waypoints.size();
+	}
 }

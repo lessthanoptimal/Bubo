@@ -46,14 +46,14 @@ public class LadarMapBayesUpdate extends LineGridGenericUpdate {
 	GridMapSpacialInfo mapSpacial;
 	LineRangeProbability probability = new LineRangeGaussian(0.2);
 
-	//    Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_GenericICP();
+//	    Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_GenericICP();
 	Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_LocalICP(new StoppingCondition(20, 0.0001), 200, 0.20);
 //    Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_IDC(new StoppingCondition(20,0.0001),
 //            UtilAngle.degreeToRadian(20),0.20,0.1);
 
 
-	float sensorWeight = 0.01f;
-	float mapWeight = 0.9999f;
+	float sensorWeight = 0.05f;
+	float mapWeight = 0.99f;
 
 	Se2_F64 position = new Se2_F64();
 
@@ -85,12 +85,14 @@ public class LadarMapBayesUpdate extends LineGridGenericUpdate {
 		final int N = param.getNumberOfScans();
 		double r[] = ranges.getRange();
 
-		Se2_F64 deltaMotion = ranges.getPosition().concat(odometryBefore.invert(null), null);
-		if (scanMatching != null) {
 
+		if (scanMatching != null) {
 			if (firstScan) {
+				firstScan = false;
 				scanMatching.setReference(r);
+				position.set(ranges.getPosition());
 			} else {
+				Se2_F64 deltaMotion = ranges.getPosition().concat(odometryBefore.invert(null), null);
 				scanMatching.setMatch(r);
 //                scanMatching.process(null);
 				scanMatching.process(deltaMotion);
@@ -99,16 +101,14 @@ public class LadarMapBayesUpdate extends LineGridGenericUpdate {
 				System.out.printf(" error %6.2e Found( %7.4f %7.4f %7.4f ) odom( %7.4f %7.4f %7.4f )\n", scanMatching.getError(),
 						found.getX(), found.getY(), found.getYaw(), deltaMotion.getX(), deltaMotion.getY(), deltaMotion.getYaw());
 
-				if (Math.abs(found.getX()) < 0.1 && Math.abs(found.getY()) < 0.1)
-					deltaMotion = found;
-
 				scanMatching.setMatchToReference();
+//				position = found.concat(position, null);
+				position.set(ranges.getPosition());
 			}
+			odometryBefore.set(ranges.getPosition());
+		} else {
+			position.set(ranges.getPosition());
 		}
-
-		firstScan = false;
-		position = deltaMotion.concat(position, null);
-		odometryBefore.set(ranges.getPosition());
 
 		double cellSize = mapSpacial.getCellSize();
 

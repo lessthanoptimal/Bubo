@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -207,6 +208,23 @@ public class ReadCsvObject<T> extends ReadCsv {
 		}
 
 		return arrayLength;
+	}
+
+	/**
+	 * Reads all objects until the end of the file
+	 * @return List of objects read
+	 * @throws IOException
+	 */
+	public List<T> readAll() throws IOException {
+		List<T> ret = new ArrayList<T>();
+
+		while( true ) {
+			T o = nextObject(null);
+			if( o == null )
+				break;
+			ret.add(o);
+		}
+		return ret;
 	}
 
 	/**

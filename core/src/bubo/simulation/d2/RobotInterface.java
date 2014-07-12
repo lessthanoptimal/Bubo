@@ -42,4 +42,6 @@ public interface RobotInterface {
 	public void odometry( long timeStamp , Se2_F64 robotToWorld );
 
 	public void ladar( long timeStamp , Lrf2dMeasurement measurement );
+
+	public boolean isDone();
 }

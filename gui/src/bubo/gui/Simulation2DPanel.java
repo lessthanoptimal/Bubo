@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.simulation;
+package bubo.gui;
 
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;

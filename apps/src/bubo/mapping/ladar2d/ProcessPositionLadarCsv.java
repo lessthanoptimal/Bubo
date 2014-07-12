@@ -20,7 +20,6 @@ package bubo.mapping.ladar2d;
 
 import boofcv.io.image.UtilImageIO;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
-import bubo.desc.sensors.lrf2d.Lrf2dParamFactory;
 import bubo.gui.UtilDisplayBubo;
 import bubo.io.serialization.SerializationDefinitionManager;
 import bubo.io.text.ReadCsvObjectSmart;
@@ -29,12 +28,15 @@ import bubo.maps.d2.grid.GridMapSpacialInfo;
 import bubo.maps.d2.grid.OccupancyGrid2D_F32;
 import bubo.maps.d2.grid.impl.ArrayGrid2D_F32;
 import bubo.maps.d2.grid.impl.OccupancyGridIO;
+import com.thoughtworks.xstream.XStream;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,7 +55,7 @@ import java.io.IOException;
 // todo create a growable occupancy grid
 public class ProcessPositionLadarCsv implements ActionListener {
 
-	private static final long pauseTimeMilli = 0;//5;
+	private static final long pauseTimeMilli = 10;
 
 	LadarMappingComponent gui;
 
@@ -73,14 +75,14 @@ public class ProcessPositionLadarCsv implements ActionListener {
 	volatile boolean takeStep = false;
 
 
-	double rangeToMeters = 0.001;
+	double rangeToMeters = 1;
 
 	public ProcessPositionLadarCsv(String fileName, Lrf2dParam param) throws FileNotFoundException {
 		this.param = param;
 		data = new PositionRangeArrayData(param.getNumberOfScans());
 
 		SerializationDefinitionManager def = new SerializationDefinitionManager();
-		def.loadDefinition(PositionRangeArrayData.class, "timeStamp", "position", "rangeTimeStamp", "unknown", "range");
+		def.loadDefinition(PositionRangeArrayData.class, "timeStamp", "position", "range");
 		def.loadDefinition(Se2_F64.class, "x", "y", "yaw");
 
 		reader = new ReadCsvObjectSmart<PositionRangeArrayData>(new FileInputStream(fileName), def, PositionRangeArrayData.class.getSimpleName());
@@ -102,9 +104,11 @@ public class ProcessPositionLadarCsv implements ActionListener {
 
 	public static void main(String args[]) throws IOException {
 
-		String fileName = "csv_data.txt";
+		String directory = "data/mapping2d/sim02/";
 
-		Lrf2dParam param = Lrf2dParamFactory.createHokuyo();
+		String fileName = directory+"observations.txt";
+
+		Lrf2dParam param = (Lrf2dParam)new XStream().fromXML(new File(directory+"lrf.xml"));
 
 		ProcessPositionLadarCsv p = new ProcessPositionLadarCsv(fileName, param);
 
@@ -135,9 +139,6 @@ public class ProcessPositionLadarCsv implements ActionListener {
 
 		frameNum = 0;
 		while (reader.nextObject(data) != null) {
-
-			if (frameNum == 11000)
-				paused = true;
 
 			// convert range data into standard units and special cases
 			double[] ranges = data.getRange();
@@ -171,8 +172,6 @@ public class ProcessPositionLadarCsv implements ActionListener {
 			frameNum++;
 			// todo create histogram viewer
 			// todo write odometry + ladar to a map and display that
-
-
 		}
 	}
 
@@ -202,9 +201,14 @@ public class ProcessPositionLadarCsv implements ActionListener {
 		Se2_F64 position = mapBuilder.getPosition();
 
 		// map coordinates
-		double x = position.getX() - mapSpacial.getBl().x;
-		double y = position.getY() - mapSpacial.getBl().y;
+		final double x = position.getX() - mapSpacial.getBl().x;
+		final double y = position.getY() - mapSpacial.getBl().y;
 
-		gui.setViewCenter(x, y);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				gui.setViewCenter(x, y);
+			}
+		});
 	}
 }

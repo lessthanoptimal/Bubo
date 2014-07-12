@@ -22,7 +22,7 @@ import bubo.gui.SpacialDisplay;
 import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_I32;
+import georegression.struct.point.Point2D_I32;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -53,6 +53,10 @@ public class LineMapDisplay extends SpacialDisplay {
 		this.map = map;
 	}
 
+	public LineSegmentMap getMap() {
+		return map;
+	}
+
 	/**
 	 * Specifies the center of the view in map coordinates
 	 *
@@ -65,7 +69,7 @@ public class LineMapDisplay extends SpacialDisplay {
 	public void autoPreferredSize() {
 		Rectangle2D_F64 bounds = map.computeBoundingRectangle();
 
-		double buffer = Math.max(bounds.getWidth(),bounds.getHeight())*0.1;
+		double buffer = Math.max(bounds.getWidth(),bounds.getHeight())*0.2;
 		double width = bounds.getWidth()+buffer;
 		double height = bounds.getHeight()+buffer;
 
@@ -148,7 +152,7 @@ public class LineMapDisplay extends SpacialDisplay {
 		}
 	}
 
-	public void mapToImage( double x , double y , Point3D_I32 imagePt ) {
+	public void mapToImage( double x , double y , Point2D_I32 imagePt ) {
 
 		Point2D_F64 a = new Point2D_F64(x,y);
 		SePointOps_F64.transformReverse(centerToWorld, a, a);

@@ -23,8 +23,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -87,6 +86,11 @@ public class TestReadCsvObject {
 		ReadCsvObject<TestClass> reader = new ReadCsvObject<TestClass>(new ByteArrayInputStream(testString2.getBytes()), TestClass.class, "a", "b", "c", "i");
 
 		TestClass t = reader.nextObject(null);
+	}
+
+	@Test
+	public void readAll() {
+		fail("Implement");
 	}
 
 	public static class TestClass {

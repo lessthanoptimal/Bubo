@@ -110,5 +110,8 @@ public class TestSimulation2D {
 		public void ladar(long timeStamp, Lrf2dMeasurement measurement) {
 			countLadar++;
 		}
+
+		@Override
+		public boolean isDone() {return false;}
 	}
 }

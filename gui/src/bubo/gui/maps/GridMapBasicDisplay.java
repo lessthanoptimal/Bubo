@@ -212,7 +212,8 @@ public class GridMapBasicDisplay extends SpacialDisplay {
 				}
 			}
 		}
-
+		// lets it know it has been modified
+		rendered.setRGB(0,0,rendered.getRGB(0,0));
 	}
 
 	/**
