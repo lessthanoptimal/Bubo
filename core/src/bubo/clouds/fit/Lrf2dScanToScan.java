@@ -69,7 +69,7 @@ public interface Lrf2dScanToScan {
 	 * is done on a sequence of data and what was the second scan will become the first scan when new data arrives.
 	 * This method is intended to avoid unnecessary recomputing or copying of data.
 	 */
-	public void setSourceToDestinationScan();
+	public void assignSourceToDestination();
 
 	/**
 	 * Finds the motion which minimizes the error first and second scan.
@@ -86,4 +86,10 @@ public interface Lrf2dScanToScan {
 	 * @return Error associated with the scan registration
 	 */
 	public double getError();
+
+	/**
+	 * Returns number of scans that were matched
+	 * @return number of scans
+	 */
+	public int totalScansMatched();
 }

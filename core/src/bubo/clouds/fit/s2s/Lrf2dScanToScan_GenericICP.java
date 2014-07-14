@@ -129,7 +129,7 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 	 * Swaps the two point lists and tells ICP about the change
 	 */
 	@Override
-	public void setSourceToDestinationScan() {
+	public void assignSourceToDestination() {
 		List<Point2D_F64> temp = reference;
 		reference = match;
 		match = temp;
@@ -181,5 +181,10 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 	@Override
 	public double getError() {
 		return icp.getFoundError();
+	}
+
+	@Override
+	public int totalScansMatched() {
+		return icp.getTotalMatched();
 	}
 }

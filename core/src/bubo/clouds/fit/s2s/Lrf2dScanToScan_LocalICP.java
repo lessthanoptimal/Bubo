@@ -61,6 +61,11 @@ public class Lrf2dScanToScan_LocalICP extends GeneralizedScanToScan {
 	}
 
 	@Override
+	public int totalScansMatched() {
+		return assoc.getListSource().size();
+	}
+
+	@Override
 	protected void estimateAndApplyMotion( ScanInfo scanSrc , EstimationResults results) {
 		results.srcToDst.set(computeMotion(assoc));
 		applyMotion(results.srcToDst,scanSrc);

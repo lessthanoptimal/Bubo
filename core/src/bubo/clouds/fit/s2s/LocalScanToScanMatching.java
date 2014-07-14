@@ -115,7 +115,7 @@ public abstract class LocalScanToScanMatching implements Lrf2dScanToScan {
 	}
 
 	@Override
-	public void setSourceToDestinationScan() {
+	public void assignSourceToDestination() {
 		ScanInfo temp = first;
 		first = second;
 		second = temp;

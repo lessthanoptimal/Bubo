@@ -96,6 +96,11 @@ public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 		assocRange.setSamplePeriod(inc);
 	}
 
+	@Override
+	public int totalScansMatched() {
+		return assocCartesian.getListSource().size();
+	}
+
 	/**
 	 * <p>
 	 * Estimates motion in two steps differentiated by the association technique.  First

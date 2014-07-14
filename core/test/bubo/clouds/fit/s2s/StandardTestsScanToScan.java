@@ -165,7 +165,7 @@ public abstract class StandardTestsScanToScan {
 
 		alg.setSource(model.getMeasurement().meas.clone());
 		// tell it to swap the first and second scan
-		alg.setSourceToDestinationScan();
+		alg.assignSourceToDestination();
 
 		// rotate and translate the sensor
 		sensorToWorld.set(0.12, -0.12, 0.05);

@@ -144,5 +144,8 @@ public class TestGeneralizedScanToScan {
 		public void projectScan(double measuredRange[], ScanInfo info) {
 			super.projectScan(measuredRange, info);
 		}
+
+		@Override
+		public int totalScansMatched() {return 0;}
 	}
 }

@@ -91,7 +91,7 @@ public class Lrf2dParam implements IntrinsicParameters {
 		if (Double.isNaN(range))
 			return false;
 
-		if (range > maxRange)
+		if (range >= maxRange)
 			return false;
 
 		return true;

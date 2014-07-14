@@ -95,18 +95,17 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 
 	public void computeScanEndPoint(double scan[], Point2D_F64 pts[]) {
 		final int N = param.getNumberOfScans();
-		final double maxRange = param.getMaxRange();
 		for (int i = 0; i < N; i++) {
 			double r = scan[i];
 
-			if (r <= maxRange) { // todo less than range?
+			if ( param.isValidRange(r)) {
 				lrf2pt.computeEndPoint(i, r, pts[i]);
 			}
 		}
 	}
 
 	@Override
-	public void setSourceToDestinationScan() {
+	public void assignSourceToDestination() {
 		ScanInfo temp = scanDst;
 		scanDst = scanSrc;
 		scanSrc = temp;
