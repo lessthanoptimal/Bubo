@@ -119,7 +119,7 @@ public class Lrf2dParam implements IntrinsicParameters {
 	}
 
 	public double getAngleIncrement() {
-		return sweepAngle / numberOfScans;
+		return sweepAngle / (numberOfScans-1);
 	}
 
 	public double getSweepAngle() {

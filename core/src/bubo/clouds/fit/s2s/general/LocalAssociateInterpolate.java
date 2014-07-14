@@ -20,6 +20,7 @@ package bubo.clouds.fit.s2s.general;
 
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +43,8 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 	protected ScanInfo scanMatch;
 	protected ScanInfo scanRef;
 	// list of associated points
-	private List<Point2D_F64> matchPts = new ArrayList<Point2D_F64>();
-	private List<Point2D_F64> refPts = new ArrayList<Point2D_F64>();
+	private List<Point2D_F64> srcPts = new ArrayList<Point2D_F64>();
+	private FastQueue<Point2D_F64> dstPts = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 	// how many radians around will it search for the best association point
 	private double searchNeighborhood;
 	// the maximum allowed distance between two associated points
@@ -68,22 +69,22 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 	}
 
 	@Override
-	public void associate(ScanInfo scanMatch, ScanInfo scanRef) {
+	public void associate(ScanInfo scanSrc, ScanInfo scanDst) {
 		if (samplePeriod == 0)
 			throw new IllegalArgumentException("Must initialize the sampling period");
 
-		this.scanMatch = scanMatch;
-		this.scanRef = scanRef;
+		this.scanMatch = scanSrc;
+		this.scanRef = scanDst;
 
-		matchPts.clear();
-		refPts.clear();
+		srcPts.clear();
+		dstPts.reset();
 
 		Point2D_F64 best = new Point2D_F64();
 		InterpolatedPoint interp = new InterpolatedPoint();
 
 		final int N = param.getNumberOfScans();
 		for (int i = 0; i < N; i++) {
-			if (!scanMatch.vis[i]) {
+			if (!scanSrc.vis[i]) {
 				continue;
 			}
 
@@ -92,7 +93,7 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 			// Interpolate using a local curve with the middle index given to it
 
 			// define the local area being search
-			double startTheta = scanMatch.theta[i] - searchNeighborhood;
+			double startTheta = scanSrc.theta[i] - searchNeighborhood;
 			int numSamples = (int) Math.ceil(2.0 * searchNeighborhood / samplePeriod);
 
 			setTarget(i);
@@ -113,8 +114,8 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 			}
 
 			if (bestDist < maxSeparation) {
-				matchPts.add(scanMatch.pts[i]);
-				refPts.add(best);
+				srcPts.add(scanSrc.pts[i]);
+				dstPts.grow().set(best);
 			}
 		}
 	}
@@ -132,13 +133,13 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 	}
 
 	@Override
-	public List<Point2D_F64> getListMatch() {
-		return matchPts;
+	public List<Point2D_F64> getListSource() {
+		return srcPts;
 	}
 
 	@Override
-	public List<Point2D_F64> getListReference() {
-		return refPts;
+	public List<Point2D_F64> getListDestination() {
+		return dstPts.toList();
 	}
 
 	public void setSamplePeriod(double samplePeriod) {

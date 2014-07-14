@@ -20,7 +20,7 @@ package bubo.simulation.d2;
 
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.maps.d2.lines.LineSegmentMap;
-import bubo.simulation.d2.sensors.SimulateLadar2D;
+import bubo.simulation.d2.sensors.SimulateLrf2D;
 import georegression.metric.ClosestPoint2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -39,7 +39,7 @@ public class Simulation2D implements ControlListener {
 	RobotInterface user;
 	LineSegmentMap world;
 	CircularRobot2D robot;
-	SimulateLadar2D sensor;
+	SimulateLrf2D sensor;
 
 	// frequency for how often each item is updated, in seconds
 	double periodControl;
@@ -67,7 +67,7 @@ public class Simulation2D implements ControlListener {
 		this.user = user;
 		this.world = world;
 		this.robot = robot;
-		sensor = new SimulateLadar2D(sensorParam);
+		sensor = new SimulateLrf2D(sensorParam);
 	}
 
 	public void setPeriods( double simulation , double control , double odometry , double lidar ) {
@@ -199,7 +199,7 @@ public class Simulation2D implements ControlListener {
 		return robot;
 	}
 
-	public SimulateLadar2D getSimulatedLadar() {
+	public SimulateLrf2D getSimulatedLadar() {
 		return sensor;
 	}
 

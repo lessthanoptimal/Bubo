@@ -47,10 +47,10 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 	// decides when to stop iterating
 	protected StoppingCondition stop;
 	// original scan measurements
-	protected double rangesFrom[];
+	protected double rangesSrc[];
 	// various bits of information related to each scan
-	protected ScanInfo scanTo; // the reference scan being registered to
-	protected ScanInfo scanFrom; // the scan which is being registered
+	protected ScanInfo scanDst; // the reference scan being registered to
+	protected ScanInfo scanSrc; // the scan which is being registered
 	// speeds up calculations
 	private Lrf2dPrecomputedTrig lrf2pt;
 	// the found total motion
@@ -61,8 +61,7 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 	// given associated points computes rigid body motion
 	private MotionSe2PointSVD_F64 motionAlg = new MotionSe2PointSVD_F64();
 
-	private List<Point2D_F64> fromPts;
-	private List<Point2D_F64> toPts;
+	EstimationResults results = new EstimationResults();
 
 	public GeneralizedScanToScan(StoppingCondition stop) {
 
@@ -74,24 +73,24 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 		this.param = param;
 		this.lrf2pt = new Lrf2dPrecomputedTrig(param);
 
-		scanTo = new ScanInfo(param.getNumberOfScans());
-		scanFrom = new ScanInfo(param.getNumberOfScans());
-		rangesFrom = new double[param.getNumberOfScans()];
+		scanDst = new ScanInfo(param.getNumberOfScans());
+		scanSrc = new ScanInfo(param.getNumberOfScans());
+		rangesSrc = new double[param.getNumberOfScans()];
 	}
 
 	@Override
-	public Se2_F64 getMotion() {
+	public Se2_F64 getSourceToDestination() {
 		return motion;
 	}
 
 	@Override
-	public void setReference(double[] scan) {
-		System.arraycopy(scan, 0, scanTo.range, 0, param.getNumberOfScans());
+	public void setDestination(double[] scan) {
+		System.arraycopy(scan, 0, scanDst.range, 0, param.getNumberOfScans());
 	}
 
 	@Override
-	public void setMatch(double[] scan) {
-		System.arraycopy(scan, 0, scanFrom.range, 0, param.getNumberOfScans());
+	public void setSource(double[] scan) {
+		System.arraycopy(scan, 0, scanSrc.range, 0, param.getNumberOfScans());
 	}
 
 	public void computeScanEndPoint(double scan[], Point2D_F64 pts[]) {
@@ -107,63 +106,59 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 	}
 
 	@Override
-	public void setMatchToReference() {
-		ScanInfo temp = scanTo;
-		scanTo = scanFrom;
-		scanFrom = temp;
+	public void setSourceToDestinationScan() {
+		ScanInfo temp = scanDst;
+		scanDst = scanSrc;
+		scanSrc = temp;
 	}
 
 	@Override
-	public boolean process(Se2_F64 hint) {
+	public boolean process(Se2_F64 hintSrcToDst) {
 		// save the original ranges
-		System.arraycopy(scanFrom.range, 0, rangesFrom, 0, param.getNumberOfScans());
+		System.arraycopy(scanSrc.range, 0, rangesSrc, 0, param.getNumberOfScans());
 		// find the obstacle location
-		computeScanEndPoint(scanFrom.range, scanFrom.pts);
-		computeScanEndPoint(scanTo.range, scanTo.pts);
+		computeScanEndPoint(scanSrc.range, scanSrc.pts);
+		computeScanEndPoint(scanDst.range, scanDst.pts);
 
-		// apply the hit if any
-		if (hint != null) {
-			transform(hint, scanFrom);
-			motion.set(hint);
+		// apply the hint, if any
+		if (hintSrcToDst != null) {
+			applyMotion(hintSrcToDst, scanSrc);
+			motion.set(hintSrcToDst);
 		} else
 			motion.set(0, 0, 0);
 
-		setVisibleByRange(scanTo); // todo could just do this when end point is computed
+		setVisibleByRange(scanDst); // todo could just do this when end point is computed
 
 		stop.reset();
 		while (true) {
 			// compute the angle of each point in the current view
-			projectScan(rangesFrom, scanFrom);
+			projectScan(rangesSrc, scanSrc);
 
 			// angle based visibility test
-			checkVisibleByDeltaAngle(scanFrom);
+			checkVisibleByDeltaAngle(scanSrc);
 
 			// find the motion which minimizes the error between the two scans
-			Se2_F64 foundMotion = estimateMotion();
-
-			// apply the transform to the points in the scan being matched
-			transform(foundMotion, scanFrom);
-			foundError = computeMeanSquaredError();
+			// and applies it to the points in the source scan
+			estimateAndApplyMotion(scanSrc,results);
+			foundError = results.meanSqError;
 
 			// increment
-			motion = motion.concat(foundMotion, null);
+			motion = motion.concat(results.srcToDst, null);
 
 			if (stop.isFinished(foundError))
 				break;
 		}
 
 		// undo the recomputed ranges
-		System.arraycopy(rangesFrom, 0, scanFrom.range, 0, param.getNumberOfScans());
+		System.arraycopy(rangesSrc, 0, scanSrc.range, 0, param.getNumberOfScans());
 
 		return true;
 	}
 
 	/**
-	 * Function which estimates the
-	 *
-	 * @return
+	 * Inner function for estimating the motion between the current incarnations of the scans
 	 */
-	protected abstract Se2_F64 estimateMotion();
+	protected abstract void estimateAndApplyMotion( ScanInfo scanSrc , EstimationResults results );
 
 	/**
 	 * Sets visibility depending on the measured range being less than the max range.
@@ -172,7 +167,7 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 		final int N = param.getNumberOfScans();
 		final double maxRange = param.getMaxRange();
 		for (int i = 0; i < N; i++) {
-			scanTo.vis[i] = info.range[i] <= maxRange;
+			scanDst.vis[i] = info.range[i] <= maxRange;
 		}
 	}
 
@@ -236,40 +231,35 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 	 * @return found motion
 	 */
 	protected Se2_F64 computeMotion(AssociateLrfMeas assoc) {
-		assoc.associate(scanFrom, scanTo);
+		assoc.associate(scanSrc, scanDst);
 
-		fromPts = assoc.getListMatch();
-		toPts = assoc.getListReference();
+		List<Point2D_F64> srcPts = assoc.getListSource();
+		List<Point2D_F64> dstPts = assoc.getListDestination();
 
-		motionAlg.process(fromPts, toPts);
+		motionAlg.process(srcPts, dstPts);
 
 		return motionAlg.getTransformSrcToDst();
 	}
 
-
-	private void transform(Se2_F64 m, ScanInfo scan) {
-		for (Point2D_F64 p : scan.pts) {
-			SePointOps_F64.transform(m, p, p);
+	protected static void applyMotion(Se2_F64 motion, ScanInfo scan) {
+		for (int i = 0; i < scan.pts.length; i++) {
+			Point2D_F64 p = scan.pts[i];
+			SePointOps_F64.transform(motion, p, p);
 		}
 	}
 
-	/**
-	 * Returns the error between associated scan points as the mean squared error.
-	 * In other words the sum of the Euclidean distance squared divided by the number of points.
-	 *
-	 * @return the error
-	 */
-	private double computeMeanSquaredError() {
+	protected static double computeMeanSqError(AssociateLrfMeas associate ) {
 		double error = 0;
+		List<Point2D_F64> listSrc = associate.getListSource();
+		List<Point2D_F64> listDst = associate.getListDestination();
 
-		for (int i = 0; i < fromPts.size(); i++) {
-			Point2D_F64 f = fromPts.get(i);
-			Point2D_F64 t = toPts.get(i);
+		for (int i = 0; i < listSrc.size(); i++) {
+			Point2D_F64 s = listSrc.get(i);
+			Point2D_F64 d = listDst.get(i);
 
-			error += f.distance2(t);
+			error += s.distance2(d);
 		}
-
-		return error / fromPts.size();
+		return error / listSrc.size();
 	}
 
 	@Override
@@ -277,4 +267,8 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 		return foundError;
 	}
 
+	protected static class EstimationResults {
+		public Se2_F64 srcToDst = new Se2_F64();
+		public double meanSqError;
+	}
 }

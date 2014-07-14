@@ -35,7 +35,7 @@ public class PositionRangeArrayData {
 	private long unknown;
 
 	// position of the robot when this observation was made
-	private Se2_F64 position;
+	private Se2_F64 scanToWorld;
 	// list of range measurements from the ladar
 	private double[] range;
 
@@ -51,12 +51,12 @@ public class PositionRangeArrayData {
 	public PositionRangeArrayData() {
 	}
 
-	public Se2_F64 getPosition() {
-		return position;
+	public Se2_F64 getScanToWorld() {
+		return scanToWorld;
 	}
 
-	public void setPosition(Se2_F64 position) {
-		this.position = position;
+	public void setScanToWorld(Se2_F64 scanToWorld) {
+		this.scanToWorld = scanToWorld;
 	}
 
 	public double[] getRange() {

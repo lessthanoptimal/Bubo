@@ -83,17 +83,17 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 	}
 
 	@Override
-	public Se2_F64 getMotion() {
+	public Se2_F64 getSourceToDestination() {
 		return foundMotion;
 	}
 
 	@Override
-	public void setReference(double[] scan) {
+	public void setDestination(double[] scan) {
 		computePoints(scan, reference);
 	}
 
 	@Override
-	public void setMatch(double[] scan) {
+	public void setSource(double[] scan) {
 		computePoints(scan, match);
 	}
 
@@ -129,7 +129,7 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 	 * Swaps the two point lists and tells ICP about the change
 	 */
 	@Override
-	public void setMatchToReference() {
+	public void setSourceToDestinationScan() {
 		List<Point2D_F64> temp = reference;
 		reference = match;
 		match = temp;
@@ -153,13 +153,13 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 	}
 
 	@Override
-	public boolean process(Se2_F64 hint) {
+	public boolean process(Se2_F64 hintSrcToDst) {
 
 		createWorkingCopy();
 
-		if (hint != null) {
+		if (hintSrcToDst != null) {
 			// use the hint to bring the two sets of odometry closer
-			SePointOps_F64.transform(hint, working);
+			SePointOps_F64.transform(hintSrcToDst, working);
 		}
 
 		// the motion is found from the current scan to the previous scan this is because in the robot's frame the
@@ -169,8 +169,8 @@ public class Lrf2dScanToScan_GenericICP implements Lrf2dScanToScan {
 		icp.process(working);
 
 		// save the found motion
-		if (hint != null)
-			hint.concat(icp.getPointsToModel(), foundMotion);
+		if (hintSrcToDst != null)
+			hintSrcToDst.concat(icp.getPointsToModel(), foundMotion);
 		else
 			foundMotion.set(icp.getPointsToModel());
 

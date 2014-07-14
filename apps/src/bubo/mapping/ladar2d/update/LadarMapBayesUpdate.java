@@ -46,7 +46,7 @@ public class LadarMapBayesUpdate extends LineGridGenericUpdate {
 	GridMapSpacialInfo mapSpacial;
 	LineRangeProbability probability = new LineRangeGaussian(0.2);
 
-//	    Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_GenericICP();
+//	Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_GenericICP();
 	Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_LocalICP(new StoppingCondition(20, 0.0001), 200, 0.20);
 //    Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_IDC(new StoppingCondition(20,0.0001),
 //            UtilAngle.degreeToRadian(20),0.20,0.1);
@@ -55,7 +55,7 @@ public class LadarMapBayesUpdate extends LineGridGenericUpdate {
 	float sensorWeight = 0.05f;
 	float mapWeight = 0.99f;
 
-	Se2_F64 position = new Se2_F64();
+	Se2_F64 estimated2to0 = new Se2_F64();
 
 	Se2_F64 odometryBefore = new Se2_F64();
 
@@ -76,47 +76,46 @@ public class LadarMapBayesUpdate extends LineGridGenericUpdate {
 	}
 
 	public Se2_F64 getPosition() {
-		return position;
+		return estimated2to0;
 	}
 
-	// todo concat Se2_F64 to go from ladar -> global -> map coordinates
 	public void process(PositionRangeArrayData ranges) {
 
 		final int N = param.getNumberOfScans();
 		double r[] = ranges.getRange();
 
-
+		// todo clean up variable naming for reference frames
 		if (scanMatching != null) {
 			if (firstScan) {
 				firstScan = false;
-				scanMatching.setReference(r);
-				position.set(ranges.getPosition());
+				scanMatching.setDestination(r);
+				estimated2to0.set(ranges.getScanToWorld());
 			} else {
-				Se2_F64 deltaMotion = ranges.getPosition().concat(odometryBefore.invert(null), null);
-				scanMatching.setMatch(r);
-//                scanMatching.process(null);
-				scanMatching.process(deltaMotion);
-				Se2_F64 found = scanMatching.getMotion();
+				Se2_F64 odom2to1 = ranges.getScanToWorld().concat(odometryBefore.invert(null), null);
+				scanMatching.setSource(r);
+				scanMatching.process(null);//odom2to1
+				Se2_F64 found2to1 = scanMatching.getSourceToDestination();
 
 				System.out.printf(" error %6.2e Found( %7.4f %7.4f %7.4f ) odom( %7.4f %7.4f %7.4f )\n", scanMatching.getError(),
-						found.getX(), found.getY(), found.getYaw(), deltaMotion.getX(), deltaMotion.getY(), deltaMotion.getYaw());
+						found2to1.getX(), found2to1.getY(), found2to1.getYaw(), odom2to1.getX(), odom2to1.getY(), odom2to1.getYaw());
 
-				scanMatching.setMatchToReference();
-//				position = found.concat(position, null);
-				position.set(ranges.getPosition());
+				scanMatching.setSourceToDestinationScan();
+				Se2_F64 estimated1to0 = estimated2to0;
+				estimated2to0 = found2to1.concat(estimated1to0, null);
+//				position.set(ranges.getScanToWorld());
 			}
-			odometryBefore.set(ranges.getPosition());
+			odometryBefore.set(ranges.getScanToWorld());
 		} else {
-			position.set(ranges.getPosition());
+			estimated2to0.set(ranges.getScanToWorld());
 		}
 
 		double cellSize = mapSpacial.getCellSize();
 
 		// todo this is where coordinates need to be concat
-		double x0 = (position.getX() - mapSpacial.getBl().getX()) / cellSize;
-		double y0 = (position.getY() - mapSpacial.getBl().getY()) / cellSize;
+		double x0 = (estimated2to0.getX() - mapSpacial.getBl().getX()) / cellSize;
+		double y0 = (estimated2to0.getY() - mapSpacial.getBl().getY()) / cellSize;
 
-//        System.out.println("Location "+ranges.getPosition().getTranslation());
+//        System.out.println("Location "+ranges.getScanToWorld().getTranslation());
 
 		Point2D_F64 temp = new Point2D_F64();
 		for (int i = 0; i < N; i++) {
@@ -134,7 +133,7 @@ public class LadarMapBayesUpdate extends LineGridGenericUpdate {
 			trig.computeEndPoint(i, dist);
 
 			// convert to map coordinates
-			SePointOps_F64.transform(position, trig.x, trig.y, temp);
+			SePointOps_F64.transform(estimated2to0, trig.x, trig.y, temp);
 
 			double x1 = (temp.getX() - mapSpacial.getBl().getX()) / cellSize;
 			double y1 = (temp.getY() - mapSpacial.getBl().getY()) / cellSize;

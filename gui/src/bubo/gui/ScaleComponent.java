@@ -117,7 +117,7 @@ public class ScaleComponent extends JComponent {
 			pixelsWide = (int) length;
 			lengthDistance = length / pixelsPerMeter;
 		} else {
-			pixelsWide = (int) Math.ceil(pixelsPerMeter * length);
+			pixelsWide = (int) Math.round(pixelsPerMeter * length);
 			lengthDistance = length;
 		}
 
@@ -125,11 +125,10 @@ public class ScaleComponent extends JComponent {
 //
 		// draw the end lines
 		g2.drawLine(space, height - endHeight, space, height);
-		g2.drawLine(pixelsWide, height - endHeight, pixelsWide, height);
+		g2.drawLine(space+pixelsWide, height - endHeight, space+pixelsWide, height);
 
 		// draw the center line
-		g2.drawLine(space, height - endHeight / 2, pixelsWide, height - endHeight / 2);
-
+		g2.drawLine(space, height - endHeight / 2, space+pixelsWide, height - endHeight / 2);
 
 		// todo compute text size with TextLayout and put in center of the bar
 		String text = String.format("%3.1f " + unitsText, lengthDistance);

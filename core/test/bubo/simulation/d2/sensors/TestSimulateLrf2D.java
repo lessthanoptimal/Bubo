@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSimulateLadar2D {
+public class TestSimulateLrf2D {
 
 	/**
 	 * Put a single wall in front of the sensor and see if it measures it correctly
@@ -44,7 +44,7 @@ public class TestSimulateLadar2D {
 		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add( new LineSegment2D_F64(2,-1,2,1));
 
-		SimulateLadar2D alg = new SimulateLadar2D(param);
+		SimulateLrf2D alg = new SimulateLrf2D(param);
 		alg.update(new Se2_F64(),world);
 
 		Lrf2dMeasurement meas = alg.getMeasurement();
@@ -75,7 +75,7 @@ public class TestSimulateLadar2D {
 		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add( new LineSegment2D_F64(-1,2,1,2));
 
-		SimulateLadar2D alg = new SimulateLadar2D(param);
+		SimulateLrf2D alg = new SimulateLrf2D(param);
 		Se2_F64 sensorToWorld = new Se2_F64(0,0,Math.PI/2.0);
 		alg.update(sensorToWorld,world);
 

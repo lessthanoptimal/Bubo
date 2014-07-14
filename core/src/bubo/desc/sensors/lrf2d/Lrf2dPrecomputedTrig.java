@@ -46,15 +46,16 @@ public class Lrf2dPrecomputedTrig {
 	 * @param config
 	 */
 	public Lrf2dPrecomputedTrig(final Lrf2dParam config) {
-		double theta = config.getStartAngle();
-		final double delta = config.getAngleIncrement();
 
+		double start = config.getStartAngle();
+		double sweep = config.getSweepAngle();
 		final int N = config.getNumberOfScans();
 
 		c = new double[N];
 		s = new double[N];
 
-		for (int i = 0; i < N; i++, theta += delta) {
+		for (int i = 0; i < N; i++) {
+			double theta = start + i*sweep/(N-1);
 			c[i] = Math.cos(theta);
 			s[i] = Math.sin(theta);
 		}

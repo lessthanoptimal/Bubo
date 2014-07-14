@@ -82,7 +82,7 @@ public class ProcessPositionLadarCsv implements ActionListener {
 		data = new PositionRangeArrayData(param.getNumberOfScans());
 
 		SerializationDefinitionManager def = new SerializationDefinitionManager();
-		def.loadDefinition(PositionRangeArrayData.class, "timeStamp", "position", "range");
+		def.loadDefinition(PositionRangeArrayData.class, "timeStamp", "scanToWorld", "range");
 		def.loadDefinition(Se2_F64.class, "x", "y", "yaw");
 
 		reader = new ReadCsvObjectSmart<PositionRangeArrayData>(new FileInputStream(fileName), def, PositionRangeArrayData.class.getSimpleName());
@@ -125,8 +125,8 @@ public class ProcessPositionLadarCsv implements ActionListener {
 			double cellSize = 0.1;
 			map = new ArrayGrid2D_F32(1400, 2000);
 
-			double bl_x = data.getPosition().getX() - map.getWidth() * cellSize / 2.0;
-			double bl_y = data.getPosition().getY() - map.getHeight() * cellSize / 2.0;
+			double bl_x = data.getScanToWorld().getX() - map.getWidth() * cellSize / 2.0;
+			double bl_y = data.getScanToWorld().getY() - map.getHeight() * cellSize / 2.0;
 
 			mapSpacial = new GridMapSpacialInfo(cellSize, new Point2D_F64(bl_x, bl_y));
 

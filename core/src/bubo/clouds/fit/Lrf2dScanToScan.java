@@ -22,8 +22,8 @@ import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import georegression.struct.se.Se2_F64;
 
 /**
- * Computes a rigid body motion {@link Se2_F64} which when applied to the 'match' scan will minimize the difference
- * between it and the 'reference' scan.
+ * Computes a rigid body motion {@link Se2_F64} which when applied to the 'source' scan will minimize the difference
+ * between it and the 'destination' scan.
  *
  * @author Peter Abeles
  */
@@ -37,40 +37,47 @@ public interface Lrf2dScanToScan {
 	public void setSensorParam(Lrf2dParam param);
 
 	/**
-	 * If {@link #process(georegression.struct.se.Se2_F64)} returned true then this is the motion from the first to second scan.
+	 * If {@link #process(georegression.struct.se.Se2_F64)} returned true then this is the motion
+	 * from the source to destination scans.
 	 *
 	 * @return The found motion.
 	 */
-	public Se2_F64 getMotion();
+	public Se2_F64 getSourceToDestination();
 
 	/**
-	 * Specifies range measurements for the reference scan.
+	 * Specifies range measurements for the destination scan.
+	 *
+	 * NOTE: A local copy of input array is made.  The data can be modified any time after the function
+	 * has exited.
 	 *
 	 * @param scan range measurements.
 	 */
-	public void setReference(double[] scan);
+	public void setDestination(double[] scan);
 
 	/**
-	 * Specifies range measurements for the scan which is to be matched against the reference.
+	 * Specifies range measurements for the source scan.
+	 *
+	 * NOTE: A local copy of input array is made.  The data can be modified any time after the function
+	 * has exited.
 	 *
 	 * @param scan range measurements
 	 */
-	public void setMatch(double[] scan);
+	public void setSource(double[] scan);
 
 	/**
-	 * Takes the data associated with the match scan and sets it to be the reference scan.  Often times scan matching
+	 * Takes the data associated with the source scan and sets it to be the destination scan.  Often times scan matching
 	 * is done on a sequence of data and what was the second scan will become the first scan when new data arrives.
 	 * This method is intended to avoid unnecessary recomputing or copying of data.
 	 */
-	public void setMatchToReference();
+	public void setSourceToDestinationScan();
 
 	/**
 	 * Finds the motion which minimizes the error first and second scan.
 	 *
-	 * @param hint An initial estimate of the transform from the first to second scan.  Often from odometry.
-	 * @return if registration was successful or not.
+	 * @param hintSrcToDst An initial estimate of the transform from the source to destination scan.  Often from odometry.
+	 * @return true if registration was successful or false if not.
 	 */
-	public boolean process(Se2_F64 hint);
+	public boolean process(Se2_F64 hintSrcToDst);
 
 	/**
 	 * A number which represents the error associated with the scan.  Primarily for debugging purposes,

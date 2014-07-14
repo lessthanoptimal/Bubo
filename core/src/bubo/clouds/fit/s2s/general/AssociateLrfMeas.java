@@ -34,13 +34,13 @@ public interface AssociateLrfMeas {
 	/**
 	 * Associates LRF measurements in the two scans.
 	 *
-	 * @param scanMatch
-	 * @param scanReference
+	 * @param scanSrc Source scan.
+	 * @param scanDst Destination scan.
 	 */
-	public void associate(ScanInfo scanMatch, ScanInfo scanReference);
+	public void associate(ScanInfo scanSrc, ScanInfo scanDst);
 
-	public List<Point2D_F64> getListMatch();
+	public List<Point2D_F64> getListSource();
 
-	public List<Point2D_F64> getListReference();
+	public List<Point2D_F64> getListDestination();
 
 }

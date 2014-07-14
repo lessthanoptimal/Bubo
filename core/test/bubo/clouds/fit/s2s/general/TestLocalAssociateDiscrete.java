@@ -56,8 +56,8 @@ public class TestLocalAssociateDiscrete {
 		alg.associate(scanMatch, scanRef);
 
 		// should associate to the point with the same index
-		List<Point2D_F64> match = alg.getListMatch();
-		List<Point2D_F64> ref = alg.getListReference();
+		List<Point2D_F64> match = alg.getListSource();
+		List<Point2D_F64> ref = alg.getListDestination();
 
 		for (int i = 0; i < N; i++) {
 			assertTrue(match.get(i) == scanMatch.pts[i]);

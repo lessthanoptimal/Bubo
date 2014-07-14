@@ -33,13 +33,13 @@ import java.util.List;
  */
 public abstract class LocalAssociateDiscrete implements AssociateLrfMeas {
 	//  LRF scan information.
-	protected ScanInfo scanMatch;
-	protected ScanInfo scanRef;
+	protected ScanInfo scanSrc;
+	protected ScanInfo scanDst;
 	// description of the sensor
 	private Lrf2dParam param;
 	// list of associated points
-	private List<Point2D_F64> matchPts = new ArrayList<Point2D_F64>();
-	private List<Point2D_F64> refPts = new ArrayList<Point2D_F64>();
+	private List<Point2D_F64> srcPts = new ArrayList<Point2D_F64>();
+	private List<Point2D_F64> dstPts = new ArrayList<Point2D_F64>();
 
 	// how many indexes away from the target index will it search
 	private int searchNeighborhood;
@@ -57,67 +57,72 @@ public abstract class LocalAssociateDiscrete implements AssociateLrfMeas {
 	}
 
 	@Override
-	public void associate(ScanInfo scanMatch, ScanInfo scanRef) {
+	public void associate(ScanInfo scanSrc, ScanInfo scanDst) {
 
-		this.scanMatch = scanMatch;
-		this.scanRef = scanRef;
+		this.scanSrc = scanSrc;
+		this.scanDst = scanDst;
 
-		matchPts.clear();
-		refPts.clear();
+		srcPts.clear();
+		dstPts.clear();
 
-		final int N = param.getNumberOfScans();
-		for (int i = 0; i < N; i++) {
-			if (!scanMatch.vis[i])
+		for (int i = 0; i < param.getNumberOfScans(); i++) {
+			if (!scanSrc.vis[i]) {
 				continue;
-
-			int min = i - searchNeighborhood;
-			int max = i + searchNeighborhood;
-			if (min < 0) min = 0;
-			if (max > N) max = N;
-
-			int bestIndex = -1;
-			double bestDistance = Double.MAX_VALUE;
-
-			setTarget(i);
-
-			for (int j = min; j < max; j++) {
-				if (!scanRef.vis[j])
-					continue;
-
-				double dist = distToTarget(j);
-
-				if (dist < bestDistance) {
-					bestDistance = dist;
-					bestIndex = j;
-				}
 			}
 
-			if (bestIndex != -1 && bestDistance < maxSeparation) {
-				matchPts.add(scanMatch.pts[i]);
-				refPts.add(scanRef.pts[bestIndex]);
+			int bestIndex = findBestMatch(scanDst, i);
+
+			if (bestIndex != -1 ) {
+				srcPts.add(scanSrc.pts[i]);
+				dstPts.add(scanDst.pts[bestIndex]);
 			}
 		}
 	}
 
-	@Override
-	public List<Point2D_F64> getListMatch() {
-		return matchPts;
+	private int findBestMatch(ScanInfo scan, int target) {
+		int min = target - searchNeighborhood;
+		int max = target + searchNeighborhood;
+		if (min < 0) min = 0;
+		if (max > param.getNumberOfScans()) max = param.getNumberOfScans();
+
+		int bestIndex = -1;
+		double bestDistance = maxSeparation;
+
+		setTarget(target);
+
+		for (int j = min; j < max; j++) {
+			if (!scan.vis[j])
+				continue;
+
+			double dist = distToTarget(j);
+
+			if (dist < bestDistance) {
+				bestDistance = dist;
+				bestIndex = j;
+			}
+		}
+		return bestIndex;
 	}
 
 	@Override
-	public List<Point2D_F64> getListReference() {
-		return refPts;
+	public List<Point2D_F64> getListSource() {
+		return srcPts;
+	}
+
+	@Override
+	public List<Point2D_F64> getListDestination() {
+		return dstPts;
 	}
 
 	/**
 	 * Specifies which measurement in the match scan that the distance is being measured against.
 	 *
-	 * @param indexMatch
+	 * @param index which point from the list
 	 */
-	public abstract void setTarget(int indexMatch);
+	public abstract void setTarget( int index);
 
 	/**
 	 * Distance from reference to the specified index
 	 */
-	public abstract double distToTarget(int indexRef);
+	public abstract double distToTarget( int index);
 }

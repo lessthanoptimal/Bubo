@@ -21,7 +21,6 @@ package bubo.clouds.fit.s2s.general;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.struct.StoppingCondition;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se2_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -135,9 +134,8 @@ public class TestGeneralizedScanToScan {
 		}
 
 		@Override
-		protected Se2_F64 estimateMotion() {
-			return null;
-		}
+		protected void estimateAndApplyMotion(ScanInfo scanSrc, EstimationResults results) {
+			}
 
 		public void checkVisibleByDeltaAngle(ScanInfo info) {
 			super.checkVisibleByDeltaAngle(info);

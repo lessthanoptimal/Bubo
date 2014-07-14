@@ -88,17 +88,17 @@ public abstract class LocalScanToScanMatching implements Lrf2dScanToScan {
 	}
 
 	@Override
-	public Se2_F64 getMotion() {
+	public Se2_F64 getSourceToDestination() {
 		return motion;
 	}
 
 	@Override
-	public void setReference(double[] scan) {
+	public void setDestination(double[] scan) {
 		System.arraycopy(scan, 0, first.scan, 0, param.getNumberOfScans());
 	}
 
 	@Override
-	public void setMatch(double[] scan) {
+	public void setSource(double[] scan) {
 		System.arraycopy(scan, 0, second.scan, 0, param.getNumberOfScans());
 	}
 
@@ -115,21 +115,21 @@ public abstract class LocalScanToScanMatching implements Lrf2dScanToScan {
 	}
 
 	@Override
-	public void setMatchToReference() {
+	public void setSourceToDestinationScan() {
 		ScanInfo temp = first;
 		first = second;
 		second = temp;
 	}
 
 	@Override
-	public boolean process(Se2_F64 hint) {
+	public boolean process(Se2_F64 hintSrcToDst) {
 //        System.out.println("-----------------------------------------------------");
 		computeScan(second.scan, second.pts);
 		computeScan(first.scan, first.pts);
 
-		if (hint != null) {
-			transform(hint, second);
-			motion.set(hint);
+		if (hintSrcToDst != null) {
+			transform(hintSrcToDst, second);
+			motion.set(hintSrcToDst);
 		} else
 			motion.set(0, 0, 0);
 

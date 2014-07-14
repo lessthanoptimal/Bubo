@@ -20,10 +20,10 @@ package bubo.clouds.fit.s2s;
 
 import bubo.clouds.fit.s2s.general.GeneralizedScanToScan;
 import bubo.clouds.fit.s2s.general.LocalAssociateInterpolate;
+import bubo.clouds.fit.s2s.general.ScanInfo;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.struct.StoppingCondition;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se2_F64;
 
 /**
  * <p>
@@ -111,26 +111,24 @@ public class Lrf2dScanToScan_IDC extends GeneralizedScanToScan {
 	 * @return Estimated motion.
 	 */
 	@Override
-	protected Se2_F64 estimateMotion() {
+	protected void estimateAndApplyMotion(  ScanInfo scanSrc , EstimationResults results)
+	{
+		estimateMotion(results);
+		applyMotion(results.srcToDst, scanSrc);
+		results.meanSqError = computeMeanSqError(assocCartesian);
+	}
+
+	private void estimateMotion(EstimationResults results) {
 		// reduce the search window size for each iteration
 		double windowRadius = searchNeighborhood * Math.exp(-windowDecayConstant * stop.getIteration());
 		assocCartesian.setSearchNeighborhood(windowRadius);
 		assocRange.setSearchNeighborhood(windowRadius);
 
 		// find translational component
-		Se2_F64 m = computeMotion(assocCartesian);
-//        System.out.println(m);
-
-		double dx = m.getX();
-		double dy = m.getY();
+		results.srcToDst.set(computeMotion(assocCartesian));
 
 		// find angular component
-		m = computeMotion(assocRange);
-//        System.out.println(m);
-
-		m.set(dx, dy, m.getYaw());
-
-		return m;
+		results.srcToDst.setYaw(computeMotion(assocRange).getYaw());
 	}
 
 	/**

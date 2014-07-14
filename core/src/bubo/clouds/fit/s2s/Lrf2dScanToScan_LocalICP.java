@@ -20,10 +20,10 @@ package bubo.clouds.fit.s2s;
 
 import bubo.clouds.fit.s2s.general.GeneralizedScanToScan;
 import bubo.clouds.fit.s2s.general.LocalAssociateDiscrete;
+import bubo.clouds.fit.s2s.general.ScanInfo;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.struct.StoppingCondition;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se2_F64;
 
 
 /**
@@ -61,28 +61,30 @@ public class Lrf2dScanToScan_LocalICP extends GeneralizedScanToScan {
 	}
 
 	@Override
-	protected Se2_F64 estimateMotion() {
-		return computeMotion(assoc);
+	protected void estimateAndApplyMotion( ScanInfo scanSrc , EstimationResults results) {
+		results.srcToDst.set(computeMotion(assoc));
+		applyMotion(results.srcToDst,scanSrc);
+		results.meanSqError = computeMeanSqError(assoc);
 	}
 
 	/**
 	 * Associates points based on cartesian distance.
 	 */
 	protected class DistanceAssociate extends LocalAssociateDiscrete {
-		Point2D_F64 fromPt;
+		Point2D_F64 srcPt;
 
 		protected DistanceAssociate(int searchNeighborhood, double maxSeparation) {
 			super(searchNeighborhood, maxSeparation);
 		}
 
 		@Override
-		public void setTarget(int indexFrom) {
-			fromPt = scanMatch.pts[indexFrom];
+		public void setTarget(int index) {
+			srcPt = scanSrc.pts[index];
 		}
 
 		@Override
-		public double distToTarget(int indexTo) {
-			return scanRef.pts[indexTo].distance2(fromPt);
+		public double distToTarget(int index) {
+			return scanDst.pts[index].distance2(srcPt);
 		}
 
 	}

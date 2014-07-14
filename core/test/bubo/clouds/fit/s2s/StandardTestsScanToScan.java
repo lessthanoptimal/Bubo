@@ -21,8 +21,7 @@ package bubo.clouds.fit.s2s;
 import bubo.clouds.fit.Lrf2dScanToScan;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.maps.d2.lines.LineSegmentMap;
-import bubo.simulation.d2.features.ModelLrf2DBasic;
-import bubo.simulation.d2.features.SimStateLrf2D;
+import bubo.simulation.d2.sensors.SimulateLrf2D;
 import georegression.misc.test.GeometryUnitTest;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.se.Se2_F64;
@@ -42,8 +41,9 @@ public abstract class StandardTestsScanToScan {
 	protected double angTol = -1;
 	protected double tranTol = -1;
 	Lrf2dParam param;
-	private ModelLrf2DBasic model;
-	private SimStateLrf2D state;
+	private SimulateLrf2D model;
+	private Se2_F64 sensorToWorld = new Se2_F64();
+	private LineSegmentMap world;
 
 	public abstract Lrf2dScanToScan createAlg();
 
@@ -69,19 +69,18 @@ public abstract class StandardTestsScanToScan {
 	}
 
 	public void setupSimulation() {
-		LineSegmentMap world = new LineSegmentMap();
+		world = new LineSegmentMap();
 		// two perpendicular lines so that the position can be uniquely localized
 		world.lines.add(new LineSegment2D_F64(-2, 4, 2, 0));
 		world.lines.add(new LineSegment2D_F64(-2, -4, 2, 0));
 
-		state = new SimStateLrf2D(param);
-
-		model = new ModelLrf2DBasic();
-		model.setWorld(world);
+		model = new SimulateLrf2D(param);
 
 		if (angTol < 0 || tranTol < 0) {
 			throw new RuntimeException("angTol and tranTol must be set");
 		}
+
+		sensorToWorld.reset();
 	}
 
 	/**
@@ -89,27 +88,27 @@ public abstract class StandardTestsScanToScan {
 	 */
 	public void checkPerfectNoHint() {
 		Lrf2dScanToScan alg = createAlg();
-		alg.setSensorParam(state.getSensorParam());
+		alg.setSensorParam(param);
 
 		// observe before any transform is applied
-		model.updateSensor(state);
+		model.update(new Se2_F64(),world);
 
-		alg.setReference(state.getRanges());
+		alg.setDestination(model.getMeasurement().meas.clone());
 
 		// rotate and translate the sensor
-		state.getLocalToParent().set(0.12, -0.12, 0.05);
+		sensorToWorld.set(0.12, -0.12, 0.05);
 
 		// make an observation in the new position
-		model.updateSensor(state);
+		model.update(sensorToWorld, world);
 
-		alg.setMatch(state.getRanges());
+		alg.setSource(model.getMeasurement().meas.clone());
 
 		// find the motion
 		assertTrue(alg.process(null));
 
 		// see if it is close enough to the expected value
-		Se2_F64 found = alg.getMotion();
-		Se2_F64 expected = state.getLocalToParent();
+		Se2_F64 found = alg.getSourceToDestination();
+		Se2_F64 expected = sensorToWorld;
 
 		GeometryUnitTest.assertEquals(expected.getTranslation(), found.getTranslation(), tranTol);
 		assertEquals(expected.getYaw(), found.getYaw(), angTol);
@@ -122,34 +121,34 @@ public abstract class StandardTestsScanToScan {
 	 */
 	public void checkPrefectHint() {
 		Lrf2dScanToScan alg = createAlg();
-		alg.setSensorParam(state.getSensorParam());
+		alg.setSensorParam(param);
 
 		// observe before any transform is applied
-		model.updateSensor(state);
+		model.update(new Se2_F64(),world);
 
-		alg.setReference(state.getRanges());
+		alg.setDestination(model.getMeasurement().meas.clone());
 
 		// rotate and translate the sensor, but make the magnitude so great it should
 		//  not be able to recover the motion
-		state.getLocalToParent().set(-0.5, -0.3, 0.6);
+		sensorToWorld.set(-0.5, -0.3, 0.6);
 
 		// make an observation in the new position
-		model.updateSensor(state);
+		model.update(sensorToWorld, world);
 
-		alg.setMatch(state.getRanges());
+		alg.setSource(model.getMeasurement().meas.clone());
 
 		// It should not be able to find an answer
 		if (alg.process(null)) {
-			Se2_F64 found = alg.getMotion();
-			Se2_F64 expected = state.getLocalToParent();
+			Se2_F64 found = alg.getSourceToDestination();
+			Se2_F64 expected = sensorToWorld;
 			GeometryUnitTest.assertNotEquals(expected, found, tranTol, angTol);
 		}
 
 		// now give it the hint
-		assertTrue(alg.process(state.getLocalToParent()));
+		assertTrue(alg.process(sensorToWorld));
 
-		Se2_F64 found = alg.getMotion();
-		Se2_F64 expected = state.getLocalToParent();
+		Se2_F64 found = alg.getSourceToDestination();
+		Se2_F64 expected = sensorToWorld;
 		GeometryUnitTest.assertEquals(expected, found, tranTol, angTol);
 		assertTrue(alg.getError() < 0.01);
 	}
@@ -159,29 +158,29 @@ public abstract class StandardTestsScanToScan {
 	 */
 	public void setSecondToFirst() {
 		Lrf2dScanToScan alg = createAlg();
-		alg.setSensorParam(state.getSensorParam());
+		alg.setSensorParam(param);
 
 		// observe before any transform is applied
-		model.updateSensor(state);
+		model.update(new Se2_F64(), world);
 
-		alg.setMatch(state.getRanges());
+		alg.setSource(model.getMeasurement().meas.clone());
 		// tell it to swap the first and second scan
-		alg.setMatchToReference();
+		alg.setSourceToDestinationScan();
 
 		// rotate and translate the sensor
-		state.getLocalToParent().set(0.12, -0.12, 0.05);
+		sensorToWorld.set(0.12, -0.12, 0.05);
 
 		// make an observation in the new position
-		model.updateSensor(state);
+		model.update(sensorToWorld,world);
 
-		alg.setMatch(state.getRanges());
+		alg.setSource(model.getMeasurement().meas.clone());
 
 		// find the motion
 		assertTrue(alg.process(null));
 
 		// see if it is close enough to the expected value
-		Se2_F64 found = alg.getMotion();
-		Se2_F64 expected = state.getLocalToParent();
+		Se2_F64 found = alg.getSourceToDestination();
+		Se2_F64 expected = sensorToWorld;
 
 		GeometryUnitTest.assertEquals(expected.getTranslation(), found.getTranslation(), tranTol);
 		assertEquals(expected.getYaw(), found.getYaw(), angTol);

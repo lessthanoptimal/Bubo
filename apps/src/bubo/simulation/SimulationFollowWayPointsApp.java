@@ -84,7 +84,7 @@ public class SimulationFollowWayPointsApp {
 		sim.initialize();
 
 		long sleepTime = Math.max(1,(int)(sim.getPeriodSimulation()*1000));
-		while( sim.getTime() < 1000 && !planner.isDone() ) {
+		while( !planner.isDone() ) {
 			sim.doStep();
 			gui.updateRobot(sim.getRobot());
 			gui.updateLidar(sim.getSimulatedLadar().getMeasurement());
@@ -94,6 +94,7 @@ public class SimulationFollowWayPointsApp {
 //				Thread.sleep(sleepTime);
 //			} catch (InterruptedException ignore) {}
 		}
+		System.out.println("Done!");
 	}
 
 	public static void main(String[] args) throws IOException {

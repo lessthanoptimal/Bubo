@@ -34,12 +34,12 @@ import georegression.transform.se.SePointOps_F64;
  *
  * @author Peter Abeles
  */
-public class SimulateLadar2D {
+public class SimulateLrf2D {
 	Lrf2dParam param;
 	Lrf2dMeasurement measurement;
 	Lrf2dPrecomputedTrig trig;
 
-	public SimulateLadar2D(Lrf2dParam param) {
+	public SimulateLrf2D(Lrf2dParam param) {
 		this.param = param;
 		this.trig = new Lrf2dPrecomputedTrig(param);
 		this.measurement = new Lrf2dMeasurement(param.getNumberOfScans());
@@ -55,8 +55,8 @@ public class SimulateLadar2D {
 
 	/**
 	 * Given the world model, computes the range measurements
-	 * @param sensorToWorld
-	 * @param world
+	 * @param sensorToWorld transform from sensor to world frame
+	 * @param world Map of the world
 	 */
 	public void update( Se2_F64 sensorToWorld , LineSegmentMap world ) {
 
@@ -88,7 +88,7 @@ public class SimulateLadar2D {
 				}
 			}
 
-			// save the results.  Mark values which didn't hit anything as having a value larger than the max range
+			// save the results
 			measurement.meas[i] = Math.sqrt(best);
 		}
 
