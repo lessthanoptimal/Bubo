@@ -16,18 +16,21 @@
  * limitations under the License.
  */
 
-package bubo.clouds.fit.s2s;
+package bubo.validation.clouds.fit.s2s;
 
-import org.junit.Test;
-
-import static org.junit.Assert.fail;
+import bubo.clouds.fit.Lrf2dScanToScan;
+import bubo.clouds.fit.s2s.Lrf2dScanToScan_LocalICP;
+import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
+import bubo.struct.StoppingCondition;
 
 /**
  * @author Peter Abeles
  */
-public class TestLrf2dMotionRollingKeyFrame {
-	@Test
-	public void stuff() {
-		fail("Implement");
+public class FactoryEvaluateScanMotion {
+
+	public static Lrf2dMotionRollingKeyFrame createIcpLocal() {
+		Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_LocalICP(new StoppingCondition(20, 0.0001), 200, 0.20);
+
+		return new Lrf2dMotionRollingKeyFrame(scanMatching,100);
 	}
 }

@@ -1,1 +1,1 @@
-include 'io', 'gui', 'apps', 'core' , 'integration:jme'
+include 'io', 'gui', 'apps', 'core' , 'validation','integration:jme'

@@ -19,8 +19,8 @@
 package bubo.mapping.ladar2d.update;
 
 import bubo.clouds.fit.Lrf2dScanToScan;
-import bubo.clouds.fit.s2s.Lrf2dMotionRollingKeyFrame;
 import bubo.clouds.fit.s2s.Lrf2dScanToScan_LocalICP;
+import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
 import bubo.mapping.ladar2d.LineGridGenericUpdate;
@@ -69,7 +69,8 @@ public class LadarMapBayesUpdate extends LineGridGenericUpdate {
 
 		if (scanMatching != null) {
 			scanMatching.setSensorParam(param);
-			motion = new Lrf2dMotionRollingKeyFrame(param,scanMatching,10);
+			motion = new Lrf2dMotionRollingKeyFrame(scanMatching,10);
+			motion.init(param);
 		}
 	}
 

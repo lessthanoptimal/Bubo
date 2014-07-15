@@ -1,0 +1,12 @@
+dependencies {
+    compile project(':core')
+    compile project(':io')
+    compile project(':gui')
+    compile project(':integration:jme')
+}
+
+idea {
+    module {
+        name = "BUBO Validation"
+    }
+}

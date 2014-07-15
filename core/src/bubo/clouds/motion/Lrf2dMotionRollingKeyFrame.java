@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.clouds.fit.s2s;
+package bubo.clouds.motion;
 
 import bubo.clouds.fit.Lrf2dScanToScan;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
@@ -52,23 +52,26 @@ public class Lrf2dMotionRollingKeyFrame {
 
 	boolean first;
 
+	int maxHistory;
 	double keyFraction = 0.75;
 	int keyValidScans;
 
 	Se2_F64 odomWorldToKey = new Se2_F64();
 	Se2_F64 odomCurrToKey = new Se2_F64();
 
-	public Lrf2dMotionRollingKeyFrame(final Lrf2dParam param,
-									  Lrf2dScanToScan estimator, int maxHistory) {
-		this.param = param;
+	public Lrf2dMotionRollingKeyFrame(Lrf2dScanToScan estimator, int maxHistory) {
 		this.estimator = estimator;
+		this.maxHistory = maxHistory;
+	}
+
+	public void init( final Lrf2dParam param ) {
+		this.param = param;
 		this.history = new CircularQueue<ScanInfo>(ScanInfo.class,maxHistory) {
 			@Override
 			protected ScanInfo createInstance() {
 				return new ScanInfo(param.getNumberOfScans());
 			}
 		};
-
 		estimator.setSensorParam(param);
 		reset();
 	}
@@ -86,8 +89,20 @@ public class Lrf2dMotionRollingKeyFrame {
 		return history.tail().sensorToWorld;
 	}
 
-	boolean firstKey = true;
 	public boolean process( Se2_F64 odometrySensorToWorld , double[] scan ) {
+
+		// check to see if the sensor is blind
+		int totalValid = countValidScans(scan);
+		if( totalValid < 2 ) {
+			if( history.size() > 0 ) {
+				ScanInfo prev = history.tail();
+
+				// TODO compute odometry correction factor?
+			}
+			// TODO just integrate odometry
+			first = true;
+			return false;
+		}
 
 		if( first ) {
 			first = false;
@@ -95,7 +110,7 @@ public class Lrf2dMotionRollingKeyFrame {
 			key.init(scan, odometrySensorToWorld);
 			key.sensorToWorld.set(odometrySensorToWorld);
 			estimator.setDestination(key.scan);
-			countValidScans(key);
+			keyValidScans = totalValid;
 		} else {
 			ScanInfo key = history.head();
 
@@ -125,19 +140,20 @@ public class Lrf2dMotionRollingKeyFrame {
 
 				key = history.head();
 				estimator.setDestination(key.scan);
-				countValidScans(key);
+				keyValidScans = totalValid;
 			}
 		}
 
 		return true;
 	}
 
-	private void countValidScans(ScanInfo key) {
-		keyValidScans = 0;
+	private int countValidScans( double scan[]) {
+		int total = 0;
 		for (int i = 0; i < param.getNumberOfScans(); i++) {
-			if( param.isValidRange(key.scan[i]))
-				keyValidScans++;
+			if( param.isValidRange(scan[i]))
+				total++;
 		}
+		return total;
 	}
 
 	/**
