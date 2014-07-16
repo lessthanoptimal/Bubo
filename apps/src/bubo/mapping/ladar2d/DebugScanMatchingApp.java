@@ -32,7 +32,6 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 
 import java.awt.*;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ public class DebugScanMatchingApp {
 
 	public static void main(String[] args) throws IOException
 	{
-		Lrf2dParam param = (Lrf2dParam)new XStream().fromXML(new File(directory+"lrf.xml"));
+		Lrf2dParam param = (Lrf2dParam)new XStream().fromXML(new FileInputStream(directory+"lrf.xml"));
 		PositionRangeArrayData data = new PositionRangeArrayData(param.getNumberOfScans());
 
 		SerializationDefinitionManager def = new SerializationDefinitionManager();

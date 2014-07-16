@@ -30,7 +30,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class SimulationFollowWayPointsApp {
 
 	public SimulationFollowWayPointsApp(String mapName, String pathName) throws IOException {
 		LineSegmentMap map = MapIO.loadLineSegmentMap(mapName);
-		List<Point2D_F64> wayPoints = (List<Point2D_F64>)new XStream().fromXML(new File(pathName));
+		List<Point2D_F64> wayPoints = (List<Point2D_F64>)new XStream().fromXML(new FileInputStream(pathName));
 
 //		planner = new FollowPathCheatingRobot(1,0.4,wayPoints);
 		planner = new FollowPathLoggingRobot(1,0.4,wayPoints);

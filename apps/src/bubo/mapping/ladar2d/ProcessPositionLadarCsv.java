@@ -36,7 +36,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -108,7 +107,7 @@ public class ProcessPositionLadarCsv implements ActionListener {
 
 		String fileName = directory+"observations.txt";
 
-		Lrf2dParam param = (Lrf2dParam)new XStream().fromXML(new File(directory+"lrf.xml"));
+		Lrf2dParam param = (Lrf2dParam)new XStream().fromXML(new FileInputStream(directory+"lrf.xml"));
 
 		ProcessPositionLadarCsv p = new ProcessPositionLadarCsv(fileName, param);
 
