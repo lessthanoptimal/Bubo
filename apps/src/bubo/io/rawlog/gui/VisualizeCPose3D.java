@@ -40,7 +40,7 @@ public class VisualizeCPose3D implements LogDataVisualization {
 	public void setText(CPose3D pose) {
 
 		DenseMatrix64F R = pose.getRotation();
-		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(R, null);
+		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(R, (double[])null);
 
 		String str = "CPose3D\n";
 		str += "\n";
