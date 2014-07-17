@@ -16,28 +16,33 @@
  * limitations under the License.
  */
 
-package bubo.validation.clouds.fit.s2s;
+package bubo.validation.clouds.motion;
 
 import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
 import georegression.struct.se.Se2_F64;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 
 /**
  * Evaluate different amounts of noise on the LRF's range measurement.
  *
  * @author Peter Abeles
  */
-public class SensorNoiseScanMotionValidation extends ScanMotionValidation {
+public class NoiseSensorScanMotionValidation extends ScanMotionValidation {
 
 	double sigmaRange;
 
-	public SensorNoiseScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
+	public NoiseSensorScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
 		super(estimator);
-		out = new PrintStream("ScanMotionSensorNoise.txt");
-		addDataSets();
+		setOutputName("ScanMotionSensorNoise.txt");
+
+		String dataDir = "data/mapping2d/";
+		String sets[] = new String[]{"sim02"};
+
+		for( String set : sets) {
+			addDataSet(dataDir+set+"/observations.txt",dataDir+set+"/lrf.xml");
+		}
 	}
 
 	public void evaluate() throws IOException {
@@ -47,16 +52,6 @@ public class SensorNoiseScanMotionValidation extends ScanMotionValidation {
 			out.println("Range SIGMA = "+sigmaRange);
 			System.out.println("Range SIGMA = "+sigmaRange);
 			super.evaluateDataSets();
-		}
-	}
-
-	@Override
-	public void addDataSets() {
-		String dataDir = "data/mapping2d/";
-		String sets[] = new String[]{"sim02"};
-
-		for( String set : sets) {
-			addDataSet(dataDir+set+"/observations.txt",dataDir+set+"/lrf.xml");
 		}
 	}
 
@@ -80,7 +75,7 @@ public class SensorNoiseScanMotionValidation extends ScanMotionValidation {
 
 		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
 
-		SensorNoiseScanMotionValidation app = new SensorNoiseScanMotionValidation(alg);
+		NoiseSensorScanMotionValidation app = new NoiseSensorScanMotionValidation(alg);
 		app.evaluate();
 	}
 }

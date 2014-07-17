@@ -16,21 +16,20 @@
  * limitations under the License.
  */
 
-package bubo.validation.clouds.fit.s2s;
+package bubo.maps.d3.triangles;
 
-import bubo.clouds.fit.Lrf2dScanToScan;
-import bubo.clouds.fit.s2s.Lrf2dScanToScan_LocalICP;
-import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
-import bubo.struct.StoppingCondition;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class FactoryEvaluateScanMotion {
+public class TestTriangle3dMap {
 
-	public static Lrf2dMotionRollingKeyFrame createIcpLocal() {
-		Lrf2dScanToScan scanMatching = new Lrf2dScanToScan_LocalICP(new StoppingCondition(20, 0.0001), 200, 0.20);
-
-		return new Lrf2dMotionRollingKeyFrame(scanMatching,100);
+	@Test
+	public void computeBoundingBox() {
+		fail("Implement");
 	}
+
 }

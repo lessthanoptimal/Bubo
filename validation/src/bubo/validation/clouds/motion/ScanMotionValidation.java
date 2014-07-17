@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-package bubo.validation.clouds.fit.s2s;
+package bubo.validation.clouds.motion;
 
 import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.io.serialization.SerializationDefinitionManager;
 import bubo.io.text.ReadCsvObjectSmart;
+import bubo.validation.ValidationBase;
 import com.thoughtworks.xstream.XStream;
 import georegression.struct.se.Se2_F64;
 import org.ddogleg.struct.GrowQueue_F64;
@@ -35,12 +36,11 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-// TODO Noisy sensor
 // TODO Biased odometry
 // TODO different data rates
 // TODO periodic bad scans with structure. look at floor or ceiling
 // TODO Pathological tests.  No data.  One wall.  Long hallway.
-public abstract class ScanMotionValidation {
+public abstract class ScanMotionValidation extends ValidationBase {
 	// how frequently it scores
 	int scorePeriod = 20;
 
@@ -65,13 +65,11 @@ public abstract class ScanMotionValidation {
 		this.estimator = estimator;
 	}
 
-	public abstract void addDataSets();
-
-	public void addDataSet( String fileObservations , String fileLidarParam ) {
+	protected void addDataSet( String fileObservations , String fileLidarParam ) {
 		dataSets.add( new DataSet(fileObservations,fileLidarParam));
 	}
 
-	public void evaluateDataSets() throws IOException {
+	protected void evaluateDataSets() throws IOException {
 		for ( DataSet s : dataSets ) {
 			System.out.println("Processing: "+s.fileObservations);
 			Results found = process(s);
@@ -89,7 +87,7 @@ public abstract class ScanMotionValidation {
 		}
 	}
 
-	public Results process( DataSet dataSet ) throws IOException {
+	protected Results process( DataSet dataSet ) throws IOException {
 		initialize(dataSet);
 		estimator.reset();
 
@@ -144,14 +142,14 @@ public abstract class ScanMotionValidation {
 
 	protected abstract double[] adjustObservations( double ranges[] );
 
-	private void initialize(DataSet dataSet) throws FileNotFoundException {
+	protected void initialize(DataSet dataSet) throws FileNotFoundException {
 		param = (Lrf2dParam)new XStream().fromXML(new File(dataSet.fileLidarParam));
 
 		SerializationDefinitionManager def = new SerializationDefinitionManager();
 		def.loadDefinition(RobotLrfObservations.class, "timeStamp", "scanToWorld", "range");
 		def.loadDefinition(Se2_F64.class, "x", "y", "yaw");
 
-		reader = new ReadCsvObjectSmart<RobotLrfObservations>(new FileInputStream(dataSet.fileObservations), def, RobotLrfObservations.class.getSimpleName());
+		reader = new ReadCsvObjectSmart<RobotLrfObservations>(new FileInputStream(dataSet.fileObservations), def,						RobotLrfObservations.class.getSimpleName());
 		reader.setComment('#');
 		reader.setIgnoreUnparsedData(true);
 

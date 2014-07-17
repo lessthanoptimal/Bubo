@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.validation.clouds.fit.s2s;
+package bubo.validation.clouds.motion;
 
 import georegression.struct.se.Se2_F64;
 

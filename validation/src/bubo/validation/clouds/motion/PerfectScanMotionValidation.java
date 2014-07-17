@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package bubo.validation.clouds.fit.s2s;
+package bubo.validation.clouds.motion;
 
 import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
 import georegression.struct.se.Se2_F64;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 
 /**
  * @author Peter Abeles
@@ -32,12 +31,8 @@ public class PerfectScanMotionValidation extends ScanMotionValidation {
 
 	public PerfectScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
 		super(estimator);
-		out = new PrintStream("ScanMotionPerfect.txt");
-		addDataSets();
-	}
+		setOutputName("ScanMotionPerfect.txt");
 
-	@Override
-	public void addDataSets() {
 		String dataDir = "data/mapping2d/";
 		String sets[] = new String[]{"sim02"};
 
@@ -46,6 +41,9 @@ public class PerfectScanMotionValidation extends ScanMotionValidation {
 		}
 	}
 
+	public void evaluate() throws IOException {
+		evaluateDataSets();
+	}
 	@Override
 	protected Se2_F64 adjustOdometry(Se2_F64 sensorToWorld) {
 		return sensorToWorld;
