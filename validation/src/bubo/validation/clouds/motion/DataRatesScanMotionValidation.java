@@ -19,23 +19,22 @@
 package bubo.validation.clouds.motion;
 
 import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
-import georegression.struct.se.Se2_F64;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Evaluate different amounts of noise on the LRF's range measurement.
+ * Add the same amount of odometry error but change the rate at which sensor data is processed.
  *
  * @author Peter Abeles
  */
-public class NoiseSensorScanMotionValidation extends ScanMotionValidation {
+public class DataRatesScanMotionValidation extends NoiseOdometryScanMotionValidation {
 
-	double sigmaRange;
+	int rates[] = new int[]{1,2,5,10};
 
-	public NoiseSensorScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
-		super(estimator);
-		setOutputName("ScanMotionSensorNoise.txt");
+	public DataRatesScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
+		this.estimator = estimator;
+		setOutputName("ScanMotionDataRate.txt");
 
 		String dataDir = "data/mapping2d/";
 		String sets[] = new String[]{"sim02"};
@@ -47,36 +46,26 @@ public class NoiseSensorScanMotionValidation extends ScanMotionValidation {
 
 	@Override
 	public void evaluate() throws IOException {
-		for( int i = 0; i <= 5; i++ ) {
-			sigmaRange = 0.01*Math.pow(2,i);
+		sigmaTravel = 0.1;
+		sigmaTravelAngle = 0.01;
+		sigmaAngle = 0.1;
+
+		for( int i = 0; i < rates.length; i++ ) {
+			skipSensor = rates[i];
+
 			out.println("=========================================");
-			out.println("Range SIGMA = "+sigmaRange);
-			System.out.println("Range SIGMA = "+sigmaRange);
+			out.println("Sensor skip = "+skipSensor);
+			out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaTravelAngle+" Angle "+sigmaAngle);
+			System.out.println("Sensor skip = "+skipSensor);
+			System.out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaTravelAngle+" Angle "+sigmaAngle);
 			super.evaluateDataSets();
 		}
 	}
 
-	@Override
-	protected Se2_F64 adjustOdometry(Se2_F64 sensorToWorld) {
-		return sensorToWorld;
-	}
-
-	@Override
-	protected double[] adjustObservations(double[] ranges) {
-		double[] ret = ranges.clone();
-		for( int i = 0; i < ret.length; i++ ) {
-			ret[i] += rand.nextGaussian()*sigmaRange;
-			if( ret[i] < 0 )
-				ret[i] = 0;
-		}
-		return ret;
-	}
-
 	public static void main(String[] args) throws IOException {
-
 		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
 
-		NoiseSensorScanMotionValidation app = new NoiseSensorScanMotionValidation(alg);
+		DataRatesScanMotionValidation app = new DataRatesScanMotionValidation(alg);
 		app.evaluate();
 	}
 }

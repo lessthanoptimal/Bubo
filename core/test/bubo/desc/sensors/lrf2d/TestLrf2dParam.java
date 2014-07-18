@@ -16,20 +16,21 @@
  * limitations under the License.
  */
 
-package bubo.simulation.d2.sensors;
+package bubo.desc.sensors.lrf2d;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestSimulateSpinningLrf2D {
-
+public class TestLrf2dParam {
 	@Test
-	public void update() {
-		fail("Implement");
-	}
+	public void computeAngle() {
+		Lrf2dParam param = new Lrf2dParam(null,-Math.PI/2,Math.PI,180,5,0,0);
 
+		assertEquals(-Math.PI / 2, param.computeAngle(0), 1e-8);
+		assertEquals(Math.PI/2,param.computeAngle(179),1e-8);
+	}
 }

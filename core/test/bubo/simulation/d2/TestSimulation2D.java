@@ -86,7 +86,7 @@ public class TestSimulation2D {
 		assertEquals(0,found.getYaw(),1e-8);
 	}
 
-	private static class User implements RobotInterface {
+	private static class User implements RobotInterface2D {
 
 		int countControl, countOdometry, countLadar;
 
@@ -96,7 +96,7 @@ public class TestSimulation2D {
 		}
 
 		@Override
-		public void setControlListener(ControlListener listener) {}
+		public void setControlListener(ControlListener2D listener) {}
 
 		@Override
 		public void setIntrinsic(Se2_F64 ladarToRobot, Lrf2dParam param) {}

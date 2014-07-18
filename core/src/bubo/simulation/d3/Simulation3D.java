@@ -16,17 +16,13 @@
  * limitations under the License.
  */
 
-package bubo.simulation.d2;
-
-import georegression.struct.se.Se2_F64;
+package bubo.simulation.d3;
 
 /**
+ * Simulated robot in 3D
+ *
  * @author Peter Abeles
  */
-public interface ControlListener {
-	public void sendControl( double velocity , double anglularVelocity );
+public class Simulation3D {
 
-	public void setPose( Se2_F64 robotToWorld );
-
-	public Se2_F64 _truthRobotToWorld();
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.simulation.d2.sensors;
+package bubo.simulation.d3.sensors;
 
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.desc.sensors.lrf3d.SpinningLrf2dMeasurement;

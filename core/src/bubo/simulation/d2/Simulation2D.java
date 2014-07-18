@@ -33,10 +33,10 @@ import georegression.struct.se.Se2_F64;
  *
  * @author Peter Abeles
  */
-public class Simulation2D implements ControlListener {
+public class Simulation2D implements ControlListener2D {
 
 	// simulation and control models
-	RobotInterface user;
+	RobotInterface2D user;
 	LineSegmentMap world;
 	CircularRobot2D robot;
 	SimulateLrf2D sensor;
@@ -60,7 +60,7 @@ public class Simulation2D implements ControlListener {
 	Se2_F64 newToOld = new Se2_F64();
 	Se2_F64 temp = new Se2_F64();
 
-	public Simulation2D(RobotInterface user,
+	public Simulation2D(RobotInterface2D user,
 						LineSegmentMap world,
 						Lrf2dParam sensorParam,
 						CircularRobot2D robot ) {
@@ -178,7 +178,7 @@ public class Simulation2D implements ControlListener {
 	}
 
 	@Override
-	public void setPose(Se2_F64 robotToWorld) {
+	public void _setPose(Se2_F64 robotToWorld) {
 		robot.getRobotToWorld().set(robotToWorld);
 	}
 

@@ -21,16 +21,27 @@ package bubo.simulation.d2;
 import georegression.struct.se.Se2_F64;
 
 /**
- * Base class for simulated objects.
+ * Interface for sending controls to simulation and cheating by getting truth/setting the pose
  *
  * @author Peter Abeles
  */
-public class SimulatedObjectState {
+public interface ControlListener2D {
+	/**
+	 * Sends a control request for the robot to travel at the specified speed
+	 * @param velocity translation velocity
+	 * @param anglularVelocity angular velocity
+	 */
+	public void sendControl( double velocity , double anglularVelocity );
 
-	// from the local to the parent reference frame
-	private Se2_F64 l2p = new Se2_F64();
+	/**
+	 * Way to cheat and make the robot magically teleport to the specified location
+	 * @param robotToWorld The new robot pose
+	 */
+	public void _setPose(Se2_F64 robotToWorld);
 
-	public Se2_F64 getLocalToParent() {
-		return l2p;
-	}
+	/**
+	 * Way to cheat and get the robot's true location in the world
+	 * @return true pose
+	 */
+	public Se2_F64 _truthRobotToWorld();
 }

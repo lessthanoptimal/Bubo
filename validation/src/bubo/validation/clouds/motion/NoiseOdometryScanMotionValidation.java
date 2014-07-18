@@ -54,20 +54,24 @@ public class NoiseOdometryScanMotionValidation extends ScanMotionValidation  {
 		}
 	}
 
+	protected NoiseOdometryScanMotionValidation() {
+	}
+
 	@Override
 	protected void initialize(DataSet dataSet) throws FileNotFoundException {
 		super.initialize(dataSet);
 		first = true;
 	}
 
+	@Override
 	public void evaluate() throws IOException {
 		for( int i = 0; i <= 5; i++ ) {
-			sigmaTravel = 0.01*Math.pow(2,i);
-			sigmaTravelAngle = 0.001*Math.pow(2,i);
-			sigmaAngle = 0.01*Math.pow(2,i);
+			sigmaTravel = 0.02*Math.pow(2,i);
+			sigmaTravelAngle = 0.002*Math.pow(2,i);
+			sigmaAngle = 0.02*Math.pow(2,i);
 			out.println("=========================================");
-			out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaAngle+" Angle "+sigmaAngle);
-			System.out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaAngle+" Angle "+sigmaAngle);
+			out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaTravelAngle+" Angle "+sigmaAngle);
+			System.out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaTravelAngle+" Angle "+sigmaAngle);
 			super.evaluateDataSets();
 		}
 	}
@@ -82,6 +86,7 @@ public class NoiseOdometryScanMotionValidation extends ScanMotionValidation  {
 		} else {
 			// find the true change in location
 			previousTruthInvert.concat(sensorToWorld,change);
+			sensorToWorld.invert(previousTruthInvert);
 
 			double T = change.T.norm();
 			double deltaAngle = change.getYaw();

@@ -41,7 +41,7 @@ public class TestLrf2dPrecomputedTrig {
 		double foundYaw = Math.atan2(alg.y, alg.x);
 
 		assertEquals(r, foundR, 1e-8);
-		assertEquals(foundYaw, -Math.PI + 5.0 / 100.0 * Math.PI, 1e-8);
+		assertEquals(foundYaw, -Math.PI + 5.0 / 99.0 * Math.PI, 1e-8);
 	}
 
 	@Test
@@ -59,7 +59,7 @@ public class TestLrf2dPrecomputedTrig {
 		double foundYaw = Math.atan2(pt.y, pt.x);
 
 		assertEquals(r, foundR, 1e-8);
-		assertEquals(foundYaw, -Math.PI + 5.0 / 100.0 * Math.PI, 1e-8);
+		assertEquals(foundYaw, -Math.PI + 5.0 / 99.0 * Math.PI, 1e-8);
 	}
 
 	private Lrf2dParam createParam() {

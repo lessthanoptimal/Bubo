@@ -16,32 +16,36 @@
  * limitations under the License.
  */
 
-package bubo.simulation.d2;
+package bubo.simulation.d3;
 
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
+import bubo.simulation.d2.ControlListener2D;
 import georegression.struct.se.Se2_F64;
+import georegression.struct.se.Se3_F64;
 
 /**
  * Provides access to simulated robot control and sensors.
  *
  * @author Peter Abeles
  */
-public interface RobotInterface {
+public interface RobotInterface3D {
 
 	/**
 	 * All control should be done when this function is called.  This allows the output to be
 	 * deterministic.
 	 */
-	public void doControl( long timeStamp );
+	public void doControl(long timeStamp);
 
-	public void setControlListener( ControlListener listener );
+	public void setControlListener(ControlListener2D listener);
 
-	public void setIntrinsic(Se2_F64 ladarToRobot , Lrf2dParam param );
+	// todo document
+	// todo code up something that can compute LRF pose in LRF reference frame given baseToLrf
+	public void setIntrinsic(Se3_F64 baseToLrf, Se3_F64 lrfToRobot , Lrf2dParam param);
 
-	public void odometry( long timeStamp , Se2_F64 robotToWorld );
+	public void odometry(long timeStamp, Se2_F64 robotToWorld);
 
-	public void ladar( long timeStamp , Lrf2dMeasurement measurement );
+	public void ladar(long timeStamp, double angle0, double angle1 , Lrf2dMeasurement measurement);
 
 	public boolean isDone();
 }

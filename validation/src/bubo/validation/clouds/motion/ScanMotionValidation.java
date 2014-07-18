@@ -27,7 +27,10 @@ import com.thoughtworks.xstream.XStream;
 import georegression.struct.se.Se2_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,13 +39,11 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-// TODO Biased odometry
-// TODO different data rates
 // TODO periodic bad scans with structure. look at floor or ceiling
 // TODO Pathological tests.  No data.  One wall.  Long hallway.
 public abstract class ScanMotionValidation extends ValidationBase {
-	// how frequently it scores
-	int scorePeriod = 20;
+	// how frequently it scores in seconds
+	double scorePeriod = 1.0;
 
 	GrowQueue_F64 errorLocation = new GrowQueue_F64();
 	GrowQueue_F64 errorAngle = new GrowQueue_F64();
@@ -59,10 +60,14 @@ public abstract class ScanMotionValidation extends ValidationBase {
 
 	Random rand = new Random(234);
 
-	protected PrintStream out;
+	// it will process every X sensor readings
+	protected int skipSensor = 1;
 
 	public ScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) {
 		this.estimator = estimator;
+	}
+
+	protected ScanMotionValidation() {
 	}
 
 	protected void addDataSet( String fileObservations , String fileLidarParam ) {
@@ -95,28 +100,40 @@ public abstract class ScanMotionValidation extends ValidationBase {
 
 		RobotLrfObservations data = new RobotLrfObservations(param.getNumberOfScans());
 		int count = 0;
+		double nextScoreTime = 0;
 		while (reader.nextObject(data) != null) {
+
+			double time = data.getTimeStamp()/1000.0;
+
+			if( count == 0 ) {
+				nextScoreTime = time;
+			}
 
 			Se2_F64 truthSensorToWorld = data.getScanToWorld().copy();
 			Se2_F64 noisySensorToWorld = adjustOdometry(data.getScanToWorld());
 			double noisyObservations[] = adjustObservations(data.getRange());
 
-			if( !estimator.process(noisySensorToWorld,noisyObservations) ) {
-				failed = true;
-				break;
-			}
-
-			if( count % scorePeriod == 0 ) {
-				if( count != 0 ) {
-					Se2_F64 found = estimator.getSensorToWorld().concat(prevFound.invert(null),null);
-					Se2_F64 truth = truthSensorToWorld.concat(prevTruth.invert(null),null);
-					Se2_F64 difference = found.concat(truth.invert(null), null);
-
-					errorLocation.add(difference.getTranslation().norm());
-					errorAngle.add(Math.abs(difference.getYaw()));
+			if( count % skipSensor == 0 ) {
+				if (!estimator.process(noisySensorToWorld, noisyObservations)) {
+					failed = true;
+					break;
 				}
-				prevFound.set(estimator.getSensorToWorld());
-				prevTruth.set(truthSensorToWorld);
+
+				if (nextScoreTime <= time) {
+					while (nextScoreTime <= time) {
+						nextScoreTime += scorePeriod;
+					}
+					if (count != 0) {
+						Se2_F64 found = estimator.getSensorToWorld().concat(prevFound.invert(null), null);
+						Se2_F64 truth = truthSensorToWorld.concat(prevTruth.invert(null), null);
+						Se2_F64 difference = found.concat(truth.invert(null), null);
+
+						errorLocation.add(difference.getTranslation().norm());
+						errorAngle.add(Math.abs(difference.getYaw()));
+					}
+					prevFound.set(estimator.getSensorToWorld());
+					prevTruth.set(truthSensorToWorld);
+				}
 			}
 			count++;
 		}

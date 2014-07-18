@@ -20,8 +20,8 @@ package bubo.simulation;
 
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
-import bubo.simulation.d2.ControlListener;
-import bubo.simulation.d2.RobotInterface;
+import bubo.simulation.d2.ControlListener2D;
+import bubo.simulation.d2.RobotInterface2D;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
@@ -35,12 +35,12 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class FollowPathCheatingRobot implements RobotInterface {
+public class FollowPathCheatingRobot implements RobotInterface2D {
 
 	List<Point2D_F64> waypoints;
 	int target;
 
-	ControlListener listener;
+	ControlListener2D listener;
 	double velocity;
 	double angularVelocity;
 
@@ -79,7 +79,7 @@ public class FollowPathCheatingRobot implements RobotInterface {
 		if( d < travel ) {
 			target++;
 			Se2_F64 pose = new Se2_F64(wp.x,wp.y,robotToWorld.getYaw());
-			listener.setPose(pose);
+			listener._setPose(pose);
 		} else {
 			Se2_F64 pose;
 			double dx = (wp.x-x.x)/d;
@@ -106,13 +106,13 @@ public class FollowPathCheatingRobot implements RobotInterface {
 				pose = new Se2_F64(xx,yy,desired);
 			}
 
-			listener.setPose(pose);
+			listener._setPose(pose);
 		}
 
 	}
 
 	@Override
-	public void setControlListener(ControlListener listener) {
+	public void setControlListener(ControlListener2D listener) {
 		this.listener = listener;
 	}
 

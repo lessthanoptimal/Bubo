@@ -166,6 +166,6 @@ public class Lrf2dParam implements IntrinsicParameters {
 	 * Returns the angle of the scan at the specified index.
 	 */
 	public double computeAngle(int index) {
-		return startAngle + sweepAngle * index / (double) numberOfScans;
+		return startAngle + sweepAngle * index / (double) (numberOfScans-1);
 	}
 }

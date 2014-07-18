@@ -49,16 +49,16 @@ public class TestSimulateLrf2D {
 
 		Lrf2dMeasurement meas = alg.getMeasurement();
 
+		// compute the solid angle for the wall plus a fudge factor
 		double theta = Math.atan2(1,2);
-		int wallSweep = 2*(int)(theta/Math.abs(param.getAngleIncrement()));
-		int start = (meas.numMeas-wallSweep)/2;
-		int stop = start + wallSweep;
+		double thetaIn = Math.atan2(1,2)+param.getAngleIncrement();
 
 		for (int i = 0; i < meas.numMeas; i++) {
-			if( i < start || i > stop) {
+			double angle = param.computeAngle(i);
+			if( angle <= -theta || angle >= theta) {
 				assertTrue(meas.meas[i] >= param.getMaxRange()-0.1);
-			} else if( i > start && i < stop ) {
-				double y = 2*Math.tan(param.computeAngle(i));
+			} if( angle > -thetaIn && angle < thetaIn) {
+				double y = 2*Math.tan(angle);
 				double r = Math.sqrt(2*2 + y*y);
 				assertEquals(r,meas.meas[i],1e-8);
 			}
@@ -80,6 +80,6 @@ public class TestSimulateLrf2D {
 		alg.update(sensorToWorld,world);
 
 		Lrf2dMeasurement meas = alg.getMeasurement();
-		assertEquals(2, meas.meas[meas.numMeas / 2], 1e-8);
+		assertEquals(2, meas.meas[meas.numMeas / 2], 0.001);// won't be perfectly infront
 	}
 }
