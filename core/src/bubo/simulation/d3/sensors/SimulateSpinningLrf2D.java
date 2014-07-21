@@ -24,13 +24,17 @@ import bubo.maps.d3.triangles.Triangle3dMap;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Simulates LRF scans in a simulated triangle world
+ * Simulates LRF scans in a simulated triangle world.
+ *
+ * The location of the first scan relative to the sensor coordinate frame is specified by baseToSensor.  The
+ * sensor then rotates around it's +z axis as it collects data.
  *
  * @author Peter Abeles
  */
 public class SimulateSpinningLrf2D {
 	Lrf2dParam param;
 	SpinningLrf2dMeasurement measurement;
+	Se3_F64 baseToSensor = new Se3_F64();
 
 	public SimulateSpinningLrf2D(Lrf2dParam param) {
 		this.param = param;

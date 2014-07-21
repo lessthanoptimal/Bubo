@@ -34,7 +34,7 @@ public class PerfectScanMotionValidation extends ScanMotionValidation {
 		setOutputName("ScanMotionPerfect.txt");
 
 		String dataDir = "data/mapping2d/";
-		String sets[] = new String[]{"sim02"};
+		String sets[] = new String[]{"sim02","sim03"};
 
 		for( String set : sets) {
 			addDataSet(dataDir+set+"/observations.txt",dataDir+set+"/lrf.xml");

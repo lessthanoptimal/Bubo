@@ -40,9 +40,7 @@ import org.ddogleg.struct.CircularQueue;
  *
  * @author Peter Abeles
  */
-// TODO detect no motion identical scans
-// TODO if history limit exceeded then change keyframe
-// TODO must be able to handle bad scans.  recognize that robot bounced up and down
+// TODO Detect if a scan match has happened, but is the geometry is so poor it's likely to diverge
 public class Lrf2dMotionRollingKeyFrame {
 
 	Lrf2dScanToScan estimator;
@@ -58,6 +56,9 @@ public class Lrf2dMotionRollingKeyFrame {
 
 	Se2_F64 odomWorldToKey = new Se2_F64();
 	Se2_F64 odomCurrToKey = new Se2_F64();
+	Se2_F64 tmpCurrToWorld = new Se2_F64();
+
+	boolean updateFromOdometry;
 
 	public Lrf2dMotionRollingKeyFrame(Lrf2dScanToScan estimator, int maxHistory) {
 		this.estimator = estimator;
@@ -89,51 +90,42 @@ public class Lrf2dMotionRollingKeyFrame {
 		return history.tail().sensorToWorld;
 	}
 
-	public boolean process( Se2_F64 odometrySensorToWorld , double[] scan ) {
 
-		// check to see if the sensor is blind
+	public void process( Se2_F64 odometrySensorToWorld , double[] scan ) {
 		int totalValid = countValidScans(scan);
-		if( totalValid < 2 ) {
-			if( history.size() > 0 ) {
-				ScanInfo prev = history.tail();
 
-				// TODO compute odometry correction factor?
-			}
-			// TODO just integrate odometry
-			first = true;
-			return false;
-		}
-
-		if( first ) {
-			first = false;
-			ScanInfo key = history.grow();
-			key.init(scan, odometrySensorToWorld);
-			key.sensorToWorld.set(odometrySensorToWorld);
-			estimator.setDestination(key.scan);
-			keyValidScans = totalValid;
+		updateFromOdometry = true;
+		ScanInfo key = history.head();
+		if( key == null ) {
+			handleFirstScan(odometrySensorToWorld, scan, totalValid);
+		} else if( !key.validScan ) {
+			handleKeyNoScan(odometrySensorToWorld, scan, totalValid, key);
 		} else {
-			ScanInfo key = history.head();
+			handleKeyWithScan(odometrySensorToWorld, scan, totalValid, key);
+		}
+	}
 
-			// todo should really do last trusted frame + odometry
-			//      since that's in theory more accurate than pure odometry
-			// then again odometry isn't tainted by a bad match
+	/**
+	 * Key-frame has a valid scan
+	 */
+	private void handleKeyWithScan(Se2_F64 odometrySensorToWorld, double[] scan, int totalValid, ScanInfo key) {
+		if( totalValid >0 ) {
 			key.odometrySensorToWorld.invert(odomWorldToKey);
 			odometrySensorToWorld.concat(odomWorldToKey, odomCurrToKey);
 
 			estimator.setSource(scan);
-			if( !estimator.process(odomCurrToKey) )
+			if (!estimator.process(odomCurrToKey))
 				throw new RuntimeException("Crap it failed.  I should something smart here");
 
 			ScanInfo curr = history.grow();
 			curr.init(scan, odometrySensorToWorld);
-			curr.trusted = key.trusted;
 
 			Se2_F64 currToKey = estimator.getSourceToDestination();
-			currToKey.concat(key.sensorToWorld,curr.sensorToWorld);
+			currToKey.concat(key.sensorToWorld, curr.sensorToWorld);
 
-			if( estimator.totalScansMatched() < keyValidScans*keyFraction ) {
-				curr.trusted = true;
-
+			// if too few scans are matched or there are too many new scans change the key-frame
+			if (estimator.totalScansMatched() < keyValidScans * keyFraction ||
+					totalValid > keyValidScans/keyFraction ) {
 				while (history.size() > 1) {
 					history.removeHead();
 				}
@@ -142,9 +134,72 @@ public class Lrf2dMotionRollingKeyFrame {
 				estimator.setDestination(key.scan);
 				keyValidScans = totalValid;
 			}
-		}
+			updateFromOdometry = false;
+		} else {
+			ScanInfo curr = history.grow();
+			curr.init(odometrySensorToWorld);
 
-		return true;
+			// the sensor update is the previous sensor pose plus the change from odometry
+			key.odometrySensorToWorld.invert(odomWorldToKey);
+			odometrySensorToWorld.concat(odomWorldToKey, odomCurrToKey);
+			odomCurrToKey.concat(key.sensorToWorld, curr.sensorToWorld);
+
+			// discard its past history to make the current frame the key-frame
+			while (history.size() > 1) {
+				history.removeHead();
+			}
+		}
+	}
+
+	/**
+	 * There is a a key-frame, but it doesn't have a valid scan
+	 */
+	private void handleKeyNoScan(Se2_F64 odometrySensorToWorld, double[] scan, int totalValid, ScanInfo key) {
+		if( totalValid > 0 ) {
+			// the current frame has valid data
+			ScanInfo curr = history.grow();
+			curr.init(scan, odometrySensorToWorld);
+
+			// compute the current location using the last location from sensor data plus odometry
+			key.odometrySensorToWorld.invert(odomWorldToKey);
+			odometrySensorToWorld.concat(odomWorldToKey, odomCurrToKey);
+			odomCurrToKey.concat(key.sensorToWorld, curr.sensorToWorld);
+
+			estimator.setDestination(curr.scan);
+			keyValidScans = totalValid;
+
+			// discard its past history to make the current frame the key-frame
+			while (history.size() > 1) {
+				history.removeHead();
+			}
+		} else {
+			// There is no new scan information, so just update odometry information
+			key.odometrySensorToWorld.invert(odomWorldToKey);
+			odometrySensorToWorld.concat(odomWorldToKey, odomCurrToKey);
+			odomCurrToKey.concat(key.sensorToWorld, tmpCurrToWorld);
+			key.sensorToWorld.set(tmpCurrToWorld);
+			key.odometrySensorToWorld.set(odometrySensorToWorld);
+		}
+	}
+
+	/**
+	 * This is the very first scan which has been seen
+	 */
+	private void handleFirstScan(Se2_F64 odometrySensorToWorld, double[] scan, int totalValid) {
+		ScanInfo key;
+		key = history.grow();
+
+		if( totalValid > 0 ) {
+			// there is a sensor scan which can be matched.  Use odometry and save the scan
+			key.init(scan,odometrySensorToWorld);
+			key.sensorToWorld.set(odometrySensorToWorld);
+			estimator.setDestination(key.scan);
+			keyValidScans = totalValid;
+		} else {
+			// there is NO sensor scan which can be matched.  Just use odometry
+			key.init(odometrySensorToWorld);
+			key.sensorToWorld.set(odometrySensorToWorld);
+		}
 	}
 
 	private int countValidScans( double scan[]) {
@@ -156,6 +211,10 @@ public class Lrf2dMotionRollingKeyFrame {
 		return total;
 	}
 
+	public boolean isUpdateFromOdometry() {
+		return updateFromOdometry;
+	}
+
 	/**
 	 * Information on a scan.
 	 */
@@ -164,7 +223,7 @@ public class Lrf2dMotionRollingKeyFrame {
 		double scan[];
 		Se2_F64 odometrySensorToWorld = new Se2_F64();
 		Se2_F64 sensorToWorld = new Se2_F64();
-		boolean trusted;
+		boolean validScan; // true if the scan
 
 		public ScanInfo( int numScans ) {
 			scan = new double[numScans];
@@ -174,7 +233,13 @@ public class Lrf2dMotionRollingKeyFrame {
 			set(scan);
 			this.odometrySensorToWorld.set(odometrySensorToWorld);
 			sensorToWorld.reset();
-			trusted = false;
+			validScan = true;
+		}
+
+		public void init( Se2_F64 odometrySensorToWorld ) {
+			this.odometrySensorToWorld.set(odometrySensorToWorld);
+			sensorToWorld.reset();
+			validScan = false;
 		}
 
 		public void set( double scan[] ) {

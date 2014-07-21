@@ -39,6 +39,8 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
+// TODO make noise for sensors into common base class
+// TODO initialize with no walls visible.
 // TODO periodic bad scans with structure. look at floor or ceiling
 // TODO Pathological tests.  No data.  One wall.  Long hallway.
 public abstract class ScanMotionValidation extends ValidationBase {
@@ -114,7 +116,9 @@ public abstract class ScanMotionValidation extends ValidationBase {
 			double noisyObservations[] = adjustObservations(data.getRange());
 
 			if( count % skipSensor == 0 ) {
-				if (!estimator.process(noisySensorToWorld, noisyObservations)) {
+				try {
+					estimator.process(noisySensorToWorld, noisyObservations);
+				} catch( RuntimeException ignore ) {
 					failed = true;
 					break;
 				}

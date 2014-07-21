@@ -86,8 +86,7 @@ public class LadarMapBayesUpdate extends LineGridGenericUpdate {
 		// todo clean up variable naming for reference frames
 
 		if( scanMatching != null ) {
-			if( !motion.process(ranges.getScanToWorld(),ranges.getRange()) )
-				throw new RuntimeException("Crap");
+			motion.process(ranges.getScanToWorld(),ranges.getRange());
 			estimatedCurrToWorld.set(motion.getSensorToWorld());
 		} else {
 			estimatedCurrToWorld.set(ranges.getScanToWorld());
