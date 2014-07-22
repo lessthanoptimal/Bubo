@@ -1,5 +1,3 @@
-- create map from raw odometry + range finder
-
 - speed benchmark for scan-to-scan registration
 
 - ICP do forward/backwards validation of associations
@@ -10,16 +8,19 @@ native:
 - directory based
 - xml
 
-
-
-point cloud
-- fit
-- detect
-- struct
-
 some structures used for detection are also should be in fitting?
 
-Simulator
------------------
-Line based world.
-LRF sensor
+-----------
+EKF localization with known landmarks
+* Create a landmark map
+* Landmark simulation where robot traverses map and logs observations + odometry
+  - velocity control
+  - odometry model
+* EKF
+  - Velocity and odometry support
+  - continuous time support for velocity?
+  - Specialized data type for obsrevations (bearing, range, accuracy_r , accuracy_theta)
+* Evaluation App
+  - Robot pose
+  - Landmark Location
+* Try creating an information matrix localization?

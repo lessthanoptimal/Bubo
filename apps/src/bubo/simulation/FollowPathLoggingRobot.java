@@ -18,6 +18,8 @@
 
 package bubo.simulation;
 
+import bubo.desc.sensors.landmark.RangeBearingMeasurement;
+import bubo.desc.sensors.landmark.RangeBearingParam;
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import com.thoughtworks.xstream.XStream;
@@ -38,14 +40,18 @@ public class FollowPathLoggingRobot extends FollowPathCheatingRobot {
 
 	Se2_F64 ladarToRobot;
 	Se2_F64 ladarToWorld = new Se2_F64();
-	PrintStream out;
+	PrintStream outLrf;
+	PrintStream outRB;
 
 	public FollowPathLoggingRobot(double velocity, double angularVelocity, List<Point2D_F64> wayPoints) {
 		super(velocity, angularVelocity, wayPoints);
 
 		try {
-			out = new PrintStream("observations.txt");
-			out.println("# time-stamp x y yaw [ranges ... N]");
+			outLrf = new PrintStream("scansLrf.txt");
+			outLrf.println("# time-stamp x y yaw [ranges ... N]");
+
+			outRB = new PrintStream("rangeBearing.txt");
+			outRB.println("# time-stamp x y yaw id range bearing");
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -57,16 +63,28 @@ public class FollowPathLoggingRobot extends FollowPathCheatingRobot {
 
 		ladarToRobot.concat(robotToWorld,ladarToWorld);
 
-		out.printf("%d %f %f %f",timeStamp,ladarToWorld.getX(),ladarToWorld.getY(),ladarToWorld.getYaw());
+		outLrf.printf("%d %f %f %f", timeStamp, ladarToWorld.getX(), ladarToWorld.getY(), ladarToWorld.getYaw());
 		for (int i = 0; i < measurement.numMeas; i++) {
-			out.printf(" %f",measurement.meas[i]);
+			outLrf.printf(" %f", measurement.meas[i]);
 		}
-		out.println();
-		out.flush();
+		outLrf.println();
+		outLrf.flush();
 	}
 
 	@Override
-	public void setIntrinsic(Se2_F64 ladarToRobot, Lrf2dParam param) {
+	public void rangeBearing(long timeStamp, RangeBearingMeasurement measurement) {
+		Se2_F64 robotToWorld =  listener._truthRobotToWorld();
+
+		ladarToRobot.concat(robotToWorld,ladarToWorld);
+
+		outRB.printf("%d %f %f %f ", timeStamp,ladarToWorld.getX(), ladarToWorld.getY(), ladarToWorld.getYaw());
+		outRB.printf("%d %.10f %.10f", measurement.id, measurement.range, measurement.bearing);
+		outRB.println();
+		outRB.flush();
+	}
+
+	@Override
+	public void setIntrinsic(Se2_F64 ladarToRobot, Lrf2dParam param, RangeBearingParam paramRb) {
 		this.ladarToRobot = ladarToRobot;
 		try {
 			new XStream().toXML(param,new FileOutputStream("lrf.xml"));

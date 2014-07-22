@@ -16,28 +16,12 @@
  * limitations under the License.
  */
 
-package bubo.evaluation;
-
-import bubo.simulation.d2.sensors.RangeBearing;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.se.Se2_F64;
-import org.ejml.data.DenseMatrix64F;
-
-import java.util.List;
+package bubo.validation.clouds.motion;
 
 /**
+ * Plays back a datalog in reverse and sees if it still produces reasonable state estimates
+ *
  * @author Peter Abeles
  */
-public interface LocalizationAlgorithm {
-
-	public void configure(List<Point2D_F64> landmarks, DenseMatrix64F R);
-
-	void setInitial(Se2_F64 pose, double sigmaXY, double sigmaYaw);
-
-	public void predict(double vel, double angVel);
-
-	public void update(List<RangeBearing> measNoisy, List<RangeBearing> measTrue);
-
-	public Se2_F64 getPoseEstimate();
-
+public class ReverseScanMotionValidation {
 }

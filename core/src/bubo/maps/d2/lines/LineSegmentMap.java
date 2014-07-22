@@ -71,7 +71,7 @@ public class LineSegmentMap {
 				maxY = l.b.y;
 		}
 
-		return new Rectangle2D_F64(minX,minY,maxX-minX,maxY-minY);
+		return new Rectangle2D_F64(minX,minY,maxX,maxY);
 	}
 
 	public Point2D_F64 computeCenter() {

@@ -19,9 +19,8 @@
 package bubo.simulation;
 
 import boofcv.gui.image.ShowImages;
-import bubo.gui.maps.LineMapDisplay;
+import bubo.gui.maps.MapDisplay;
 import bubo.io.maps.MapIO;
-import bubo.maps.d2.lines.LineSegmentMap;
 import com.thoughtworks.xstream.XStream;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -40,14 +39,18 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class SelectRobotWayPointsApp extends LineMapDisplay
+public class SelectRobotWayPointsApp extends MapDisplay
 		implements MouseListener, KeyListener {
 
 	List<Point2D_F64> path = new ArrayList<Point2D_F64>();
 
-	public SelectRobotWayPointsApp( String fileName ) {
-		LineSegmentMap map = MapIO.loadLineSegmentMap(fileName);
-		setMap(map);
+	public SelectRobotWayPointsApp( String wallsName , String landmarksName ) {
+		try {
+			setMapWalls(MapIO.loadLineSegmentMap(wallsName));
+		} catch( RuntimeException ignore ) {}
+		try {
+			setMapLandmarks(MapIO.loadLandmarkMap(landmarksName));
+		} catch( RuntimeException ignore ) {}
 		autoPreferredSize();
 		addMouseListener(this);
 		addKeyListener(this);
@@ -132,7 +135,9 @@ public class SelectRobotWayPointsApp extends LineMapDisplay
 	}
 
 	public static void main(String[] args) {
-		SelectRobotWayPointsApp app = new SelectRobotWayPointsApp("map.csv");
+//		SelectRobotWayPointsApp app = new SelectRobotWayPointsApp("walls.csv","landmarks.csv");
+//		SelectRobotWayPointsApp app = new SelectRobotWayPointsApp("walls.csv",null);
+		SelectRobotWayPointsApp app = new SelectRobotWayPointsApp(null,"landmarks.csv");
 		JFrame frame = ShowImages.showWindow(app, "Way Points");
 		frame.addKeyListener(app);
 	}

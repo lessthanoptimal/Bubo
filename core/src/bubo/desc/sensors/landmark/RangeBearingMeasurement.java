@@ -16,28 +16,21 @@
  * limitations under the License.
  */
 
-package bubo.simulation.d2.sensors;
+package bubo.desc.sensors.landmark;
 
 /**
- * Range bearing sensor measurement
+ * Measurement from a range-bearing landmark sensor
  *
  * @author Peter Abeles
  */
-public class RangeBearing {
-	// landmark ID
-	public long id;
-
-	// range to landmark
-	public double r;
-	// landmark's relative bearing
+public class RangeBearingMeasurement {
+	public int id;
+	public double range;
 	public double bearing;
 
-	public RangeBearing(long id, double r, double bearing) {
-		this.id = id;
-		this.r = r;
-		this.bearing = bearing;
-	}
-
-	public RangeBearing() {
+	public void set( RangeBearingMeasurement meas ) {
+		this.id = meas.id;
+		this.range = meas.range;
+		this.bearing = meas.bearing;
 	}
 }

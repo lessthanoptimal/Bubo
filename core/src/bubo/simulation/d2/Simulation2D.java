@@ -18,14 +18,19 @@
 
 package bubo.simulation.d2;
 
+import bubo.desc.sensors.landmark.RangeBearingMeasurement;
+import bubo.desc.sensors.landmark.RangeBearingParam;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
+import bubo.maps.d2.LandmarkMap2D;
 import bubo.maps.d2.lines.LineSegmentMap;
 import bubo.simulation.d2.sensors.SimulateLrf2D;
+import bubo.simulation.d2.sensors.SimulateRangeBearing;
 import georegression.metric.ClosestPoint2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Vector2D_F64;
 import georegression.struct.se.Se2_F64;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Simulation of a robot in 2D with a LIDAR sensor on it.  Primary intended to act as a simple way to generator
@@ -37,9 +42,11 @@ public class Simulation2D implements ControlListener2D {
 
 	// simulation and control models
 	RobotInterface2D user;
-	LineSegmentMap world;
+	LineSegmentMap walls;
+	LandmarkMap2D landmarks;
 	CircularRobot2D robot;
-	SimulateLrf2D sensor;
+	SimulateLrf2D sensorLrf;
+	SimulateRangeBearing sensorLandmarks;
 
 	// frequency for how often each item is updated, in seconds
 	double periodControl;
@@ -61,13 +68,23 @@ public class Simulation2D implements ControlListener2D {
 	Se2_F64 temp = new Se2_F64();
 
 	public Simulation2D(RobotInterface2D user,
-						LineSegmentMap world,
-						Lrf2dParam sensorParam,
 						CircularRobot2D robot ) {
 		this.user = user;
-		this.world = world;
 		this.robot = robot;
-		sensor = new SimulateLrf2D(sensorParam);
+
+	}
+
+	public void setWalls(LineSegmentMap walls) {
+		this.walls = walls;
+	}
+
+	public void setLaserRangeFinder( Lrf2dParam sensorLrfParam ) {
+		sensorLrf = new SimulateLrf2D(sensorLrfParam);
+	}
+
+	public void setLandmarks(LandmarkMap2D landmarks, RangeBearingParam param ) {
+		this.landmarks = landmarks;
+		this.sensorLandmarks = new SimulateRangeBearing(param);
 	}
 
 	public void setPeriods( double simulation , double control , double odometry , double lidar ) {
@@ -86,7 +103,11 @@ public class Simulation2D implements ControlListener2D {
 	 */
 	public void initialize() {
 		user.setControlListener(this);
-		user.setIntrinsic(robot.sensorToRobot,sensor.getParam());
+
+		Lrf2dParam paramLrf = sensorLrf == null ? null : sensorLrf.getParam();
+		RangeBearingParam paramRb = sensorLandmarks == null ? null : sensorLandmarks.getParam();
+
+		user.setIntrinsic(robot.sensorToRobot, paramLrf , paramRb );
 		this.time = 0;
 		this.lastOdometry = this.lastLidar = this.lastControl = 0;
 	}
@@ -106,10 +127,20 @@ public class Simulation2D implements ControlListener2D {
 		}
 		if( time >= lastLidar+periodLidar ) {
 			lastLidar = time;
-			robot.sensorToRobot.concat(robot.robotToWorld,sensorToWorld);
-			sensor.update(sensorToWorld,world);
+			robot.sensorToRobot.concat(robot.robotToWorld, sensorToWorld);
 
-			user.ladar(timeStamp, sensor.getMeasurement());
+			if( sensorLrf != null ) {
+				sensorLrf.update(sensorToWorld, walls);
+				user.ladar(timeStamp, sensorLrf.getMeasurement());
+			}
+
+			if( sensorLandmarks != null ) {
+				sensorLandmarks.update(sensorToWorld,landmarks);
+				FastQueue<RangeBearingMeasurement> measurements = sensorLandmarks.getMeasurements();
+				for (int i = 0; i < measurements.size; i++) {
+					user.rangeBearing(timeStamp,measurements.get(i));
+				}
+			}
 		}
 		if( time >= lastControl+periodControl ) {
 			lastControl = time;
@@ -122,12 +153,22 @@ public class Simulation2D implements ControlListener2D {
 	 * @param T integration time
 	 */
 	protected void moveRobot( double T ) {
-		// find its change in motion and update its state
-		double theta = robot.angularVelocity*T;
-		double dx = (robot.velocity*T)*Math.cos(theta);
-		double dy = (robot.velocity*T)*Math.sin(theta);
 
-		newToOld.set(dx, dy, theta);
+		// This motion model is referred to as the "velocity" model in Probabilistic Robotics
+		if( robot.angularVelocity == 0.0 ) {
+			newToOld.set(robot.velocity*T,0,0);
+		} else {
+			// absolute value of v/w is the radius
+			double r = robot.velocity/robot.angularVelocity;
+
+			// derived using the center of the circle it's moving along and location
+			// on the circle
+			double dtheta = robot.angularVelocity*T;
+			double dx = r*Math.sin(dtheta);
+			double dy = r*(1-Math.cos(dtheta));
+
+			newToOld.set(dx,dy,dtheta);
+		}
 
 		// add it to the previous pose and update
 		newToOld.concat(robot.robotToWorld,temp);
@@ -139,14 +180,17 @@ public class Simulation2D implements ControlListener2D {
 	 * from the wall.
 	 */
 	protected void handleCollisions() {
+		if( walls == null )
+			return;
+
 		Vector2D_F64 T = robot.robotToWorld.getTranslation();
 		Point2D_F64 p = new Point2D_F64(T.x,T.y);
 		Point2D_F64 c = new Point2D_F64();
 		int numCycles;
 		for( numCycles = 0; numCycles < 10; numCycles++ ) {
 			boolean collision = false;
-			for (int i = 0; i < world.lines.size(); i++) {
-				LineSegment2D_F64 line = world.lines.get(i);
+			for (int i = 0; i < walls.lines.size(); i++) {
+				LineSegment2D_F64 line = walls.lines.get(i);
 
 				ClosestPoint2D_F64.closestPoint(line,p,c);
 				double d = p.distance2(c);
@@ -200,7 +244,11 @@ public class Simulation2D implements ControlListener2D {
 	}
 
 	public SimulateLrf2D getSimulatedLadar() {
-		return sensor;
+		return sensorLrf;
+	}
+
+	public SimulateRangeBearing getSensorLandmarks() {
+		return sensorLandmarks;
 	}
 
 	public double getPeriodControl() {

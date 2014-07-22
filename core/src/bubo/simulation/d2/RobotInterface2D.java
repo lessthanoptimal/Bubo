@@ -18,6 +18,8 @@
 
 package bubo.simulation.d2;
 
+import bubo.desc.sensors.landmark.RangeBearingMeasurement;
+import bubo.desc.sensors.landmark.RangeBearingParam;
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import georegression.struct.se.Se2_F64;
@@ -37,11 +39,15 @@ public interface RobotInterface2D {
 
 	public void setControlListener( ControlListener2D listener );
 
-	public void setIntrinsic(Se2_F64 ladarToRobot , Lrf2dParam param );
+	public void setIntrinsic(Se2_F64 ladarToRobot ,
+							 Lrf2dParam paramLrf ,
+							 RangeBearingParam paramRb );
 
 	public void odometry( long timeStamp , Se2_F64 robotToWorld );
 
 	public void ladar( long timeStamp , Lrf2dMeasurement measurement );
+
+	public void rangeBearing( long timeStamp , RangeBearingMeasurement measurement );
 
 	public boolean isDone();
 }

@@ -18,6 +18,8 @@
 
 package bubo.simulation.d2;
 
+import bubo.desc.sensors.landmark.RangeBearingMeasurement;
+import bubo.desc.sensors.landmark.RangeBearingParam;
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.maps.d2.lines.LineSegmentMap;
@@ -26,6 +28,7 @@ import georegression.struct.se.Se2_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
@@ -40,7 +43,9 @@ public class TestSimulation2D {
 		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(2, -1, 2, 1));
 
-		Simulation2D alg = new Simulation2D(user,world,param,new CircularRobot2D(0.5));
+		Simulation2D alg = new Simulation2D(user,new CircularRobot2D(0.5));
+		alg.setWalls(world);
+		alg.setLaserRangeFinder(param);
 		alg.setPeriods(0.01,0.1,0.2,0.3);
 		for( int i = 0; i < 200; i++ ) {
 			alg.doStep();
@@ -56,7 +61,9 @@ public class TestSimulation2D {
 		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(2, -1, 2, 1));
 
-		Simulation2D alg = new Simulation2D(null,world,param,new CircularRobot2D(0.5));
+		Simulation2D alg = new Simulation2D(null,new CircularRobot2D(0.5));
+		alg.setWalls(world);
+		alg.setLaserRangeFinder(param);
 		alg.setLocation(1.75, 0, 0);
 		alg.sendControl(0,Math.PI/2);
 		alg.moveRobot(1);
@@ -75,7 +82,9 @@ public class TestSimulation2D {
 		LineSegmentMap world = new LineSegmentMap();
 		world.lines.add(new LineSegment2D_F64(2, -1, 2, 1));
 
-		Simulation2D alg = new Simulation2D(null,world,param,new CircularRobot2D(0.5));
+		Simulation2D alg = new Simulation2D(null,new CircularRobot2D(0.5));
+		alg.setWalls(world);
+		alg.setLaserRangeFinder(param);
 		alg.setLocation(1.75,0,0);
 
 		alg.handleCollisions();
@@ -84,6 +93,11 @@ public class TestSimulation2D {
 		assertEquals(1.5,found.getX(),0.01);
 		assertEquals(0,found.getY(),1e-8);
 		assertEquals(0,found.getYaw(),1e-8);
+	}
+
+	@Test
+	public void rangeBearingSensor() {
+		fail("Implement");
 	}
 
 	private static class User implements RobotInterface2D {
@@ -99,7 +113,7 @@ public class TestSimulation2D {
 		public void setControlListener(ControlListener2D listener) {}
 
 		@Override
-		public void setIntrinsic(Se2_F64 ladarToRobot, Lrf2dParam param) {}
+		public void setIntrinsic(Se2_F64 ladarToRobot, Lrf2dParam paramLrf, RangeBearingParam paramRb) {}
 
 		@Override
 		public void odometry(long timeStamp, Se2_F64 robotToWorld) {
@@ -109,6 +123,11 @@ public class TestSimulation2D {
 		@Override
 		public void ladar(long timeStamp, Lrf2dMeasurement measurement) {
 			countLadar++;
+		}
+
+		@Override
+		public void rangeBearing(long timeStamp, RangeBearingMeasurement measurement) {
+
 		}
 
 		@Override

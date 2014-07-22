@@ -19,8 +19,10 @@
 package bubo.io.maps;
 
 import bubo.io.text.ReadCsv;
+import bubo.maps.d2.LandmarkMap2D;
 import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.struct.line.LineSegment2D_F64;
+import georegression.struct.point.Point2D_F64;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,6 +36,41 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class MapIO {
+
+	public static void save( LandmarkMap2D map , String fileName ) {
+		try {
+			PrintStream out = new PrintStream(fileName);
+			out.println("# LandmarkMap2D");
+			out.println("# x y");
+			for(Point2D_F64 l : map.getLocations()) {
+				out.printf("%10f %10f\n",l.x,l.y);
+			}
+			out.close();
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static LandmarkMap2D loadLandmarkMap(String fileName ) {
+		try {
+			ReadCsv reader = new ReadCsv(new FileInputStream(fileName));
+			reader.setComment('#');
+			LandmarkMap2D map = new LandmarkMap2D();
+			while( true ) {
+				List<String> words = reader.extractWords();
+				if( words == null ) return map;
+				Point2D_F64 location = new Point2D_F64();
+				location.x = Double.parseDouble(words.get(0));
+				location.y = Double.parseDouble(words.get(1));
+				map.getLocations().add(location);
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static void save( LineSegmentMap map , String fileName ) {
 		try {
 			PrintStream out = new PrintStream(fileName);

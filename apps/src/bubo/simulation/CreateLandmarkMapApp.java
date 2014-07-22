@@ -21,8 +21,7 @@ package bubo.simulation;
 import boofcv.gui.image.ShowImages;
 import bubo.gui.maps.MapDisplay;
 import bubo.io.maps.MapIO;
-import bubo.maps.d2.lines.LineSegmentMap;
-import georegression.struct.line.LineSegment2D_F64;
+import bubo.maps.d2.LandmarkMap2D;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
@@ -33,20 +32,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 /**
- * Application for creating a map made out line segments.  Used to define walls which the
- * robot can't pass through.
+ * Creates a map with landmarks.
  *
  * @author Peter Abeles
  */
-public class CreateLineMapApp extends MapDisplay
+public class CreateLandmarkMapApp extends MapDisplay
 		implements MouseListener , KeyListener {
 
-	boolean hasFirst = false;
-	Point2D_F64 first = new Point2D_F64();
-	Point2D_F64 previous = new Point2D_F64();
 
-	public CreateLineMapApp() {
-		setMapWalls(new LineSegmentMap());
+	public CreateLandmarkMapApp() {
+		setMapLandmarks(new LandmarkMap2D());
 		addMouseListener(this);
 		addKeyListener(this);
 		grabFocus();
@@ -58,11 +53,11 @@ public class CreateLineMapApp extends MapDisplay
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if( e.getKeyChar() == 's' || e.getKeyChar() == 'S') {
-			System.out.println("saving map to walls.csv");
+			System.out.println("saving map to landmarks.csv");
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					MapIO.save(getMapWalls(), "walls.csv");
+					MapIO.save(getMapLandmarks(), "landmarks.csv");
 				}
 			});
 		}
@@ -76,32 +71,12 @@ public class CreateLineMapApp extends MapDisplay
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if( !hasFirst ) {
-			hasFirst = true;
-			imageToMap(e.getX(), e.getY(), first);
-			previous.set(first);
-		} else if( e.getButton() == 2 ) {
-			hasFirst = false;
-		} else if( e.getButton() == 3 ) {
-			LineSegment2D_F64 line = new LineSegment2D_F64();
-			line.a.set(previous);
-			line.b.set(first);
-			addToMap(line);
-			hasFirst = false;
-		} else {
-			LineSegment2D_F64 line = new LineSegment2D_F64();
-			line.a.set(previous);
-			imageToMap(e.getX(),e.getY(),line.b);
-			addToMap(line);
-			previous.set(line.b);
-		}
-	}
-
-	public void addToMap( final LineSegment2D_F64 line ) {
+		final Point2D_F64 where = new Point2D_F64();
+		imageToMap(e.getX(),e.getY(),where);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				getMapWalls().getLines().add(line);
+				getMapLandmarks().add(where.x, where.y);
 				repaint();
 			}
 		});
@@ -117,7 +92,7 @@ public class CreateLineMapApp extends MapDisplay
 	public void mouseExited(MouseEvent e) {}
 
 	public static void main(String[] args) {
-		CreateLineMapApp app = new CreateLineMapApp();
+		CreateLandmarkMapApp app = new CreateLandmarkMapApp();
 		app.setPreferredSize(new Dimension(500,500));
 		JFrame frame = ShowImages.showWindow(app,"Map Maker");
 		frame.addKeyListener(app);

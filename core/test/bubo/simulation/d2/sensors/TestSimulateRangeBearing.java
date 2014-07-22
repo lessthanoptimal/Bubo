@@ -16,19 +16,18 @@
  * limitations under the License.
  */
 
-package bubo.evaluation;
+package bubo.simulation.d2.sensors;
 
-import georegression.struct.se.Se2_F64;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public interface InitialPose {
-	public void generatePose(Se2_F64 poseTruth);
-
-	public Se2_F64 getPoseNoisy();
-
-	public double getSigmaLocation();
-
-	public double getSigmaYaw();
+public class TestSimulateRangeBearing {
+	@Test
+	public void stuff() {
+		fail("Implement");
+	}
 }

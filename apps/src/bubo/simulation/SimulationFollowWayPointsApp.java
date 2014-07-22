@@ -19,9 +19,11 @@
 package bubo.simulation;
 
 import boofcv.gui.image.ShowImages;
+import bubo.desc.sensors.landmark.RangeBearingParam;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.gui.Simulation2DPanel;
 import bubo.io.maps.MapIO;
+import bubo.maps.d2.LandmarkMap2D;
 import bubo.maps.d2.lines.LineSegmentMap;
 import bubo.simulation.d2.CircularRobot2D;
 import bubo.simulation.d2.Simulation2D;
@@ -45,15 +47,19 @@ public class SimulationFollowWayPointsApp {
 	Simulation2DPanel gui;
 	FollowPathCheatingRobot planner;
 
-	public SimulationFollowWayPointsApp(String mapName, String pathName) throws IOException {
-		LineSegmentMap map = MapIO.loadLineSegmentMap(mapName);
+	public SimulationFollowWayPointsApp(String wallName, String landmarkName , String pathName) throws IOException {
+		LineSegmentMap mapWall = null;
+		LandmarkMap2D mapLandmarks = null;
+
+		try {mapWall = MapIO.loadLineSegmentMap(wallName);
+		} catch( RuntimeException ignore) {}
+		try {mapLandmarks = MapIO.loadLandmarkMap(landmarkName);
+		} catch( RuntimeException ignore) {}
+
 		List<Point2D_F64> wayPoints = (List<Point2D_F64>)new XStream().fromXML(new FileInputStream(pathName));
 
 //		planner = new FollowPathCheatingRobot(1,0.4,wayPoints);
 		planner = new FollowPathLoggingRobot(1,0.4,wayPoints);
-
-		// SICK like sensor
-		Lrf2dParam param = new Lrf2dParam(null,Math.PI/2.0,-Math.PI,180,5,0,0);
 
 		// put the robot at the initial location facing the second way point
 		Point2D_F64 p0 = wayPoints.get(0);
@@ -64,15 +70,32 @@ public class SimulationFollowWayPointsApp {
 		robot.getRobotToWorld().set(p0.x, p0.y, yaw);
 		robot.getSensorToRobot().T.set(0.15,0);
 
-		sim = new Simulation2D(planner,map,param,robot);
+		sim = new Simulation2D(planner,robot);
+		gui = new Simulation2DPanel();
+
+		Rectangle2D_F64 r = null;
+		if( mapWall != null ) {
+			// SICK like sensor
+			Lrf2dParam param = new Lrf2dParam(null, Math.PI / 2.0, -Math.PI, 180, 5, 0, 0);
+			r = mapWall.computeBoundingRectangle();
+			sim.setWalls(mapWall);
+			gui.setMapWalls(mapWall);
+			sim.setLaserRangeFinder(param);
+			gui.configureLrf(param);
+		}
+
+		if( mapLandmarks != null ) {
+			RangeBearingParam param = new RangeBearingParam(5);
+			r = mapLandmarks.computeBoundingRectangle();
+			sim.setLandmarks(mapLandmarks,param);
+			gui.setMapLandmarks(mapLandmarks);
+		}
+
 		sim.setPeriods(0.005,0.03,100,0.03);
 
-		Rectangle2D_F64 r = map.computeBoundingRectangle();
 		Se2_F64 centerToWorld = new Se2_F64();
-		centerToWorld.T.set(r.getX()+r.width/2,r.getY()+r.height/2);
+		centerToWorld.T.set((r.p0.x+r.p1.x)/2.0,(r.p0.y+r.p1.y)/2.0);
 
-		gui = new Simulation2DPanel(param);
-		gui.setMap(map);
 		gui.setViewCenter(centerToWorld);
 		gui.autoPreferredSize();
 		gui.setMinimumSize(gui.getPreferredSize());
@@ -83,25 +106,32 @@ public class SimulationFollowWayPointsApp {
 	public void process() {
 		sim.initialize();
 
-		long sleepTime = Math.max(1,(int)(sim.getPeriodSimulation()*1000));
+		long sleepTime = 0;//Math.max(1,(int)(sim.getPeriodSimulation()*1000));
 		while( !planner.isDone() ) {
 			sim.doStep();
 			gui.updateRobot(sim.getRobot());
-			gui.updateLidar(sim.getSimulatedLadar().getMeasurement());
+			if( sim.getSimulatedLadar() != null )
+				gui.updateLidar(sim.getSimulatedLadar().getMeasurement());
+			if( sim.getSensorLandmarks() != null )
+				gui.updateRangeBearing(sim.getSensorLandmarks().getMeasurements());
 			gui.repaint();
 
-//			try {
-//				Thread.sleep(sleepTime);
-//			} catch (InterruptedException ignore) {}
+			try {
+				Thread.sleep(sleepTime);
+			} catch (InterruptedException ignore) {}
 		}
 		System.out.println("Done!");
 	}
 
 	public static void main(String[] args) throws IOException {
-		String mapName = "map.csv";
+		String wallName = "walls.csv";
+		String landmarkName = "landmarks.csv";
 		String wayPointsName = "path.xml";
 
-		SimulationFollowWayPointsApp app = new SimulationFollowWayPointsApp(mapName,wayPointsName);
+		wallName = null;
+//		landmarkName = null;
+
+		SimulationFollowWayPointsApp app = new SimulationFollowWayPointsApp(wallName,landmarkName,wayPointsName);
 		app.process();
 	}
 

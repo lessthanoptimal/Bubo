@@ -18,6 +18,8 @@
 
 package bubo.simulation;
 
+import bubo.desc.sensors.landmark.RangeBearingMeasurement;
+import bubo.desc.sensors.landmark.RangeBearingParam;
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.simulation.d2.ControlListener2D;
@@ -117,7 +119,7 @@ public class FollowPathCheatingRobot implements RobotInterface2D {
 	}
 
 	@Override
-	public void setIntrinsic(Se2_F64 ladarToRobot, Lrf2dParam param) {
+	public void setIntrinsic(Se2_F64 ladarToRobot, Lrf2dParam param, RangeBearingParam paramRb) {
 
 	}
 
@@ -128,6 +130,11 @@ public class FollowPathCheatingRobot implements RobotInterface2D {
 
 	@Override
 	public void ladar(long timeStamp, Lrf2dMeasurement measurement) {
+
+	}
+
+	@Override
+	public void rangeBearing(long timeStamp, RangeBearingMeasurement measurement) {
 
 	}
 

@@ -16,15 +16,28 @@
  * limitations under the License.
  */
 
-package bubo.simulation.d2.features;
-
-import georegression.struct.point.Point2D_F64;
+package bubo.desc.sensors.landmark;
 
 /**
- * Landmark in a simulated map
+ * Parameters which describe a range-bearing landmark sensor
  *
  * @author Peter Abeles
  */
-public class PointLandmark extends Point2D_F64 {
-	public int id;
+public class RangeBearingParam {
+	public double maxRange;
+	public double rangeSigma;
+	public double bearingSigma;
+
+	public RangeBearingParam(double maxRange, double rangeSigma, double bearingSigma) {
+		this.maxRange = maxRange;
+		this.rangeSigma = rangeSigma;
+		this.bearingSigma = bearingSigma;
+	}
+
+	public RangeBearingParam(double maxRange) {
+		this.maxRange = maxRange;
+	}
+
+	public RangeBearingParam() {
+	}
 }

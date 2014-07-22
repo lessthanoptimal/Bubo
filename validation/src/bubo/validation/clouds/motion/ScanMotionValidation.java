@@ -42,7 +42,7 @@ import java.util.Random;
 // TODO make noise for sensors into common base class
 // TODO initialize with no walls visible.
 // TODO periodic bad scans with structure. look at floor or ceiling
-// TODO Pathological tests.  No data.  One wall.  Long hallway.
+// TODO Pathological tests.  No data.  One wall.  Long hallway
 public abstract class ScanMotionValidation extends ValidationBase {
 	// how frequently it scores in seconds
 	double scorePeriod = 1.0;

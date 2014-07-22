@@ -27,25 +27,29 @@ import static org.ejml.ops.CommonOps.subEquals;
 
 
 /**
+ * <p>
  * This is an implementation of a first order continuous discrete extended Kalman filter.
  * The implementation below is the same as the implementation provided in:
- * <p/>
+ * </p>
+ * <p>
  * "Estimation with Applications to Tracking and Navigation" by Bar-Shalom, et all.
- * <p/>
+ * </p>
+ * <p>
  * The version provided in "Applied Optimal Estimation"  edited by Arthur Gelb is slightly
  * different in the covariance propagation step.  I haven't bothered to step through the derivations
  * to decide which one is better.  The implementation provided here seems to be more
  * common in recent literature.
- * <p/>
- * kinematics model:
- * <p/>
- * x_k = f(x_{k-1}) + w_k
- * z_k = h(x_k) + v_k
- * <p/>
- * w_k ~ N(0,Q_k)
- * v_k ~ N(0,R_k)
- * <p/>
+ * </p>
+ * <p>
+ * kinematics model:<br>
+ * x_k = f(x<sub>k-1</sub>) + w<sub>k</sub><br>
+ * z_k = h(x<sub>k</sub>) + v<sub>k</sub><br>
+ * <br>
+ * w_k ~ N(0,Q<sub>k</sub>)<br>
+ * v_k ~ N(0,R<sub>k</sub>)<br>
+ * <br>
  * This implementation assumes a that all the measurements it gets have the same dimension.
+ * </p>
  */
 public class ExtendedKalmanFilter extends DKFCommon implements KalmanFilterInterface {
 	// describes how the state changes as a function of time

@@ -19,6 +19,7 @@
 package bubo.gui.maps;
 
 import bubo.gui.SpacialDisplay;
+import bubo.maps.d2.LandmarkMap2D;
 import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.struct.line.LineSegment2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -30,31 +31,23 @@ import georegression.transform.se.SePointOps_F64;
 import java.awt.*;
 
 /**
- *
+ * Base class for displaying 2D maps
  *
  * @author Peter Abeles
  */
-public class LineMapDisplay extends SpacialDisplay {
-
-	LineSegmentMap map;
-
+public class MapDisplay extends SpacialDisplay {
 	// transform from map center to world
 	protected Se2_F64 centerToWorld = new Se2_F64();
 
-	boolean drawGrid = true;
-	double gridWidth = 2.0;
-	Color gridColor =  new Color(220, 220, 220);
+	protected boolean drawGrid = true;
+	protected double gridWidth = 2.0;
+	protected Color gridColor =  new Color(220, 220, 220);
 
-	public LineMapDisplay() {
+	LineSegmentMap mapWalls;
+	LandmarkMap2D mapLandmarks;
+
+	public MapDisplay() {
 		showCoordinateAxis("Y", true, "X", true);
-	}
-
-	public void setMap( final LineSegmentMap map ) {
-		this.map = map;
-	}
-
-	public LineSegmentMap getMap() {
-		return map;
 	}
 
 	/**
@@ -66,14 +59,90 @@ public class LineMapDisplay extends SpacialDisplay {
 		this.centerToWorld.set(centerToWorld);
 	}
 
+	public void setMapWalls(final LineSegmentMap mapWalls) {
+		this.mapWalls = mapWalls;
+	}
+
+	public LineSegmentMap getMapWalls() {
+		return mapWalls;
+	}
+
+	public void setMapLandmarks(final LandmarkMap2D mapLandmarks) {
+		this.mapLandmarks = mapLandmarks;
+	}
+
+	public LandmarkMap2D getMapLandmarks() {
+		return mapLandmarks;
+	}
+
 	public void autoPreferredSize() {
-		Rectangle2D_F64 bounds = map.computeBoundingRectangle();
+		Rectangle2D_F64 bounds;
+
+		if( mapWalls != null ) {
+			bounds = mapWalls.computeBoundingRectangle();
+		} else if( mapLandmarks != null ) {
+			bounds = mapLandmarks.computeBoundingRectangle();
+		} else {
+			throw new RuntimeException("No map set");
+		}
 
 		double buffer = Math.max(bounds.getWidth(),bounds.getHeight())*0.2;
 		double width = bounds.getWidth()+buffer;
 		double height = bounds.getHeight()+buffer;
 
 		setPreferredSize(new Dimension((int) (width * metersToPixels), (int) (height * metersToPixels)));
+
+	}
+
+	@Override
+	public void paintComponent(Graphics g) {
+		Graphics2D g2 = (Graphics2D)g;
+
+		if( drawGrid ) {
+			drawGrid(g2);
+		}
+
+		if( mapWalls != null )
+			drawWalls(g2);
+
+		if( mapLandmarks != null )
+			drawLandmarks(g2);
+	}
+
+	private void drawWalls(Graphics2D g2) {
+		Point2D_F64 a = new Point2D_F64();
+		Point2D_F64 b = new Point2D_F64();
+		g2.setColor(Color.BLACK);
+		for (int i = 0; i < mapWalls.getLines().size(); i++) {
+			LineSegment2D_F64 l = mapWalls.getLines().get(i);
+
+			SePointOps_F64.transformReverse(centerToWorld, l.a, a);
+			SePointOps_F64.transformReverse(centerToWorld, l.b, b);
+
+			int x0 = (int)Math.round(a.x*metersToPixels);
+			int y0 = (int)Math.round(a.y*metersToPixels);
+			int x1 = (int)Math.round(b.x*metersToPixels);
+			int y1 = (int)Math.round(b.y*metersToPixels);
+
+			drawLine(g2, x0, y0, x1, y1);
+		}
+	}
+
+	private void drawLandmarks(Graphics2D g2) {
+		int r = 4;
+		int w = r*2+1;
+		g2.setColor(Color.BLUE);
+		Point2D_F64 a = new Point2D_F64();
+		for (int i = 0; i < mapLandmarks.getTotal(); i++) {
+			Point2D_F64 l = mapLandmarks.getLocation(i);
+
+			SePointOps_F64.transformReverse(centerToWorld, l, a);
+
+			int x = (int)Math.round(a.x*metersToPixels);
+			int y = (int)Math.round(a.y*metersToPixels);
+
+			drawOval(g2, x-r,y-r,w,w);
+		}
 	}
 
 	public void setDrawGrid(boolean drawGrid) {
@@ -88,39 +157,10 @@ public class LineMapDisplay extends SpacialDisplay {
 		this.gridWidth = gridWidth;
 	}
 
-	@Override
-	public void paintComponent(Graphics g) {
-		if( map == null )
-			return;
-
-		Graphics2D g2 = (Graphics2D)g;
-
-		if( drawGrid ) {
-			drawGrid(g2);
-		}
-
-		Point2D_F64 a = new Point2D_F64();
-		Point2D_F64 b = new Point2D_F64();
-		g2.setColor(Color.BLACK);
-		for (int i = 0; i < map.getLines().size(); i++) {
-			LineSegment2D_F64 l = map.getLines().get(i);
-
-			SePointOps_F64.transformReverse(centerToWorld, l.a, a);
-			SePointOps_F64.transformReverse(centerToWorld, l.b, b);
-
-			int x0 = (int)Math.round(a.x*metersToPixels);
-			int y0 = (int)Math.round(a.y*metersToPixels);
-			int x1 = (int)Math.round(b.x*metersToPixels);
-			int y1 = (int)Math.round(b.y*metersToPixels);
-
-			drawLine(g2, x0, y0, x1, y1);
-		}
-	}
-
 	/**
 	 * Draws a grid in the background
 	 */
-	private void drawGrid(Graphics2D g2) {
+	protected void drawGrid(Graphics2D g2) {
 		Point2D_F64 a = new Point2D_F64();
 
 		int width = getWidth();
