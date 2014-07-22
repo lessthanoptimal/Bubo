@@ -39,10 +39,8 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-// TODO make noise for sensors into common base class
-// TODO initialize with no walls visible.
+// TODO add uniform random noise test
 // TODO periodic bad scans with structure. look at floor or ceiling
-// TODO Pathological tests.  No data.  One wall.  Long hallway
 public abstract class ScanMotionValidation extends ValidationBase {
 	// how frequently it scores in seconds
 	double scorePeriod = 1.0;
@@ -105,6 +103,8 @@ public abstract class ScanMotionValidation extends ValidationBase {
 		double nextScoreTime = 0;
 		while (reader.nextObject(data) != null) {
 
+			mangleData(data);
+
 			double time = data.getTimeStamp()/1000.0;
 
 			if( count == 0 ) {
@@ -159,6 +159,8 @@ public abstract class ScanMotionValidation extends ValidationBase {
 		return result;
 	}
 
+	protected void mangleData( RobotLrfObservations data ){}
+
 	protected abstract Se2_F64 adjustOdometry( Se2_F64 sensorToWorld );
 
 	protected abstract double[] adjustObservations( double ranges[] );
@@ -170,7 +172,8 @@ public abstract class ScanMotionValidation extends ValidationBase {
 		def.loadDefinition(RobotLrfObservations.class, "timeStamp", "scanToWorld", "range");
 		def.loadDefinition(Se2_F64.class, "x", "y", "yaw");
 
-		reader = new ReadCsvObjectSmart<RobotLrfObservations>(new FileInputStream(dataSet.fileObservations), def,						RobotLrfObservations.class.getSimpleName());
+		reader = new ReadCsvObjectSmart<RobotLrfObservations>(new FileInputStream(dataSet.fileObservations), def,
+				RobotLrfObservations.class.getSimpleName());
 		reader.setComment('#');
 		reader.setIgnoreUnparsedData(true);
 

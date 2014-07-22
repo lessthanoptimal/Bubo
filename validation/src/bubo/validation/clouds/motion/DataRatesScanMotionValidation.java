@@ -28,7 +28,7 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
-public class DataRatesScanMotionValidation extends NoiseOdometryScanMotionValidation {
+public class DataRatesScanMotionValidation extends BaseNoiseScanMotionValidation {
 
 	int rates[] = new int[]{1,2,5,10};
 
@@ -46,18 +46,15 @@ public class DataRatesScanMotionValidation extends NoiseOdometryScanMotionValida
 
 	@Override
 	public void evaluate() throws IOException {
-		sigmaTravel = 0.1;
-		sigmaTravelAngle = 0.01;
-		sigmaAngle = 0.1;
 
 		for( int i = 0; i < rates.length; i++ ) {
 			skipSensor = rates[i];
 
 			out.println("=========================================");
 			out.println("Sensor skip = "+skipSensor);
-			out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaTravelAngle+" Angle "+sigmaAngle);
 			System.out.println("Sensor skip = "+skipSensor);
-			System.out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaTravelAngle+" Angle "+sigmaAngle);
+			configurePrintNoise(1);
+
 			super.evaluateDataSets();
 		}
 	}

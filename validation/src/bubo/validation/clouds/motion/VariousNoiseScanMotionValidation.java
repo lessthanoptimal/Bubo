@@ -19,23 +19,20 @@
 package bubo.validation.clouds.motion;
 
 import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
-import georegression.struct.se.Se2_F64;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Evaluate different amounts of noise on the LRF's range measurement.
+ * Evaluate different amounts of additive noise on odometry and LRF
  *
  * @author Peter Abeles
  */
-public class NoiseSensorScanMotionValidation extends ScanMotionValidation {
+public class VariousNoiseScanMotionValidation extends BaseNoiseScanMotionValidation {
 
-	double sigmaRange;
-
-	public NoiseSensorScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
-		super(estimator);
-		setOutputName("ScanMotionSensorNoise.txt");
+	public VariousNoiseScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
+		this.estimator = estimator;
+		setOutputName("ScanMotionVariousNoise.txt");
 
 		String dataDir = "data/mapping2d/";
 		String sets[] = new String[]{"sim02"};
@@ -43,40 +40,38 @@ public class NoiseSensorScanMotionValidation extends ScanMotionValidation {
 		for( String set : sets) {
 			addDataSet(dataDir+set+"/observations.txt",dataDir+set+"/lrf.xml");
 		}
+
+		baseOdomAngle = baseOdomTravelAngle = baseOdomTravel = 0;
 	}
 
 	@Override
 	public void evaluate() throws IOException {
+		// Noise on LRF
+		baseOdomAngle = baseOdomTravelAngle = baseOdomTravel = 0;
+		baseLrfRange = 0.01;
 		for( int i = 0; i <= 5; i++ ) {
-			sigmaRange = 0.01*Math.pow(2,i);
 			out.println("=========================================");
-			out.println("Range SIGMA = "+sigmaRange);
-			System.out.println("Range SIGMA = "+sigmaRange);
+			configurePrintNoise(Math.pow(2,i));
 			super.evaluateDataSets();
 		}
-	}
 
-	@Override
-	protected Se2_F64 adjustOdometry(Se2_F64 sensorToWorld) {
-		return sensorToWorld;
-	}
-
-	@Override
-	protected double[] adjustObservations(double[] ranges) {
-		double[] ret = ranges.clone();
-		for( int i = 0; i < ret.length; i++ ) {
-			ret[i] += rand.nextGaussian()*sigmaRange;
-			if( ret[i] < 0 )
-				ret[i] = 0;
+		// Odometry Noise
+		baseOdomTravel = 0.02;
+		baseOdomTravelAngle = 0.002;
+		baseOdomAngle = 0.02;
+		baseLrfRange = 0;
+		for( int i = 0; i <= 5; i++ ) {
+			out.println("=========================================");
+			configurePrintNoise(Math.pow(2,i));
+			super.evaluateDataSets();
 		}
-		return ret;
 	}
 
 	public static void main(String[] args) throws IOException {
 
 		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
 
-		NoiseSensorScanMotionValidation app = new NoiseSensorScanMotionValidation(alg);
+		VariousNoiseScanMotionValidation app = new VariousNoiseScanMotionValidation(alg);
 		app.evaluate();
 	}
 }

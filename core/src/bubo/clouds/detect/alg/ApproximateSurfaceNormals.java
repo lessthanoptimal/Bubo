@@ -88,7 +88,7 @@ public class ApproximateSurfaceNormals {
 	 * @param nn                  Which nearest-neighbor algorithm to use
 	 * @param numPlane            Number of closest neighbors it will use to estimate the plane
 	 * @param maxDistancePlane    The maximum distance a point can be from the focus to be included in the plane calculation
-	 * @param numNeighbors        Number of neighbors it will find
+	 * @param numNeighbors        Number of neighbors it will find.  Can be useful if another algorithm wants more neighbors than this one will need.
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
 	public ApproximateSurfaceNormals(NearestNeighbor<PointVectorNN> nn,

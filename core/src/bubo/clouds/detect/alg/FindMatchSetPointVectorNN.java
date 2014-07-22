@@ -24,11 +24,14 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Given an initial set of points which match the model, find all points which match the model by traversing
+ * <p>
+ * Given an initial set of points that match the model, find all points which match the model by traversing
  * the nearest neighbor graph.  Points are only considered as potential matches if they are directly
  * connected to a node which has already been matched to the model.
- * <p/>
+ * </p>
+ * <p>
  * It knows if a point has been searched because it writes the marker value to the points marker
+ * </p>
  *
  * @author Peter Abeles
  */

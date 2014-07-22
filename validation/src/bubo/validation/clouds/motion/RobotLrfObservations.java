@@ -66,4 +66,10 @@ public class RobotLrfObservations {
 	public void setRange(double[] range) {
 		this.range = range;
 	}
+
+	public void set( RobotLrfObservations a ) {
+		timeStamp = a.timeStamp;
+		scanToWorld.set(a.scanToWorld);
+		System.arraycopy(a.range,0,range,0,a.range.length);
+	}
 }

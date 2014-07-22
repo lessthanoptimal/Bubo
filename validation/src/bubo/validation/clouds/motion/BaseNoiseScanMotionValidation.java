@@ -18,62 +18,64 @@
 
 package bubo.validation.clouds.motion;
 
-import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
 import georegression.struct.se.Se2_F64;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
+ * Base class for adding noise to robot motion and LRF
+ *
  * @author Peter Abeles
  */
-public class NoiseOdometryScanMotionValidation extends ScanMotionValidation  {
+public abstract class BaseNoiseScanMotionValidation extends ScanMotionValidation {
+
+	// base error at a scale of one
+	protected double baseOdomTravel = 0.02;
+	protected double baseOdomTravelAngle = 0.002;
+	protected double baseOdomAngle = 0.02;
+
+	protected double baseLrfRange = 0.01;
 
 	// location error per distance traveled
-	double sigmaTravel;
+	double odomTravelSigma;
 	// angle error per distance traveled
-	double sigmaTravelAngle = 0.001;
+	double odomTravelAngleSigma;
 	// rotation error per radian turned
-	double sigmaAngle = 0.01;
+	double odomAngleSigma;
 
+	// Gaussian noise added to range measurements
+	double lrfRangeSigma;
+
+	// book keeping for odometry error
 	Se2_F64 previousTruthInvert = new Se2_F64();
 	Se2_F64 previousOdometry = new Se2_F64();
 	Se2_F64 odometry = new Se2_F64();
 	Se2_F64 change = new Se2_F64();
 	boolean first;
 
-	public NoiseOdometryScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
-		super(estimator);
-		setOutputName("ScanMotionOdometryNoise.txt");
-
-		String dataDir = "data/mapping2d/";
-		String sets[] = new String[]{"sim02"};
-
-		for( String set : sets) {
-			addDataSet(dataDir+set+"/observations.txt",dataDir+set+"/lrf.xml");
-		}
-	}
-
-	protected NoiseOdometryScanMotionValidation() {
-	}
-
-	@Override
-	protected void initialize(DataSet dataSet) throws FileNotFoundException {
-		super.initialize(dataSet);
-		first = true;
-	}
-
 	@Override
 	public void evaluate() throws IOException {
 		for( int i = 0; i <= 5; i++ ) {
-			sigmaTravel = 0.02*Math.pow(2,i);
-			sigmaTravelAngle = 0.002*Math.pow(2,i);
-			sigmaAngle = 0.02*Math.pow(2,i);
+			lrfRangeSigma = 0.01*Math.pow(2,i);
 			out.println("=========================================");
-			out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaTravelAngle+" Angle "+sigmaAngle);
-			System.out.println("SIGMA Travel = "+sigmaTravel+" TravelAngle "+sigmaTravelAngle+" Angle "+sigmaAngle);
+			out.println("Range SIGMA = "+ lrfRangeSigma);
+			System.out.println("Range SIGMA = "+ lrfRangeSigma);
 			super.evaluateDataSets();
 		}
+	}
+
+	protected void configurePrintNoise( double scale ) {
+		odomTravelSigma = baseOdomTravel*scale;
+		odomTravelAngleSigma = baseOdomTravelAngle*scale;
+		odomAngleSigma = baseOdomAngle*scale;
+
+		lrfRangeSigma = baseLrfRange*scale;
+
+		out.println("LRF range = "+ lrfRangeSigma);
+		out.println("Odometry Travel = "+ odomTravelSigma +" TravelAngle "+ odomTravelAngleSigma +" Angle "+ odomAngleSigma);
+
+		System.out.println("LRF range = "+ lrfRangeSigma);
+		System.out.println("Odometry Travel = "+ odomTravelSigma +" TravelAngle "+ odomTravelAngleSigma +" Angle "+ odomAngleSigma);
 	}
 
 	@Override
@@ -92,10 +94,10 @@ public class NoiseOdometryScanMotionValidation extends ScanMotionValidation  {
 			double deltaAngle = change.getYaw();
 
 			// add noise to change
-			change.T.x += rand.nextGaussian()*sigmaTravel*T;
-			change.T.y += rand.nextGaussian()*sigmaTravel*T;
+			change.T.x += rand.nextGaussian()* odomTravelSigma *T;
+			change.T.y += rand.nextGaussian()* odomTravelSigma *T;
 
-			double noiseYaw = rand.nextGaussian()*(sigmaTravelAngle*T + sigmaAngle*deltaAngle);
+			double noiseYaw = rand.nextGaussian()*(odomTravelAngleSigma *T + odomAngleSigma *deltaAngle);
 			change.setYaw( change.getYaw() + noiseYaw );
 
 			previousOdometry.concat(change,odometry);
@@ -107,13 +109,12 @@ public class NoiseOdometryScanMotionValidation extends ScanMotionValidation  {
 
 	@Override
 	protected double[] adjustObservations(double[] ranges) {
-		return ranges;
-	}
-
-	public static void main(String[] args) throws IOException {
-		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
-
-		NoiseOdometryScanMotionValidation app = new NoiseOdometryScanMotionValidation(alg);
-		app.evaluate();
+		double[] ret = ranges.clone();
+		for( int i = 0; i < ret.length; i++ ) {
+			ret[i] += rand.nextGaussian()* lrfRangeSigma;
+			if( ret[i] < 0 )
+				ret[i] = 0;
+		}
+		return ret;
 	}
 }

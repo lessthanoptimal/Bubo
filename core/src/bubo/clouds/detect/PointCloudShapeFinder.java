@@ -113,5 +113,9 @@ public interface PointCloudShapeFinder {
 		 * Index of the point in the original cloud
 		 */
 		public GrowQueue_I32 indexes = new GrowQueue_I32();
+
+		public <T>T getParameters() {
+			return (T)parameters;
+		}
 	}
 }

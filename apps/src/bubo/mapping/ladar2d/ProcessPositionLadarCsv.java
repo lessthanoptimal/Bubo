@@ -23,6 +23,7 @@ import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.gui.UtilDisplayBubo;
 import bubo.io.serialization.SerializationDefinitionManager;
 import bubo.io.text.ReadCsvObjectSmart;
+import bubo.io.text.ReverseLineInputStream;
 import bubo.mapping.ladar2d.update.LadarMapBayesUpdate;
 import bubo.maps.d2.grid.GridMapSpacialInfo;
 import bubo.maps.d2.grid.OccupancyGrid2D_F32;
@@ -39,6 +40,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Peter Abeles
@@ -76,7 +78,7 @@ public class ProcessPositionLadarCsv implements ActionListener {
 
 	double rangeToMeters = 1;
 
-	public ProcessPositionLadarCsv(String fileName, Lrf2dParam param) throws FileNotFoundException {
+	public ProcessPositionLadarCsv(String fileName, Lrf2dParam param , boolean reverse ) throws FileNotFoundException {
 		this.param = param;
 		data = new PositionRangeArrayData(param.getNumberOfScans());
 
@@ -84,7 +86,8 @@ public class ProcessPositionLadarCsv implements ActionListener {
 		def.loadDefinition(PositionRangeArrayData.class, "timeStamp", "scanToWorld", "range");
 		def.loadDefinition(Se2_F64.class, "x", "y", "yaw");
 
-		reader = new ReadCsvObjectSmart<PositionRangeArrayData>(new FileInputStream(fileName), def, PositionRangeArrayData.class.getSimpleName());
+		InputStream in = reverse ? new ReverseLineInputStream(fileName) : new FileInputStream(fileName);
+		reader = new ReadCsvObjectSmart<PositionRangeArrayData>(in, def, PositionRangeArrayData.class.getSimpleName());
 		reader.setComment('#');
 		reader.setIgnoreUnparsedData(true);  // TODO read hokuyo config and make sure this is needed
 
@@ -103,13 +106,13 @@ public class ProcessPositionLadarCsv implements ActionListener {
 
 	public static void main(String args[]) throws IOException {
 
-		String directory = "data/mapping2d/sim02/";
+		String directory = "data/mapping2d/sim03/";
 
 		String fileName = directory+"observations.txt";
 
 		Lrf2dParam param = (Lrf2dParam)new XStream().fromXML(new FileInputStream(directory+"lrf.xml"));
 
-		ProcessPositionLadarCsv p = new ProcessPositionLadarCsv(fileName, param);
+		ProcessPositionLadarCsv p = new ProcessPositionLadarCsv(fileName, param, false);
 
 		p.process();
 	}
