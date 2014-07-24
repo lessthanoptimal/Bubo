@@ -18,6 +18,7 @@
 
 package bubo.gui.d3;
 
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -46,6 +47,14 @@ public abstract class PointCloudPanel extends JPanel {
 	public abstract void addBox( double sizeX , double sizeY , double sizeZ ,
 								 Se3_F64 boxToWorld ,
 								 int color );
+
+	/**
+	 * Draws 2D mesh on a plane
+	 *
+	 * @param meshToWorld Transform from the plane to world coordinate
+	 * @param vertexes Ordered (CW or CCW) set of vertexes which define the outside hull of the mesh
+	 */
+	public abstract void addMesh2D( Se3_F64 meshToWorld , List<Point2D_F64> vertexes , int argb );
 
 	public abstract void shutdownVisualize();
 

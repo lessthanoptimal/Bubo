@@ -19,8 +19,6 @@
 package bubo.desc.sensors.lrf3d;
 
 import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
-import georegression.struct.se.Se3_F64;
-import georegression.transform.se.InterpolateLinearSe3_F64;
 
 /**
  * <p>
@@ -40,44 +38,37 @@ import georegression.transform.se.InterpolateLinearSe3_F64;
  */
 public class SpinningLrf2dMeasurement extends Lrf2dMeasurement {
 	/**
-	 * Location of the sensor at the start of the scan
+	 * Rotation angle at the start of the scan
 	 */
-	public Se3_F64 startToBase = new Se3_F64();
+	public double angle0;
 	/**
-	 * Location of the sensor at the end of the scan
+	 * Rotation angle at the end of the scan
 	 */
-	public Se3_F64 endToBase = new Se3_F64();
-
-	/**
-	 * Used to interpolate the laser's location.
-	 */
-	protected InterpolateLinearSe3_F64 interp = new InterpolateLinearSe3_F64();
+	public double angle1;
 
 	public SpinningLrf2dMeasurement(int numMeas) {
 		super(numMeas);
 	}
 
-	public SpinningLrf2dMeasurement() {
+	public SpinningLrf2dMeasurement(int numMeas, double angle0, double angle1 ) {
+		super(numMeas);
+		this.angle0 = angle0;
+		this.angle1 = angle1;
 	}
 
-	/**
-	 * Sets the location of the observations at the start and end of the scan
-	 * @param startToBase Initial location
-	 * @param endToBase Final location
-	 */
-	public void setTransforms( Se3_F64 startToBase , Se3_F64 endToBase ) {
-		this.startToBase.set(startToBase);
-		this.endToBase.set(endToBase);
-		interp.setTransforms(startToBase,endToBase);
+	public double getAngle0() {
+		return angle0;
 	}
 
-	/**
-	 * Interpolates the location of the RLF when the specified measurement was taken in thisscan
-	 * @param measIndex Which laser measurement
-	 * @param currToBase (output) Location of the measurement
-	 */
-	public void interpolate( int measIndex , Se3_F64 currToBase ) {
-		double t = measIndex/(double)(numMeas-1);
-		interp.interpolate(t,currToBase);
+	public void setAngle0(double angle0) {
+		this.angle0 = angle0;
+	}
+
+	public double getAngle1() {
+		return angle1;
+	}
+
+	public void setAngle1(double angle1) {
+		this.angle1 = angle1;
 	}
 }

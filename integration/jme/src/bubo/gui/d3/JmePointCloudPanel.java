@@ -30,12 +30,18 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Box;
+import com.jme3.util.BufferUtils;
 import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.UtilPolygons2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Quaternion_F64;
+import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -185,6 +191,130 @@ public class JmePointCloudPanel extends PointCloudPanel {
 				return null;
 			}
 		});
+	}
+
+	@Override
+	public void addMesh2D( final Se3_F64 meshToWorld, List<Point2D_F64> vertexes , int argb ) {
+
+		if( vertexes.size() < 3 )
+			throw new IllegalArgumentException("There must be at least 3 points to be a mesh");
+
+		final List<Point2D_F64> ordered = ensureCCW(vertexes);
+
+		float alpha = ((argb >> 24) & 0xFF ) / 255.0f;
+		float red = ((argb >> 16) & 0xFF ) / 255.0f;
+		float green = ((argb >> 8) & 0xFF ) / 255.0f;
+		float blue = (argb & 0xFF ) / 255.0f;
+		final boolean translucent = alpha < 1.0f;
+
+		final ColorRGBA jmeColor = new ColorRGBA(red,green,blue,alpha);
+
+		bridge.enqueue(new Callable<Void>() {
+			public Void call() {
+
+				Vector3f [] vertices = new Vector3f[ordered.size()];
+
+				Point3D_F64 p3 = new Point3D_F64();
+				for (int i = 0; i < ordered.size(); i++) {
+					Point2D_F64 p2 = ordered.get(i);
+					p3.set(p2.x,p2.y,0);
+					SePointOps_F64.transform(meshToWorld,p3,p3);
+
+					vertices[i] = new Vector3f((float)p3.x,(float)p3.y,(float)p3.z);
+				}
+
+				// specify mesh triangles
+				GrowQueue_I32 open = new GrowQueue_I32();
+				GrowQueue_I32 open2 = new GrowQueue_I32();
+
+				for (int i = 0; i < ordered.size(); i++) {
+					open.add(i);
+				}
+
+				// Create triangles along the outside border and work your way in
+				// TODO not sure this algorithm is really right.  seems to render correctly but concave shapes are off
+				// maybe see what the order of the points is and skip or accept
+				// see if vertex is CW if so, do nothing.  If CCW don't add triangle and add vertexes instead?
+				// TODO could use O(N) algorithm.  this is a slower
+				GrowQueue_I32 list = new GrowQueue_I32();
+				while( open.size() > 0 ) {
+					open2.reset();
+					if( open.size() >= 3 ) {
+						for (int i = 0; i < open.size(); i += 2) {
+
+							int index0 = i;
+							int index1 = i+1;
+							int index2 = i+2;
+
+							if( index1 == open.size() ) {
+								break;
+							} else if( index2 == open.size() ) {
+								open2.add(open.get(index1));
+							} else {
+								list.add(open.get(index0));
+								list.add(open.get(index1));
+								list.add(open.get(index2));
+
+								if( i == 0 )
+									open2.add(open.get(index0));
+								open2.add(open.get(index2));
+							}
+						}
+					} else {
+						break;
+					}
+
+					GrowQueue_I32 tmp = open2;
+					open2 = open;
+					open = tmp;
+				}
+
+				// add a second set of triangles so that it can be visible on the other side
+				int origSize = list.size();
+				for (int i = 0; i < origSize; i += 3 ) {
+					list.add( list.get(i+2));
+					list.add( list.get(i+1));
+					list.add( list.get(i));
+				}
+
+				int tmp[] = new int[ list.size() ];
+				System.arraycopy(list.data,0,tmp,0,tmp.length);
+
+
+				Mesh mesh = new Mesh();
+				mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
+				mesh.setBuffer(VertexBuffer.Type.Index,    3, BufferUtils.createIntBuffer(tmp));
+				mesh.updateBound();
+
+				Material mat = new Material(bridge.getAssetManager(),"Common/MatDefs/Misc/Unshaded.j3md");
+				mat.setColor("Color", jmeColor);
+
+				Geometry g = new Geometry("Mesh2D", mesh);
+				g.setMaterial(mat);
+
+				if( translucent ) {
+					mat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+					g.setQueueBucket(RenderQueue.Bucket.Translucent);
+				}
+
+				bridge.getRootNode().attachChild(g);
+
+				return null;
+			}
+		});
+	}
+
+	public static List<Point2D_F64> ensureCCW( List<Point2D_F64> mesh ) {
+
+		if(UtilPolygons2D_F64.isCCW(mesh) ) {
+			return mesh;
+		} else {
+			List<Point2D_F64> ret = new ArrayList<Point2D_F64>();
+			for (int i = 0; i < mesh.size(); i++) {
+				ret.add( mesh.get(mesh.size()-1-i) );
+			}
+			return ret;
+		}
 	}
 
 	public static Transform convertToJme( Se3_F64 a ) {

@@ -20,7 +20,7 @@ package bubo.clouds.fit.algs;
 
 import bubo.struct.StoppingCondition;
 import georegression.fitting.se.MotionSe2PointSVD_F64;
-import georegression.fitting.se.MotionSe3PointCrossCovariance_F64;
+import georegression.fitting.se.MotionSe3PointSVD_F64;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.geometry.UtilPoint3D_F64;
@@ -90,7 +90,7 @@ public class TestIterativeClosestPoint {
 			PointModel<Point3D_F64> model = new PointModel<Point3D_F64>(modelPts);
 			StoppingCondition stop = new StoppingCondition(10, 0.1 * noise / srcPts.size() + 1e-8);
 			IterativeClosestPoint<Se3_F64, Point3D_F64>
-					alg = new IterativeClosestPoint<Se3_F64, Point3D_F64>(stop, new MotionSe3PointCrossCovariance_F64());
+					alg = new IterativeClosestPoint<Se3_F64, Point3D_F64>(stop, new MotionSe3PointSVD_F64());
 			alg.setModel(model);
 
 			alg.process(srcPts);
