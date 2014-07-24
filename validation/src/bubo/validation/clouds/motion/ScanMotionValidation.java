@@ -39,7 +39,9 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-// TODO add uniform random noise test
+// Provide a way to visualize a single trial
+// - truth, odometry, estimated pose
+// - measurements
 // TODO periodic bad scans with structure. look at floor or ceiling
 public abstract class ScanMotionValidation extends ValidationBase {
 	// how frequently it scores in seconds
@@ -47,10 +49,12 @@ public abstract class ScanMotionValidation extends ValidationBase {
 
 	GrowQueue_F64 errorLocation = new GrowQueue_F64();
 	GrowQueue_F64 errorAngle = new GrowQueue_F64();
+	GrowQueue_F64 totalDistance = new GrowQueue_F64();
+	GrowQueue_F64 totalRotate = new GrowQueue_F64();
 
 	List<DataSet> dataSets = new ArrayList<DataSet>();
 
-	Lrf2dParam param;
+	protected Lrf2dParam param;
 	ReadCsvObjectSmart<RobotLrfObservations> reader;
 
 	Lrf2dMotionRollingKeyFrame estimator;
@@ -85,10 +89,14 @@ public abstract class ScanMotionValidation extends ValidationBase {
 			out.println("    **** METRICS ****");
 			out.println("failed     = "+found.failed);
 			out.println("total      = "+found.total);
-			out.println("location50 = "+found.location50);
-			out.println("location95 = "+found.location95);
-			out.println("angle50    = "+found.angle50);
-			out.println("angle95    = "+found.angle95);
+			out.println("motion travel50 = "+found.travel50);
+			out.println("motion travel95 = "+found.travel95);
+			out.println("motion rotate50 = "+found.rotate50);
+			out.println("motion rotate95 = "+found.rotate95);
+			out.println("error location50 = "+found.location50);
+			out.println("error location95 = "+found.location95);
+			out.println("error angle50    = "+found.angle50);
+			out.println("error angle95    = "+found.angle95);
 		}
 	}
 
@@ -134,6 +142,9 @@ public abstract class ScanMotionValidation extends ValidationBase {
 
 						errorLocation.add(difference.getTranslation().norm());
 						errorAngle.add(Math.abs(difference.getYaw()));
+
+						totalDistance.add(truth.getTranslation().norm());
+						totalRotate.add(Math.abs(truth.getYaw()));
 					}
 					prevFound.set(estimator.getSensorToWorld());
 					prevTruth.set(truthSensorToWorld);
@@ -144,6 +155,8 @@ public abstract class ScanMotionValidation extends ValidationBase {
 
 		Arrays.sort(errorLocation.data,0,errorLocation.size);
 		Arrays.sort(errorAngle.data,0,errorAngle.size);
+		Arrays.sort(totalDistance.data,0,totalDistance.size);
+		Arrays.sort(totalRotate.data,0,totalRotate.size);
 
 		int index50 = errorLocation.size/2;
 		int index95 = (int)(errorLocation.size*0.95);
@@ -151,6 +164,10 @@ public abstract class ScanMotionValidation extends ValidationBase {
 		Results result = new Results();
 		result.failed = failed;
 		result.total = errorAngle.size;
+		result.travel50 = totalDistance.get(index50);
+		result.travel95 = totalDistance.get(index95);
+		result.rotate50 = totalRotate.get(index50);
+		result.rotate95 = totalRotate.get(index95);
 		result.location50 = errorLocation.get(index50);
 		result.location95 = errorLocation.get(index95);
 		result.angle50 = errorAngle.get(index50);
@@ -179,6 +196,8 @@ public abstract class ScanMotionValidation extends ValidationBase {
 
 		errorLocation.reset();
 		errorAngle.reset();
+		totalDistance.reset();
+		totalRotate.reset();
 
 		estimator.init(param);
 	}
@@ -197,6 +216,12 @@ public abstract class ScanMotionValidation extends ValidationBase {
 	{
 		public boolean failed;
 		public int total;
+
+		public double travel50;
+		public double travel95;
+		public double rotate50;
+		public double rotate95;
+
 		public double location50;
 		public double location95;
 		public double angle50;

@@ -48,6 +48,7 @@ public class MapDisplay extends SpacialDisplay {
 
 	public MapDisplay() {
 		showCoordinateAxis("Y", true, "X", true);
+		showScale(false,4.0);
 	}
 
 	/**

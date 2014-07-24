@@ -24,15 +24,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Evaluate different amounts of additive noise on odometry and LRF
+ * Every scan has a change of returning a completely random value
  *
  * @author Peter Abeles
  */
-public class VariousNoiseScanMotionValidation extends BaseNoiseScanMotionValidation {
+public class RandomScanScanMotionValidation extends BaseNoiseScanMotionValidation {
 
-	public VariousNoiseScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
+	double chanceRandomMeas;
+
+	public RandomScanScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) throws FileNotFoundException {
 		this.estimator = estimator;
-		setOutputName("ScanMotionVariousNoise.txt");
+		setOutputName("ScanMotionRandomScan.txt");
 
 		String dataDir = "data/mapping2d/";
 		String sets[] = new String[]{"sim02"};
@@ -45,31 +47,33 @@ public class VariousNoiseScanMotionValidation extends BaseNoiseScanMotionValidat
 	@Override
 	public void evaluate() throws IOException {
 		// Noise on LRF
-		baseOdomAngle = baseOdomTravelAngle = baseOdomTravel = 0;
-		baseLrfRange = 0.01;
-		for( int i = 0; i <= 5; i++ ) {
+		lrfRangeSigma = 0.01;
+		for( int i = 0; i <= 7; i++ ) {
 			out.println("=========================================");
-			configurePrintNoise(Math.pow(2,i));
+			chanceRandomMeas = 0.002 * Math.pow(2,i);
+			out.println("badScanProb "+chanceRandomMeas);
+			System.out.println("badScanProb "+chanceRandomMeas);
+			printNoise();
 			super.evaluateDataSets();
 		}
+	}
 
-		// Odometry Noise
-		baseOdomTravel = 0.02;
-		baseOdomTravelAngle = 0.002;
-		baseOdomAngle = 0.02;
-		baseLrfRange = 0;
-		for( int i = 0; i <= 5; i++ ) {
-			out.println("=========================================");
-			configurePrintNoise(Math.pow(2,i));
-			super.evaluateDataSets();
+	@Override
+	protected double[] adjustObservations(double[] ranges) {
+		double []ret = super.adjustObservations(ranges);
+		for( int i = 0; i < ret.length; i++ ) {
+			if( rand.nextDouble() <= chanceRandomMeas ) {
+				ret[i] = rand.nextDouble()*param.getMaxRange();
+			}
 		}
+		return ret;
 	}
 
 	public static void main(String[] args) throws IOException {
 
 		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
 
-		VariousNoiseScanMotionValidation app = new VariousNoiseScanMotionValidation(alg);
+		RandomScanScanMotionValidation app = new RandomScanScanMotionValidation(alg);
 		app.evaluate();
 	}
 }

@@ -71,6 +71,10 @@ public abstract class BaseNoiseScanMotionValidation extends ScanMotionValidation
 
 		lrfRangeSigma = baseLrfRange*scale;
 
+		printNoise();
+	}
+
+	protected void printNoise() {
 		out.println("LRF range = "+ lrfRangeSigma);
 		out.println("Odometry Travel = "+ odomTravelSigma +" TravelAngle "+ odomTravelAngleSigma +" Angle "+ odomAngleSigma);
 
