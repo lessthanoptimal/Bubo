@@ -19,6 +19,7 @@
 package bubo.models.sensor;
 
 import bubo.filters.ekf.EkfProjector;
+import georegression.metric.UtilAngle;
 import org.ejml.data.DenseMatrix64F;
 
 /**
@@ -80,7 +81,7 @@ public class ProjectorRangeBearing2D implements LandmarkProjector {
 
 		// predicted observation
 		predicted.data[0] = d;
-		predicted.data[1] = Math.atan2(dy, dx) - rtheta;
+		predicted.data[1] = UtilAngle.bound( Math.atan2(dy, dx) - rtheta );
 
 	}
 

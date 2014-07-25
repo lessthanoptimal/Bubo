@@ -20,10 +20,10 @@ package bubo.filters.specific.ekf;
 
 import bubo.filters.GenericKalmanFilterTests;
 import bubo.filters.MultivariateGaussianDM;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.kf.ConstAccel1D;
-import bubo.filters.kf.DiscreteKalmanFilter;
 import bubo.filters.kf.FixedKalmanProjector;
+import bubo.filters.kf.KalmanFilter;
 import bubo.filters.kf.KalmanPredictor;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.MatrixFeatures;
@@ -53,13 +53,13 @@ public class TestKfToEkfPredictorWrapper {
 			u = createControl();
 		}
 
-		EkfPredictorDiscrete pred = new KfToEkfPredictorDiscrete(createPredictor(hasInput), u);
-		DiscreteKalmanFilter filter = createFilter(hasInput);
+		EkfPredictor pred = new KfToEkfPredictor(createPredictor(hasInput), u);
+		KalmanFilter filter = createFilter(hasInput);
 
 		MultivariateGaussianDM x = GenericKalmanFilterTests.createState(9.0, 0, 1, 2);
 
-		pred.compute(x.getMean());
-		filter.predict(x);
+		pred.predict(x.getMean(), null, -1);
+		filter.predict(x,null,-1);
 
 		assertTrue(MatrixFeatures.isIdentical(pred.getPredictedState(), x.getMean(), 1e-5));
 	}
@@ -69,11 +69,11 @@ public class TestKfToEkfPredictorWrapper {
 	 */
 	@Test
 	public void checkStateNoModify() {
-		EkfPredictorDiscrete pred = new KfToEkfPredictorDiscrete(createPredictor(true), createControl());
+		EkfPredictor pred = new KfToEkfPredictor(createPredictor(true), createControl());
 
 		MultivariateGaussianDM x = GenericKalmanFilterTests.createState(9.0, 0, 1, 2);
 
-		pred.compute(x.getMean());
+		pred.predict(x.getMean(), null, -1);
 
 		// make sure the original hasn't changed
 		assertEquals(0, x.getMean().get(0, 0), 1e-5);
@@ -86,14 +86,14 @@ public class TestKfToEkfPredictorWrapper {
 		}
 	}
 
-	private DiscreteKalmanFilter createFilter(boolean withControl) {
+	private KalmanFilter createFilter(boolean withControl) {
 		KalmanPredictor prop = createPredictor(withControl);
 
 		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
 
 		FixedKalmanProjector projector = new FixedKalmanProjector(H);
 
-		DiscreteKalmanFilter ret = new DiscreteKalmanFilter(prop, projector);
+		KalmanFilter ret = new KalmanFilter(prop, projector);
 
 		if (withControl) {
 			ret.setControlInputRef(createControl());

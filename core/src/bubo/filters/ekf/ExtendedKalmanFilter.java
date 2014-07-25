@@ -51,14 +51,14 @@ import static org.ejml.ops.CommonOps.subEquals;
  * This implementation assumes a that all the measurements it gets have the same dimension.
  * </p>
  */
-public class ExtendedKalmanFilter extends DKFCommon implements KalmanFilterInterface {
+public class ExtendedKalmanFilter<Control> extends DKFCommon implements KalmanFilterInterface<Control> {
 	// describes how the state changes as a function of time
-	private EkfPredictorDiscrete predictor;
+	private EkfPredictor<Control> predictor;
 
 	// the state to meas matrix
 	private EkfProjector projector;
 
-	public ExtendedKalmanFilter(EkfPredictorDiscrete predictor, EkfProjector projector) {
+	public ExtendedKalmanFilter(EkfPredictor<Control> predictor, EkfProjector projector) {
 		super(predictor.getSystemSize(), projector.getMeasurementSize());
 
 		this.predictor = predictor;
@@ -86,7 +86,7 @@ public class ExtendedKalmanFilter extends DKFCommon implements KalmanFilterInter
 	/**
 	 * Used to change the propagator used by the filter.
 	 */
-	public void setPredictor(EkfPredictorDiscrete predictor) {
+	public void setPredictor(EkfPredictor predictor) {
 		if (predictor.getSystemSize() != getStateDOF())
 			throw new IllegalArgumentException("The predictor must have the same DOF as the filter");
 
@@ -110,8 +110,8 @@ public class ExtendedKalmanFilter extends DKFCommon implements KalmanFilterInter
 	 * The results of the prediction are stored in the 'state' variable.
 	 */
 	@Override
-	public void predict(MultivariateGaussianDM state) {
-		predictor.compute(state.getMean());
+	public void predict(MultivariateGaussianDM state, Control control , double elapsedTime) {
+		predictor.predict(state.getMean(), control, elapsedTime);
 
 		DenseMatrix64F F = predictor.getJacobianF();
 		DenseMatrix64F Q = predictor.getPlantNoise();

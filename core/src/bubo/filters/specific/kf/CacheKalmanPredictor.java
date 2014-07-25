@@ -18,14 +18,14 @@
 
 package bubo.filters.specific.kf;
 
-import bubo.filters.kf.KalmanCdtExpPredictor;
+import bubo.filters.kf.KalmanPredictor;
 import org.ejml.data.DenseMatrix64F;
 
 /**
  * Checks to see if the delta time has changed, if so it recomputes everything, otherwise it
  * uses the previous value.
  */
-public abstract class CacheKalmanPredictor implements KalmanCdtExpPredictor {
+public abstract class CacheKalmanPredictor<Control> implements KalmanPredictor<Control> {
 
 	protected DenseMatrix64F tran;
 	protected DenseMatrix64F control;
@@ -43,10 +43,11 @@ public abstract class CacheKalmanPredictor implements KalmanCdtExpPredictor {
 		plant = new DenseMatrix64F(stateDimen, stateDimen);
 	}
 
-	public void compute(double deltaTime) {
-		if (this.prevDeltaTime != deltaTime) {
-			_compute(deltaTime);
-			prevDeltaTime = deltaTime;
+	@Override
+	public void compute(Control control, double elapsedTime) {
+		if (this.prevDeltaTime != elapsedTime) {
+			_compute(elapsedTime);
+			prevDeltaTime = elapsedTime;
 		}
 	}
 

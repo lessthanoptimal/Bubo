@@ -21,14 +21,14 @@ package bubo.filters.imm.inhomo;
 import bubo.filters.GenericKalmanFilterTests;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.UtilMultivariateGaussian;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.EkfProjector;
 import bubo.filters.ekf.ExtendedKalmanFilter;
 import bubo.filters.kf.ConstAccel1D;
 import bubo.filters.kf.FixedKalmanPredictor;
 import bubo.filters.kf.FixedKalmanProjector;
 import bubo.filters.kf.KalmanPredictor;
-import bubo.filters.specific.ekf.KfToEkfPredictorDiscrete;
+import bubo.filters.specific.ekf.KfToEkfPredictor;
 import bubo.filters.specific.ekf.KfToEkfProjector;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -41,20 +41,20 @@ public class TestInhomoInteractingMultipleModelFilter {
 	/**
 	 * Create a predictor where nothing changes
 	 */
-	public static EkfPredictorDiscrete createStaticPredictor() {
+	public static EkfPredictor createStaticPredictor() {
 		DenseMatrix64F F = CommonOps.identity(3);
 		DenseMatrix64F Q = CommonOps.identity(3);
 		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
 
-		return new KfToEkfPredictorDiscrete(kalmanPred, null);
+		return new KfToEkfPredictor(kalmanPred, null);
 	}
 
-	public static EkfPredictorDiscrete createPredictorN(int dof) {
+	public static EkfPredictor createPredictorN(int dof) {
 		DenseMatrix64F F = CommonOps.identity(dof);
 		DenseMatrix64F Q = CommonOps.identity(dof);
 		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
 
-		return new KfToEkfPredictorDiscrete(kalmanPred, null);
+		return new KfToEkfPredictor(kalmanPred, null);
 	}
 
 	public static EkfProjector createProjectorN(int dof) {
@@ -83,7 +83,7 @@ public class TestInhomoInteractingMultipleModelFilter {
 	 */
 	@Test
 	public void checkBlowUp() {
-		InhomoInteractingMultipleModel imm = createDiffIMM();
+		InhomoInteractingMultipleModel<?> imm = createDiffIMM();
 		IhImmState state = new IhImmState(imm);
 
 		MultivariateGaussianDM z = GenericKalmanFilterTests.createState(2.0, 1);
@@ -91,7 +91,7 @@ public class TestInhomoInteractingMultipleModelFilter {
 		state.setState(0, UtilMultivariateGaussian.createDummy(2, 1), 0.4);
 		state.setState(1, UtilMultivariateGaussian.createDummy(3, 1), 0.6);
 
-		imm.predict(state);
+		imm.predict(state,null,-1);
 		imm.update(state, z);
 
 		state.computeMOG();
@@ -113,7 +113,7 @@ public class TestInhomoInteractingMultipleModelFilter {
 		setHomoState(state, initState, initWeights);
 
 		for (int i = 0; i < 20; i++) {
-			imm.predict(state);
+			imm.predict(state,null,-1);
 			imm.update(state, z);
 		}
 
@@ -143,12 +143,12 @@ public class TestInhomoInteractingMultipleModelFilter {
 	/**
 	 * Create an IMM with two models.  one is static and the other moves.
 	 */
-	private InhomoInteractingMultipleModel createConvergeIMM() {
+	private InhomoInteractingMultipleModel<?> createConvergeIMM() {
 		DenseMatrix64F H = CommonOps.identity(3);
 		FixedKalmanProjector kfProj = new FixedKalmanProjector(H);
 
-		EkfPredictorDiscrete predMove = new KfToEkfPredictorDiscrete(new ConstAccel1D(1, 1), null);
-		EkfPredictorDiscrete predStatic = createStaticPredictor();
+		EkfPredictor predMove = new KfToEkfPredictor(new ConstAccel1D(1, 1), null);
+		EkfPredictor predStatic = createStaticPredictor();
 
 		ExtendedKalmanFilter filters[] = new ExtendedKalmanFilter[2];
 		filters[0] = new ExtendedKalmanFilter(predMove, new KfToEkfProjector(kfProj));
@@ -165,7 +165,7 @@ public class TestInhomoInteractingMultipleModelFilter {
 	 * Create an IMM with two models with different state vector size.
 	 * one is static and the other moves.
 	 */
-	private InhomoInteractingMultipleModel createDiffIMM() {
+	private InhomoInteractingMultipleModel<?> createDiffIMM() {
 
 		ExtendedKalmanFilter filters[] = new ExtendedKalmanFilter[2];
 		filters[0] = new ExtendedKalmanFilter(createPredictorN(2), createProjectorN(2));

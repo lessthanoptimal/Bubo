@@ -29,7 +29,7 @@ import org.ejml.ops.CommonOps;
  * states with different dimension and meaning.  It doesn't have a homogeneous set of internal states.
  * This is accomplished by specifying a set of converters that convert between each type of filter.
  */
-public class InhomoInteractingMultipleModel {
+public class InhomoInteractingMultipleModel<Control> {
 
 	// converts between different state vector types
 	private InternalStateConverter converter;
@@ -38,7 +38,7 @@ public class InhomoInteractingMultipleModel {
 	private DenseMatrix64F markov;
 
 	// an array of the internal models
-	private ExtendedKalmanFilter models[];
+	private ExtendedKalmanFilter<Control> models[];
 
 	private DenseMatrix64F c;
 	private DenseMatrix64F d[];
@@ -59,7 +59,7 @@ public class InhomoInteractingMultipleModel {
 	 * @param markov       Used to compute the interaction matrix at each time step
 	 */
 	public InhomoInteractingMultipleModel(InternalStateConverter converter,
-										  ExtendedKalmanFilter modelFilters[],
+										  ExtendedKalmanFilter<Control> modelFilters[],
 										  DenseMatrix64F markov) {
 		this.converter = converter;
 		dimen = converter.getOutputDimen();
@@ -120,7 +120,7 @@ public class InhomoInteractingMultipleModel {
 	 * Before the state are propagated in the future the filter mixes
 	 * the model estimates together.
 	 */
-	public void predict(IhImmState state) {
+	public void predict(IhImmState state, Control control , double elapsedTime) {
 		// mix the states together
 		mixing(state);
 
@@ -129,8 +129,8 @@ public class InhomoInteractingMultipleModel {
 		IhImmHypothesis hypotheses[] = state.hypotheses;
 		for (int i = 0; i < hypotheses.length; i++) {
 			IhImmHypothesis h = hypotheses[i];
-			ExtendedKalmanFilter filter = models[i];
-			filter.predict(h.getMix());
+			ExtendedKalmanFilter<Control> filter = models[i];
+			filter.predict(h.getMix(),control,elapsedTime);
 			h.swapMix();
 		}
 	}

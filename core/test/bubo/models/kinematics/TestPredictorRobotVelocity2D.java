@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPredictorRobotVelocity2D extends StandardPredictorTests {
+public class TestPredictorRobotVelocity2D extends StandardPredictorTimeTests {
 
 	public TestPredictorRobotVelocity2D() {
 		super(1e-4);
@@ -60,7 +60,7 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTests {
 		DenseMatrix64F x = new DenseMatrix64F(3, 1, true, 1, 2, Math.PI / 2.0);
 
 		alg.setControl(1, 0);
-		alg.compute(x, 0.5);
+		alg.predict(x, null, 0.5);
 		DenseMatrix64F xp = alg.getPredictedState();
 
 		assertEquals(1, xp.get(0), 1e-8);
@@ -70,7 +70,7 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTests {
 		// point turn
 		x = new DenseMatrix64F(3, 1, true, 1, 2, Math.PI / 2.0);
 		alg.setControl(0, Math.PI / 4);
-		alg.compute(x, 1);
+		alg.predict(x, null, 1);
 
 		assertEquals(1, xp.get(0), 1e-8);
 		assertEquals(2, xp.get(1), 1e-8);
@@ -79,7 +79,7 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTests {
 		// translation and rotation
 		x = new DenseMatrix64F(3, 1, true, 1, 2, Math.PI / 2.0);
 		alg.setControl(2, Math.PI / 4);
-		alg.compute(x, 1);
+		alg.predict(x, null, 1);
 
 		// very crude test, see if it traveled about the expected distance
 		double d = UtilPoint2D_F64.distance(1, 2, xp.data[0], xp.data[1]);

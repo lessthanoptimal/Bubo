@@ -37,7 +37,7 @@ import static java.lang.Math.*;
  * [ v                 ]
  * [ cos( acos(x3) + T ]
  */
-public class OscillatingConstMotion implements EkfPredictorDiscrete, EkfPredictorTime {
+public class OscillatingConstMotion implements EkfPredictor {
 
 	DenseMatrix64F x;
 	DenseMatrix64F F;
@@ -60,12 +60,10 @@ public class OscillatingConstMotion implements EkfPredictorDiscrete, EkfPredicto
 	}
 
 	@Override
-	public void compute(DenseMatrix64F mean) {
-		compute(mean, T);
-	}
+	public void predict(DenseMatrix64F mean, Object o, double T) {
+		if( !Double.isNaN(this.T))
+			T = this.T;
 
-	@Override
-	public void compute(DenseMatrix64F mean, double T) {
 		double x1 = mean.get(0, 0);
 		double x2 = mean.get(1, 0);
 		double x3 = mean.get(2, 0);

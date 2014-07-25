@@ -19,7 +19,7 @@
 package bubo.filters.imm;
 
 import bubo.filters.MultivariateGaussianDM;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.ExtendedKalmanFilter;
 import org.ejml.UtilEjml;
 import org.ejml.data.DenseMatrix64F;
@@ -35,10 +35,10 @@ import org.ejml.ops.MatrixFeatures;
  * In a developmental environment where a small performance hit is not essential this
  * might be preferable to the orignal filter.
  */
-public class ImmCheckingFilter extends InteractingMultipleModelFilter {
+public class ImmCheckingFilter<Control> extends InteractingMultipleModelFilter<Control> {
 
-	public ImmCheckingFilter(ExtendedKalmanFilter filter,
-							 EkfPredictorDiscrete[] propagators,
+	public ImmCheckingFilter(ExtendedKalmanFilter<Control> filter,
+							 EkfPredictor<Control>[] propagators,
 							 DenseMatrix64F interaction) {
 		super(filter, propagators, interaction);
 
@@ -93,8 +93,8 @@ public class ImmCheckingFilter extends InteractingMultipleModelFilter {
 	}
 
 	@Override
-	public void predict(ImmState state) {
-		super.predict(state);
+	public void predict(ImmState state , Control control , double elapsedTime ) {
+		super.predict(state,control,elapsedTime);
 		sanityCheckFilter(state.hypotheses);
 	}
 

@@ -19,7 +19,7 @@
 package bubo.filters.imm;
 
 import bubo.filters.MultivariateGaussianDM;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 
 /**
  * Describes the current state of a filter associated with a model in the IMM
@@ -33,7 +33,7 @@ public class ImmHypothesis {
 
 	private MultivariateGaussianDM mix;
 
-	public ImmHypothesis(EkfPredictorDiscrete model) {
+	public ImmHypothesis(EkfPredictor<?> model) {
 		state = new MultivariateGaussianDM(model.getSystemSize());
 		mix = new MultivariateGaussianDM(model.getSystemSize());
 		probability = Double.NaN;

@@ -19,7 +19,7 @@
 package bubo.filters.specific.ekf;
 
 import bubo.filters.MultivariateGaussianDM;
-import bubo.filters.ekf.EkfPredictorTime;
+import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.UtilEkfPropagator;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.MatrixFeatures;
@@ -46,14 +46,14 @@ public abstract class GenericEkfPredictorTimeTests {
 	public void checkDoublePrediction() {
 		DenseMatrix64F initX = createInitState().getMean();
 
-		EkfPredictorTime prop = createPredictor();
+		EkfPredictor prop = createPredictor();
 
-		prop.compute(initX, 1);
+		prop.predict(initX, null, 1);
 		DenseMatrix64F a = new DenseMatrix64F(prop.getPredictedState());
 
-		prop.compute(initX, 0.5);
+		prop.predict(initX, null, 0.5);
 		DenseMatrix64F b = new DenseMatrix64F(prop.getPredictedState());
-		prop.compute(b, 0.5);
+		prop.predict(b, null, 0.5);
 		b.set(prop.getPredictedState());
 
 		assertTrue(MatrixFeatures.isIdentical(a, b, 1e-5));
@@ -63,7 +63,7 @@ public abstract class GenericEkfPredictorTimeTests {
 	 * Compare a numerically computed F to the one returned by the propagator.
 	 */
 	public void checkNumericallyF() {
-		EkfPredictorTime prop = createPredictor();
+		EkfPredictor prop = createPredictor();
 
 		double T = 1e-2;
 
@@ -73,7 +73,7 @@ public abstract class GenericEkfPredictorTimeTests {
 		DenseMatrix64F F_numerical = UtilEkfPropagator.numericalJacobian(a, prop, T, 1e-3);
 
 		// get the one from the propagator
-		prop.compute(a, T);
+		prop.predict(a, null, T);
 		DenseMatrix64F F = prop.getJacobianF();
 
 
@@ -86,19 +86,19 @@ public abstract class GenericEkfPredictorTimeTests {
 	 * The original state that it provided to the propagator should not be modified
 	 */
 	public void checkOriginalUnchanged() {
-		EkfPredictorTime prop = createPredictor();
+		EkfPredictor prop = createPredictor();
 
 		DenseMatrix64F orig = createInitState().getMean();
 		DenseMatrix64F origTest = createInitState().getMean();
 
-		prop.compute(orig, 1);
+		prop.predict(orig, null, 1);
 
 		assertTrue(MatrixFeatures.isIdentical(orig, origTest, 1e-8));
 
 		assertFalse(MatrixFeatures.isIdentical(orig, prop.getPredictedState(), 1e-8));
 	}
 
-	public abstract EkfPredictorTime createPredictor();
+	public abstract EkfPredictor createPredictor();
 
 	public abstract MultivariateGaussianDM createInitState();
 }

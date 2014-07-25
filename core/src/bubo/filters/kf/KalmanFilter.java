@@ -26,7 +26,7 @@ import static org.ejml.ops.CommonOps.*;
 
 /**
  * <p>
- * Standard implementation of a continuous-discrete Kalman filter:<br>
+ * Standard implementation of a Kalman filter.<br>
  * <br>
  * x<sub>k</sub> = F<sub>k</sub> x<sub>k-1</sub> + w<sub>k</sub><br>
  * z<sub>k</sub> = H<sub>k</sub> x<sub>k</sub> + v<sub>k</sub> <br>
@@ -46,16 +46,16 @@ import static org.ejml.ops.CommonOps.*;
  * * could be removed by moving matrices to the projector and making projectors specific to this algoritihm
  * </p>
  */
-public class DiscreteKalmanFilter extends DKFCommon implements KalmanFilterInterface {
+public class KalmanFilter<Control> extends DKFCommon implements KalmanFilterInterface<Control> {
 	// describes how the state changes as a function of time
-	private KalmanPredictor predictor;
+	private KalmanPredictor<Control> predictor;
 
 	// the state to meas matrix
 	private KalmanProjector projector;
 
 	private DenseMatrix64F controlInput;
 
-	public DiscreteKalmanFilter(KalmanPredictor predictor, KalmanProjector projector) {
+	public KalmanFilter(KalmanPredictor<Control> predictor, KalmanProjector projector) {
 		super(predictor.getNumStates(), projector.getNumStates());
 
 		this.predictor = predictor;
@@ -86,7 +86,9 @@ public class DiscreteKalmanFilter extends DKFCommon implements KalmanFilterInter
 	 * @param state The current state and covariance estimate
 	 */
 	@Override
-	public void predict(MultivariateGaussianDM state) {
+	public void predict(MultivariateGaussianDM state, Control control, double elapsedTime) {
+
+		predictor.compute(control, elapsedTime);
 
 		DenseMatrix64F F = predictor.getStateTransition();
 		DenseMatrix64F Q = predictor.getPlantNoise();

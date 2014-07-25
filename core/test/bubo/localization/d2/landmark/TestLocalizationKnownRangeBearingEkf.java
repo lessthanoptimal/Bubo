@@ -16,17 +16,18 @@
  * limitations under the License.
  */
 
-package bubo.filters.kf;
+package bubo.localization.d2.landmark;
 
+import org.junit.Test;
 
-import bubo.filters.MultivariateGaussianDM;
+import static org.junit.Assert.fail;
 
 /**
- * An interface for the continuous discrete time Kalman filter.
+ * @author Peter Abeles
  */
-public interface KalmanCdtFilterInterface {
-
-	public void predict(MultivariateGaussianDM state, double T);
-
-	public void update(MultivariateGaussianDM state, MultivariateGaussianDM meas);
+public class TestLocalizationKnownRangeBearingEkf {
+	@Test
+	public void stuff() {
+		fail("Implement");
+	}
 }

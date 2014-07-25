@@ -21,15 +21,24 @@ package bubo.filters.kf;
 import org.ejml.data.DenseMatrix64F;
 
 /**
- * Computes matrices needed to propagate the estimated state forward in time.
- * <p/>
- * It is assumed that the dynamics does not change as a function of time.
- * <p/>
- * x(k+1) = F(k)x(k) + G(k)u(k) + v(k)
- * <p/>
+ * <p>
+ * Computes matrices needed to propagate the estimated state forward in time.  Supports both discrete and
+ * continuous-discrete models. The equations below are for a discrete system:<br>
+ * <br>
+ * x(k+1) = F(k)x(k) + G(k)u(k) + v(k)<br>
  * v ~ N[0,R(k)]
+ * </p>
  */
-public interface KalmanPredictor {
+public interface KalmanPredictor<Control> {
+
+	/**
+	 * Computes the various matrices.  If the system is discrete then just the control input is needed.
+	 * For continuous systems elapsed time is required and control might be needed in some applications.
+	 *
+	 * @param control Known control input.  null if there is none
+	 * @param elapsedTime Elapsed time since previous prediction.  Ignored by discrete filters
+	 */
+	public void compute(Control control, double elapsedTime);
 
 	/**
 	 * Returns a state transition matrix for the specified time step length.

@@ -49,7 +49,7 @@ import org.ejml.ops.CommonOps;
  * <p/>
  * ------------------------------------------------
  */
-public class DiscreteHInfinityFilter implements KalmanFilterInterface {
+public class DiscreteHInfinityFilter<Control> implements KalmanFilterInterface<Control> {
 	// describes how the state changes as a function of time
 	private KalmanPredictor predictor;
 
@@ -128,7 +128,8 @@ public class DiscreteHInfinityFilter implements KalmanFilterInterface {
 	}
 
 	@Override
-	public void predict(MultivariateGaussianDM state) {
+	public void predict(MultivariateGaussianDM state, Object o, double elapsedTime) {
+
 		DenseMatrix64F x = state.getMean();
 		DenseMatrix64F P = state.getCovariance();
 

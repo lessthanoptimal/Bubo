@@ -21,11 +21,11 @@ package bubo.filters.imm;
 import bubo.filters.GenericKalmanFilterTests;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.UtilMultivariateGaussian;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.EkfProjector;
 import bubo.filters.ekf.ExtendedKalmanFilter;
 import bubo.filters.kf.*;
-import bubo.filters.specific.ekf.KfToEkfPredictorDiscrete;
+import bubo.filters.specific.ekf.KfToEkfPredictor;
 import bubo.filters.specific.ekf.KfToEkfProjector;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -36,13 +36,13 @@ import static org.junit.Assert.assertTrue;
 
 public class TestInteractingMultipleModelFilter {
 
-	private static DiscreteKalmanFilter createKalman() {
+	private static KalmanFilter createKalman() {
 		KalmanPredictor pred = createPred();
 
 		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 0, 0}});
 		FixedKalmanProjector projector = new FixedKalmanProjector(H);
 
-		return new DiscreteKalmanFilter(pred, projector);
+		return new KalmanFilter(pred, projector);
 	}
 
 	private static KalmanPredictor createPred() {
@@ -60,10 +60,10 @@ public class TestInteractingMultipleModelFilter {
 		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 0, 0}});
 		FixedKalmanProjector kfProj = new FixedKalmanProjector(H);
 
-		KfToEkfPredictorDiscrete pred = new KfToEkfPredictorDiscrete(createPred(), null);
+		KfToEkfPredictor pred = new KfToEkfPredictor(createPred(), null);
 		EkfProjector proj = new KfToEkfProjector(kfProj);
 
-		KfToEkfPredictorDiscrete preds[] = new KfToEkfPredictorDiscrete[numModels];
+		KfToEkfPredictor preds[] = new KfToEkfPredictor[numModels];
 		for (int i = 0; i < numModels; i++) {
 			preds[i] = pred;
 		}
@@ -109,12 +109,12 @@ public class TestInteractingMultipleModelFilter {
 	/**
 	 * Create a predictor where nothing changes
 	 */
-	public static EkfPredictorDiscrete createStaticPredictor() {
+	public static EkfPredictor createStaticPredictor() {
 		DenseMatrix64F F = CommonOps.identity(3);
 		DenseMatrix64F Q = CommonOps.identity(3);
 		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
 
-		return new KfToEkfPredictorDiscrete(kalmanPred, null);
+		return new KfToEkfPredictor(kalmanPred, null);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class TestInteractingMultipleModelFilter {
 	 */
 	@Test
 	public void compareToKalmanFilter() {
-		DiscreteKalmanFilter kf = createKalman();
+		KalmanFilter kf = createKalman();
 		InteractingMultipleModelFilter imm = createEquivIMM();
 
 		double initWeights[] = new double[]{0.4, 0.5, 0.1};
@@ -133,8 +133,8 @@ public class TestInteractingMultipleModelFilter {
 		MultivariateGaussianDM kfState = createInitState();
 
 		// perform the prediction step
-		kf.predict(kfState);
-		imm.predict(immState);
+		kf.predict(kfState,null,-1);
+		imm.predict(immState,null,-1);
 
 		assertTrue(UtilMultivariateGaussian.isSimilar(kfState, immState.computeMOG()));
 		assertTrue(didModelWeightsChange(initWeights, immState.hypotheses));
@@ -169,7 +169,7 @@ public class TestInteractingMultipleModelFilter {
 		state.setState(initState, initWeights);
 
 		for (int i = 0; i < 20; i++) {
-			imm.predict(state);
+			imm.predict(state,null,-1);
 			imm.update(state, z);
 		}
 
@@ -205,11 +205,11 @@ public class TestInteractingMultipleModelFilter {
 		DenseMatrix64F H = CommonOps.identity(3);
 		FixedKalmanProjector kfProj = new FixedKalmanProjector(H);
 
-		EkfPredictorDiscrete predMove = new KfToEkfPredictorDiscrete(createPred(), null);
-		EkfPredictorDiscrete predStatic = createStaticPredictor();
+		EkfPredictor predMove = new KfToEkfPredictor(createPred(), null);
+		EkfPredictor predStatic = createStaticPredictor();
 		EkfProjector proj = new KfToEkfProjector(kfProj);
 
-		EkfPredictorDiscrete preds[] = new EkfPredictorDiscrete[2];
+		EkfPredictor preds[] = new EkfPredictor[2];
 		preds[0] = predMove;
 		preds[1] = predStatic;
 

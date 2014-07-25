@@ -18,8 +18,8 @@
 
 package bubo.filters.specific.ekf;
 
-import bubo.filters.ekf.EkfPredictorTime;
-import bubo.filters.kf.KalmanCdtExpPredictor;
+import bubo.filters.ekf.EkfPredictor;
+import bubo.filters.kf.KalmanPredictor;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -27,24 +27,23 @@ import org.ejml.ops.CommonOps;
  * A simple wrapper that lets a KF propagator be used as a propagator for an EKF.
  * If the model is not linear this is highly likely
  */
-public class KfToEkfPredictorTime implements EkfPredictorTime {
+public class KfToEkfPredictor<Control> implements EkfPredictor<Control> {
 
-	private KalmanCdtExpPredictor prop;
+	private KalmanPredictor<Control> predictor;
 	private DenseMatrix64F controlInput;
 	private DenseMatrix64F a;
-	private double T;
 
-	public KfToEkfPredictorTime(KalmanCdtExpPredictor predictor, DenseMatrix64F controlInput) {
-		this.prop = predictor;
+	public KfToEkfPredictor(KalmanPredictor<Control> predictor, DenseMatrix64F controlInput) {
+		this.predictor = predictor;
 		this.a = new DenseMatrix64F(predictor.getNumStates(), 1);
 		this.controlInput = controlInput;
 	}
 
 	@Override
-	public void compute(DenseMatrix64F state, double T) {
-		prop.compute(T);
-		DenseMatrix64F F = prop.getStateTransition();
-		DenseMatrix64F G = prop.getControlTransition();
+	public void predict(DenseMatrix64F state, Control control, double elapsedTime) {
+		predictor.compute(control,elapsedTime);
+		DenseMatrix64F F = predictor.getStateTransition();
+		DenseMatrix64F G = predictor.getControlTransition();
 
 		// predict the state
 		CommonOps.mult(F, state, a);
@@ -61,12 +60,12 @@ public class KfToEkfPredictorTime implements EkfPredictorTime {
 
 	@Override
 	public DenseMatrix64F getJacobianF() {
-		return prop.getStateTransition();
+		return predictor.getStateTransition();
 	}
 
 	@Override
 	public DenseMatrix64F getPlantNoise() {
-		return prop.getPlantNoise();
+		return predictor.getPlantNoise();
 	}
 
 	@Override
@@ -76,6 +75,6 @@ public class KfToEkfPredictorTime implements EkfPredictorTime {
 
 	@Override
 	public int getSystemSize() {
-		return prop.getNumStates();
+		return predictor.getNumStates();
 	}
 }

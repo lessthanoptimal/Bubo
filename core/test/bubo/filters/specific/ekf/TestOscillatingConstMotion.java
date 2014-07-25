@@ -20,7 +20,7 @@ package bubo.filters.specific.ekf;
 
 import bubo.filters.GenericKalmanFilterTests;
 import bubo.filters.MultivariateGaussianDM;
-import bubo.filters.ekf.EkfPredictorTime;
+import bubo.filters.ekf.EkfPredictor;
 import org.junit.Test;
 
 public class TestOscillatingConstMotion
@@ -30,7 +30,7 @@ public class TestOscillatingConstMotion
 		allGenericTests();
 	}
 
-	public EkfPredictorTime createPredictor() {
+	public EkfPredictor createPredictor() {
 		return new OscillatingConstMotion(1);
 	}
 

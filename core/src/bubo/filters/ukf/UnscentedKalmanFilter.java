@@ -21,7 +21,6 @@ package bubo.filters.ukf;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.abst.KalmanFilterInterface;
 import bubo.filters.ekf.EkfPredictor;
-import bubo.filters.ekf.EkfPredictorDiscrete;
 import bubo.filters.ekf.EkfProjector;
 import bubo.filters.ekf.ExtendedKalmanFilter;
 import org.ejml.data.DenseMatrix64F;
@@ -57,7 +56,7 @@ import org.ejml.ops.CommonOps;
  * at the cost of accuracy) that have not been used.
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class UnscentedKalmanFilter implements KalmanFilterInterface {
+public class UnscentedKalmanFilter<Control> implements KalmanFilterInterface<Control> {
 
 	// should it perform an unscented update on the prediction and/or update?
 	boolean unscentedPred;
@@ -67,7 +66,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 	// the DOF of the state
 	private int n;
 	// target and sensor models
-	private EkfPredictorDiscrete predictor;
+	private EkfPredictor<Control> predictor;
 	private EkfProjector projector;
 
 	// sample points
@@ -79,7 +78,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 	private int firstCovIndex;
 
 	// used to update the state when the unscented transform has not been requested
-	private ExtendedKalmanFilter ekf;
+	private ExtendedKalmanFilter<Control> ekf;
 
 	// used during the unscented prediction and update steps
 	private DenseMatrix64F tempMxM;
@@ -104,7 +103,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 	public UnscentedKalmanFilter(double kappa,
 								 boolean unscentedPred,
 								 boolean unscentedUpdate,
-								 EkfPredictorDiscrete predictor,
+								 EkfPredictor<Control> predictor,
 								 EkfProjector projector) {
 		if (!unscentedPred && !unscentedUpdate)
 			throw new IllegalArgumentException("No point in using the unscented filter if it " +
@@ -143,7 +142,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 		}
 
 		if (!unscentedPred || !unscentedUpdate) {
-			ekf = new ExtendedKalmanFilter(predictor, projector);
+			ekf = new ExtendedKalmanFilter<Control>(predictor, projector);
 		}
 
 		weights[0] = kappa / (n + kappa);
@@ -215,11 +214,12 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 	 * @param state Initially its the current state of the system.  After the function exits,
 	 *              it is the predicted state of the system
 	 */
-	public void predict(MultivariateGaussianDM state) {
+	@Override
+	public void predict(MultivariateGaussianDM state, Control control, double elapsedTime) {
 		if (unscentedPred) {
-			predictUnscented(state);
+			predictUnscented(state,control,elapsedTime);
 		} else {
-			ekf.predict(state);
+			ekf.predict(state,control,elapsedTime);
 		}
 	}
 
@@ -241,7 +241,7 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 	/**
 	 * Predicts the state unsing the unscented transforme
 	 */
-	private void predictUnscented(MultivariateGaussianDM state) {
+	private void predictUnscented(MultivariateGaussianDM state, Control control, double elapsedTime) {
 		setPoints(state);
 
 		DenseMatrix64F x = state.getMean();
@@ -253,14 +253,14 @@ public class UnscentedKalmanFilter implements KalmanFilterInterface {
 		for (int i = 0; i < points.length; i++) {
 			DenseMatrix64F p = points[i];
 
-			predictor.compute(p);
+			predictor.predict(p,control,elapsedTime);
 			p.set(predictor.getPredictedState());
 
 			CommonOps.add(x, weights[i], p, x);
 		}
 
 		// compute the covariance with plant noise
-		predictor.compute(x);
+		predictor.predict(x, control, elapsedTime);
 		P.set(predictor.getPlantNoise());
 
 		for (int i = firstCovIndex; i < points.length; i++) {

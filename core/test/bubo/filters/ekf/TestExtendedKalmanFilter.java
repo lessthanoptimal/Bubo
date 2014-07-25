@@ -63,7 +63,7 @@ public class TestExtendedKalmanFilter extends GenericKalmanFilterTests {
 	@Override
 	protected KalmanFilterInterface createFilter() {
 
-		EkfPredictorDiscrete propagator = new OscillatingConstMotion(T);
+		EkfPredictor propagator = new OscillatingConstMotion(T);
 		EkfProjector projector = new Projector();
 
 		return new ExtendedKalmanFilter(propagator, projector);
@@ -77,11 +77,11 @@ public class TestExtendedKalmanFilter extends GenericKalmanFilterTests {
 	@Override
 	protected DenseMatrix64F createTargetState() {
 		ExtendedKalmanFilter filter = (ExtendedKalmanFilter) createFilter();
-		EkfPredictorDiscrete prop = filter.getPredictor();
+		EkfPredictor prop = filter.getPredictor();
 
 		MultivariateGaussianDM ret = createInitialState();
 
-		prop.compute(ret.getMean());
+		prop.predict(ret.getMean(),null,-1);
 
 		return new DenseMatrix64F(prop.getPredictedState());
 	}

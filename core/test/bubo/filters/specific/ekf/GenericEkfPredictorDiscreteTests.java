@@ -19,7 +19,7 @@
 package bubo.filters.specific.ekf;
 
 import bubo.filters.MultivariateGaussianDM;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.MatrixFeatures;
 
@@ -41,19 +41,19 @@ public abstract class GenericEkfPredictorDiscreteTests {
 	 * The original state that it provided to the propagator should not be modified
 	 */
 	public void checkOriginalUnchanged() {
-		EkfPredictorDiscrete prop = createPredictor();
+		EkfPredictor prop = createPredictor();
 
 		DenseMatrix64F orig = createInitState().getMean();
 		DenseMatrix64F origTest = createInitState().getMean();
 
-		prop.compute(orig);
+		prop.predict(orig, null, -1);
 
 		assertTrue(MatrixFeatures.isIdentical(orig, origTest, 1e-8));
 
 		assertFalse(MatrixFeatures.isIdentical(orig, prop.getPredictedState(), 1e-8));
 	}
 
-	public abstract EkfPredictorDiscrete createPredictor();
+	public abstract EkfPredictor createPredictor();
 
 	public abstract MultivariateGaussianDM createInitState();
 }

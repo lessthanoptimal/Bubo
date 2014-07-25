@@ -36,6 +36,9 @@ public class FixedKalmanPredictor implements KalmanPredictor {
 	}
 
 	@Override
+	public void compute(Object o, double elapsedTime) {}
+
+	@Override
 	public DenseMatrix64F getStateTransition() {
 		return F;
 	}

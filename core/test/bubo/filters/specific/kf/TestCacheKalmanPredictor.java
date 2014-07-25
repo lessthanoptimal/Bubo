@@ -32,12 +32,12 @@ public class TestCacheKalmanPredictor {
 	public void checkNumCompute() {
 		Helper h = new Helper();
 
-		h.compute(0.1);
-		h.compute(0.1);
+		h.compute(null,0.1);
+		h.compute(null,0.1);
 
 		assertEquals(1, h.getNumCompute());
 
-		h.compute(0.22);
+		h.compute(null,0.22);
 		assertEquals(2, h.getNumCompute());
 
 	}
@@ -45,7 +45,7 @@ public class TestCacheKalmanPredictor {
 	/**
 	 * A simple implementation that is just counts the number of times compute is called.
 	 */
-	private static class Helper extends CacheKalmanPredictor {
+	private static class Helper extends CacheKalmanPredictor<Object> {
 		int numCompute = 0;
 
 		public Helper() {

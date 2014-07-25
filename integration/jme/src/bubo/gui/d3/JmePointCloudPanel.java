@@ -49,6 +49,7 @@ import java.util.concurrent.Callable;
  * @author Peter Abeles
  */
 // TODO get point size working
+@SuppressWarnings("PointlessArithmeticExpression")
 public class JmePointCloudPanel extends PointCloudPanel {
 
 	final JmeBridgeToAwt bridge;
@@ -302,6 +303,56 @@ public class JmePointCloudPanel extends PointCloudPanel {
 				return null;
 			}
 		});
+	}
+
+	@Override
+	public void addVectors(List<Point3D_F64> location, List<Vector3D_F64> direction, final int argb) {
+
+		if( location.size() != direction.size() )
+			throw new IllegalArgumentException("size of location and direction must match");
+
+		final float[] buf = new float[location.size()*6];
+		final short[]connections = new short[location.size()*2];
+		for (int i = 0; i < location.size(); i++) {
+			Point3D_F64 p = location.get(i);
+			Vector3D_F64 v = direction.get(i);
+			int index = i*6;
+
+			buf[index+0] = (float)p.x;
+			buf[index+1] = (float)p.y;
+			buf[index+2] = (float)p.z;
+			buf[index+3] = (float)(p.x+v.x);
+			buf[index+4] = (float)(p.y+v.y);
+			buf[index+5] = (float)(p.z+v.z);
+
+			connections[i*2+0] = (short)(i*2);
+			connections[i*2+1] = (short)(i*2+1);
+		}
+
+		bridge.enqueue(new Callable<Void>(){
+			public Void call(){
+				float alpha = ((argb >> 24) & 0xFF ) / 255.0f;
+				float red = ((argb >> 16) & 0xFF ) / 255.0f;
+				float green = ((argb >> 8) & 0xFF ) / 255.0f;
+				float blue = (argb & 0xFF ) / 255.0f;
+
+				Material mat = new Material(bridge.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+				mat.setColor("Color", new ColorRGBA(red,green,blue,alpha) );
+				mat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
+
+				Mesh m = new Mesh();
+				m.setMode(Mesh.Mode.Lines);
+				m.setBuffer(VertexBuffer.Type.Position, 3, buf);
+				m.setBuffer(VertexBuffer.Type.Index, 2, connections);
+				m.updateBound();
+
+				Geometry g = new Geometry("Line",m);
+				g.setShadowMode(RenderQueue.ShadowMode.Off);
+				g.setQueueBucket(RenderQueue.Bucket.Opaque);
+				g.setMaterial(mat);
+				bridge.getRootNode().attachChild(g);
+				return null;
+			}});
 	}
 
 	public static List<Point2D_F64> ensureCCW( List<Point2D_F64> mesh ) {

@@ -20,6 +20,7 @@ package bubo.gui.d3;
 
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import javax.swing.*;
@@ -40,13 +41,13 @@ public abstract class PointCloudPanel extends JPanel {
 
 	public abstract boolean getShowAxis();
 
-	public abstract void addPoints( List<Point3D_F64> points , int color , float size );
+	public abstract void addPoints( List<Point3D_F64> points , int argb , float size );
 
-	public abstract void addPoints( List<Point3D_F64> points , int[] colors , float size );
+	public abstract void addPoints( List<Point3D_F64> points , int[] argb , float size );
 
 	public abstract void addBox( double sizeX , double sizeY , double sizeZ ,
 								 Se3_F64 boxToWorld ,
-								 int color );
+								 int argb );
 
 	/**
 	 * Draws 2D mesh on a plane
@@ -55,6 +56,8 @@ public abstract class PointCloudPanel extends JPanel {
 	 * @param vertexes Ordered (CW or CCW) set of vertexes which define the outside hull of the mesh
 	 */
 	public abstract void addMesh2D( Se3_F64 meshToWorld , List<Point2D_F64> vertexes , int argb );
+
+	public abstract void addVectors( List<Point3D_F64> location , List<Vector3D_F64> direction , int argb );
 
 	public abstract void shutdownVisualize();
 

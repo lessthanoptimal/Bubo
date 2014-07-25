@@ -21,7 +21,7 @@ package bubo.filters.imm;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.UtilMultivariateGaussian;
 import bubo.filters.kf.ConstAccel1D;
-import bubo.filters.kf.DiscreteKalmanFilter;
+import bubo.filters.kf.KalmanFilter;
 import bubo.filters.kf.KalmanPredictor;
 import bubo.filters.kf.KalmanProjector;
 import bubo.filters.specific.kf.FirstFewProjector;
@@ -49,7 +49,7 @@ public abstract class CompareToKalmanTests {
 	 * See if the Kalman filter and particle filter produce similar results
 	 */
 	public void compareToKalman() {
-		DiscreteKalmanFilter kf = createKalman();
+		KalmanFilter kf = createKalman();
 		createOtherFilter();
 
 		MultivariateGaussianDM kalState = createPrior();
@@ -63,7 +63,7 @@ public abstract class CompareToKalmanTests {
 		for (int i = 0; i < 100; i++) {
 //            System.out.println("----------------------------------");
 			predict(target);
-			kf.predict(kalState);
+			kf.predict(kalState,null,-1);
 			predictOther();
 
 			otherOutput = computeOutput();
@@ -120,11 +120,11 @@ public abstract class CompareToKalmanTests {
 		x.set(1, 0, v + a * T);
 	}
 
-	private DiscreteKalmanFilter createKalman() {
+	private KalmanFilter createKalman() {
 		KalmanPredictor pred = createPredictor();
 		KalmanProjector proj = createProjector();
 
-		return new DiscreteKalmanFilter(pred, proj);
+		return new KalmanFilter(pred, proj);
 	}
 
 	protected KalmanPredictor createPredictor() {

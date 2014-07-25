@@ -18,9 +18,9 @@
 
 package bubo.filters.imm;
 
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.kf.ConstAccel1D;
-import bubo.filters.specific.ekf.KfToEkfPredictorDiscrete;
+import bubo.filters.specific.ekf.KfToEkfPredictor;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.junit.Test;
@@ -80,7 +80,7 @@ public class TestImmCheckingFilter {
 	 * Anything else is all good.
 	 */
 	private ImmHypothesis[] createModels(int whatIsBad) {
-		EkfPredictorDiscrete pred = createPred();
+		EkfPredictor pred = createPred();
 
 		ImmHypothesis[] ret = new ImmHypothesis[2];
 
@@ -102,7 +102,7 @@ public class TestImmCheckingFilter {
 		return ret;
 	}
 
-	private EkfPredictorDiscrete createPred() {
-		return new KfToEkfPredictorDiscrete(new ConstAccel1D(1, 1), null);
+	private EkfPredictor createPred() {
+		return new KfToEkfPredictor(new ConstAccel1D(1, 1), null);
 	}
 }

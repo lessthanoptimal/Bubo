@@ -22,8 +22,8 @@ import bubo.filters.GenericKalmanFilterTests;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.abst.KalmanFilterInterface;
 import bubo.filters.kf.ConstAccel1D;
-import bubo.filters.kf.DiscreteKalmanFilter;
 import bubo.filters.kf.FixedKalmanProjector;
+import bubo.filters.kf.KalmanFilter;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 import org.ejml.ops.MatrixFeatures;
@@ -73,8 +73,8 @@ public class TestDiscreteHInfinityFilter extends GenericKalmanFilterTests {
 			assertTrue(MatrixFeatures.isIdentical(x_kal.getMean(), x_inf.getMean(), 1e-5));
 			assertTrue(MatrixFeatures.isIdentical(x_kal.getCovariance(), x_inf.getCovariance(), 1e-5));
 
-			kalman.predict(x_kal);
-			h_inf.predict(x_inf);
+			kalman.predict(x_kal,null,-1);
+			h_inf.predict(x_inf,null,-1);
 
 			assertTrue(MatrixFeatures.isIdentical(x_kal.getMean(), x_inf.getMean(), 1e-5));
 			assertTrue(MatrixFeatures.isIdentical(x_kal.getCovariance(), x_inf.getCovariance(), 1e-5));
@@ -134,6 +134,6 @@ public class TestDiscreteHInfinityFilter extends GenericKalmanFilterTests {
 
 		FixedKalmanProjector projector = new FixedKalmanProjector(H);
 
-		return new DiscreteKalmanFilter(constAccelProp, projector);
+		return new KalmanFilter(constAccelProp, projector);
 	}
 }

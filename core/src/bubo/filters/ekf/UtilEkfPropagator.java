@@ -37,20 +37,20 @@ public class UtilEkfPropagator {
 	 * @param delta How much the state changes should be adjusted
 	 * @return
 	 */
-	public static DenseMatrix64F numericalJacobian(DenseMatrix64F initX, EkfPredictorTime prop, double T, double delta) {
+	public static DenseMatrix64F numericalJacobian(DenseMatrix64F initX, EkfPredictor<?> prop, double T, double delta) {
 		int N = prop.getSystemSize();
 
 		DenseMatrix64F a = new DenseMatrix64F(N, 1);
 		DenseMatrix64F b = new DenseMatrix64F(initX);
 		DenseMatrix64F F = new DenseMatrix64F(N, N);
 
-		prop.compute(initX, T);
+		prop.predict(initX, null, T);
 		a.set(prop.getPredictedState());
 
 		for (int i = 0; i < N; i++) {
 			b.set(i, 0, initX.get(i, 0) + delta);
 
-			prop.compute(b, T);
+			prop.predict(b, null, T);
 			b.set(prop.getPredictedState());
 			CommonOps.add(b, -1, a, b);
 

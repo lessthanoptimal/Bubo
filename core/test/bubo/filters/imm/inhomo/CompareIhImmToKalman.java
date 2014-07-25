@@ -24,7 +24,7 @@ import bubo.filters.ekf.ExtendedKalmanFilter;
 import bubo.filters.imm.CompareToKalmanTests;
 import bubo.filters.kf.KalmanPredictor;
 import bubo.filters.kf.KalmanProjector;
-import bubo.filters.specific.ekf.KfToEkfPredictorDiscrete;
+import bubo.filters.specific.ekf.KfToEkfPredictor;
 import bubo.filters.specific.ekf.KfToEkfProjector;
 import org.ejml.data.DenseMatrix64F;
 
@@ -50,7 +50,7 @@ public class CompareIhImmToKalman extends CompareToKalmanTests {
 		KalmanProjector kfProj = createProjector();
 		KalmanPredictor kfPred = createPredictor();
 
-		KfToEkfPredictorDiscrete pred = new KfToEkfPredictorDiscrete(kfPred, null);
+		KfToEkfPredictor pred = new KfToEkfPredictor(kfPred, null);
 		EkfProjector proj = new KfToEkfProjector(kfProj);
 
 		ExtendedKalmanFilter filters[] = new ExtendedKalmanFilter[numModels];
@@ -68,7 +68,7 @@ public class CompareIhImmToKalman extends CompareToKalmanTests {
 
 	@Override
 	protected void predictOther() {
-		imm.predict(stateImm);
+		imm.predict(stateImm,null,-1);
 	}
 
 	@Override

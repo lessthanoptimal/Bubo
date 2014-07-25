@@ -23,9 +23,16 @@ import bubo.filters.MultivariateGaussianDM;
 /**
  * There are many different forums of the KalmanFilter
  */
-public interface KalmanFilterInterface {
+public interface KalmanFilterInterface<Control> {
 
-	public void predict(MultivariateGaussianDM state);
+	/**
+	 * Predictor which supports discrete and continuous-discrete models.
+	 *
+	 * @param state The initial system state. Not modified.
+	 * @param control Known control input.  null if there is none
+	 * @param elapsedTime Elapsed time since previous prediction. Ignored by discrete systems.
+	 */
+	public void predict(MultivariateGaussianDM state, Control control , double elapsedTime );
 
 	public void update(MultivariateGaussianDM state, MultivariateGaussianDM meas);
 }

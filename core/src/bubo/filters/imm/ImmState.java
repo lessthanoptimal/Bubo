@@ -19,7 +19,7 @@
 package bubo.filters.imm;
 
 import bubo.filters.MultivariateGaussianDM;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import org.ejml.UtilEjml;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -36,8 +36,8 @@ public class ImmState {
 	private DenseMatrix64F d;
 	private DenseMatrix64F outer;
 
-	public ImmState(InteractingMultipleModelFilter filter) {
-		EkfPredictorDiscrete[] models = filter.getModels();
+	public ImmState(InteractingMultipleModelFilter<?> filter) {
+		EkfPredictor[] models = filter.getModels();
 
 		hypotheses = new ImmHypothesis[models.length];
 		for (int i = 0; i < models.length; i++) {

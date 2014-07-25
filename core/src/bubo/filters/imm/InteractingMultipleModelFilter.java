@@ -20,7 +20,7 @@ package bubo.filters.imm;
 
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.UtilMultivariateGaussian;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.ExtendedKalmanFilter;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
@@ -35,15 +35,15 @@ import org.ejml.ops.CommonOps;
  * This means that each element in the state vector has the same meaning and the same number of
  * elements in each vector.  This makes the merging process much easier to implement.
  */
-public class InteractingMultipleModelFilter {
+public class InteractingMultipleModelFilter<Control> {
 
 	// the filter which is used to update the state of the internal models
-	private ExtendedKalmanFilter filter;
+	private ExtendedKalmanFilter<Control> filter;
 	// creates the interaction matrix based upon the sensors measurement sojourn time
 	private DenseMatrix64F markov;
 
 	// an array of the internal models
-	private EkfPredictorDiscrete models[];
+	private EkfPredictor<Control> models[];
 
 	private DenseMatrix64F c;
 
@@ -60,15 +60,15 @@ public class InteractingMultipleModelFilter {
 	 * @param predictors The predictor each internal model will use
 	 * @param markov     Used to compute the interaction matrix at each time step (reference is saved)
 	 */
-	public InteractingMultipleModelFilter(ExtendedKalmanFilter filter,
-										  EkfPredictorDiscrete predictors[],
+	public InteractingMultipleModelFilter(ExtendedKalmanFilter<Control> filter,
+										  EkfPredictor<Control> predictors[],
 										  DenseMatrix64F markov) {
 
 		dimen = predictors[0].getSystemSize();
 		final int N = predictors.length;
 
 		// create one model for each dynamics model provided
-		models = new EkfPredictorDiscrete[N];
+		models = new EkfPredictor[N];
 		System.arraycopy(predictors, 0, models, 0, N);
 
 		this.markov = markov;
@@ -110,7 +110,7 @@ public class InteractingMultipleModelFilter {
 	 * Before the state are propagated in the future the filter mixes
 	 * the model estimates together.
 	 */
-	public void predict(ImmState state) {
+	public void predict(ImmState state , Control control , double elapsedTime ) {
 		ImmHypothesis hypotheses[] = state.hypotheses;
 
 		// mix the states together
@@ -120,9 +120,9 @@ public class InteractingMultipleModelFilter {
 		// to be the true state
 		for (int i = 0; i < hypotheses.length; i++) {
 			ImmHypothesis h = hypotheses[i];
-			EkfPredictorDiscrete model = models[i];
+			EkfPredictor<Control> model = models[i];
 			filter.setPredictor(model);
-			filter.predict(h.getMix());
+			filter.predict(h.getMix(),control,elapsedTime);
 			h.swapMix();
 		}
 	}
@@ -229,7 +229,7 @@ public class InteractingMultipleModelFilter {
 		}
 	}
 
-	protected EkfPredictorDiscrete[] getModels() {
+	protected EkfPredictor<Control>[] getModels() {
 		return models;
 	}
 }

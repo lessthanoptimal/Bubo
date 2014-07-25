@@ -23,7 +23,17 @@ import org.ejml.data.DenseMatrix64F;
 /**
  * A state propagator for an extended Kalman filter.
  */
-public interface EkfPredictor {
+public interface EkfPredictor<Control> {
+
+	/**
+	 * Before any of the other functions are called this needs to be called first.
+	 * It tells the propagator to compute matrices for a time step
+	 *
+	 * @param state The initial system state. Not modified.
+	 * @param control Known control input.  null if there is none
+	 * @param elapsedTime Elapsed time since previous prediction.  Ignored by discrete filters
+	 */
+	public void predict(DenseMatrix64F state, Control control , double elapsedTime);
 
 	/**
 	 * Returns the jacobian of f(x) with respect to x.

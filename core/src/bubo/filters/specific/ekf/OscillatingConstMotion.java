@@ -20,7 +20,6 @@ package bubo.filters.specific.ekf;
 
 
 import bubo.filters.ekf.EkfPredictor;
-import bubo.filters.ekf.EkfPredictorTime;
 import org.ejml.data.DenseMatrix64F;
 
 import static java.lang.Math.*;
@@ -39,7 +38,7 @@ import static java.lang.Math.*;
  * [ v                 ]
  * [ cos( acos(x3) + T ]
  */
-public class OscillatingConstMotion implements EkfPredictor, EkfPredictorTime {
+public class OscillatingConstMotion implements EkfPredictor {
 
 	DenseMatrix64F x;
 	DenseMatrix64F F;
@@ -62,7 +61,7 @@ public class OscillatingConstMotion implements EkfPredictor, EkfPredictorTime {
 	}
 
 	@Override
-	public void compute(DenseMatrix64F mean, double T) {
+	public void predict(DenseMatrix64F mean, Object o, double T) {
 		double x1 = mean.get(0, 0);
 		double x2 = mean.get(1, 0);
 		double x3 = mean.get(2, 0);

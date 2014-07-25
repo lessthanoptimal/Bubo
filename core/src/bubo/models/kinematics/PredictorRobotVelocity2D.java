@@ -18,7 +18,7 @@
 
 package bubo.models.kinematics;
 
-import bubo.filters.ekf.EkfPredictorTime;
+import bubo.filters.ekf.EkfPredictor;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
@@ -29,9 +29,9 @@ import org.ejml.ops.CommonOps;
  * <p>
  * Motion Model:
  * <pre>
- * [ x' ]   [ x ]   [ -v/w*sin(&theta;) + v/w*sin(&theta; + w*&Delta;t ]
- * [ y' ] = [ y ] + [ v/w*cos(&theta;) - v/w*cos(&theta; + w*&Delta;t ]
- * [ &theta;' ]   [ &theta; ]   [ w*&Delta;t + &gamma;*&Delta;t ]
+ * [ x' ]   [ x ]   [ -v/w*sin(&theta;) + v/w*sin(&theta; + w*&Delta;t) ]
+ * [ y' ] = [ y ] + [  v/w*cos(&theta;) - v/w*cos(&theta; + w*&Delta;t) ]
+ * [ &theta;' ]   [ &theta; ]   [    w*&Delta;t + &gamma;*&Delta;t ]
  * </pre>
  * where v and w are translation and rotational velocity
  * </p>
@@ -42,7 +42,7 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class PredictorRobotVelocity2D implements EkfPredictorTime {
+public class PredictorRobotVelocity2D implements EkfPredictor<Object> {
 
 	// estimated state
 	DenseMatrix64F x_est = new DenseMatrix64F(3, 1);
@@ -97,7 +97,7 @@ public class PredictorRobotVelocity2D implements EkfPredictorTime {
 	}
 
 	@Override
-	public void compute(DenseMatrix64F state, double T) {
+	public void predict(DenseMatrix64F state, Object o, double T) {
 		double x = state.get(0);
 		double y = state.get(1);
 		double theta = state.get(2);

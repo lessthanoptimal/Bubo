@@ -65,7 +65,7 @@ public abstract class GenericKalmanFilterTests {
 
 		MultivariateGaussianDM x = createInitialState();
 
-		filter.predict(x);
+		filter.predict(x,null,-1);
 
 		// see if the mean is correct
 		for (int i = 0; i < x.getDimension(); i++) {
@@ -84,7 +84,7 @@ public abstract class GenericKalmanFilterTests {
 		double prev = NormOps.normF(x.getCovariance());
 
 		for (int i = 0; i < 5; i++) {
-			filter.predict(x);
+			filter.predict(x,null,-1);
 
 			assertTrue(!MatrixFeatures.hasUncountable(x.getMean()));
 			assertTrue(!MatrixFeatures.hasUncountable(x.getCovariance()));

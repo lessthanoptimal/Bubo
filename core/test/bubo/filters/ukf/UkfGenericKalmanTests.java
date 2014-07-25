@@ -21,11 +21,11 @@ package bubo.filters.ukf;
 import bubo.filters.GenericKalmanFilterTests;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.abst.KalmanFilterInterface;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.EkfProjector;
 import bubo.filters.kf.ConstAccel1D;
 import bubo.filters.kf.FixedKalmanProjector;
-import bubo.filters.specific.ekf.KfToEkfPredictorDiscrete;
+import bubo.filters.specific.ekf.KfToEkfPredictor;
 import bubo.filters.specific.ekf.KfToEkfProjector;
 import org.ejml.data.DenseMatrix64F;
 
@@ -38,7 +38,7 @@ public class UkfGenericKalmanTests extends GenericKalmanFilterTests {
 	protected KalmanFilterInterface createFilter() {
 		ConstAccel1D constAccelProp = new ConstAccel1D(1.0, 1);
 
-		EkfPredictorDiscrete predictor = new KfToEkfPredictorDiscrete(constAccelProp, null);
+		EkfPredictor predictor = new KfToEkfPredictor(constAccelProp, null);
 
 		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
 

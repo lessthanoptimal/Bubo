@@ -19,12 +19,12 @@
 package bubo.filters.ukf;
 
 import bubo.filters.MultivariateGaussianDM;
-import bubo.filters.ekf.EkfPredictorDiscrete;
+import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.EkfProjector;
 import bubo.filters.imm.CompareToKalmanTests;
 import bubo.filters.kf.KalmanPredictor;
 import bubo.filters.kf.KalmanProjector;
-import bubo.filters.specific.ekf.KfToEkfPredictorDiscrete;
+import bubo.filters.specific.ekf.KfToEkfPredictor;
 import bubo.filters.specific.ekf.KfToEkfProjector;
 
 /**
@@ -45,7 +45,7 @@ public class UkfCompareToKalmanTests extends CompareToKalmanTests {
 		KalmanProjector kfProj = createProjector();
 		KalmanPredictor kfPred = createPredictor();
 
-		EkfPredictorDiscrete pred = new KfToEkfPredictorDiscrete(kfPred, null);
+		EkfPredictor pred = new KfToEkfPredictor(kfPred, null);
 		EkfProjector proj = new KfToEkfProjector(kfProj);
 
 		ukf = new UnscentedKalmanFilter(kappa, true, true, pred, proj);
@@ -53,7 +53,7 @@ public class UkfCompareToKalmanTests extends CompareToKalmanTests {
 
 	@Override
 	protected void predictOther() {
-		ukf.predict(state);
+		ukf.predict(state,null,-1);
 	}
 
 	@Override
