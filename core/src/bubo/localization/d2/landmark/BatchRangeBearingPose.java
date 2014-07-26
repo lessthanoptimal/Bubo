@@ -16,30 +16,32 @@
  * limitations under the License.
  */
 
-package bubo.desc.sensors.landmark;
+package bubo.localization.d2.landmark;
+
+import bubo.desc.sensors.landmark.RangeBearingMeasurement;
+import bubo.filters.MultivariateGaussianDM;
+import bubo.maps.d2.LandmarkMap2D;
+
+import java.util.List;
 
 /**
- * Measurement from a range-bearing landmark sensor
+ * Extremely simplistic robot pose estimation from multiple range-bearing landmark observations.
  *
  * @author Peter Abeles
  */
-public class RangeBearingMeasurement {
-	public int id;
-	public double range;
-	public double bearing;
+public class BatchRangeBearingPose {
+	LandmarkMap2D map;
 
-	public RangeBearingMeasurement(int id, double range, double bearing) {
-		this.id = id;
-		this.range = range;
-		this.bearing = bearing;
+	List<RangeBearingMeasurement> observations;
+
+	/**
+	 * Adds an observation.  Returns true if it has enough information to provide an initial estimate
+	 */
+	public boolean addObservation( RangeBearingMeasurement obs ) {
+		return true;
 	}
 
-	public RangeBearingMeasurement() {
-	}
-
-	public void set( RangeBearingMeasurement meas ) {
-		this.id = meas.id;
-		this.range = meas.range;
-		this.bearing = meas.bearing;
+	public MultivariateGaussianDM getState() {
+		return null;
 	}
 }

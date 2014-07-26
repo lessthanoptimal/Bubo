@@ -27,8 +27,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPredictorRobotVelocity2D extends StandardPredictorTimeTests {
+public class TestPredictorRobotVelocity2D extends StandardPredictorTests {
 
+	VelocityControl2D control = new VelocityControl2D();
+	
 	public TestPredictorRobotVelocity2D() {
 		super(1e-4);
 	}
@@ -38,16 +40,16 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTimeTests {
 		PredictorRobotVelocity2D alg = new PredictorRobotVelocity2D(0.1, 0.1, 0.1, 0.1);
 
 		// check translation only
-		alg.setControl(1.5, 0);
-		checkStateJacobianAtPoint(alg, false, 0.5, 1, 2, Math.PI / 2.0);
+		control.set(1.5, 0);
+		checkStateJacobianAtPoint(alg, control, false, 0.5, 1, 2, Math.PI / 2.0);
 
 		// check rotation only
-		alg.setControl(0, 0.5);
-		checkStateJacobianAtPoint(alg, false, 0.5, 1, 2, Math.PI / 2.0);
+		control.set(0, 0.5);
+		checkStateJacobianAtPoint(alg, control, false, 0.5, 1, 2, Math.PI / 2.0);
 
 		// check both
-		alg.setControl(0.7, 0.5);
-		checkStateJacobianAtPoint(alg, false, 0.5, 1, 2, Math.PI / 2.0);
+		control.set(0.7, 0.5);
+		checkStateJacobianAtPoint(alg, control, false, 0.5, 1, 2, Math.PI / 2.0);
 	}
 
 	@Test
@@ -59,8 +61,8 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTimeTests {
 		// pure translation
 		DenseMatrix64F x = new DenseMatrix64F(3, 1, true, 1, 2, Math.PI / 2.0);
 
-		alg.setControl(1, 0);
-		alg.predict(x, null, 0.5);
+		control.set(1, 0);
+		alg.predict(x, control, 0.5);
 		DenseMatrix64F xp = alg.getPredictedState();
 
 		assertEquals(1, xp.get(0), 1e-8);
@@ -69,8 +71,8 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTimeTests {
 
 		// point turn
 		x = new DenseMatrix64F(3, 1, true, 1, 2, Math.PI / 2.0);
-		alg.setControl(0, Math.PI / 4);
-		alg.predict(x, null, 1);
+		control.set(0, Math.PI / 4);
+		alg.predict(x, control, 1);
 
 		assertEquals(1, xp.get(0), 1e-8);
 		assertEquals(2, xp.get(1), 1e-8);
@@ -78,8 +80,8 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTimeTests {
 
 		// translation and rotation
 		x = new DenseMatrix64F(3, 1, true, 1, 2, Math.PI / 2.0);
-		alg.setControl(2, Math.PI / 4);
-		alg.predict(x, null, 1);
+		control.set(2, Math.PI / 4);
+		alg.predict(x, control, 1);
 
 		// very crude test, see if it traveled about the expected distance
 		double d = UtilPoint2D_F64.distance(1, 2, xp.data[0], xp.data[1]);
@@ -90,23 +92,22 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTimeTests {
 	@Test
 	public void plantNoise_grow() {
 		PredictorRobotVelocity2D alg = new PredictorRobotVelocity2D(2, 2, 2, 2);
-		alg.setControl(0.5, 0);
-		checkCovarianceIncreaseWithTime(alg, 0.5, 1, 2, 0.4);
-		alg.setControl(0, 0.3);
-		checkCovarianceIncreaseWithTime(alg, 0.5, 1, 2, 0.4);
-		alg.setControl(0.75, 0.3);
-		checkCovarianceIncreaseWithTime(alg, 0.5, 1, 2, 0.4);
-
+		control.set(0.5, 0);
+		checkCovarianceIncreaseWithTime(alg, control, 0.5, 1, 2, 0.4);
+		control.set(0, 0.3);
+		checkCovarianceIncreaseWithTime(alg, control, 0.5, 1, 2, 0.4);
+		control.set(0.75, 0.3);
+		checkCovarianceIncreaseWithTime(alg, control,  0.5, 1, 2, 0.4);
 	}
 
 	@Test
 	public void plantNoise_valid_covariance() {
 		PredictorRobotVelocity2D alg = new PredictorRobotVelocity2D(2, 2, 2, 2);
-		alg.setControl(0.5, 0);
-		checkValidCovariance(alg, 0.5, 1, 2, 0.4);
-		alg.setControl(0, 0.5);
-		checkValidCovariance(alg, 0.5, 1, 2, 0.4);
-		alg.setControl(0.75, 0.5);
-		checkValidCovariance(alg, 0.5, 1, 2, 0.4);
+		control.set(0.5, 0);
+		checkValidCovariance(alg, control, 0.5, 1, 2, 0.4);
+		control.set(0, 0.5);
+		checkValidCovariance(alg, control, 0.5, 1, 2, 0.4);
+		control.set(0.75, 0.5);
+		checkValidCovariance(alg, control, 0.5, 1, 2, 0.4);
 	}
 }

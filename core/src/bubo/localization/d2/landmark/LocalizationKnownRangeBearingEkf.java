@@ -27,6 +27,7 @@ import bubo.maps.d2.LandmarkMap2D;
 import bubo.models.sensor.ProjectorRangeBearing2D;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se2_F64;
 import org.ejml.data.DenseMatrix64F;
 
 /**
@@ -40,13 +41,17 @@ public class LocalizationKnownRangeBearingEkf<Control> extends ExtendedKalmanFil
 	// known locations of landmarks
 	private LandmarkMap2D map;
 
-	ProjectorRangeBearing2D projector;
+	// projector for range bearing measurements
+	private ProjectorRangeBearing2D projector;
 
 	// Robot's pose estimate
 	private MultivariateGaussianDM state = new MultivariateGaussianDM(3);
 
 	// storage for landmark observation
 	private MultivariateGaussianDM measurement = new MultivariateGaussianDM(2);
+
+	// storage for initial pose
+	private Se2_F64 pose = new Se2_F64();
 
 	public LocalizationKnownRangeBearingEkf(EkfPredictor<Control> predictor, RangeBearingParam param) {
 		super(predictor, new ProjectorRangeBearing2D());
@@ -69,7 +74,7 @@ public class LocalizationKnownRangeBearingEkf<Control> extends ExtendedKalmanFil
 	 *
 	 * @param state Initial filter state
 	 */
-	public void setInitialPose(MultivariateGaussianDM state) {
+	public void setInitialState(MultivariateGaussianDM state) {
 		this.state.set(state);
 	}
 
@@ -105,6 +110,8 @@ public class LocalizationKnownRangeBearingEkf<Control> extends ExtendedKalmanFil
 		y.data[0] = obs.range - z_hat.get(0);
 		y.data[1] = UtilAngle.minus(obs.bearing, z_hat.get(1));
 
+//		System.out.println(" bearing residual "+y.data[1]);
+
 		_updateCovariance(H, x, P, R);
 	}
 
@@ -115,5 +122,12 @@ public class LocalizationKnownRangeBearingEkf<Control> extends ExtendedKalmanFil
 	 */
 	public MultivariateGaussianDM getState() {
 		return state;
+	}
+
+	public Se2_F64 getPose() {
+		pose.T.x = state.x.data[0];
+		pose.T.y = state.x.data[1];
+		pose.setYaw(state.x.data[2]);
+		return pose;
 	}
 }

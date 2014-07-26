@@ -32,12 +32,12 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class StandardPredictorTimeTests {
+public class StandardPredictorTests {
 	EkfPredictor predictor;
 	double tol;
 	double T;
 
-	public StandardPredictorTimeTests(double tolerance) {
+	public StandardPredictorTests(double tolerance) {
 		this.tol = tolerance;
 	}
 
@@ -48,13 +48,13 @@ public class StandardPredictorTimeTests {
 	 * @param predictor
 	 * @param T_init    the smaller time.  the larger time will be 50% larger
 	 */
-	public void checkCovarianceIncreaseWithTime(EkfPredictor predictor, double T_init, double... state) {
+	public void checkCovarianceIncreaseWithTime(EkfPredictor predictor, Object control, double T_init, double... state) {
 		DenseMatrix64F x = new DenseMatrix64F(state.length, 1, true, state);
-		predictor.predict(x, null,T_init);
+		predictor.predict(x, control,T_init);
 
 		// Using P2 norm instead of determinant since the determinant seems to produce very small numbers
 		double Q1 = NormOps.normP2(predictor.getPlantNoise());
-		predictor.predict(x, null, T_init * 1.5);
+		predictor.predict(x, control, T_init * 1.5);
 		double Q2 = NormOps.normP2(predictor.getPlantNoise());
 
 		assertTrue(Q1 < Q2);
@@ -65,11 +65,11 @@ public class StandardPredictorTimeTests {
 	 *
 	 * @param input
 	 */
-	public void checkStateJacobianAtPoint(EkfPredictor predictor, boolean printResults, double T, double... input) {
+	public void checkStateJacobianAtPoint(EkfPredictor predictor, Object control, boolean printResults, double T, double... input) {
 		this.predictor = predictor;
 		this.T = T;
-		PredictorStateJacobian j = new PredictorStateJacobian();
-		PredictorFunction f = new PredictorFunction();
+		PredictorStateJacobian j = new PredictorStateJacobian(control);
+		PredictorFunction f = new PredictorFunction(control);
 
 		if (printResults) {
 			JacobianChecker.jacobianPrint(f, j, input, tol);
@@ -80,9 +80,9 @@ public class StandardPredictorTimeTests {
 	/**
 	 * Checks to see if the covariance matrix is valid
 	 */
-	public void checkValidCovariance(EkfPredictor predictor, double T, double... state) {
+	public void checkValidCovariance(EkfPredictor predictor, Object control , double T, double... state) {
 		DenseMatrix64F x = new DenseMatrix64F(state.length, 1, true, state);
-		predictor.predict(x, null, T);
+		predictor.predict(x, control, T);
 		DenseMatrix64F Q = predictor.getPlantNoise();
 
 		// has all valid numbers
@@ -95,6 +95,12 @@ public class StandardPredictorTimeTests {
 
 	private class PredictorFunction implements FunctionNtoM {
 
+		Object control;
+
+		private PredictorFunction(Object control) {
+			this.control = control;
+		}
+
 		@Override
 		public int getNumOfInputsN() {
 			return predictor.getSystemSize();
@@ -109,7 +115,7 @@ public class StandardPredictorTimeTests {
 		public void process(double[] input, double[] output) {
 			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
 
-			predictor.predict(X, null, T);
+			predictor.predict(X, control, T);
 
 			double[] found = predictor.getPredictedState().data;
 
@@ -120,6 +126,12 @@ public class StandardPredictorTimeTests {
 
 	private class PredictorStateJacobian implements FunctionNtoMxN {
 
+		Object control;
+
+		private PredictorStateJacobian(Object control) {
+			this.control = control;
+		}
+
 		@Override
 		public int getNumOfInputsN() {
 			return predictor.getSystemSize();
@@ -134,7 +146,7 @@ public class StandardPredictorTimeTests {
 		public void process(double[] input, double[] output) {
 			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
 
-			predictor.predict(X, null, T);
+			predictor.predict(X, control, T);
 
 			double[] found = predictor.getJacobianF().data;
 

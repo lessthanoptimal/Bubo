@@ -42,7 +42,7 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class PredictorRobotVelocity2D implements EkfPredictor<Object> {
+public class PredictorRobotVelocity2D implements EkfPredictor<VelocityControl2D> {
 
 	// estimated state
 	DenseMatrix64F x_est = new DenseMatrix64F(3, 1);
@@ -58,10 +58,6 @@ public class PredictorRobotVelocity2D implements EkfPredictor<Object> {
 	// holds intermediate results
 	DenseMatrix64F tempVM = new DenseMatrix64F(3, 2);
 
-	// control input: Translational Velocity
-	double vel;
-	// control input: Angular Velocity
-	double velAngle;
 	// robot parameters
 	double a1, a2, a3, a4;
 
@@ -80,30 +76,22 @@ public class PredictorRobotVelocity2D implements EkfPredictor<Object> {
 		this.a4 = a4;
 	}
 
-	/**
-	 * Specify velocity controls.
-	 *
-	 * @param translationalVel translational velocity
-	 * @param angularVel       angular velocity
-	 */
-	public void setControl(double translationalVel, double angularVel) {
-		this.vel = translationalVel;
-		this.velAngle = angularVel;
-	}
-
 	@Override
 	public int getSystemSize() {
 		return 3;
 	}
 
 	@Override
-	public void predict(DenseMatrix64F state, Object o, double T) {
+	public void predict(DenseMatrix64F state, VelocityControl2D o, double T) {
 		double x = state.get(0);
 		double y = state.get(1);
 		double theta = state.get(2);
 
 		double s = Math.sin(theta);
 		double c = Math.cos(theta);
+
+		double velAngle = o.angularVel;
+		double vel = o.translationalVel;
 
 		if (velAngle == 0.0) {
 			// handle pathological case where there is no curvature

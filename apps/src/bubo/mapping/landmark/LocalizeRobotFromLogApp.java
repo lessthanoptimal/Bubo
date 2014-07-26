@@ -16,30 +16,18 @@
  * limitations under the License.
  */
 
-package bubo.desc.sensors.landmark;
+package bubo.mapping.landmark;
 
 /**
- * Measurement from a range-bearing landmark sensor
- *
  * @author Peter Abeles
  */
-public class RangeBearingMeasurement {
-	public int id;
-	public double range;
-	public double bearing;
+public class LocalizeRobotFromLogApp {
 
-	public RangeBearingMeasurement(int id, double range, double bearing) {
-		this.id = id;
-		this.range = range;
-		this.bearing = bearing;
-	}
+	public void process() {
+		// load map and observations
 
-	public RangeBearingMeasurement() {
-	}
+		// TODO create initialization algorithm
 
-	public void set( RangeBearingMeasurement meas ) {
-		this.id = meas.id;
-		this.range = meas.range;
-		this.bearing = meas.bearing;
+		// draw covariance ellipse
 	}
 }
