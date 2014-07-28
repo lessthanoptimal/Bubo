@@ -59,6 +59,7 @@ public class PerfectScanMotionValidation extends ScanMotionValidation {
 		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
 
 		PerfectScanMotionValidation app = new PerfectScanMotionValidation(alg);
+//		app.activateVisualization();
 		app.evaluateDataSets();
 	}
 }

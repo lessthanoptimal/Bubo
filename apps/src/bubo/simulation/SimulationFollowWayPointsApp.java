@@ -43,6 +43,8 @@ import java.util.List;
 // TODO Follow robot mode?
 public class SimulationFollowWayPointsApp {
 
+	boolean skipPause = false;
+
 	Simulation2D sim;
 	Simulation2DPanel gui;
 	FollowPathCheatingRobot planner;
@@ -106,7 +108,7 @@ public class SimulationFollowWayPointsApp {
 	public void process() {
 		sim.initialize();
 
-		long sleepTime = 0;//Math.max(1,(int)(sim.getPeriodSimulation()*1000));
+		long sleepTime = Math.max(1,(int)(sim.getPeriodSimulation()*1000));
 		while( !planner.isDone() ) {
 			sim.doStep();
 			gui.updateRobot(sim.getRobot());
@@ -116,9 +118,12 @@ public class SimulationFollowWayPointsApp {
 				gui.updateRangeBearing(sim.getSensorLandmarks().getMeasurements());
 			gui.repaint();
 
-			try {
-				Thread.sleep(sleepTime);
-			} catch (InterruptedException ignore) {}
+			if( !skipPause ) {
+				try {
+					Thread.sleep(sleepTime);
+				} catch (InterruptedException ignore) {
+				}
+			}
 		}
 		System.out.println("Done!");
 	}

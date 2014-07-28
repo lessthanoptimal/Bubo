@@ -51,4 +51,8 @@ public class Lrf2dMeasurement {
 	public void setMeasurements( Lrf2dMeasurement src ) {
 		System.arraycopy(src.meas,0,meas,0,numMeas);
 	}
+
+	public void setMeasurements( double []meas ) {
+		System.arraycopy(meas,0,this.meas,0,numMeas);
+	}
 }

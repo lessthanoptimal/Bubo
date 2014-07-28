@@ -74,6 +74,7 @@ public class RandomScanScanMotionValidation extends BaseNoiseScanMotionValidatio
 		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
 
 		RandomScanScanMotionValidation app = new RandomScanScanMotionValidation(alg);
+//		app.activateVisualization();
 		app.evaluate();
 	}
 }

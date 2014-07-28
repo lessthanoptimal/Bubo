@@ -18,8 +18,10 @@
 
 package bubo.validation.clouds.motion;
 
+import boofcv.gui.image.ShowImages;
 import bubo.clouds.motion.Lrf2dMotionRollingKeyFrame;
 import bubo.desc.sensors.lrf2d.Lrf2dParam;
+import bubo.gui.Simulation2DPanel;
 import bubo.io.serialization.SerializationDefinitionManager;
 import bubo.io.text.ReadCsvObjectSmart;
 import bubo.validation.ValidationBase;
@@ -27,6 +29,8 @@ import com.thoughtworks.xstream.XStream;
 import georegression.struct.se.Se2_F64;
 import org.ddogleg.struct.GrowQueue_F64;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -67,11 +71,18 @@ public abstract class ScanMotionValidation extends ValidationBase {
 	// it will process every X sensor readings
 	protected int skipSensor = 1;
 
+	protected boolean showGui = false;
+	protected Simulation2DPanel gui;
+
 	public ScanMotionValidation(Lrf2dMotionRollingKeyFrame estimator) {
 		this.estimator = estimator;
 	}
 
 	protected ScanMotionValidation() {
+	}
+
+	public void activateVisualization() {
+		showGui = true;
 	}
 
 	protected void addDataSet( String fileObservations , String fileLidarParam ) {
@@ -104,6 +115,22 @@ public abstract class ScanMotionValidation extends ValidationBase {
 		initialize(dataSet);
 		estimator.reset();
 
+		JFrame window = null;
+		if( showGui ) {
+			gui = new Simulation2DPanel();
+			gui.setPreferredSize(new Dimension(640,640));
+			gui.configureLrf(param);
+			gui.setTotalGhosts(2);
+			// ground truth
+			gui.getGhosts().get(0).color = Color.RED;
+			gui.getGhosts().get(0).radius = 0.1;
+			// odometry
+			gui.getGhosts().get(1).color = Color.DARK_GRAY;
+			gui.getGhosts().get(1).radius = 0.1;
+
+			window = ShowImages.showWindow(gui,"Visualization");
+		}
+
 		boolean failed = false;
 
 		RobotLrfObservations data = new RobotLrfObservations(param.getNumberOfScans());
@@ -131,6 +158,15 @@ public abstract class ScanMotionValidation extends ValidationBase {
 					break;
 				}
 
+				if( showGui ) {
+					gui.updateLidar(noisyObservations);
+					gui.updateRobot(estimator.getSensorToWorld());
+					gui.updateGhost(0,truthSensorToWorld);
+					gui.updateGhost(1,noisySensorToWorld);
+					gui.repaint();
+					try {Thread.sleep(5);} catch (InterruptedException ignore) {}
+				}
+
 				if (nextScoreTime <= time) {
 					while (nextScoreTime <= time) {
 						nextScoreTime += scorePeriod;
@@ -151,6 +187,11 @@ public abstract class ScanMotionValidation extends ValidationBase {
 				}
 			}
 			count++;
+		}
+
+		if( showGui ) {
+			window.dispose();
+			gui = null;
 		}
 
 		Arrays.sort(errorLocation.data,0,errorLocation.size);

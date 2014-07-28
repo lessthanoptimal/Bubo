@@ -30,6 +30,8 @@ import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Abeles
@@ -37,6 +39,7 @@ import java.awt.*;
 public class Simulation2DPanel extends MapDisplay {
 
 	final CircularRobot2D robot = new CircularRobot2D();
+	final List<Ghost> ghosts = new ArrayList<Ghost>();
 
 	// LRF stuff
 	Lrf2dMeasurement measurementLrf;
@@ -53,10 +56,23 @@ public class Simulation2DPanel extends MapDisplay {
 	Se2_F64 robotToCenter = new Se2_F64();
 	Se2_F64 worldToCenter = new Se2_F64();
 
+	public void setTotalGhosts( int total ) {
+		ghosts.clear();
+		for (int i = 0; i < total; i++) {
+			ghosts.add( new Ghost() );
+		}
+	}
+
 	public void configureLrf( Lrf2dParam param ) {
 		this.trig = new Lrf2dPrecomputedTrig(param);
 		this.measurementLrf = new Lrf2dMeasurement(param.getNumberOfScans());
 		this.maxRange = param.getMaxRange();
+	}
+
+	public void updateGhost( int which , Se2_F64 robotToWorld ) {
+		synchronized (ghosts){
+			ghosts.get(which).getRobotToWorld().set(robotToWorld);
+		}
 	}
 
 	public void updateRobot( CircularRobot2D robot ) {
@@ -65,7 +81,19 @@ public class Simulation2DPanel extends MapDisplay {
 		}
 	}
 
+	public void updateRobot( Se2_F64 robotToWorld ) {
+		synchronized ( this.robot ) {
+			this.robot.getRobotToWorld().set(robotToWorld);
+		}
+	}
+
 	public void updateLidar( Lrf2dMeasurement measurements ) {
+		synchronized ( this.measurementLrf) {
+			this.measurementLrf.setMeasurements(measurements);
+		}
+	}
+
+	public void updateLidar( double[] measurements ) {
 		synchronized ( this.measurementLrf) {
 			this.measurementLrf.setMeasurements(measurements);
 		}
@@ -135,6 +163,12 @@ public class Simulation2DPanel extends MapDisplay {
 		synchronized ( robot ) {
 			drawRobot(g2);
 		}
+
+		synchronized ( ghosts ) {
+			for (int i = 0; i < ghosts.size(); i++) {
+				drawGhost(g2,ghosts.get(i));
+			}
+		}
 	}
 
 	private void updateTransforms() {
@@ -162,4 +196,35 @@ public class Simulation2DPanel extends MapDisplay {
 		drawLine(g2, robotX, robotY, dirX, dirY);
 	}
 
+	private void drawGhost(Graphics2D g2, Ghost ghost ) {
+		g2.setColor(ghost.color);
+
+		ghost.getRobotToWorld().concat(worldToCenter, robotToCenter);
+
+		int robotX = (int)Math.round(robotToCenter.T.x*metersToPixels);
+		int robotY = (int)Math.round(robotToCenter.T.y*metersToPixels);
+		int pradius = (int)Math.round(ghost.getRadius()*metersToPixels);
+		int pwidth = (int)Math.round(2*ghost.getRadius()*metersToPixels);
+
+		// create a line indicating where the robot is facing
+		Point2D_F64 x = new Point2D_F64(ghost.getRadius(),0);
+		SePointOps_F64.transform(robotToCenter, x, x);
+
+		int dirX = (int)Math.round(x.x*metersToPixels);
+		int dirY = (int)Math.round(x.y*metersToPixels);
+
+		drawOval(g2, robotX - pradius, robotY - pradius, pwidth, pwidth);
+		drawLine(g2, robotX, robotY, dirX, dirY);
+	}
+
+	/**
+	 * Returns all the ghosts.  It's unsafe to use this function after the GUI has started
+	 */
+	public List<Ghost> getGhosts() {
+		return ghosts;
+	}
+
+	public static class Ghost extends CircularRobot2D {
+		public Color color;
+	}
 }

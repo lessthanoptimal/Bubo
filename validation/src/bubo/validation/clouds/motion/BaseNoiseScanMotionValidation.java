@@ -18,9 +18,10 @@
 
 package bubo.validation.clouds.motion;
 
+import georegression.metric.UtilAngle;
 import georegression.struct.se.Se2_F64;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 
 /**
  * Base class for adding noise to robot motion and LRF
@@ -32,7 +33,7 @@ public abstract class BaseNoiseScanMotionValidation extends ScanMotionValidation
 	// base error at a scale of one
 	protected double baseOdomTravel = 0.02;
 	protected double baseOdomTravelAngle = 0.002;
-	protected double baseOdomAngle = 0.02;
+	protected double baseOdomAngle = 0.05;
 
 	protected double baseLrfRange = 0.01;
 
@@ -47,22 +48,9 @@ public abstract class BaseNoiseScanMotionValidation extends ScanMotionValidation
 	double lrfRangeSigma;
 
 	// book keeping for odometry error
-	Se2_F64 previousTruthInvert = new Se2_F64();
-	Se2_F64 previousOdometry = new Se2_F64();
+	Se2_F64 prevTruth = new Se2_F64();
 	Se2_F64 odometry = new Se2_F64();
-	Se2_F64 change = new Se2_F64();
 	boolean first;
-
-	@Override
-	public void evaluate() throws IOException {
-		for( int i = 0; i <= 5; i++ ) {
-			lrfRangeSigma = 0.01*Math.pow(2,i);
-			out.println("=========================================");
-			out.println("Range SIGMA = "+ lrfRangeSigma);
-			System.out.println("Range SIGMA = "+ lrfRangeSigma);
-			super.evaluateDataSets();
-		}
-	}
 
 	protected void configurePrintNoise( double scale ) {
 		odomTravelSigma = baseOdomTravel*scale;
@@ -74,6 +62,12 @@ public abstract class BaseNoiseScanMotionValidation extends ScanMotionValidation
 		printNoise();
 	}
 
+	@Override
+	protected void initialize(DataSet dataSet) throws FileNotFoundException {
+		super.initialize(dataSet);
+		first = true;
+	}
+
 	protected void printNoise() {
 		out.println("LRF range = "+ lrfRangeSigma);
 		out.println("Odometry Travel = "+ odomTravelSigma +" TravelAngle "+ odomTravelAngleSigma +" Angle "+ odomAngleSigma);
@@ -82,30 +76,34 @@ public abstract class BaseNoiseScanMotionValidation extends ScanMotionValidation
 		System.out.println("Odometry Travel = "+ odomTravelSigma +" TravelAngle "+ odomTravelAngleSigma +" Angle "+ odomAngleSigma);
 	}
 
+
 	@Override
 	protected Se2_F64 adjustOdometry(Se2_F64 sensorToWorld) {
 		if( first ) {
 			first = false;
-			previousOdometry.set(sensorToWorld);
-			sensorToWorld.invert(previousTruthInvert);
+			prevTruth.set(sensorToWorld);
+			odometry.set(sensorToWorld);
 			return sensorToWorld;
 		} else {
-			// find the true change in location
-			previousTruthInvert.concat(sensorToWorld,change);
-			sensorToWorld.invert(previousTruthInvert);
-
-			double T = change.T.norm();
-			double deltaAngle = change.getYaw();
+			// compute change in translation and orientation from previous frame
+			double Tx = sensorToWorld.T.x - prevTruth.T.x;
+			double Ty = sensorToWorld.T.y - prevTruth.T.y;
+			double T = sensorToWorld.T.distance(prevTruth.T);
+			double deltaAngle = UtilAngle.minus( sensorToWorld.getYaw() , prevTruth.getYaw() );
+			double adjustAngle = UtilAngle.minus(odometry.getYaw(),prevTruth.getYaw());
+			prevTruth.set(sensorToWorld);
 
 			// add noise to change
-			change.T.x += rand.nextGaussian()* odomTravelSigma *T;
-			change.T.y += rand.nextGaussian()* odomTravelSigma *T;
+			double noiseAngle = rand.nextGaussian() * (odomTravelAngleSigma * T + odomAngleSigma * deltaAngle);
 
-			double noiseYaw = rand.nextGaussian()*(odomTravelAngleSigma *T + odomAngleSigma *deltaAngle);
-			change.setYaw( change.getYaw() + noiseYaw );
+//			System.out.println("adjustAngle "+adjustAngle);
 
-			previousOdometry.concat(change,odometry);
-			previousOdometry.set(odometry);
+			double c = Math.cos(adjustAngle);
+			double s = Math.sin(adjustAngle);
+
+			odometry.T.x += Tx*c - Ty*s + rand.nextGaussian()* odomTravelSigma*T;
+			odometry.T.y += Tx*s + Ty*c + rand.nextGaussian()* odomTravelSigma*T;
+			odometry.setYaw( odometry.getYaw() + deltaAngle + noiseAngle );
 
 			return odometry;
 		}

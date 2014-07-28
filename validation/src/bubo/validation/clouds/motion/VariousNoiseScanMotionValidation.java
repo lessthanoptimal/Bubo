@@ -56,7 +56,7 @@ public class VariousNoiseScanMotionValidation extends BaseNoiseScanMotionValidat
 		// Odometry Noise
 		baseOdomTravel = 0.02;
 		baseOdomTravelAngle = 0.002;
-		baseOdomAngle = 0.02;
+		baseOdomAngle = 0.05;
 		baseLrfRange = 0;
 		for( int i = 0; i <= 5; i++ ) {
 			out.println("=========================================");
@@ -70,6 +70,7 @@ public class VariousNoiseScanMotionValidation extends BaseNoiseScanMotionValidat
 		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
 
 		VariousNoiseScanMotionValidation app = new VariousNoiseScanMotionValidation(alg);
+//		app.activateVisualization();
 		app.evaluate();
 	}
 }
