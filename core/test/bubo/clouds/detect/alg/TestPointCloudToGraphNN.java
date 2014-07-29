@@ -16,29 +16,18 @@
  * limitations under the License.
  */
 
-package bubo.clouds.detect.wrapper;
+package bubo.clouds.detect.alg;
 
-import bubo.clouds.FactoryPointCloudShape;
-import bubo.clouds.detect.PointCloudShapeFinder;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestRansac_to_PointCloudShapeFinder extends GeneralChecksPointCloudShapeFinder {
-	public TestRansac_to_PointCloudShapeFinder() {
-		super(10, 1e-6);
+public class TestPointCloudToGraphNN {
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
-
-	@Override
-	public PointCloudShapeFinder createAlgorithm() {
-
-		ConfigMultiShapeRansac configRansac = ConfigMultiShapeRansac.createDefault(100, 0.6, 0.1);
-
-		configRansac.minimumPoints = 20;
-
-		ConfigSurfaceNormals configSurface = new ConfigSurfaceNormals(6, 3);
-
-		return FactoryPointCloudShape.ransacSingle(configSurface, configRansac);
-	}
-
 }

@@ -60,8 +60,7 @@ public class FactoryPointCloudShape {
 
 		PointCloudShapeDetectionSchnabel2007 alg = new PointCloudShapeDetectionSchnabel2007(configRansac);
 
-		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
-				configNormal.numPlane, configNormal.maxDistancePlane, configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
+		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
 
 //		PostProcessShapes postProcess = new MergeShapesPointVectorNN(
 //				configMerge.commonMembershipFraction,configMerge.commonMembershipFraction);
@@ -99,7 +98,7 @@ public class FactoryPointCloudShape {
 		configNormal.checkConfig();
 
 		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
-				configNormal.numPlane, configNormal.maxDistancePlane, configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
+				configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
 
 		RansacMulti<PointVectorNN> ransac = new RansacMulti<PointVectorNN>(
 				configRansac.randSeed, configRansac.maxIterations, configRansac.models, PointVectorNN.class);
@@ -107,5 +106,28 @@ public class FactoryPointCloudShape {
 		return new Ransac_to_PointCloudShapeFinder(surface, ransac,
 				configRansac.modelManagers, configRansac.fitters, configRansac.minimumPoints,
 				configRansac.types);
+	}
+
+	/**
+	 * Uses RANSAC to robustly find a single shape in the point cloud when given a set of shape types.
+	 *
+	 * @param configNormal Configuration for computing the shape's normal
+	 * @param configRansac Configuration for RANSAC
+	 * @return PointCloudShapeFinder
+	 */
+	public static PointCloudShapeFinder ransacSingleAll(ConfigSurfaceNormals configNormal,
+														ConfigMultiShapeRansac configRansac) {
+
+		configNormal.checkConfig();
+
+		ApproximateSurfaceNormals surface = new ApproximateSurfaceNormals(
+				configNormal.numNeighbors, configNormal.maxDistanceNeighbor);
+
+		RansacMulti<PointVectorNN> ransac = new RansacMulti<PointVectorNN>(
+				configRansac.randSeed, configRansac.maxIterations, configRansac.models, PointVectorNN.class);
+
+		return new FindAllOfShapeInCloud(surface, ransac,
+				configRansac.modelManagers, configRansac.fitters, configRansac.minimumPoints,
+				configRansac.maximumNumberOfShapes,configRansac.types);
 	}
 }

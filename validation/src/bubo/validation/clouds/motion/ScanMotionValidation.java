@@ -31,9 +31,9 @@ import org.ddogleg.struct.GrowQueue_F64;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -224,7 +224,7 @@ public abstract class ScanMotionValidation extends ValidationBase {
 	protected abstract double[] adjustObservations( double ranges[] );
 
 	protected void initialize(DataSet dataSet) throws FileNotFoundException {
-		param = (Lrf2dParam)new XStream().fromXML(new File(dataSet.fileLidarParam));
+		param = (Lrf2dParam)new XStream().fromXML(new FileReader(dataSet.fileLidarParam));
 
 		SerializationDefinitionManager def = new SerializationDefinitionManager();
 		def.loadDefinition(RobotLrfObservations.class, "timeStamp", "scanToWorld", "range");

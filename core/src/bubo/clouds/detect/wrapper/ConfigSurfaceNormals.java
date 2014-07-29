@@ -25,15 +25,6 @@ package bubo.clouds.detect.wrapper;
  */
 public class ConfigSurfaceNormals {
 	/**
-	 * Number of closest neighbors it will use to estimate the plane
-	 */
-	public int numPlane;
-
-	/**
-	 * The maximum distance a point can be when computing the plane.
-	 */
-	public double maxDistancePlane = Double.MAX_VALUE;
-	/**
 	 * Number of neighbors it will use to approximate normal.  Can be useful to set to a higher number if
 	 * nearest-neighbor graph is used by other algorithms
 	 */
@@ -44,19 +35,12 @@ public class ConfigSurfaceNormals {
 	 */
 	public double maxDistanceNeighbor = Double.MAX_VALUE;
 
-	public ConfigSurfaceNormals(int numPlane, int numNeighbors, double maxDistanceNeighbor) {
-		this.numPlane = numPlane;
+	public ConfigSurfaceNormals(int numNeighbors, double maxDistanceNeighbor) {
 		this.numNeighbors = numNeighbors;
 		this.maxDistanceNeighbor = maxDistanceNeighbor;
 	}
 
 	public void checkConfig() {
-		if (numPlane <= 3)
-			throw new IllegalArgumentException("A minimum of three points must be uesd to fit a plane");
-		if (numNeighbors < numPlane)
-			throw new IllegalArgumentException("The number of neighbors must be >= the number used by the plane");
-		if (maxDistancePlane <= maxDistanceNeighbor)
-			throw new IllegalArgumentException("maxDistancePlane must be less than or equal to maxDistanceNeighbor");
 	}
 }
 

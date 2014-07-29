@@ -56,6 +56,11 @@ public class ConfigMultiShapeRansac {
 	public int minimumPoints = 0;
 
 	/**
+	 * The maximum number of shapes it will find
+	 */
+	public int maximumNumberOfShapes = Integer.MAX_VALUE;
+
+	/**
 	 * Description of the shapes RANSAC will search for.
 	 */
 	public List<RansacMulti.ObjectType> models;

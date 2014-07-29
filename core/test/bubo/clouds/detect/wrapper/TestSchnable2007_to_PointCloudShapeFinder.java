@@ -38,7 +38,7 @@ public class TestSchnable2007_to_PointCloudShapeFinder extends GeneralChecksPoin
 		configRansac.minModelAccept = 50;
 		configRansac.octreeSplit = 60;
 
-		ConfigSurfaceNormals configSurface = new ConfigSurfaceNormals(6, 20, 3);
+		ConfigSurfaceNormals configSurface = new ConfigSurfaceNormals(20, 3);
 		ConfigRemoveFalseShapes configMerge = new ConfigRemoveFalseShapes(0.7);
 
 		return FactoryPointCloudShape.ransacOctree(configSurface, configRansac, configMerge);

@@ -22,13 +22,10 @@ import georegression.fitting.plane.FitPlane3D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
-import org.ddogleg.nn.NnData;
-import org.ddogleg.sorting.QuickSelectArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Given a point cloud, estimate the tangent to the surface at each point and record the nearest neighbors.
@@ -50,29 +47,8 @@ import java.util.Stack;
  */
 public class ApproximateSurfaceNormals {
 
-	// number of nearest-neighbors it will use to compute the plane
-	private int numPlane;
-	// number of nearest-neighbors it will search for
-	private int numNeighbors;
-	// the maximum distance a neighbor can be when computing the surface normal
-	private double maxDistancePlane;
-	// the maximum distance a neighbor can be
-	private double maxDistanceNeighbor;
 	// The algorithm used to search for nearest neighbors
-	private NearestNeighbor<PointVectorNN> nn;
-
-	// stores and recycles Point3D converted to double[] for use in NN
-	private Stack<double[]> unusedNnData = new Stack<double[]>();
-	private Stack<double[]> usedNnData = new Stack<double[]>();
-
-	// point normal data which is stored in the graph
-	private FastQueue<PointVectorNN> listPointVector = new FastQueue<PointVectorNN>(PointVectorNN.class, true);
-
-	// results of NN search
-	private FastQueue<NnData<PointVectorNN>> resultsNN = new FastQueue<NnData<PointVectorNN>>((Class) NnData.class, true);
-
-	// storage for distances the neighbors are.  Used to select the closest ones
-	private double[] distance;
+	private PointCloudToGraphNN createGraph;
 
 	// the local plane computed using neighbors
 	private FitPlane3D_F64 fitPlane = new FitPlane3D_F64();
@@ -86,46 +62,22 @@ public class ApproximateSurfaceNormals {
 	 * Configures approximation algorithm
 	 *
 	 * @param nn                  Which nearest-neighbor algorithm to use
-	 * @param numPlane            Number of closest neighbors it will use to estimate the plane
-	 * @param maxDistancePlane    The maximum distance a point can be from the focus to be included in the plane calculation
 	 * @param numNeighbors        Number of neighbors it will find.  Can be useful if another algorithm wants more neighbors than this one will need.
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
 	public ApproximateSurfaceNormals(NearestNeighbor<PointVectorNN> nn,
-									 int numPlane, double maxDistancePlane,
 									 int numNeighbors, double maxDistanceNeighbor) {
-		if (numPlane <= 2)
-			throw new IllegalArgumentException("Can't compute the plane from less than 2 points");
-		if (numNeighbors < numPlane)
-			throw new IllegalArgumentException("The number of neighbors found must be at least the number used to" +
-					"compute the plane");
-		if (maxDistanceNeighbor < maxDistancePlane)
-			throw new IllegalArgumentException("Maximum distance for the plane needs to be less than maxDistanceNeighbor");
-
-		this.numPlane = numPlane;
-		this.maxDistancePlane = maxDistancePlane;
-		this.numNeighbors = numNeighbors;
-		this.maxDistanceNeighbor = maxDistanceNeighbor;
-		this.nn = nn;
-		this.distance = new double[numNeighbors + 1];
+		this.createGraph = new PointCloudToGraphNN(nn,numNeighbors,maxDistanceNeighbor);
 	}
 
 	/**
 	 * Configures approximation algorithm and uses a K-D tree by default.
 	 *
-	 * @param numPlane            Number of closest neighbors it will use to estimate the plane
-	 * @param maxDistancePlane    The maximum distance a point can be from the focus to be included in the plane calculation
 	 * @param numNeighbors        Number of neighbors it will use to approximate normal
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
-	public ApproximateSurfaceNormals(int numPlane, double maxDistancePlane, int numNeighbors, double maxDistanceNeighbor) {
-		this.numPlane = numPlane;
-		this.maxDistancePlane = maxDistancePlane;
-		this.numNeighbors = numNeighbors;
-		this.maxDistanceNeighbor = maxDistanceNeighbor;
-		this.distance = new double[numNeighbors + 1];
-
-		nn = FactoryNearestNeighbor.kdtree();
+	public ApproximateSurfaceNormals(int numNeighbors, double maxDistanceNeighbor) {
+		this.createGraph = new PointCloudToGraphNN((NearestNeighbor)FactoryNearestNeighbor.kdtree(),numNeighbors,maxDistanceNeighbor);
 	}
 
 	/**
@@ -138,42 +90,13 @@ public class ApproximateSurfaceNormals {
 	public void process(List<Point3D_F64> cloud, FastQueue<PointVectorNN> output) {
 
 		// convert the point cloud into a format that the NN algorithm can recognize
-		setupNearestNeighbor(cloud);
+		createGraph.process(cloud);
 
-		// declare the output data for creating the NN graph
-		listPointVector.reset();
-		for (int i = 0; i < cloud.size(); i++) {
-			PointVectorNN p = listPointVector.grow();
-			p.reset();
-			p.p = cloud.get(i);
-			p.index = i;
-		}
+		FastQueue<PointVectorNN> listPointVector = createGraph.getListPointVector();
 
-		// find the nearest-neighbor for each point in the cloud
-		nn.setPoints(usedNnData, listPointVector.toList());
-
+		// compute surface normal for each point using their neighbors
 		for (int i = 0; i < listPointVector.size; i++) {
-			// find the nearest-neighbors
-			resultsNN.reset();
-
-			double[] targetPt = usedNnData.get(i);
-			// numNeighbors+1 since the target node will also be returned and is removed
-			nn.findNearest(targetPt, maxDistanceNeighbor, numNeighbors + 1, resultsNN);
-
 			PointVectorNN p = listPointVector.get(i);
-
-			// save the results
-			p.neighbors.reset();
-			for (int j = 0; j < resultsNN.size; j++) {
-				NnData<PointVectorNN> n = resultsNN.get(j);
-
-				// don't add the point to its own list of neighbors list
-				if (n.point != targetPt) {
-					p.neighbors.add(n.data);
-				}
-			}
-
-			// try to compute the normal and add it to the output list if one could be fond
 			computeSurfaceNormal(p);
 			output.add(p);
 		}
@@ -187,63 +110,15 @@ public class ApproximateSurfaceNormals {
 		if (point.neighbors.size >= 2) {
 			fitList.clear();
 
-			// the NN algorithm's neighbor list includes the targeted point
-			if (resultsNN.size <= numPlane) {
-				for (int i = 0; i < resultsNN.size; i++) {
-					NnData<PointVectorNN> n = resultsNN.get(i);
-					if (n.distance < maxDistanceNeighbor) {
-						fitList.add(n.data.p);
-					}
-				}
-			} else {
-				for (int i = 0; i < resultsNN.size; i++) {
-					NnData<PointVectorNN> n = resultsNN.get(i);
-					distance[i] = n.distance;
-				}
-				double threshold = QuickSelectArray.select(distance, numPlane - 1, resultsNN.size);
-				threshold = Math.min(threshold, maxDistanceNeighbor);
-				for (int i = 0; i < resultsNN.size; i++) {
-					NnData<PointVectorNN> n = resultsNN.get(i);
-					if (n.distance <= threshold)
-						fitList.add(n.data.p);
-				}
+			fitList.add(point.p);
+			for (int i = 0; i < point.neighbors.size; i++) {
+				PointVectorNN n = point.neighbors.get(i);
+				fitList.add(n.p);
 			}
+
 			fitPlane.svd(fitList, center, point.normal);
 		} else {
 			point.normal.set(0, 0, 0);
-		}
-	}
-
-	/**
-	 * Converts points into a format understood by the NN algorithm and initializes it
-	 */
-	private void setupNearestNeighbor(List<Point3D_F64> cloud) {
-		nn.init(3);
-
-		// swap the two lists to recycle old data and avoid creating new memory
-		Stack<double[]> tmp = unusedNnData;
-		unusedNnData = usedNnData;
-		usedNnData = tmp;
-		// add the smaller list to the larger one
-		unusedNnData.addAll(usedNnData);
-		usedNnData.clear();
-
-		// convert the point cloud into the NN format
-		for (int i = 0; i < cloud.size(); i++) {
-			Point3D_F64 p = cloud.get(i);
-
-			double[] d;
-			if (unusedNnData.isEmpty()) {
-				d = new double[3];
-			} else {
-				d = unusedNnData.pop();
-			}
-
-			d[0] = p.x;
-			d[1] = p.y;
-			d[2] = p.z;
-
-			usedNnData.add(d);
 		}
 	}
 }
