@@ -23,7 +23,7 @@ import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.sorting.QuickSelectArray;
+import org.ddogleg.sorting.QuickSelect;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -200,7 +200,7 @@ public class ApproximateSurfaceNormals {
 					NnData<PointVectorNN> n = resultsNN.get(i);
 					distance[i] = n.distance;
 				}
-				double threshold = QuickSelectArray.select(distance, numPlane - 1, resultsNN.size);
+				double threshold = QuickSelect.select(distance, numPlane - 1, resultsNN.size);
 				threshold = Math.min(threshold, maxDistanceNeighbor);
 				for (int i = 0; i < resultsNN.size; i++) {
 					NnData<PointVectorNN> n = resultsNN.get(i);
