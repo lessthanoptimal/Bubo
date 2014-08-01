@@ -22,13 +22,10 @@ import georegression.fitting.plane.FitPlane3D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
-import org.ddogleg.nn.NnData;
-import org.ddogleg.sorting.QuickSelectArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Given a point cloud, estimate the tangent to the surface at each point and record the nearest neighbors.
