@@ -59,6 +59,16 @@ public abstract class PointCloudPanel extends JPanel {
 
 	public abstract void addVectors( List<Point3D_F64> location , List<Vector3D_F64> direction , int argb );
 
+	public abstract void addSphere( double x , double y , double z, double radius , int argb );
+
+	/**
+	 * Renders arrows pointing along the local x,y,z axis in the global frame
+	 * @param localToWorld transform from local to global reference frames
+	 * @param armLength Length of the arrows
+	 * @param armRadius Radius/thickness of the arrows
+	 */
+	public abstract void addAxis( Se3_F64 localToWorld , double armLength , double armRadius );
+
 	public abstract void shutdownVisualize();
 
 }

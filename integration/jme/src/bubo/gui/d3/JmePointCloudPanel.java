@@ -30,6 +30,8 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Box;
+import com.jme3.scene.shape.Cylinder;
+import com.jme3.scene.shape.Sphere;
 import com.jme3.util.BufferUtils;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.geometry.UtilPolygons2D_F64;
@@ -40,6 +42,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Quaternion_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -362,6 +365,99 @@ public class JmePointCloudPanel extends PointCloudPanel {
 		}
 	}
 
+	@Override
+	public void addSphere( final double x , final double y , final double z, final double radius, final int argb) {
+		bridge.enqueue(new Callable<Void>(){
+			public Void call(){
+				float alpha = ((argb >> 24) & 0xFF ) / 255.0f;
+				float red = ((argb >> 16) & 0xFF ) / 255.0f;
+				float green = ((argb >> 8) & 0xFF ) / 255.0f;
+				float blue = (argb & 0xFF ) / 255.0f;
+
+				Material mat = new Material(bridge.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+				mat.setColor("Color", new ColorRGBA(red,green,blue,alpha) );
+				mat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
+
+				Sphere m = new Sphere(32,32, (float)radius );
+				m.updateBound();
+
+				Geometry g = new Geometry("Sphere",m);
+				g.setShadowMode(RenderQueue.ShadowMode.Off);
+				g.setQueueBucket(RenderQueue.Bucket.Opaque);
+				g.setMaterial(mat);
+				g.setLocalTransform(new Transform(new Vector3f((float)x,(float)y,(float)z)));
+
+				if( alpha < 1.0f ) {
+					mat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+					g.setQueueBucket(RenderQueue.Bucket.Translucent);
+				}
+
+				bridge.getRootNode().attachChild(g);
+				return null;
+			}});
+	}
+
+	@Override
+	public void addAxis(Se3_F64 localToWorld, final double armLength, final double armRadius) {
+
+		Se3_F64 rodToLocal = new Se3_F64();
+		rodToLocal.T.z = armLength/2;
+
+		Se3_F64 rotX = new Se3_F64();
+		RotationMatrixGenerator.eulerXYZ(-Math.PI/2.0,0,0,rotX.R);
+
+		Se3_F64 rotY = new Se3_F64();
+		RotationMatrixGenerator.eulerXYZ(0,Math.PI/2.0,0,rotY.R);
+
+		final Transform transformZ = convert(rodToLocal.concat(localToWorld,null));
+		final Transform transformY = convert(rodToLocal.concat(rotX,null).concat(localToWorld,null));
+		final Transform transformX = convert(rodToLocal.concat(rotY,null).concat(localToWorld,null));
+
+		bridge.enqueue(new Callable<Void>(){
+			public Void call(){
+
+				Cylinder m = new Cylinder(32,32, (float)armRadius, (float)armLength , true );
+				m.updateBound();
+
+				Material matZ = new Material(bridge.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+				matZ.setColor("Color", ColorRGBA.Red);
+				matZ.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
+
+				Geometry geoZ = new Geometry("z-axis",m);
+				geoZ.setShadowMode(RenderQueue.ShadowMode.Off);
+				geoZ.setQueueBucket(RenderQueue.Bucket.Opaque);
+				geoZ.setMaterial(matZ);
+				geoZ.setLocalTransform(transformZ);
+
+				bridge.getRootNode().attachChild(geoZ);
+
+				Material matY = new Material(bridge.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+				matY.setColor("Color", ColorRGBA.Blue);
+				matY.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
+
+				Geometry geoY = new Geometry("y-axis",m);
+				geoY.setShadowMode(RenderQueue.ShadowMode.Off);
+				geoY.setQueueBucket(RenderQueue.Bucket.Opaque);
+				geoY.setMaterial(matY);
+				geoY.setLocalTransform(transformY);
+
+				bridge.getRootNode().attachChild(geoY);
+
+				Material matX = new Material(bridge.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+				matX.setColor("Color", ColorRGBA.Green);
+				matX.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
+
+				Geometry geoX = new Geometry("x-axis",m);
+				geoX.setShadowMode(RenderQueue.ShadowMode.Off);
+				geoX.setQueueBucket(RenderQueue.Bucket.Opaque);
+				geoX.setMaterial(matX);
+				geoX.setLocalTransform(transformX);
+
+				bridge.getRootNode().attachChild(geoX);
+				return null;
+			}});
+	}
+
 	public static List<Point2D_F64> ensureCCW( List<Point2D_F64> mesh ) {
 
 		if(UtilPolygons2D_F64.isCCW(mesh) ) {
@@ -402,5 +498,16 @@ public class JmePointCloudPanel extends PointCloudPanel {
 			buf[i*3+2] = (float)p.z;
 		}
 		return buf;
+	}
+
+	public static Transform convert( Se3_F64 input ) {
+		Vector3f T = new Vector3f((float)input.T.x,(float)input.T.y,(float)input.T.z);
+		Quaternion R = convert( input.getR() );
+		return new Transform(T,R);
+	}
+
+	public static Quaternion convert( DenseMatrix64F R ) {
+		Quaternion_F64 quat = RotationMatrixGenerator.matrixToQuaternion(R,null);
+		return new Quaternion((float)quat.x,(float)quat.y,(float)quat.z,(float)quat.w);
 	}
 }
