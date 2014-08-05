@@ -31,13 +31,12 @@ public abstract class ValidationBase {
 
 	protected String outputDirectory = "./";
 	protected String algorithmName = "";
+	protected String outputName;
 
 	protected PrintStream out;
 
-	public abstract void evaluate() throws IOException;
-
 	public void setOutputName( String dataName ) throws FileNotFoundException {
-		out = new PrintStream(outputDirectory+algorithmName+"_"+dataName);
+		this.outputName = dataName;
 	}
 
 	public void setAlgorithmName(String algorithmName) {
@@ -47,4 +46,20 @@ public abstract class ValidationBase {
 	public void setOutputDirectory(String outputDirectory) {
 		this.outputDirectory = outputDirectory;
 	}
+
+	public void performEvaluation() {
+		try {
+			out = new PrintStream(outputDirectory+algorithmName+"_"+outputName);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException();
+		}
+
+		try {
+			_performEvaluation();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected abstract void _performEvaluation() throws IOException;
 }

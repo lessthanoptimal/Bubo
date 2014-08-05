@@ -41,9 +41,11 @@ public class PerfectScanMotionValidation extends ScanMotionValidation {
 		}
 	}
 
-	public void evaluate() throws IOException {
+	@Override
+	protected void _performEvaluation() throws IOException {
 		evaluateDataSets();
 	}
+
 	@Override
 	protected Se2_F64 adjustOdometry(Se2_F64 sensorToWorld) {
 		return sensorToWorld;
@@ -60,6 +62,6 @@ public class PerfectScanMotionValidation extends ScanMotionValidation {
 
 		PerfectScanMotionValidation app = new PerfectScanMotionValidation(alg);
 //		app.activateVisualization();
-		app.evaluateDataSets();
+		app.performEvaluation();
 	}
 }

@@ -43,7 +43,7 @@ public class VariousNoiseScanMotionValidation extends BaseNoiseScanMotionValidat
 	}
 
 	@Override
-	public void evaluate() throws IOException {
+	public void _performEvaluation() throws IOException {
 		// Noise on LRF
 		baseOdomAngle = baseOdomTravelAngle = baseOdomTravel = 0;
 		baseLrfRange = 0.01;
@@ -71,6 +71,6 @@ public class VariousNoiseScanMotionValidation extends BaseNoiseScanMotionValidat
 
 		VariousNoiseScanMotionValidation app = new VariousNoiseScanMotionValidation(alg);
 //		app.activateVisualization();
-		app.evaluate();
+		app.performEvaluation();
 	}
 }

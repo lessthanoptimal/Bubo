@@ -45,7 +45,7 @@ public class DataRatesScanMotionValidation extends BaseNoiseScanMotionValidation
 	}
 
 	@Override
-	public void evaluate() throws IOException {
+	public void _performEvaluation() throws IOException {
 
 		for( int i = 0; i < rates.length; i++ ) {
 			skipSensor = rates[i];
@@ -63,6 +63,6 @@ public class DataRatesScanMotionValidation extends BaseNoiseScanMotionValidation
 		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
 
 		DataRatesScanMotionValidation app = new DataRatesScanMotionValidation(alg);
-		app.evaluate();
+		app.performEvaluation();
 	}
 }

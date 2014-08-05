@@ -1,0 +1,72 @@
+=========================================
+Sensor skip = 1
+LRF range = 0.01
+Odometry Travel = 0.02 TravelAngle 0.0020 Angle 0.05
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.014263252671655515
+error location95 = 0.11397323536433895
+error angle50    = 0.0019171273942355511
+error angle95    = 0.006044028698024118
+=========================================
+Sensor skip = 2
+LRF range = 0.01
+Odometry Travel = 0.02 TravelAngle 0.0020 Angle 0.05
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9799999999999999
+motion travel95 = 1.0500000000000007
+motion rotate50 = 0.0
+motion rotate95 = 0.392
+error location50 = 0.01417683464135915
+error location95 = 0.09126265935293469
+error angle50    = 0.0029640973284275063
+error angle95    = 0.009558885222435332
+=========================================
+Sensor skip = 5
+LRF range = 0.01
+Odometry Travel = 0.02 TravelAngle 0.0020 Angle 0.05
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 1.049999606918974
+motion travel95 = 1.0500006068783971
+motion rotate50 = 0.0
+motion rotate95 = 0.41999999999999993
+error location50 = 0.014582174417186507
+error location95 = 0.07448025563959913
+error angle50    = 0.002148372336863381
+error angle95    = 0.007439784137226459
+=========================================
+Sensor skip = 10
+LRF range = 0.01
+Odometry Travel = 0.02 TravelAngle 0.0020 Angle 0.05
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 1.0490000000000002
+motion travel95 = 1.2000005788502766
+motion rotate50 = 0.0
+motion rotate95 = 0.41999999999999993
+error location50 = 0.009700944195989505
+error location95 = 0.03629004970121543
+error angle50    = 0.0018335552155124275
+error angle95    = 0.007585201993570934

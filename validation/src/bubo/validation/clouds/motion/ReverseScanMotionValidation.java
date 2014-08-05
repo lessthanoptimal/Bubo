@@ -51,7 +51,7 @@ public class ReverseScanMotionValidation extends ScanMotionValidation {
 	}
 
 	@Override
-	public void evaluate() throws IOException {
+	public void _performEvaluation() throws IOException {
 		evaluateDataSets();
 	}
 
@@ -106,6 +106,6 @@ public class ReverseScanMotionValidation extends ScanMotionValidation {
 		Lrf2dMotionRollingKeyFrame alg = FactoryEvaluateScanMotion.createIcpLocal();
 
 		ReverseScanMotionValidation app = new ReverseScanMotionValidation(alg);
-		app.evaluateDataSets();
+		app.performEvaluation();
 	}
 }

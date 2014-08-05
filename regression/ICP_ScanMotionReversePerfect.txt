@@ -1,0 +1,28 @@
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403898
+motion travel95 = 1.0200000000000002
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.008914167386917325
+error location95 = 0.02550018971948013
+error angle50    = 0.001860665763390168
+error angle95    = 0.006264336362009459
+----------------------------------
+File: data/mapping2d/sim03/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 136
+motion travel50 = 0.9799998444780512
+motion travel95 = 1.0199999166245066
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.17412762078607197
+error location95 = 0.5839032021002618
+error angle50    = 0.002154691099773731
+error angle95    = 0.0861532853845059

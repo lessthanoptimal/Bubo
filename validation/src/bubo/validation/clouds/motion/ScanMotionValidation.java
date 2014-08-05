@@ -41,11 +41,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * Base class which plays back recorded LRF scan data plus ground truth.  Noise is added to the data and motion
+ * estimation performance measured.
+ *
  * @author Peter Abeles
  */
-// Provide a way to visualize a single trial
-// - truth, odometry, estimated pose
-// - measurements
 // TODO periodic bad scans with structure. look at floor or ceiling
 public abstract class ScanMotionValidation extends ValidationBase {
 	// how frequently it scores in seconds
@@ -90,6 +90,7 @@ public abstract class ScanMotionValidation extends ValidationBase {
 	}
 
 	protected void evaluateDataSets() throws IOException {
+
 		for ( DataSet s : dataSets ) {
 			System.out.println("Processing: "+s.fileObservations);
 			Results found = process(s);

@@ -1,0 +1,204 @@
+=========================================
+LRF range = 0.01
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.015373510056759252
+error location95 = 0.11768967665082468
+error angle50    = 0.001997889159405265
+error angle95    = 0.007237758154681926
+=========================================
+LRF range = 0.02
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.018542345939486442
+error location95 = 0.10960650757030625
+error angle50    = 0.0032338899108941277
+error angle95    = 0.009198808303575534
+=========================================
+LRF range = 0.04
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.0230846693175707
+error location95 = 0.11799822354020419
+error angle50    = 0.0034132400343813707
+error angle95    = 0.013213425932851578
+=========================================
+LRF range = 0.08
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.03612313531093541
+error location95 = 0.10498541817234101
+error angle50    = 0.005543618704421327
+error angle95    = 0.019010811238555643
+=========================================
+LRF range = 0.16
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.05869648355491393
+error location95 = 0.1540493500211376
+error angle50    = 0.00867162778482311
+error angle95    = 0.03373666021412841
+=========================================
+LRF range = 0.32
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.13030311122857594
+error location95 = 0.2610894904250083
+error angle50    = 0.024627436802199476
+error angle95    = 0.07364594901564558
+=========================================
+LRF range = 0.0
+Odometry Travel = 0.02 TravelAngle 0.0020 Angle 0.05
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.007568322287287535
+error location95 = 0.03449976671453446
+error angle50    = 0.0017273151446874908
+error angle95    = 0.00563686903664906
+=========================================
+LRF range = 0.0
+Odometry Travel = 0.04 TravelAngle 0.0040 Angle 0.1
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.008447445009325132
+error location95 = 0.032023830311823105
+error angle50    = 0.001745662828362971
+error angle95    = 0.006882340508957974
+=========================================
+LRF range = 0.0
+Odometry Travel = 0.08 TravelAngle 0.0080 Angle 0.2
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.009457454414979282
+error location95 = 0.033031749997149244
+error angle50    = 0.0019875179963091405
+error angle95    = 0.00689914328777419
+=========================================
+LRF range = 0.0
+Odometry Travel = 0.16 TravelAngle 0.016 Angle 0.4
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.011374994875979937
+error location95 = 0.037030435799236885
+error angle50    = 0.0020472328285499053
+error angle95    = 0.00747683095181173
+=========================================
+LRF range = 0.0
+Odometry Travel = 0.32 TravelAngle 0.032 Angle 0.8
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.013377496579708699
+error location95 = 0.05126427155803478
+error angle50    = 0.0025778678764936114
+error angle95    = 0.00793426207006576
+=========================================
+LRF range = 0.0
+Odometry Travel = 0.64 TravelAngle 0.064 Angle 1.6
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.019178659079376208
+error location95 = 0.17590871768454497
+error angle50    = 0.0027316659318648503
+error angle95    = 0.014843564605099054

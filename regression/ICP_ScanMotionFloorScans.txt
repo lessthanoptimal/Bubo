@@ -1,0 +1,108 @@
+=========================================
+floorScanProb 0.0010
+LRF range = 0.01
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.0073908301288842775
+error location95 = 0.03528299993625074
+error angle50    = 0.0017759858028008058
+error angle95    = 0.006043056623346477
+=========================================
+floorScanProb 0.0020
+LRF range = 0.01
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.0088184076071628
+error location95 = 0.12370867144363919
+error angle50    = 0.0020906275196346255
+error angle95    = 0.01158038231025138
+=========================================
+floorScanProb 0.0040
+LRF range = 0.01
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.010068119451609337
+error location95 = 0.17368567697203915
+error angle50    = 0.0017162646258090941
+error angle95    = 0.013245501704606255
+=========================================
+floorScanProb 0.0080
+LRF range = 0.01
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.012140978530072318
+error location95 = 0.7511824175031548
+error angle50    = 0.0027998702593348135
+error angle95    = 0.28840391688077904
+=========================================
+floorScanProb 0.016
+LRF range = 0.01
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.01804220843603595
+error location95 = 0.531765287142679
+error angle50    = 0.003503571172325249
+error angle95    = 0.05750892505744065
+=========================================
+floorScanProb 0.032
+LRF range = 0.01
+Odometry Travel = 0.0 TravelAngle 0.0 Angle 0.0
+----------------------------------
+File: data/mapping2d/sim02/observations.txt
+score period = 1.0
+    **** METRICS ****
+failed     = false
+total      = 92
+motion travel50 = 0.9900001678403897
+motion travel95 = 1.0199999999999998
+motion rotate50 = 0.0
+motion rotate95 = 0.4059999999999999
+error location50 = 0.159185359646655
+error location95 = 0.823814428789631
+error angle50    = 0.009631769540219715
+error angle95    = 0.16566812713432175
