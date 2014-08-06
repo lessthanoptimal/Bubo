@@ -19,6 +19,9 @@
 package bubo.io.maps;
 
 import bubo.io.text.ReadCsv;
+import bubo.io.text.ReadCsvObject;
+import bubo.log.streams.LogPoseRangeBearing;
+import bubo.log.streams.LogSe2_F64;
 import bubo.maps.d2.LandmarkMap2D;
 import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.struct.line.LineSegment2D_F64;
@@ -36,6 +39,33 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class MapIO {
+
+	public static List<LogSe2_F64> loadPath2D(String fileName ) {
+		try {
+			ReadCsvObject<LogSe2_F64> reader = new ReadCsvObject<LogSe2_F64>(new FileInputStream(fileName),
+							LogSe2_F64.class,"time","x","y","yaw");
+			reader.setComment('#');
+			return reader.readAll();
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static List<LogPoseRangeBearing> loadPoseRangeBearing(String fileName ) {
+		try {
+			ReadCsvObject<LogPoseRangeBearing> reader =
+					new ReadCsvObject<LogPoseRangeBearing>(new FileInputStream(fileName),
+							LogPoseRangeBearing.class,"time","x","y","yaw","id","range","bearing");
+			reader.setComment('#');
+			return reader.readAll();
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public static void save( LandmarkMap2D map , String fileName ) {
 		try {

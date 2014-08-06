@@ -42,6 +42,7 @@ public class FollowPathLoggingRobot extends FollowPathCheatingRobot {
 	Se2_F64 ladarToWorld = new Se2_F64();
 	PrintStream outLrf;
 	PrintStream outRB;
+	PrintStream outPose;
 
 	public FollowPathLoggingRobot(double velocity, double angularVelocity, List<Point2D_F64> wayPoints) {
 		super(velocity, angularVelocity, wayPoints);
@@ -52,6 +53,9 @@ public class FollowPathLoggingRobot extends FollowPathCheatingRobot {
 
 			outRB = new PrintStream("rangeBearing.txt");
 			outRB.println("# time-stamp x y yaw id range bearing");
+
+			outPose = new PrintStream("poseTruth.txt");
+			outPose.println("# time-stamp x y yaw");
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -84,10 +88,21 @@ public class FollowPathLoggingRobot extends FollowPathCheatingRobot {
 	}
 
 	@Override
-	public void setIntrinsic(Se2_F64 ladarToRobot, Lrf2dParam param, RangeBearingParam paramRb) {
+	public void doControl(long timeStamp) {
+		super.doControl(timeStamp);
+
+		Se2_F64 robotToWorld =  listener._truthRobotToWorld();
+		outPose.printf("%d %.10f %.10f %.10f\n",timeStamp,robotToWorld.getX(),robotToWorld.getY(),robotToWorld.getYaw());
+		outPose.flush();
+	}
+
+	@Override
+	public void setIntrinsic(Se2_F64 ladarToRobot, Lrf2dParam paramLrf, RangeBearingParam paramRb) {
 		this.ladarToRobot = ladarToRobot;
 		try {
-			new XStream().toXML(param,new FileOutputStream("lrf.xml"));
+			new XStream().toXML(ladarToRobot,new FileOutputStream("sensorToRobot.xml"));
+			new XStream().toXML(paramLrf,new FileOutputStream("sensorLRF.xml"));
+			new XStream().toXML(paramRb,new FileOutputStream("sensorRB.xml"));
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}

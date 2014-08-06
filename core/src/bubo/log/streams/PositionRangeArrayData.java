@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package bubo.mapping.ladar2d;
+package bubo.log.streams;
 
 import georegression.struct.se.Se2_F64;
 

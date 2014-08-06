@@ -43,7 +43,7 @@ import java.util.List;
 // TODO Follow robot mode?
 public class SimulationFollowWayPointsApp {
 
-	boolean skipPause = false;
+	boolean skipPause = true;
 
 	Simulation2D sim;
 	Simulation2DPanel gui;

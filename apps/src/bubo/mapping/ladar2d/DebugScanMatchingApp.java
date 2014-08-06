@@ -26,6 +26,7 @@ import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
 import bubo.gui.sensors.laser2d.ComparePoints2DPanel;
 import bubo.io.serialization.SerializationDefinitionManager;
 import bubo.io.text.ReadCsvObjectSmart;
+import bubo.log.streams.PositionRangeArrayData;
 import bubo.struct.StoppingCondition;
 import com.thoughtworks.xstream.XStream;
 import georegression.struct.point.Point2D_F64;
