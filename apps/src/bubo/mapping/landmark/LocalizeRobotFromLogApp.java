@@ -30,6 +30,7 @@ import bubo.log.streams.LogSe2_F64;
 import bubo.maps.d2.LandmarkMap2D;
 import bubo.models.kinematics.PredictorSe2;
 import com.thoughtworks.xstream.XStream;
+import georegression.fitting.ellipse.CovarianceToEllipse_F64;
 import georegression.struct.se.Se2_F64;
 import org.ejml.ops.CommonOps;
 
@@ -53,6 +54,7 @@ public class LocalizeRobotFromLogApp {
 	Simulation2DPanel gui;
 	Se2_F64 sensorToRobot;
 
+	CovarianceToEllipse_F64 covToEllipse = new CovarianceToEllipse_F64();
 
 	boolean paused = false;
 	boolean takeStep = false;
@@ -73,6 +75,7 @@ public class LocalizeRobotFromLogApp {
 		gui.getGhosts().get(1).radius = 0.3;
 		gui.getGhosts().get(1).color = Color.GRAY;
 
+		covToEllipse.setNumStdev(2.5);
 	}
 
 	public void process() {
@@ -81,28 +84,38 @@ public class LocalizeRobotFromLogApp {
 		LogSe2_F64 initial = path.get(0);
 
 		LocalizationKnownRangeBearingEkf<Se2_F64> estimator =
-				new LocalizationKnownRangeBearingEkf<Se2_F64>(new PredictorSe2(0.05,0.001,0.05),paramRb);
+				new LocalizationKnownRangeBearingEkf<Se2_F64>(new PredictorSe2(0.0,0.001,0.05),paramRb);
 
 		MultivariateGaussianDM initState = new MultivariateGaussianDM(3);
 		initState.x.data[0] = initial.getX();
 		initState.x.data[1] = initial.getY();
 		initState.x.data[2] = initial.getYaw();
-		initState.P.set(CommonOps.diag(4, 4, 0.2));
+		initState.P.set(CommonOps.diag(0.5, 0.5, 0.05));
 
 		estimator.setInitialState(initState);
 
 		Se2_F64 sensor0ToWorld = sensorToRobot.concat(initial,null);
-		Se2_F64 sensor0ToSensor1 = new Se2_F64();
+		Se2_F64 motion = new Se2_F64();
 
+		// TODO covariance isn't growing symmetrically
 		for (int i = 0; i < path.size(); i++) {
 
 			Se2_F64 robotToWorld = path.get(i);
 			Se2_F64 sensor1ToWorld = sensorToRobot.concat(robotToWorld,null);
-			sensor0ToWorld.concat(sensor1ToWorld.invert(null),sensor0ToSensor1);
+			sensor0ToWorld.invert(null).concat(sensor1ToWorld,motion);
 
-			estimator.predict(sensor0ToSensor1);
+			estimator.predict(motion);
 
-			gui.updateGhost(0,estimator.getPose());
+			// TODO add measurements, if any
+
+			// draw covariance ellipse
+			MultivariateGaussianDM stateDM = estimator.getState();
+			covToEllipse.setCovariance(stateDM.P.get(0, 0), stateDM.P.get(0, 1), stateDM.P.get(1, 1));
+			gui.updateGhostEllipse(0, covToEllipse.getMinorAxis(), covToEllipse.getMajorAxis(), covToEllipse.getAngle());
+
+			System.out.println("ellipse "+covToEllipse.getMinorAxis()+"  "+covToEllipse.getMajorAxis());
+
+			gui.updateGhost(0, estimator.getPose());
 			gui.updateGhost(1,robotToWorld);
 			gui.repaint();
 
@@ -117,10 +130,6 @@ public class LocalizeRobotFromLogApp {
 				}
 			}
 		}
-
-		// TODO create initialization algorithm
-
-		// draw covariance ellipse
 	}
 
 	private Se2_F64 convertToSensor( Se2_F64 robotToWorld ) {

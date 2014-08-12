@@ -26,6 +26,7 @@ import bubo.gui.maps.MapDisplay;
 import bubo.simulation.d2.CircularRobot2D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
+import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -72,6 +73,12 @@ public class Simulation2DPanel extends MapDisplay {
 	public void updateGhost( int which , Se2_F64 robotToWorld ) {
 		synchronized (ghosts){
 			ghosts.get(which).getRobotToWorld().set(robotToWorld);
+		}
+	}
+
+	public void updateGhostEllipse( int which , double minor , double major , double theta  ) {
+		synchronized (ghosts){
+			ghosts.get(which).ellipse.set(0,0,major,minor,theta);
 		}
 	}
 
@@ -215,6 +222,11 @@ public class Simulation2DPanel extends MapDisplay {
 
 		drawOval(g2, robotX - pradius, robotY - pradius, pwidth, pwidth);
 		drawLine(g2, robotX, robotY, dirX, dirY);
+
+		if( ghost.ellipse.a != 0 ) {
+			drawEllipseRotated(g2,robotX,robotY,ghost.ellipse.b,ghost.ellipse.a,ghost.ellipse.phi);
+		}
+
 	}
 
 	/**
@@ -226,5 +238,6 @@ public class Simulation2DPanel extends MapDisplay {
 
 	public static class Ghost extends CircularRobot2D {
 		public Color color;
+		public EllipseRotated_F64 ellipse = new EllipseRotated_F64();
 	}
 }

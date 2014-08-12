@@ -29,6 +29,8 @@ import georegression.struct.shapes.Rectangle2D_F64;
 import georegression.transform.se.SePointOps_F64;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 
 /**
  * Base class for displaying 2D maps
@@ -235,5 +237,24 @@ public class MapDisplay extends SpacialDisplay {
 		int h = getHeight()-1;
 		int y1 = y+height-1;
 		g2.drawOval(x+centerX,h-y1-centerY,width,height);
+	}
+
+	protected void drawEllipseRotated( Graphics2D g2 , int x, int y, double minor, double major , double phi ) {
+		int centerX = getWidth()/2;
+		int centerY = getHeight()/2;
+
+		int h = getHeight()-1;
+
+		AffineTransform rotate = new AffineTransform();
+		rotate.rotate(-phi);
+
+		// TODO make sure this is correct
+		double ww = major*metersToPixels * 2;
+		double hh = minor*metersToPixels * 2;
+
+		Shape shape = rotate.createTransformedShape(new Ellipse2D.Double(-ww/2,-hh/2,ww,hh));
+		shape = AffineTransform.getTranslateInstance(x+centerX,h-y-centerY).createTransformedShape(shape);
+
+		g2.draw(shape);
 	}
 }
