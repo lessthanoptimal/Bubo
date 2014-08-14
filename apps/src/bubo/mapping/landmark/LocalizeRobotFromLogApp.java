@@ -19,6 +19,7 @@
 package bubo.mapping.landmark;
 
 import boofcv.gui.image.ShowImages;
+import bubo.desc.sensors.landmark.RangeBearingMeasurement;
 import bubo.desc.sensors.landmark.RangeBearingParam;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.gui.Simulation2DPanel;
@@ -33,6 +34,7 @@ import bubo.models.kinematics.PredictorLocalMotion2D;
 import com.thoughtworks.xstream.XStream;
 import georegression.fitting.ellipse.CovarianceToEllipse_F64;
 import georegression.struct.se.Se2_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.ops.CommonOps;
 
 import java.awt.*;
@@ -77,6 +79,9 @@ public class LocalizeRobotFromLogApp {
 		gui.getGhosts().get(1).color = Color.GRAY;
 
 		covToEllipse.setNumStdev(2.5);
+
+		paramRb.rangeSigma = 100;
+		paramRb.bearingSigma = .5;
 	}
 
 	public void process() {
@@ -85,7 +90,9 @@ public class LocalizeRobotFromLogApp {
 		LogSe2_F64 initial = path.get(0);
 
 		LocalizationKnownRangeBearingEkf<LocalMotion2D> estimator =
-				new LocalizationKnownRangeBearingEkf<LocalMotion2D>(new PredictorLocalMotion2D(0.0,0.001,0.05),paramRb);
+				new LocalizationKnownRangeBearingEkf<LocalMotion2D>(new PredictorLocalMotion2D(0.4,0.01,0.1),paramRb);
+
+		estimator.setLandmarks(map);
 
 		MultivariateGaussianDM initState = new MultivariateGaussianDM(3);
 		initState.x.data[0] = initial.getX();
@@ -98,24 +105,55 @@ public class LocalizeRobotFromLogApp {
 		Se2_F64 sensor0ToWorld = sensorToRobot.concat(initial,null);
 		LocalMotion2D motion = new LocalMotion2D();
 
-		// TODO covariance isn't growing symmetrically
+		int indexMeas = 0;
+
+		long time = path.get(0).time;
+
+		// synchronize measurements and path
+		while( measurements.get(indexMeas).getTime() < time ) {
+			indexMeas++;
+		}
+
+		FastQueue<RangeBearingMeasurement> measurementsRB = new FastQueue<RangeBearingMeasurement>(RangeBearingMeasurement.class,true);
 		for (int i = 0; i < path.size(); i++) {
 
-			Se2_F64 robotToWorld = path.get(i);
+			LogSe2_F64 robotToWorld = path.get(i);
 			Se2_F64 sensor1ToWorld = sensorToRobot.concat(robotToWorld,null);
 
 			motion.setFrom(sensor0ToWorld,sensor1ToWorld);
+			motion.x += 0.01;
 			estimator.predict(motion);
 
-			// TODO add measurements, if any
+			// process measurements
+			time = robotToWorld.getTime();
+			measurementsRB.reset();
+			while( indexMeas < measurements.size()  ) {
+				LogPoseRangeBearing meas = measurements.get(indexMeas);
+
+				if( meas.getTime() <= time ) {
+					indexMeas++;
+//					System.out.println("   measurement "+meas.getId());
+					RangeBearingMeasurement rb = measurementsRB.grow();
+					rb.bearing = meas.getBearing();
+					rb.range = meas.getRange();
+					rb.id = meas.getId();
+					estimator.update(rb);
+				} else {
+					break;
+				}
+			}
 
 			// draw covariance ellipse
 			MultivariateGaussianDM stateDM = estimator.getState();
-			covToEllipse.setCovariance(stateDM.P.get(0, 0), stateDM.P.get(0, 1), stateDM.P.get(1, 1));
-			gui.updateGhostEllipse(0, covToEllipse.getMinorAxis(), covToEllipse.getMajorAxis(), covToEllipse.getAngle());
+			if( covToEllipse.setCovariance(stateDM.P.get(0, 0), stateDM.P.get(0, 1), stateDM.P.get(1, 1)) ) {
+				gui.updateGhostEllipse(0, covToEllipse.getMinorAxis(), covToEllipse.getMajorAxis(), covToEllipse.getAngle());
+			} else {
+				gui.updateGhostEllipse(0, 0,0,0);
+			}
 
-			System.out.println("ellipse "+covToEllipse.getMinorAxis()+"  "+covToEllipse.getMajorAxis());
+//			System.out.println("ellipse "+covToEllipse.getMinorAxis()+"  "+covToEllipse.getMajorAxis());
 
+			gui.updateRangeBearing(0,measurementsRB);
 			gui.updateGhost(0, estimator.getPose());
 			gui.updateGhost(1,robotToWorld);
 			gui.repaint();

@@ -79,14 +79,14 @@ public class ExtendedKalmanFilter<Control> extends DKFCommon implements KalmanFi
 		this.projector = null;
 	}
 
-	public <T extends EkfPredictor> T getPredictor() {
+	public <T extends EkfPredictor<Control>> T getPredictor() {
 		return (T) predictor;
 	}
 
 	/**
 	 * Used to change the propagator used by the filter.
 	 */
-	public void setPredictor(EkfPredictor predictor) {
+	public void setPredictor(EkfPredictor<Control> predictor) {
 		if (predictor.getSystemSize() != getStateDOF())
 			throw new IllegalArgumentException("The predictor must have the same DOF as the filter");
 

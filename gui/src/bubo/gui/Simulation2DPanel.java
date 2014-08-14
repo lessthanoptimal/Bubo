@@ -115,6 +115,16 @@ public class Simulation2DPanel extends MapDisplay {
 		}
 	}
 
+	public void updateRangeBearing( int which , FastQueue<RangeBearingMeasurement> measurements ) {
+		FastQueue<RangeBearingMeasurement> rangeBearing = ghosts.get(which).rangeBearing;
+		synchronized ( rangeBearing) {
+			rangeBearing.reset();
+			for (int i = 0; i < measurements.size; i++) {
+				rangeBearing.grow().set(measurements.get(i));
+			}
+		}
+	}
+
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -147,24 +157,7 @@ public class Simulation2DPanel extends MapDisplay {
 		}
 
 		synchronized ( rangeBearing ) {
-			g2.setColor(Color.CYAN);
-			int sensorX = (int) Math.round(lrfToCenter.T.x * metersToPixels);
-			int sensorY = (int) Math.round(lrfToCenter.T.y * metersToPixels);
-
-			Point2D_F64 x = new Point2D_F64();
-			for (int i = 0; i < rangeBearing.size; i++) {
-				double r = rangeBearing.get(i).range;
-				double bearing = rangeBearing.get(i).bearing;
-
-				x.x = Math.cos(bearing)*r;
-				x.y = Math.sin(bearing)*r;
-
-				SePointOps_F64.transform(lrfToCenter, x, x);
-				int scanX = (int) Math.round(x.x * metersToPixels);
-				int scanY = (int) Math.round(x.y * metersToPixels);
-
-				drawLine(g2, sensorX, sensorY, scanX, scanY);
-			}
+			renderRangeBearing(g2,lrfToCenter,rangeBearing);
 		}
 
 		synchronized ( robot ) {
@@ -175,6 +168,27 @@ public class Simulation2DPanel extends MapDisplay {
 			for (int i = 0; i < ghosts.size(); i++) {
 				drawGhost(g2,ghosts.get(i));
 			}
+		}
+	}
+
+	private void renderRangeBearing(Graphics2D g2 , Se2_F64 lrfToCenter , FastQueue<RangeBearingMeasurement> rangeBearing ) {
+		g2.setColor(Color.CYAN);
+		int sensorX = (int) Math.round(lrfToCenter.T.x * metersToPixels);
+		int sensorY = (int) Math.round(lrfToCenter.T.y * metersToPixels);
+
+		Point2D_F64 x = new Point2D_F64();
+		for (int i = 0; i < rangeBearing.size; i++) {
+			double r = rangeBearing.get(i).range;
+			double bearing = rangeBearing.get(i).bearing;
+
+			x.x = Math.cos(bearing)*r;
+			x.y = Math.sin(bearing)*r;
+
+			SePointOps_F64.transform(lrfToCenter, x, x);
+			int scanX = (int) Math.round(x.x * metersToPixels);
+			int scanY = (int) Math.round(x.y * metersToPixels);
+
+			drawLine(g2, sensorX, sensorY, scanX, scanY);
 		}
 	}
 
@@ -223,6 +237,12 @@ public class Simulation2DPanel extends MapDisplay {
 		drawOval(g2, robotX - pradius, robotY - pradius, pwidth, pwidth);
 		drawLine(g2, robotX, robotY, dirX, dirY);
 
+
+		synchronized ( rangeBearing ) {
+			FastQueue<RangeBearingMeasurement> rangeBearing = ghost.rangeBearing;
+			renderRangeBearing(g2,robotToCenter,rangeBearing);
+		}
+
 		if( ghost.ellipse.a != 0 ) {
 			drawEllipseRotated(g2,robotX,robotY,ghost.ellipse.b,ghost.ellipse.a,ghost.ellipse.phi);
 		}
@@ -239,5 +259,7 @@ public class Simulation2DPanel extends MapDisplay {
 	public static class Ghost extends CircularRobot2D {
 		public Color color;
 		public EllipseRotated_F64 ellipse = new EllipseRotated_F64();
+		public FastQueue<RangeBearingMeasurement> rangeBearing =
+				new FastQueue<RangeBearingMeasurement>(RangeBearingMeasurement.class,true);
 	}
 }
