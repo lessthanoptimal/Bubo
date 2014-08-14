@@ -21,7 +21,8 @@ package bubo.localization.d2.landmark;
 import bubo.desc.sensors.landmark.RangeBearingMeasurement;
 import bubo.desc.sensors.landmark.RangeBearingParam;
 import bubo.maps.d2.LandmarkMap2D;
-import bubo.models.kinematics.PredictorSe2;
+import bubo.models.kinematics.LocalMotion2D;
+import bubo.models.kinematics.PredictorLocalMotion2D;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
@@ -53,7 +54,7 @@ public class TestLocalizationKnownRangeBearingEkf {
 		// test it with various numbers of landmarks
 		for (int i = 1; i <= 20; i++) {
 
-			PredictorSe2 predictor = new PredictorSe2(0.1, 0.01, 0.1);
+			PredictorLocalMotion2D predictor = new PredictorLocalMotion2D(0.1, 0.01, 0.1);
 			LocalizationKnownRangeBearingEkf alg = new LocalizationKnownRangeBearingEkf(predictor, param);
 
 			CommonOps.diag(alg.getState().getCovariance(), 3, 10000, 10000, 100);
@@ -95,14 +96,14 @@ public class TestLocalizationKnownRangeBearingEkf {
 
 	@Test
 	public void predictionIncreasesUncertainty(){
-		PredictorSe2 predictor = new PredictorSe2(0.1, 0.01, 0.1);
-		LocalizationKnownRangeBearingEkf<Se2_F64> alg = new LocalizationKnownRangeBearingEkf<Se2_F64>(predictor, param);
+		PredictorLocalMotion2D predictor = new PredictorLocalMotion2D(0.1, 0.01, 0.1);
+		LocalizationKnownRangeBearingEkf<LocalMotion2D> alg = new LocalizationKnownRangeBearingEkf<LocalMotion2D>(predictor, param);
 
 		CommonOps.diag(alg.getState().getCovariance(), 3, 100, 100, 100);
 
 		double before = NormOps.normF(alg.getState().getCovariance());
 
-		alg.predict(new Se2_F64(300,200,0.1));
+		alg.predict(new LocalMotion2D(300,200,0.1));
 
 		double after = NormOps.normF(alg.getState().getCovariance());
 

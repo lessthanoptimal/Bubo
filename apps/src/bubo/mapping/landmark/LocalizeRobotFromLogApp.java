@@ -28,7 +28,8 @@ import bubo.localization.d2.landmark.LocalizationKnownRangeBearingEkf;
 import bubo.log.streams.LogPoseRangeBearing;
 import bubo.log.streams.LogSe2_F64;
 import bubo.maps.d2.LandmarkMap2D;
-import bubo.models.kinematics.PredictorSe2;
+import bubo.models.kinematics.LocalMotion2D;
+import bubo.models.kinematics.PredictorLocalMotion2D;
 import com.thoughtworks.xstream.XStream;
 import georegression.fitting.ellipse.CovarianceToEllipse_F64;
 import georegression.struct.se.Se2_F64;
@@ -83,8 +84,8 @@ public class LocalizeRobotFromLogApp {
 
 		LogSe2_F64 initial = path.get(0);
 
-		LocalizationKnownRangeBearingEkf<Se2_F64> estimator =
-				new LocalizationKnownRangeBearingEkf<Se2_F64>(new PredictorSe2(0.0,0.001,0.05),paramRb);
+		LocalizationKnownRangeBearingEkf<LocalMotion2D> estimator =
+				new LocalizationKnownRangeBearingEkf<LocalMotion2D>(new PredictorLocalMotion2D(0.0,0.001,0.05),paramRb);
 
 		MultivariateGaussianDM initState = new MultivariateGaussianDM(3);
 		initState.x.data[0] = initial.getX();
@@ -95,15 +96,15 @@ public class LocalizeRobotFromLogApp {
 		estimator.setInitialState(initState);
 
 		Se2_F64 sensor0ToWorld = sensorToRobot.concat(initial,null);
-		Se2_F64 motion = new Se2_F64();
+		LocalMotion2D motion = new LocalMotion2D();
 
 		// TODO covariance isn't growing symmetrically
 		for (int i = 0; i < path.size(); i++) {
 
 			Se2_F64 robotToWorld = path.get(i);
 			Se2_F64 sensor1ToWorld = sensorToRobot.concat(robotToWorld,null);
-			sensor0ToWorld.invert(null).concat(sensor1ToWorld,motion);
 
+			motion.setFrom(sensor0ToWorld,sensor1ToWorld);
 			estimator.predict(motion);
 
 			// TODO add measurements, if any

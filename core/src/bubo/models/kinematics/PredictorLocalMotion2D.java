@@ -19,24 +19,21 @@
 package bubo.models.kinematics;
 
 import bubo.filters.ekf.EkfPredictor;
-import georegression.struct.se.Se2_F64;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
 
 /**
  * <p>
- * Kinematics for a 2D robot which moves according to rigid body motion.  Control inputs is
- * a rigid body motion (translation and rotation), e.g. [tx,ty,&Delta;&theta;].  This is
- * primarily used for simulation purposes where the robot magically moves
+ * Kinematics for a 2D robot which move according to a {@link LocalMotion2D local motion}.
  * </p>
  * <p>
  * Motion Model:
  * <pre>
- * [ x' ]   [ tx + x*c - y*s ]
- * [ y' ] = [ ty + x*s + y*c  ]
- * [ &theta;' ]   [ &theta; + &Delta;&theta; ]
+ * [ x' ]   [ x + tx*c - ty*s ]
+ * [ y' ] = [ y + tx*s + ty*c  ]
+ * [ &theta;' ]   [ &theta; + t&theta; ]
  * </pre>
- * where c = cos(&Delta;&theta;) and s = sin(&Delta;&theta;).
+ * where c = cos(&theta;) and s = sin(&theta;).
  * </p>
  *
  * <p>
@@ -46,7 +43,7 @@ import org.ejml.ops.CommonOps;
  *
  * @author Peter Abeles
  */
-public class PredictorSe2 implements EkfPredictor<Se2_F64> {
+public class PredictorLocalMotion2D implements EkfPredictor<LocalMotion2D> {
 
 	// estimated state
 	DenseMatrix64F x_est = new DenseMatrix64F(3, 1);
@@ -69,9 +66,9 @@ public class PredictorSe2 implements EkfPredictor<Se2_F64> {
 	// rotation error per radian turned
 	double odomAngleSigma;
 
-	public PredictorSe2(double odomTravelSigma,
-						double odomTravelAngleSigma,
-						double odomAngleSigma) {
+	public PredictorLocalMotion2D(double odomTravelSigma,
+								  double odomTravelAngleSigma,
+								  double odomAngleSigma) {
 		this.odomTravelSigma = odomTravelSigma;
 		this.odomTravelAngleSigma = odomTravelAngleSigma;
 		this.odomAngleSigma = odomAngleSigma;
@@ -83,23 +80,25 @@ public class PredictorSe2 implements EkfPredictor<Se2_F64> {
 	}
 
 	@Override
-	public void predict(DenseMatrix64F state, Se2_F64 control, double elapsedTime) {
+	public void predict(DenseMatrix64F state, LocalMotion2D control, double elapsedTime) {
 
 		double x = state.get(0);
 		double y = state.get(1);
 		double theta = state.get(2);
-		double ctheta = control.getYaw();
+		double c = Math.cos(theta);
+		double s = Math.sin(theta);
 
-		x_est.data[0] = control.T.x + control.c*x - control.s*y;
-		x_est.data[1] = control.T.y + control.s*x + control.c*y;
-		x_est.data[2] = theta + ctheta;
 
-		G.data[0] = control.c; G.data[1] = -control.s;
-		G.data[3] = control.s; G.data[4] = control.c;
+		x_est.data[0] = x + control.x*c - control.y*s;
+		x_est.data[1] = y + control.x*s + control.y*c;
+		x_est.data[2] = theta + control.theta;
+
+		G.data[0] = 1; G.data[2] = -control.x*s - control.y*c;
+		G.data[4] = 1; G.data[5] =  control.x*c - control.y*s;
 		G.data[8] = 1;
 
-		V.data[0] = 1; V.data[2] = -x*control.s - y*control.c;
-		V.data[4] = 1; V.data[5] =  x*control.c - y*control.s;
+		V.data[0] = c; V.data[1] = -s;
+		V.data[3] = s; V.data[4] =  c;
 		V.data[8] = 1;
 
 		// plant noise is dependent magnitude of motion
@@ -109,7 +108,7 @@ public class PredictorSe2 implements EkfPredictor<Se2_F64> {
 
 		M.unsafe_set(0, 0, d*odomTravelSigma );
 		M.unsafe_set(1, 1, d*odomTravelSigma );
-		M.unsafe_set(2, 2, d*odomTravelAngleSigma + Math.abs(ctheta)*odomAngleSigma );
+		M.unsafe_set(2, 2, d*odomTravelAngleSigma + Math.abs(control.theta)*odomAngleSigma );
 
 		CommonOps.mult(V, M, tempVM);
 		CommonOps.multTransB(tempVM, V, Q);

@@ -29,21 +29,23 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPredictorSe2 extends StandardPredictorTests {
+public class TestPredictorLocalMotion2D extends StandardPredictorTests {
 
-	Se2_F64 control = new Se2_F64();
+	LocalMotion2D control = new LocalMotion2D();
 
-	public TestPredictorSe2() {
+	public TestPredictorLocalMotion2D() {
 		super(1e-6);
 	}
 
 	@Test
 	public void stateJacobian() {
-		PredictorSe2 alg = new PredictorSe2(0.1,0.01,0.1);
+		PredictorLocalMotion2D alg = new PredictorLocalMotion2D(0.1,0.01,0.1);
 
 		// check translation only
 		control.set(1.5, 0.5, 0);
 		checkStateJacobianAtPoint(alg, control, false, -1, 1, 2, Math.PI / 2.0);
+		control.set(1.5, 0.5, Math.PI/2);
+		checkStateJacobianAtPoint(alg, control, false, -1, 1, 2, 0);
 
 		// check rotation only
 		control.set(0, 0, 1);
@@ -56,14 +58,16 @@ public class TestPredictorSe2 extends StandardPredictorTests {
 
 	@Test
 	public void predictedState() {
-		PredictorSe2 alg = new PredictorSe2(0.1,0.01,0.1);
+		PredictorLocalMotion2D alg = new PredictorLocalMotion2D(0.1,0.01,0.1);
 
 		Se2_F64 init = new Se2_F64(1,2, Math.PI/2.0);
 		DenseMatrix64F x = new DenseMatrix64F(3, 1, true, init.T.x, init.T.y, init.getYaw());
 
 		control.set(1,0.5,0.1);
 
-		Se2_F64 expected = init.concat(control,null);
+
+		Se2_F64 expected = init.copy();
+		control.addTo(expected);
 
 		alg.predict(x, control, -1);
 		DenseMatrix64F xp = alg.getPredictedState();
@@ -78,29 +82,27 @@ public class TestPredictorSe2 extends StandardPredictorTests {
 	 */
 	@Test
 	public void plantNoise_motion() {
-		PredictorSe2 alg = new PredictorSe2(0.1,0.01,0.1);
+		PredictorLocalMotion2D alg = new PredictorLocalMotion2D(0.1,0.01,0.1);
 		DenseMatrix64F x = new DenseMatrix64F(3, 1);
 
 		// plant noise should be zero since there is no motion
-		alg.predict(x, new Se2_F64(0,0,0), -1);
+		alg.predict(x, new LocalMotion2D(0,0,0), -1);
 		assertEquals(0, NormOps.normF(alg.getPlantNoise()),1e-8);
 
-		alg.predict(x, new Se2_F64(1,0,0), -1);
+		alg.predict(x, new LocalMotion2D(1,0,0), -1);
 		assertTrue( NormOps.normF(alg.getPlantNoise()) > 0 );
-		alg.predict(x, new Se2_F64(0,1,0), -1);
+		alg.predict(x, new LocalMotion2D(0,1,0), -1);
 		assertTrue( NormOps.normF(alg.getPlantNoise()) > 0 );
-		alg.predict(x, new Se2_F64(0,0,1), -1);
+		alg.predict(x, new LocalMotion2D(0,0,1), -1);
 		assertTrue( NormOps.normF(alg.getPlantNoise()) > 0 );
 	}
 
 	@Test
 	public void plantNoise_valid_covariance() {
-		PredictorSe2 alg = new PredictorSe2(0.1,0.01,0.1);
+		PredictorLocalMotion2D alg = new PredictorLocalMotion2D(0.1,0.01,0.1);
 		control.set(1,0.5,0);
 		checkValidCovariance(alg, control, -1, 1, 2, 0.4);
 		control.set(0, 0, 0.5);
-		checkValidCovariance(alg, control, -1, 1, 2, 0.4);
-		control.set(1,0.5,0,0.2);
 		checkValidCovariance(alg, control, -1, 1, 2, 0.4);
 	}
 }
