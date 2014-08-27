@@ -164,5 +164,9 @@ public abstract class Octree< O extends Octree, P extends GeoTuple> {
 		 * User specified data
 		 */
 		public Object userData;
+
+		public <T>T getUserData() {
+			return (T)userData;
+		}
 	}
 }

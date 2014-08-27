@@ -138,7 +138,7 @@ public class KalmanFilter<Control> extends DKFCommon implements KalmanFilterInte
 
 		// compute the residual
 		mult(H, x, y);
-		sub(z, y, y);
+		subtract(z, y, y);
 
 		_updateCovariance(H, x, P, R);
 	}

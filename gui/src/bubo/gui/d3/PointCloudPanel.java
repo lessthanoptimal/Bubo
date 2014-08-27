@@ -18,6 +18,7 @@
 
 package bubo.gui.d3;
 
+import georegression.struct.line.LineSegment3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -68,6 +69,8 @@ public abstract class PointCloudPanel extends JPanel {
 	 * @param armRadius Radius/thickness of the arrows
 	 */
 	public abstract void addAxis( Se3_F64 localToWorld , double armLength , double armRadius );
+
+	public abstract void addLines( List<LineSegment3D_F64> lines , double radius , int argb );
 
 	public abstract void shutdownVisualize();
 

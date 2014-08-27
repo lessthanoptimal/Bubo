@@ -35,6 +35,7 @@ import com.jme3.scene.shape.Sphere;
 import com.jme3.util.BufferUtils;
 import georegression.geometry.RotationMatrixGenerator;
 import georegression.geometry.UtilPolygons2D_F64;
+import georegression.struct.line.LineSegment3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -420,7 +421,7 @@ public class JmePointCloudPanel extends PointCloudPanel {
 				m.updateBound();
 
 				Material matZ = new Material(bridge.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-				matZ.setColor("Color", ColorRGBA.Red);
+				matZ.setColor("Color", ColorRGBA.Blue);
 				matZ.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
 
 				Geometry geoZ = new Geometry("z-axis",m);
@@ -432,7 +433,7 @@ public class JmePointCloudPanel extends PointCloudPanel {
 				bridge.getRootNode().attachChild(geoZ);
 
 				Material matY = new Material(bridge.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-				matY.setColor("Color", ColorRGBA.Blue);
+				matY.setColor("Color", ColorRGBA.Green);
 				matY.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
 
 				Geometry geoY = new Geometry("y-axis",m);
@@ -444,7 +445,7 @@ public class JmePointCloudPanel extends PointCloudPanel {
 				bridge.getRootNode().attachChild(geoY);
 
 				Material matX = new Material(bridge.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-				matX.setColor("Color", ColorRGBA.Green);
+				matX.setColor("Color", ColorRGBA.Red);
 				matX.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
 
 				Geometry geoX = new Geometry("x-axis",m);
@@ -456,6 +457,58 @@ public class JmePointCloudPanel extends PointCloudPanel {
 				bridge.getRootNode().attachChild(geoX);
 				return null;
 			}});
+	}
+
+	@Override
+	public void addLines(final List<LineSegment3D_F64> lines, final double radius, final int argb) {
+		bridge.enqueue(new Callable<Void>(){
+			public Void call(){
+				// there appears to be an upper limit to complexity of a mesh
+				int max = 10000;
+
+				for( int start = 0; start < lines.size(); start += max ) {
+					int N = Math.min(max, lines.size() - start);
+					final float[] buf = new float[N * 6];
+					final short[] connections = new short[N * 2];
+					for (int i = 0; i < N; i++) {
+						LineSegment3D_F64 l = lines.get(i);
+						int index = i * 6;
+
+						buf[index + 0] = (float) l.a.x;
+						buf[index + 1] = (float) l.a.y;
+						buf[index + 2] = (float) l.a.z;
+						buf[index + 3] = (float) l.b.x;
+						buf[index + 4] = (float) l.b.y;
+						buf[index + 5] = (float) l.b.z;
+
+						connections[i * 2 + 0] = (short) (i * 2);
+						connections[i * 2 + 1] = (short) (i * 2 + 1);
+					}
+
+					float alpha = ((argb >> 24) & 0xFF) / 255.0f;
+					float red = ((argb >> 16) & 0xFF) / 255.0f;
+					float green = ((argb >> 8) & 0xFF) / 255.0f;
+					float blue = (argb & 0xFF) / 255.0f;
+
+					Material mat = new Material(bridge.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+					mat.setColor("Color", new ColorRGBA(red, green, blue, alpha));
+					mat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Off);
+
+					Mesh m = new Mesh();
+					m.setMode(Mesh.Mode.Lines);
+					m.setBuffer(VertexBuffer.Type.Position, 3, buf);
+					m.setBuffer(VertexBuffer.Type.Index, 2, connections);
+					m.updateBound();
+
+					Geometry g = new Geometry("Line", m);
+					g.setShadowMode(RenderQueue.ShadowMode.Off);
+					g.setQueueBucket(RenderQueue.Bucket.Opaque);
+					g.setMaterial(mat);
+					bridge.getRootNode().attachChild(g);
+				}
+				return null;
+			}});
+
 	}
 
 	public static List<Point2D_F64> ensureCCW( List<Point2D_F64> mesh ) {

@@ -117,7 +117,7 @@ public abstract class DKFCommon implements InnovationInterface {
 		// P = (I-kH)P = P - K(HP)
 		mult(H, P, c);
 		mult(K, c, b);
-		subEquals(P, b);
+		subtractEquals(P, b);
 
 		// the above is correct because matrix multiplication is associative
 		// (KH)P=K(HP)

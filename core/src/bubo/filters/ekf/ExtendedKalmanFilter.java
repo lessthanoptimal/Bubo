@@ -23,7 +23,7 @@ import bubo.filters.abst.KalmanFilterInterface;
 import bubo.filters.kf.DKFCommon;
 import org.ejml.data.DenseMatrix64F;
 
-import static org.ejml.ops.CommonOps.subEquals;
+import static org.ejml.ops.CommonOps.subtractEquals;
 
 
 /**
@@ -141,7 +141,7 @@ public class ExtendedKalmanFilter<Control> extends DKFCommon implements KalmanFi
 
 		// compute the residual
 		y.set(z);
-		subEquals(y, projector.getProjected());
+		subtractEquals(y, projector.getProjected());
 
 		_updateCovariance(H, x, P, R);
 	}
