@@ -18,9 +18,8 @@
 
 package bubo.simulation.d3;
 
-import bubo.desc.sensors.lrf2d.Lrf2dMeasurement;
-import bubo.desc.sensors.lrf2d.Lrf2dParam;
-import bubo.simulation.d2.ControlListener2D;
+import bubo.desc.sensors.lrf3d.SpinningLrf2dMeasurement;
+import bubo.desc.sensors.lrf3d.SpinningLrf2dParam;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -37,15 +36,15 @@ public interface RobotInterface3D {
 	 */
 	public void doControl(long timeStamp);
 
-	public void setControlListener(ControlListener2D listener);
+	public void setControlListener(ControlListener3D listener);
 
 	// todo document
 	// todo code up something that can compute LRF pose in LRF reference frame given baseToLrf
-	public void setIntrinsic(Se3_F64 baseToLrf, Se3_F64 lrfToRobot , Lrf2dParam param);
+	public void setIntrinsic(Se3_F64 baseToLrf, Se3_F64 lrfToRobot , SpinningLrf2dParam param);
 
 	public void odometry(long timeStamp, Se2_F64 robotToWorld);
 
-	public void ladar(long timeStamp, double angle0, double angle1 , Lrf2dMeasurement measurement);
+	public void spinningLrf(long timeStamp, SpinningLrf2dMeasurement measurement);
 
 	public boolean isDone();
 }

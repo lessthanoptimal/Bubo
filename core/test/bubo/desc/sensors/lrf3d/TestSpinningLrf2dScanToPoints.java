@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestSpinningLrf2dTransform {
+public class TestSpinningLrf2dScanToPoints {
 
 	/**
 	 * Rotation angle of 0.  lrfToArm is identity.
@@ -47,7 +47,7 @@ public class TestSpinningLrf2dTransform {
 		meas.meas[90] = 1;
 		meas.meas[180] = 1;
 
-		SpinningLrf2dTransform alg = new SpinningLrf2dTransform(param);
+		SpinningLrf2dScanToPoints alg = new SpinningLrf2dScanToPoints(param);
 
 		alg.process(meas,null,null);
 
@@ -74,7 +74,7 @@ public class TestSpinningLrf2dTransform {
 		meas.meas[90] = 1;
 		meas.meas[180] = 1;
 
-		SpinningLrf2dTransform alg = new SpinningLrf2dTransform(param);
+		SpinningLrf2dScanToPoints alg = new SpinningLrf2dScanToPoints(param);
 
 		alg.process(meas,null,null);
 
@@ -101,7 +101,7 @@ public class TestSpinningLrf2dTransform {
 		meas.meas[90] = 1;
 		meas.meas[180] = 1;
 
-		SpinningLrf2dTransform alg = new SpinningLrf2dTransform(param);
+		SpinningLrf2dScanToPoints alg = new SpinningLrf2dScanToPoints(param);
 
 		alg.process(meas,null,null);
 

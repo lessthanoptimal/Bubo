@@ -16,24 +16,33 @@
  * limitations under the License.
  */
 
-package bubo.desc.sensors.lrf3d;
+package bubo.simulation.d3.sensors;
 
 import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
+import bubo.desc.sensors.lrf3d.SpinningLrf2dMeasurement;
+import bubo.desc.sensors.lrf3d.SpinningLrf2dParam;
+import bubo.maps.d3.triangles.Triangle3dMap;
+import georegression.geometry.GeometryMath_F64;
 import georegression.geometry.RotationMatrixGenerator;
-import georegression.struct.point.Point2D_F64;
+import georegression.metric.Intersection3D_F64;
+import georegression.struct.line.LineParametric3D_F64;
+import georegression.struct.line.LineSegment3D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector2D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.shapes.Triangle3D_F64;
 import georegression.transform.se.InterpolateLinearSe3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ddogleg.struct.FastQueue;
 
 /**
- * Code for converting a LRF scan into 3D points in the spinning sensor's base reference frame.  For
- * a description of all the coordinate systems see {@link SpinningLrf2dParam}.
+ * Simulates a spinning 2D LRF in a Triangle3dMap world.
  *
  * @author Peter Abeles
  */
-public class SpinningLrf2dTransform {
+public class RaytraceSpinningLrf2D {
+
+	// world map
+	private Triangle3dMap map;
 
 	// specification of the spinning LRF
 	private SpinningLrf2dParam param;
@@ -53,28 +62,28 @@ public class SpinningLrf2dTransform {
 	// interpolate between lrf0 and lrf1
 	private InterpolateLinearSe3_F64 interp = new InterpolateLinearSe3_F64();
 
-	// storage for 2D point
-	private Point2D_F64 point2D = new Point2D_F64();
-	// Storage for 3D points
-	private FastQueue<Point3D_F64> points = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
+	// direction in 2D
+	Vector2D_F64 v = new Vector2D_F64();
+	// laser ray
+	LineParametric3D_F64 line = new LineParametric3D_F64();
+	LineSegment3D_F64 segment = new LineSegment3D_F64();
 
 	// dummy matrix
 	private Se3_F64 identity = new Se3_F64();
 
-	public SpinningLrf2dTransform( SpinningLrf2dParam param ) {
+	public RaytraceSpinningLrf2D( SpinningLrf2dParam param ) {
 		this.param = param;
 		trig = new Lrf2dPrecomputedTrig(param.param2d);
-		points.growArray(param.param2d.getNumberOfScans());
 		armToBaseR.getT().set(param.radius,0,0);
 	}
 
 	/**
 	 * Computes the coordinate of all valid scans in the measurement.
-	 * @param meas Measurement
 	 * @param baseToWorld0 (Optional) transform from sensor base to world at start of scan.  If null identity is used.
 	 * @param baseToWorld1 (Optional) transform from sensor base to world at end of scan.  If null identity is used.
+	 * @param meas (output) simulated measurements in the world
 	 */
-	public void process( SpinningLrf2dMeasurement meas , Se3_F64 baseToWorld0 , Se3_F64 baseToWorld1 ) {
+	public void process(Se3_F64 baseToWorld0, Se3_F64 baseToWorld1, SpinningLrf2dMeasurement meas) {
 
 		if( baseToWorld0 == null )
 			baseToWorld0 = identity;
@@ -82,7 +91,7 @@ public class SpinningLrf2dTransform {
 			baseToWorld1 = identity;
 
 		// The LRF is spinning.  Compute the transform when the first scan was collected and when it ended
-		RotationMatrixGenerator.eulerXYZ(0,0,meas.angle0, baseRtoBase.R);
+		RotationMatrixGenerator.eulerXYZ(0, 0, meas.angle0, baseRtoBase.R);
 		armToBaseR.concat(baseRtoBase, armToBase);
 		param.lrfToArm.concat(armToBase, lrfToBase);
 		lrfToBase.concat(baseToWorld0,lrf0ToWorld0);
@@ -94,26 +103,53 @@ public class SpinningLrf2dTransform {
 		// set up interpolation
 		interp.setTransforms(lrf0ToWorld0, lrf1ToWorld1);
 
-		// compute the location of each measurement and convert to sensor frame
-		points.reset();
 		for (int i = 0; i < meas.numMeas; i++) {
-			double r = meas.meas[i];
-			if( param.param2d.isValidRange(r)) {
-				Point3D_F64 p3 = points.grow();
-				trig.computeEndPoint(i, meas.meas[i], point2D);
+			// compute ray in sensor reference frame
+			trig.computeDirection(i, v);
+			line.p.set(0, 0, 0);
+			line.slope.set(-v.y,0,v.x);
 
-				// compute point location in LRF reference frame
-				p3.set(-point2D.y, 0, point2D.x);
+			// transform to world
+			interp.interpolate( i/(double)(meas.numMeas-1), lrfToWorld);
+			SePointOps_F64.transform(lrfToWorld, line.p, line.p);
+			GeometryMath_F64.mult(lrfToWorld.getR(),line.slope,line.slope);
 
-				// now put it into the sensor's base
-				interp.interpolate( i/(double)(meas.numMeas-1), lrfToWorld);
-
-				SePointOps_F64.transform(lrfToWorld,p3,p3);
-			}
+			// see if it hits anything in the world
+			meas.meas[i] = findIntersection(line);
 		}
 	}
 
-	public FastQueue<Point3D_F64> getPoints() {
-		return points;
+	/**
+	 * Find the intersection (if any) of the line with objects in the world
+	 */
+	protected double findIntersection( LineParametric3D_F64 line ) {
+
+		double R = param.getParam2d().getMaxRange();
+
+		segment.a.set(line.p);
+		segment.b.x = line.p.x + R*line.slope.x;
+		segment.b.y = line.p.y + R*line.slope.y;
+		segment.b.z = line.p.z + R*line.slope.z;
+
+		Point3D_F64 hit = new Point3D_F64();
+
+		double best = Double.MAX_VALUE;
+
+		for(Triangle3D_F64 t : map.triangles ) {
+			int result = Intersection3D_F64.intersection(t,segment,hit);
+
+			if( result == 1 ) {
+				double d = line.p.distance(hit);
+				if( d < best ) {
+					best = d;
+				}
+			}
+		}
+
+		return best;
+	}
+
+	public void setMap(Triangle3dMap map) {
+		this.map = map;
 	}
 }

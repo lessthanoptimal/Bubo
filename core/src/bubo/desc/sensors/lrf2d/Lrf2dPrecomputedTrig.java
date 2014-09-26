@@ -19,6 +19,7 @@
 package bubo.desc.sensors.lrf2d;
 
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Vector2D_F64;
 
 /**
  * <p>
@@ -36,7 +37,7 @@ public class Lrf2dPrecomputedTrig {
 	public double c[];
 	public double s[];
 
-	// end point of ladar
+	// end point of LRF scan
 	public double x;
 	public double y;
 
@@ -82,5 +83,10 @@ public class Lrf2dPrecomputedTrig {
 	public void computeEndPoint(int index, double range, Point2D_F64 pt) {
 		pt.x = c[index] * range;
 		pt.y = s[index] * range;
+	}
+
+	public void computeDirection( int index , Vector2D_F64 pt ) {
+		pt.x = c[index];
+		pt.y = s[index];
 	}
 }

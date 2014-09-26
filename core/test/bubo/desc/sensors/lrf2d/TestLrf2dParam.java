@@ -18,6 +18,7 @@
 
 package bubo.desc.sensors.lrf2d;
 
+import georegression.struct.point.Point2D_F64;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,5 +33,23 @@ public class TestLrf2dParam {
 
 		assertEquals(-Math.PI / 2, param.computeAngle(0), 1e-8);
 		assertEquals(Math.PI/2,param.computeAngle(179),1e-8);
+	}
+
+	@Test
+	public void computeLocation() {
+		Lrf2dParam param = new Lrf2dParam(null,-Math.PI/2,Math.PI,180,5,0,0);
+
+		Point2D_F64 p = new Point2D_F64();
+
+		param.computeLocation(0,2,p);
+
+		double theta = -Math.PI/2.0;
+		assertEquals(2*Math.cos(theta),p.x,1e-8);
+		assertEquals(2*Math.sin(theta),p.y,1e-8);
+
+		theta = param.computeAngle(15);
+		param.computeLocation(15,2,p);
+		assertEquals(2*Math.cos(theta),p.x,1e-8);
+		assertEquals(2*Math.sin(theta),p.y,1e-8);
 	}
 }

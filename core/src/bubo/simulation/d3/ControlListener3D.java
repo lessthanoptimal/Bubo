@@ -21,11 +21,21 @@ package bubo.simulation.d3;
 import georegression.struct.se.Se3_F64;
 
 /**
+ * Interface for sending controls to simulation and cheating by getting truth/setting the pose
+ *
  * @author Peter Abeles
  */
 public interface ControlListener3D {
 
-	public void setPose(Se3_F64 robotToWorld);
+	/**
+	 * Way to cheat and make the robot magically teleport to the specified location
+	 * @param robotToWorld The new robot pose
+	 */
+	public void _setPose(Se3_F64 robotToWorld);
 
+	/**
+	 * Way to cheat and get the robot's true location in the world
+	 * @return true pose
+	 */
 	public Se3_F64 _truthRobotToWorld();
 }

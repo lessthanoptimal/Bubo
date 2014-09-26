@@ -19,6 +19,7 @@
 package bubo.desc.sensors.lrf2d;
 
 import bubo.desc.IntrinsicParameters;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * Description of basic parameters that describe a typical planar LADAR, such as a SICK or Hokuyo.
@@ -95,6 +96,21 @@ public class Lrf2dParam implements IntrinsicParameters {
 			return false;
 
 		return true;
+	}
+
+	/**
+	 * Computes the end point of a scan for the specified index and range measurement.
+	 */
+	public Point2D_F64 computeLocation( int index , double range , Point2D_F64 output ) {
+		if( output == null )
+			output = new Point2D_F64();
+
+		double theta = computeAngle(index);
+
+		output.x = Math.cos(theta)*range;
+		output.y = Math.sin(theta)*range;
+
+		return output;
 	}
 
 	@Override
