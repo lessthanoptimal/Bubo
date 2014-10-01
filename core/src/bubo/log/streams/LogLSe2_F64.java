@@ -25,7 +25,7 @@ import georegression.struct.se.Se2_F64;
  *
  * @author Peter Abeles
  */
-public class LogSe2_F64 extends Se2_F64 {
+public class LogLSe2_F64 extends Se2_F64 {
 	public long time;
 
 	public long getTime() {

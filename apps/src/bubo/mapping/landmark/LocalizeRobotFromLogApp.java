@@ -26,8 +26,8 @@ import bubo.gui.Simulation2DPanel;
 import bubo.gui.UtilDisplayBubo;
 import bubo.io.maps.MapIO;
 import bubo.localization.d2.landmark.LocalizationKnownRangeBearingEkf;
+import bubo.log.streams.LogLSe2_F64;
 import bubo.log.streams.LogPoseRangeBearing;
-import bubo.log.streams.LogSe2_F64;
 import bubo.maps.d2.LandmarkMap2D;
 import bubo.models.kinematics.LocalMotion2D;
 import bubo.models.kinematics.PredictorLocalMotion2D;
@@ -51,7 +51,7 @@ public class LocalizeRobotFromLogApp {
 
 	LandmarkMap2D map;
 	RangeBearingParam paramRb;
-	List<LogSe2_F64> path;
+	List<LogLSe2_F64> path;
 	List<LogPoseRangeBearing> measurements;
 
 	Simulation2DPanel gui;
@@ -87,7 +87,7 @@ public class LocalizeRobotFromLogApp {
 	public void process() {
 		ShowImages.showWindow(gui,"Landmark Localization");
 
-		LogSe2_F64 initial = path.get(0);
+		LogLSe2_F64 initial = path.get(0);
 
 		LocalizationKnownRangeBearingEkf<LocalMotion2D> estimator =
 				new LocalizationKnownRangeBearingEkf<LocalMotion2D>(new PredictorLocalMotion2D(0.4,0.01,0.1),paramRb);
@@ -117,7 +117,7 @@ public class LocalizeRobotFromLogApp {
 		FastQueue<RangeBearingMeasurement> measurementsRB = new FastQueue<RangeBearingMeasurement>(RangeBearingMeasurement.class,true);
 		for (int i = 0; i < path.size(); i++) {
 
-			LogSe2_F64 robotToWorld = path.get(i);
+			LogLSe2_F64 robotToWorld = path.get(i);
 			Se2_F64 sensor1ToWorld = sensorToRobot.concat(robotToWorld,null);
 
 			motion.setFrom(sensor0ToWorld,sensor1ToWorld);

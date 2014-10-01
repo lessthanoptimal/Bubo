@@ -51,7 +51,7 @@ subprojects {
 
     dependencies {
         ['ip','io','calibration','geo','recognition','feature','sfm','visualize','openkinect','WebcamCapture'].
-                each { String a -> compile group: 'org.boofcv', name: a, version: '0.18' }
+                each { String a -> compile group: 'org.boofcv', name: a, version: '0.19-SNAPSHOT' }
 
         testCompile group: 'junit', name: 'junit', version: '4.11'
     }

@@ -20,8 +20,8 @@ package bubo.io.maps;
 
 import bubo.io.text.ReadCsv;
 import bubo.io.text.ReadCsvObject;
+import bubo.log.streams.LogLSe2_F64;
 import bubo.log.streams.LogPoseRangeBearing;
-import bubo.log.streams.LogSe2_F64;
 import bubo.maps.d2.LandmarkMap2D;
 import bubo.maps.d2.lines.LineSegmentMap;
 import georegression.struct.line.LineSegment2D_F64;
@@ -40,10 +40,10 @@ import java.util.List;
  */
 public class MapIO {
 
-	public static List<LogSe2_F64> loadPath2D(String fileName ) {
+	public static List<LogLSe2_F64> loadPath2D(String fileName ) {
 		try {
-			ReadCsvObject<LogSe2_F64> reader = new ReadCsvObject<LogSe2_F64>(new FileInputStream(fileName),
-							LogSe2_F64.class,"time","x","y","yaw");
+			ReadCsvObject<LogLSe2_F64> reader = new ReadCsvObject<LogLSe2_F64>(new FileInputStream(fileName),
+							LogLSe2_F64.class,"time","x","y","yaw");
 			reader.setComment('#');
 			return reader.readAll();
 		} catch (FileNotFoundException e) {

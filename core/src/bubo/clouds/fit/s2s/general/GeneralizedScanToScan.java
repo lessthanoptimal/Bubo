@@ -166,7 +166,8 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 		final int N = param.getNumberOfScans();
 		final double maxRange = param.getMaxRange();
 		for (int i = 0; i < N; i++) {
-			scanDst.vis[i] = info.range[i] <= maxRange;
+			double r = info.range[i];
+			scanDst.vis[i] = r > 0 && info.range[i] <= maxRange;
 		}
 	}
 
@@ -180,13 +181,13 @@ public abstract class GeneralizedScanToScan implements Lrf2dScanToScan {
 		for (int i = 0; i < N; i++) {
 			double r = measuredRange[i];
 
-			if (r <= maxRange) {
+			if (r > 0 && r <= maxRange) {
 				Point2D_F64 p = info.pts[i];
 				info.theta[i] = Math.atan2(p.y, p.x);
 				info.range[i] = p.norm();
 				info.vis[i] = true;
 			} else {
-				info.range[i] = maxRange;
+				info.range[i] = 0;
 				info.vis[i] = false;
 			}
 		}
