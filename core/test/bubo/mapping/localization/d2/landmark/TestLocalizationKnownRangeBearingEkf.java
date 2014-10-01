@@ -20,9 +20,9 @@ package bubo.mapping.localization.d2.landmark;
 
 import bubo.desc.sensors.landmark.RangeBearingMeasurement;
 import bubo.desc.sensors.landmark.RangeBearingParam;
+import bubo.mapping.models.kinematics.LocalMotion2D;
+import bubo.mapping.models.kinematics.PredictorLocalMotion2D;
 import bubo.maps.d2.LandmarkMap2D;
-import bubo.models.kinematics.LocalMotion2D;
-import bubo.models.kinematics.PredictorLocalMotion2D;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
