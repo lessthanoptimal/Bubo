@@ -18,7 +18,7 @@
 
 package bubo.io.data.encoded;
 
-import boofcv.core.image.ConvertBufferedImage;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageUInt8;

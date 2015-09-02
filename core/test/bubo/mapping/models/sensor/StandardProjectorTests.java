@@ -19,7 +19,7 @@
 package bubo.mapping.models.sensor;
 
 import bubo.filters.ekf.EkfProjector;
-import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
@@ -49,9 +49,9 @@ public class StandardProjectorTests {
 		ProjectorFunction f = new ProjectorFunction();
 
 		if (printResults) {
-			JacobianChecker.jacobianPrint(f, j, input, tol);
+			DerivativeChecker.jacobianPrint(f, j, input, tol);
 		}
-		assertTrue(JacobianChecker.jacobian(f, j, input, tol));
+		assertTrue(DerivativeChecker.jacobian(f, j, input, tol));
 	}
 
 	private class ProjectorFunction implements FunctionNtoM {

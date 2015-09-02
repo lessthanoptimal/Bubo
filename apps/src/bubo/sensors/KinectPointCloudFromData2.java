@@ -20,10 +20,10 @@ package bubo.sensors;
 
 import boofcv.alg.depth.VisualDepthOps;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.core.image.ConvertBufferedImage;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.FastQueueArray_I32;
@@ -65,7 +65,7 @@ public class KinectPointCloudFromData2 {
 
 		MultiSpectral<ImageUInt8> rgb =
 				new MultiSpectral<ImageUInt8>(ImageUInt8.class,input.getWidth(),input.getHeight(),3);
-		ConvertBufferedImage.convertFromMulti(input,rgb,true,ImageUInt8.class);
+		ConvertBufferedImage.convertFromMulti(input, rgb, true, ImageUInt8.class);
 		UtilOpenKinect.parseDepth(nameDepth,depth,null);
 
 		FastQueue<Point3D_F64> cloud = new FastQueue<Point3D_F64>(Point3D_F64.class,true);

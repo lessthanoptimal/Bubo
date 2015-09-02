@@ -19,7 +19,7 @@
 package bubo.mapping.models.kinematics;
 
 import bubo.filters.ekf.EkfPredictor;
-import org.ddogleg.optimization.JacobianChecker;
+import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ejml.data.DenseMatrix64F;
@@ -72,9 +72,9 @@ public class StandardPredictorTests {
 		PredictorFunction f = new PredictorFunction(control);
 
 		if (printResults) {
-			JacobianChecker.jacobianPrint(f, j, input, tol);
+			DerivativeChecker.jacobianPrint(f, j, input, tol);
 		}
-		assertTrue(JacobianChecker.jacobian(f, j, input, tol));
+		assertTrue(DerivativeChecker.jacobian(f, j, input, tol));
 	}
 
 	/**
