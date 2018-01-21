@@ -197,6 +197,10 @@ idea {
     }
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.3'
+}
+
 // Disable the creation of jars for distribution.  If you don't do this it will crash
 [':validation',':integration'].each {String a ->
     project(a) {
