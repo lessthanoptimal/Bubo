@@ -2,7 +2,7 @@ dependencies {
     compile project(':core')
     compile project(':io')
     compile project(':gui')
-    compile project(':integration:jme')
+//    compile project(':integration:jme')
 }
 
 idea {

@@ -2,26 +2,6 @@ repositories {
 
 }
 
-// TODO disable if libs isn't set up correctly
-
-ext.disableJme = !file('libs').exists() || !file('libs/jME3-lwjgl.jar').exists()
-
-if( ext.disableJme && !hasProperty('locationJme') ) {
-    println "Can't find JME!  Disabling compilation of JME package"
-    println "  To copy the JME jars into the appropriate location you need to:"
-    println "  1) Install JME"
-    println "  2) gradle -PlocationJme=/path/to/jme  copyFromJme"
-    println "  3) Run gradle again and this message should go away"
-
-    sourcesJar.enabled = false
-    javadocJar.enabled = false
-    jar.enabled = false
-    uploadArchives.enabled = false
-    install.enabled = false
-    compileJava.enabled = false
-    compileTestJava.enabled = false
-}
-
 dependencies {
     compile project(':core')
     compile project(':io')

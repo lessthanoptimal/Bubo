@@ -131,7 +131,12 @@ subprojects {
 }
 
 // list of projects for creating javadoc and jars
-def mainProjects = [':apps', ':core', ':gui', ':io', ':integration:jme']
+def mainProjects = [':apps', ':core', ':gui', ':io']
+
+try {
+    project( ':integration:jme')
+    mainProjects.add( ':integration:jme')
+} catch( UnknownProjectException ignore ) {}
 
 // Creates a directory with all the compiled jars and the dependencies for main
 task createLibraryDirectory(dependsOn: mainProjects.collect { it + ":jar" } + mainProjects.collect {
@@ -202,7 +207,7 @@ task wrapper(type: Wrapper) {
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
-[':validation',':integration'].each {String a ->
+[':validation'].each {String a ->
     project(a) {
         if( project.hasProperty('ossrhUsername') ) {
             signArchives.enabled = false

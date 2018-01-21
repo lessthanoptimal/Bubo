@@ -1,1 +1,12 @@
-include 'io', 'gui', 'apps', 'core' , 'validation','integration:jme'
+include 'io', 'gui', 'apps', 'core' , 'validation'
+
+
+if( file('lintegration/jme/ibs/jME3-lwjgl.jar').exists() ) {
+    include 'integration:jme'
+} else {
+    println "Can't find JME!  Disabling compilation of JME package"
+    println "  To copy the JME jars into the appropriate location you need to:"
+    println "  1) Install JME"
+    println "  2) gradle -PlocationJme=/path/to/jme  copyFromJme"
+    println "  3) Run gradle again and this message should go away"
+}
