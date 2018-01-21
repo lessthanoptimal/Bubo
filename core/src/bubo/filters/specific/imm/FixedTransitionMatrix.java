@@ -19,16 +19,16 @@
 package jtarget.tracking.specific.filter.imm;
 
 import bubo.filters.imm.InteractionMatrixInterface;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * This transition matrix is independent of the observation sojourn time.
  */
 public class FixedTransitionMatrix
 		implements InteractionMatrixInterface {
-	private DenseMatrix64F pi;
+	private DMatrixRMaj pi;
 
-	public FixedTransitionMatrix(DenseMatrix64F pi) {
+	public FixedTransitionMatrix(DMatrixRMaj pi) {
 		this.pi = pi;
 
 		// make sure its a valid matrix
@@ -43,7 +43,7 @@ public class FixedTransitionMatrix
 	}
 
 	@Override
-	public DenseMatrix64F computeMatrix(double deltaTime) {
+	public DMatrixRMaj computeMatrix(double deltaTime) {
 		return pi;
 	}
 }

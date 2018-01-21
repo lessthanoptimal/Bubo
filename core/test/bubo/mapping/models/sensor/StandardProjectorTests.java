@@ -22,7 +22,8 @@ import bubo.filters.ekf.EkfProjector;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrix;
+import org.ejml.data.DMatrixRMaj;
 
 import static org.junit.Assert.assertTrue;
 
@@ -68,7 +69,7 @@ public class StandardProjectorTests {
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
+			DMatrixRMaj X = new DMatrixRMaj(3, 1, true, input);
 
 			projector.compute(X);
 
@@ -92,8 +93,14 @@ public class StandardProjectorTests {
 		}
 
 		@Override
-		public void process(double[] input, double[] output) {
-			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
+		public DMatrix declareMatrixMxN() {
+			return new DMatrixRMaj(projector.getMeasurementSize(),projector.getSystemSize());
+		}
+
+		@Override
+		public void process(double[] input, DMatrix outputM) {
+			double[] output = ((DMatrixRMaj)outputM).data;
+			DMatrixRMaj X = new DMatrixRMaj(3, 1, true, input);
 
 			projector.compute(X);
 

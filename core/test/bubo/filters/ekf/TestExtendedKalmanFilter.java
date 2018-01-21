@@ -21,8 +21,8 @@ package bubo.filters.ekf;
 import bubo.filters.GenericKalmanFilterTests;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.abst.KalmanFilterInterface;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.Test;
 
 /**
@@ -52,7 +52,7 @@ public class TestExtendedKalmanFilter extends GenericKalmanFilterTests {
 		double v = x_init.getMean().get(1, 0);
 		double e = x_init.getMean().get(2, 0);
 
-		DenseMatrix64F t = new DenseMatrix64F(3, 1);
+		DMatrixRMaj t = new DMatrixRMaj(3, 1);
 		t.set(0, 0, x + v * T);
 		t.set(1, 0, v);
 		t.set(2, 0, Math.cos(Math.acos(e) + T));
@@ -75,7 +75,7 @@ public class TestExtendedKalmanFilter extends GenericKalmanFilterTests {
 	}
 
 	@Override
-	protected DenseMatrix64F createTargetState() {
+	protected DMatrixRMaj createTargetState() {
 		ExtendedKalmanFilter filter = (ExtendedKalmanFilter) createFilter();
 		EkfPredictor prop = filter.getPredictor();
 
@@ -83,17 +83,17 @@ public class TestExtendedKalmanFilter extends GenericKalmanFilterTests {
 
 		prop.predict(ret.getMean(),null,-1);
 
-		return new DenseMatrix64F(prop.getPredictedState());
+		return new DMatrixRMaj(prop.getPredictedState());
 	}
 
 	@Override
 	protected MultivariateGaussianDM createPerfectMeas(KalmanFilterInterface filter,
-													   DenseMatrix64F state) {
+													   DMatrixRMaj state) {
 		EkfProjector proj = ((ExtendedKalmanFilter) filter).getProjector();
 
 		proj.compute(state);
-		DenseMatrix64F z = proj.getProjected();
-		DenseMatrix64F R = CommonOps.identity(2);
+		DMatrixRMaj z = proj.getProjected();
+		DMatrixRMaj R = CommonOps_DDRM.identity(2);
 
 		return new MultivariateGaussianDM(z, R);
 	}
@@ -105,8 +105,8 @@ public class TestExtendedKalmanFilter extends GenericKalmanFilterTests {
 	 * h(x) = [x1 + x3 ; x1x2 ]
 	 */
 	private static class Projector implements EkfProjector {
-		DenseMatrix64F z = new DenseMatrix64F(2, 1);
-		DenseMatrix64F H = new DenseMatrix64F(2, 3);
+		DMatrixRMaj z = new DMatrixRMaj(2, 1);
+		DMatrixRMaj H = new DMatrixRMaj(2, 3);
 
 
 		@Override
@@ -119,7 +119,7 @@ public class TestExtendedKalmanFilter extends GenericKalmanFilterTests {
 			return 2;
 		}
 
-		public void compute(DenseMatrix64F state) {
+		public void compute(DMatrixRMaj state) {
 			double x1 = state.get(0, 0);
 			double x2 = state.get(1, 0);
 			double x3 = state.get(2, 0);
@@ -133,12 +133,12 @@ public class TestExtendedKalmanFilter extends GenericKalmanFilterTests {
 		}
 
 		@Override
-		public DenseMatrix64F getJacobianH() {
+		public DMatrixRMaj getJacobianH() {
 			return H;
 		}
 
 		@Override
-		public DenseMatrix64F getProjected() {
+		public DMatrixRMaj getProjected() {
 			return z;
 		}
 	}

@@ -22,6 +22,7 @@ import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -68,11 +69,13 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 	 * are marked with a unique ID for this function call so that it knows which ones it has examined.
 	 */
 	@Override
-	protected <Model> void selectMatchSet(DistanceFromModel<Model, PointVectorNN> modelDistance,
-										  double threshold, Model param) {
+	protected <Model>void selectMatchSet( List<PointVectorNN> dataSet ,
+										  DistanceFromModel<Model,PointVectorNN> modelDistance ,
+										  double threshold, Model param)  {
 		candidatePoints.clear();
 		matchFinder.setModelDistance(modelDistance);
-		matchFinder.selectMatchSet(initialSample.toList(), param, threshold, false, candidatePoints);
+		matchFinder.selectMatchSet(dataSet, param, threshold, false, candidatePoints);
+		Arrays.fill(matchToInput,0,Math.min(matchToInput.length,candidatePoints.size()),-1);
 	}
 
 	@Override

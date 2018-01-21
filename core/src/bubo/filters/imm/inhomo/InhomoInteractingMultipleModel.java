@@ -21,8 +21,8 @@ package bubo.filters.imm.inhomo;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.UtilMultivariateGaussian;
 import bubo.filters.ekf.ExtendedKalmanFilter;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * This is a generalized implementation of the IMM filter.  It allows is internal filters to have
@@ -35,14 +35,14 @@ public class InhomoInteractingMultipleModel<Control> {
 	private InternalStateConverter converter;
 
 	// creates the interaction matrix based upon the sensors measurement sojourn time
-	private DenseMatrix64F markov;
+	private DMatrixRMaj markov;
 
 	// an array of the internal models
 	private ExtendedKalmanFilter<Control> models[];
 
-	private DenseMatrix64F c;
-	private DenseMatrix64F d[];
-	private DenseMatrix64F outer[];
+	private DMatrixRMaj c;
+	private DMatrixRMaj d[];
+	private DMatrixRMaj outer[];
 
 	// The DOF of the state for each one of the internal models.
 	// note the all the models' state will have the same dimension/DOF.
@@ -60,7 +60,7 @@ public class InhomoInteractingMultipleModel<Control> {
 	 */
 	public InhomoInteractingMultipleModel(InternalStateConverter converter,
 										  ExtendedKalmanFilter<Control> modelFilters[],
-										  DenseMatrix64F markov) {
+										  DMatrixRMaj markov) {
 		this.converter = converter;
 		dimen = converter.getOutputDimen();
 		measDOF = modelFilters[0].getMeasDOF();
@@ -69,8 +69,8 @@ public class InhomoInteractingMultipleModel<Control> {
 		// create one model for each dynamics model provided
 		models = new ExtendedKalmanFilter[N];
 		System.arraycopy(modelFilters, 0, models, 0, N);
-		d = new DenseMatrix64F[N];
-		outer = new DenseMatrix64F[N];
+		d = new DMatrixRMaj[N];
+		outer = new DMatrixRMaj[N];
 		for (int i = 0; i < N; i++) {
 			if (measDOF != modelFilters[i].getMeasDOF())
 				throw new RuntimeException("All filters must have the same measurement DOF");
@@ -78,14 +78,14 @@ public class InhomoInteractingMultipleModel<Control> {
 			int dof = modelFilters[i].getStateDOF();
 			// this could be made more memory efficient by only creating new structures for
 			// each DOF once
-			d[i] = new DenseMatrix64F(dof, 1);
-			outer[i] = new DenseMatrix64F(dof, dof);
+			d[i] = new DMatrixRMaj(dof, 1);
+			outer[i] = new DMatrixRMaj(dof, dof);
 		}
 
 		this.markov = markov;
 
 		// predeclare matrices that will be used later on
-		c = new DenseMatrix64F(N, N);
+		c = new DMatrixRMaj(N, N);
 
 
 	}
@@ -152,9 +152,9 @@ public class InhomoInteractingMultipleModel<Control> {
 			filter.update(h.getState(), meas);
 
 			// compute the likelihood
-			DenseMatrix64F y = filter.getInnovation();
-			DenseMatrix64F S = filter.getInnovationCov();
-			DenseMatrix64F S_inv = filter.getInnovationCovInverse();
+			DMatrixRMaj y = filter.getInnovation();
+			DMatrixRMaj S = filter.getInnovationCov();
+			DMatrixRMaj S_inv = filter.getInnovationCovInverse();
 
 			double likelihood = UtilMultivariateGaussian.likelihoodP(y, S, S_inv);
 			double prob = h.getProbability() * likelihood;
@@ -205,14 +205,14 @@ public class InhomoInteractingMultipleModel<Control> {
 		IhImmHypothesis hypotheses[] = state.hypotheses;
 
 		for (int i = 0; i < hypotheses.length; i++) {
-			DenseMatrix64F mix = hypotheses[i].getMix().getMean();
+			DMatrixRMaj mix = hypotheses[i].getMix().getMean();
 			mix.zero();
 
 			for (int j = 0; j < hypotheses.length; j++) {
-				DenseMatrix64F x_j_orig = hypotheses[j].getState().getMean();
-				DenseMatrix64F x_j = converter.convertMergeFrom(true, x_j_orig, j, i);
+				DMatrixRMaj x_j_orig = hypotheses[j].getState().getMean();
+				DMatrixRMaj x_j = converter.convertMergeFrom(true, x_j_orig, j, i);
 
-				CommonOps.add(mix, c.get(i, j), x_j, mix);
+				CommonOps_DDRM.add(mix, c.get(i, j), x_j, mix);
 			}
 		}
 	}
@@ -222,29 +222,29 @@ public class InhomoInteractingMultipleModel<Control> {
 
 		for (int i = 0; i < hypotheses.length; i++) {
 			IhImmHypothesis m = hypotheses[i];
-			DenseMatrix64F mixMean = m.getMix().getMean();
-			DenseMatrix64F mixCov = m.getMix().getCovariance();
+			DMatrixRMaj mixMean = m.getMix().getMean();
+			DMatrixRMaj mixCov = m.getMix().getCovariance();
 			mixCov.zero();
 
-			DenseMatrix64F d = this.d[i];
-			DenseMatrix64F outer = this.outer[i];
+			DMatrixRMaj d = this.d[i];
+			DMatrixRMaj outer = this.outer[i];
 
 			for (int j = 0; j < hypotheses.length; j++) {
 				IhImmHypothesis m_j = hypotheses[j];
 
-				DenseMatrix64F x_j_orig = hypotheses[j].getState().getMean();
-				DenseMatrix64F x_j = converter.convertMergeFrom(true, x_j_orig, j, i);
+				DMatrixRMaj x_j_orig = hypotheses[j].getState().getMean();
+				DMatrixRMaj x_j = converter.convertMergeFrom(true, x_j_orig, j, i);
 
 				d.set(mixMean);
-				CommonOps.add(d, -1.0, x_j, d);
-				CommonOps.multTransB(d, d, outer);
+				CommonOps_DDRM.add(d, -1.0, x_j, d);
+				CommonOps_DDRM.multTransB(d, d, outer);
 
-				DenseMatrix64F P_j_orig = m_j.getState().getCovariance();
-				DenseMatrix64F P_j = converter.convertMergeFrom(false, P_j_orig, j, i);
+				DMatrixRMaj P_j_orig = m_j.getState().getCovariance();
+				DMatrixRMaj P_j = converter.convertMergeFrom(false, P_j_orig, j, i);
 
-				CommonOps.add(outer, P_j, outer);
+				CommonOps_DDRM.add(outer, P_j, outer);
 
-				CommonOps.add(mixCov, c.get(i, j), outer, mixCov);
+				CommonOps_DDRM.add(mixCov, c.get(i, j), outer, mixCov);
 			}
 		}
 	}

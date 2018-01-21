@@ -22,8 +22,8 @@ import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.abst.KalmanFilterInterface;
 import bubo.filters.kf.KalmanPredictor;
 import bubo.filters.kf.KalmanProjector;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * An implementation of the discrete-time H Infinity filter.  This filter is designed to
@@ -59,24 +59,24 @@ public class DiscreteHInfinityFilter<Control> implements KalmanFilterInterface<C
 	/**
 	 * \bar{s} = L^T S L
 	 */
-	private DenseMatrix64F S_bar;
+	private DMatrixRMaj S_bar;
 
 	/**
 	 * A user defined performance bound
 	 */
 	private double theta;
 
-	private DenseMatrix64F I_z;
-	private DenseMatrix64F I_x;
-	private DenseMatrix64F R_inv;
-	private DenseMatrix64F temp0_m_m;
-	private DenseMatrix64F D;
-	private DenseMatrix64F temp0_m_n;
-	private DenseMatrix64F K;
-	private DenseMatrix64F temp0_m_1;
-	private DenseMatrix64F innovation;
+	private DMatrixRMaj I_z;
+	private DMatrixRMaj I_x;
+	private DMatrixRMaj R_inv;
+	private DMatrixRMaj temp0_m_m;
+	private DMatrixRMaj D;
+	private DMatrixRMaj temp0_m_n;
+	private DMatrixRMaj K;
+	private DMatrixRMaj temp0_m_1;
+	private DMatrixRMaj innovation;
 
-	private DenseMatrix64F control;
+	private DMatrixRMaj control;
 
 	/**
 	 * L is a user defined full rank matrix.  If we want to estimate the full state (like in a kalman
@@ -99,8 +99,8 @@ public class DiscreteHInfinityFilter<Control> implements KalmanFilterInterface<C
 	 * @param theta     performance bound.
 	 */
 	public DiscreteHInfinityFilter(KalmanPredictor predictor, KalmanProjector projector,
-								   DenseMatrix64F control,
-								   DenseMatrix64F S, DenseMatrix64F L, double theta) {
+								   DMatrixRMaj control,
+								   DMatrixRMaj S, DMatrixRMaj L, double theta) {
 		this.predictor = predictor;
 		this.projector = projector;
 		this.theta = theta;
@@ -112,81 +112,81 @@ public class DiscreteHInfinityFilter<Control> implements KalmanFilterInterface<C
 		int m = predictor.getNumStates();
 		int n = projector.getNumStates();
 
-		I_z = CommonOps.identity(n);
-		I_x = CommonOps.identity(m);
-		R_inv = new DenseMatrix64F(n, n);
-		temp0_m_m = new DenseMatrix64F(m, m);
-		D = new DenseMatrix64F(m, m);
-		temp0_m_n = new DenseMatrix64F(m, n);
-		K = new DenseMatrix64F(m, n);
-		temp0_m_1 = new DenseMatrix64F(m, 1);
-		innovation = new DenseMatrix64F(n, 1);
+		I_z = CommonOps_DDRM.identity(n);
+		I_x = CommonOps_DDRM.identity(m);
+		R_inv = new DMatrixRMaj(n, n);
+		temp0_m_m = new DMatrixRMaj(m, m);
+		D = new DMatrixRMaj(m, m);
+		temp0_m_n = new DMatrixRMaj(m, n);
+		K = new DMatrixRMaj(m, n);
+		temp0_m_1 = new DMatrixRMaj(m, 1);
+		innovation = new DMatrixRMaj(n, 1);
 
-		S_bar = new DenseMatrix64F(m, m);
-		CommonOps.multAddTransA(L, S, temp0_m_m);
-		CommonOps.mult(temp0_m_m, L, S_bar);
+		S_bar = new DMatrixRMaj(m, m);
+		CommonOps_DDRM.multAddTransA(L, S, temp0_m_m);
+		CommonOps_DDRM.mult(temp0_m_m, L, S_bar);
 	}
 
 	@Override
 	public void predict(MultivariateGaussianDM state, Object o, double elapsedTime) {
 
-		DenseMatrix64F x = state.getMean();
-		DenseMatrix64F P = state.getCovariance();
+		DMatrixRMaj x = state.getMean();
+		DMatrixRMaj P = state.getCovariance();
 
-		DenseMatrix64F F = predictor.getStateTransition();
-		DenseMatrix64F Q = predictor.getPlantNoise();
+		DMatrixRMaj F = predictor.getStateTransition();
+		DMatrixRMaj Q = predictor.getPlantNoise();
 
-		CommonOps.mult(F, x, temp0_m_1);
+		CommonOps_DDRM.mult(F, x, temp0_m_1);
 		x.set(temp0_m_1);
 
 		if (control != null) {
-			DenseMatrix64F G = predictor.getControlTransition();
+			DMatrixRMaj G = predictor.getControlTransition();
 
-			CommonOps.mult(G, control, temp0_m_1);
-			CommonOps.add(x, temp0_m_1, x);
+			CommonOps_DDRM.mult(G, control, temp0_m_1);
+			CommonOps_DDRM.add(x, temp0_m_1, x);
 		}
 
-		CommonOps.mult(F, P, temp0_m_m);
-		CommonOps.multTransB(temp0_m_m, F, P);
-		CommonOps.add(P, Q, P);
+		CommonOps_DDRM.mult(F, P, temp0_m_m);
+		CommonOps_DDRM.multTransB(temp0_m_m, F, P);
+		CommonOps_DDRM.add(P, Q, P);
 	}
 
 	@Override
 	public void update(MultivariateGaussianDM state,
 					   MultivariateGaussianDM meas) {
-		DenseMatrix64F x = state.getMean();
-		DenseMatrix64F P = state.getCovariance();
-		DenseMatrix64F H = projector.getProjectionMatrix();
-		DenseMatrix64F R = meas.getCovariance();
-		DenseMatrix64F y = meas.getMean();
+		DMatrixRMaj x = state.getMean();
+		DMatrixRMaj P = state.getCovariance();
+		DMatrixRMaj H = projector.getProjectionMatrix();
+		DMatrixRMaj R = meas.getCovariance();
+		DMatrixRMaj y = meas.getMean();
 
 		// compute D
-		CommonOps.mult(-theta, S_bar, P, D);
+		CommonOps_DDRM.mult(-theta, S_bar, P, D);
 
-		CommonOps.invert(R, R_inv);
+		CommonOps_DDRM.invert(R, R_inv);
 
-		CommonOps.multTransA(H, R_inv, temp0_m_n);
-		CommonOps.mult(temp0_m_n, H, temp0_m_m);
-		CommonOps.mult(temp0_m_m, P, D);
+		CommonOps_DDRM.multTransA(H, R_inv, temp0_m_n);
+		CommonOps_DDRM.mult(temp0_m_n, H, temp0_m_m);
+		CommonOps_DDRM.mult(temp0_m_m, P, D);
 
 		for (int i = 0; i < D.getNumCols(); i++)
 			D.set(i, i, D.get(i, i) + 1);
 
-		CommonOps.invert(D, temp0_m_m);
-		DenseMatrix64F PD_inv = D;
-		CommonOps.mult(P, temp0_m_m, PD_inv);
+		CommonOps_DDRM.invert(D, temp0_m_m);
+		DMatrixRMaj PD_inv = D;
+		CommonOps_DDRM.mult(P, temp0_m_m, PD_inv);
 
 		// compute K
-		CommonOps.multTransB(PD_inv, H, temp0_m_n);
-		CommonOps.mult(temp0_m_n, R_inv, K);
+		CommonOps_DDRM.multTransB(PD_inv, H, temp0_m_n);
+		CommonOps_DDRM.mult(temp0_m_n, R_inv, K);
 
 		// innovation
 		innovation.set(y);
-		CommonOps.multAdd(-1, H, x, innovation);
+		CommonOps_DDRM.multAdd(-1, H, x, innovation);
 
 		// update the state
-		CommonOps.mult(K, innovation, temp0_m_1);
-		CommonOps.add(x, temp0_m_1, x);
+		CommonOps_DDRM.mult(K, innovation, temp0_m_1);
+		CommonOps_DDRM.add(x, temp0_m_1, x);
 
 		// update the covariance
 		P.set(PD_inv);
@@ -200,7 +200,7 @@ public class DiscreteHInfinityFilter<Control> implements KalmanFilterInterface<C
 		return predictor;
 	}
 
-	public DenseMatrix64F getInnovation() {
+	public DMatrixRMaj getInnovation() {
 		return innovation;
 	}
 

@@ -20,9 +20,9 @@ package bubo.filters.kf;
 
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.abst.KalmanFilterInterface;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
-import static org.ejml.ops.CommonOps.*;
+import static org.ejml.dense.row.CommonOps_DDRM.*;
 
 /**
  * <p>
@@ -53,7 +53,7 @@ public class KalmanFilter<Control> extends DKFCommon implements KalmanFilterInte
 	// the state to meas matrix
 	private KalmanProjector projector;
 
-	private DenseMatrix64F controlInput;
+	private DMatrixRMaj controlInput;
 
 	public KalmanFilter(KalmanPredictor<Control> predictor, KalmanProjector projector) {
 		super(predictor.getNumStates(), projector.getNumStates());
@@ -62,16 +62,16 @@ public class KalmanFilter<Control> extends DKFCommon implements KalmanFilterInte
 		this.projector = projector;
 	}
 
-	public void setControlInputRef(DenseMatrix64F controlInput) {
+	public void setControlInputRef(DMatrixRMaj controlInput) {
 		this.controlInput = controlInput;
 	}
 
-	public DenseMatrix64F getControlInput() {
+	public DMatrixRMaj getControlInput() {
 		return controlInput;
 	}
 
-	public void setControlInput(DenseMatrix64F controlInput) {
-		this.controlInput = new DenseMatrix64F(controlInput);
+	public void setControlInput(DMatrixRMaj controlInput) {
+		this.controlInput = new DMatrixRMaj(controlInput);
 	}
 
 	/**
@@ -90,13 +90,13 @@ public class KalmanFilter<Control> extends DKFCommon implements KalmanFilterInte
 
 		predictor.compute(control, elapsedTime);
 
-		DenseMatrix64F F = predictor.getStateTransition();
-		DenseMatrix64F Q = predictor.getPlantNoise();
+		DMatrixRMaj F = predictor.getStateTransition();
+		DMatrixRMaj Q = predictor.getPlantNoise();
 
-		DenseMatrix64F G = predictor.getControlTransition();
+		DMatrixRMaj G = predictor.getControlTransition();
 
-		DenseMatrix64F x = state.getMean();
-		DenseMatrix64F P = state.getCovariance();
+		DMatrixRMaj x = state.getMean();
+		DMatrixRMaj P = state.getCovariance();
 
 		// predict the state
 		mult(F, x, a);
@@ -119,8 +119,8 @@ public class KalmanFilter<Control> extends DKFCommon implements KalmanFilterInte
 	 * deltaTime.
 	 */
 	public void addControl(MultivariateGaussianDM state) {
-		DenseMatrix64F G = predictor.getControlTransition();
-		DenseMatrix64F x = state.getMean();
+		DMatrixRMaj G = predictor.getControlTransition();
+		DMatrixRMaj x = state.getMean();
 
 		mult(G, controlInput, a);
 		addEquals(x, a);
@@ -128,13 +128,13 @@ public class KalmanFilter<Control> extends DKFCommon implements KalmanFilterInte
 
 	@Override
 	public void update(MultivariateGaussianDM state, MultivariateGaussianDM meas) {
-		DenseMatrix64F H = projector.getProjectionMatrix();
+		DMatrixRMaj H = projector.getProjectionMatrix();
 
-		DenseMatrix64F x = state.getMean();
-		DenseMatrix64F P = state.getCovariance();
+		DMatrixRMaj x = state.getMean();
+		DMatrixRMaj P = state.getCovariance();
 
-		DenseMatrix64F z = meas.getMean();
-		DenseMatrix64F R = meas.getCovariance();
+		DMatrixRMaj z = meas.getMean();
+		DMatrixRMaj R = meas.getCovariance();
 
 		// compute the residual
 		mult(H, x, y);

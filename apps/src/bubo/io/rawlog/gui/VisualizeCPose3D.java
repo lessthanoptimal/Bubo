@@ -19,8 +19,9 @@
 package bubo.io.rawlog.gui;
 
 import bubo.io.rawlog.data.CPose3D;
-import georegression.geometry.RotationMatrixGenerator;
-import org.ejml.data.DenseMatrix64F;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.swing.*;
 
@@ -39,8 +40,8 @@ public class VisualizeCPose3D implements LogDataVisualization {
 
 	public void setText(CPose3D pose) {
 
-		DenseMatrix64F R = pose.getRotation();
-		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(R, (double[])null);
+		DMatrixRMaj R = pose.getRotation();
+		double euler[] = ConvertRotation3D_F64.matrixToEuler(R, EulerType.XYZ, (double[])null);
 
 		String str = "CPose3D\n";
 		str += "\n";

@@ -50,4 +50,14 @@ public class DistanceCylinderToPoint3D implements DistanceFromModel<Cylinder3D_F
 			distance[i] = Math.abs(Distance3D_F64.distance(model, points.get(i)));
 		}
 	}
+
+	@Override
+	public Class<Point3D_F64> getPointType() {
+		return Point3D_F64.class;
+	}
+
+	@Override
+	public Class<Cylinder3D_F64> getModelType() {
+		return Cylinder3D_F64.class;
+	}
 }

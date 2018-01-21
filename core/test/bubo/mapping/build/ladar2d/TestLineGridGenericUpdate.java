@@ -82,7 +82,7 @@ public class TestLineGridGenericUpdate {
 		double dist[] = toPrimitive(update.dist);
 
 		QuickSort_F64 sort = new QuickSort_F64();
-		sort.sort(dist, N, order);
+		sort.sort(dist, 0,N, order);
 
 		for (int i = 0; i < N; i++, x += dx, y += dy) {
 			int index = order[i];

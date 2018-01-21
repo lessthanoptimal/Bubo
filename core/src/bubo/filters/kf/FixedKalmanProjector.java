@@ -18,16 +18,16 @@
 
 package bubo.filters.kf;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 
 /**
  * An implementation of the KalmanProjector with a fixed matrix.
  */
 public class FixedKalmanProjector implements KalmanProjector {
-	private DenseMatrix64F H;
+	private DMatrixRMaj H;
 
-	public FixedKalmanProjector(DenseMatrix64F H) {
+	public FixedKalmanProjector(DMatrixRMaj H) {
 		this.H = H;
 	}
 
@@ -35,7 +35,7 @@ public class FixedKalmanProjector implements KalmanProjector {
 		return H.numRows;
 	}
 
-	public DenseMatrix64F getProjectionMatrix() {
+	public DMatrixRMaj getProjectionMatrix() {
 		return H;
 	}
 }

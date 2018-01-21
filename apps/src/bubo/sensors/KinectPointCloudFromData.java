@@ -20,10 +20,10 @@ package bubo.sensors;
 
 import boofcv.alg.depth.VisualDepthOps;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.image.GrayU16;
 import bubo.clouds.FactoryFitting;
 import bubo.clouds.fit.MatchCloudToCloud;
 import bubo.gui.FactoryVisualization3D;
@@ -92,11 +92,11 @@ public class KinectPointCloudFromData {
 	}
 
 	public static List<Point3D_F64> loadPointCloud( String which ) throws IOException {
-		IntrinsicParameters intrinsic = UtilIO.loadXML("data/kinect/trashcan/intrinsic.xml");
+		CameraPinholeRadial intrinsic = CalibrationIO.load("data/kinect/trashcan/intrinsic.xml");
 
 		String nameDepth = "data/kinect/trashcan/depth"+which+".depth";
 
-		ImageUInt16 depth = new ImageUInt16(1,1);
+		GrayU16 depth = new GrayU16(1,1);
 
 		UtilOpenKinect.parseDepth(nameDepth, depth, null);
 

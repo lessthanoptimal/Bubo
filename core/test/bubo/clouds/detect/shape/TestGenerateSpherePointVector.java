@@ -19,13 +19,13 @@
 package bubo.clouds.detect.shape;
 
 import bubo.clouds.detect.alg.PointVectorNN;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
 import georegression.struct.so.Rodrigues_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -52,9 +52,9 @@ public class TestGenerateSpherePointVector {
 
 
 		Rodrigues_F64 rodX = new Rodrigues_F64(phi, new Vector3D_F64(1, 0, 0));
-		DenseMatrix64F rotX = RotationMatrixGenerator.rodriguesToMatrix(rodX, null);
+		DMatrixRMaj rotX = ConvertRotation3D_F64.rodriguesToMatrix(rodX, null);
 		Rodrigues_F64 rodZ = new Rodrigues_F64(theta, new Vector3D_F64(0, 0, 1));
-		DenseMatrix64F rotZ = RotationMatrixGenerator.rodriguesToMatrix(rodZ, null);
+		DMatrixRMaj rotZ = ConvertRotation3D_F64.rodriguesToMatrix(rodZ, null);
 
 		GeometryMath_F64.mult(rotX, pv.p, pv.p);
 		GeometryMath_F64.mult(rotZ, pv.p, pv.p);
@@ -221,7 +221,7 @@ public class TestGenerateSpherePointVector {
 		rotationAxis.normalize();
 
 		Rodrigues_F64 rod = new Rodrigues_F64(angle, rotationAxis);
-		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod, null);
+		DMatrixRMaj R = ConvertRotation3D_F64.rodriguesToMatrix(rod, null);
 
 		GeometryMath_F64.mult(R, pv.normal, pv.normal);
 	}

@@ -20,7 +20,7 @@ package bubo.gui.jme;
 
 import bubo.gui.UtilDisplayBubo;
 import bubo.gui.d3.PointCloudPanel;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -68,7 +68,7 @@ public class VisualCheckMesh2D {
 
 		meshToWorld = new Se3_F64();
 		meshToWorld.getT().set(0.5,0,1);
-		RotationMatrixGenerator.eulerXYZ(-3,1,0,meshToWorld.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,-3,1,0,meshToWorld.R);
 
 		points = new ArrayList<Point2D_F64>();
 		points.add(new Point2D_F64(0,0));

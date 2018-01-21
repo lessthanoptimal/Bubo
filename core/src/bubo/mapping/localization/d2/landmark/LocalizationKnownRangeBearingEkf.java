@@ -28,7 +28,7 @@ import bubo.maps.d2.LandmarkMap2D;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Straight forward implementation of localization using an EKF which assumes perfect association and a known set
@@ -98,15 +98,15 @@ public class LocalizationKnownRangeBearingEkf<Control> extends ExtendedKalmanFil
 
 		// special kalman update
 		projector.compute(state.getMean());
-		DenseMatrix64F H = projector.getJacobianH();
+		DMatrixRMaj H = projector.getJacobianH();
 
-		DenseMatrix64F x = state.getMean();
-		DenseMatrix64F P = state.getCovariance();
+		DMatrixRMaj x = state.getMean();
+		DMatrixRMaj P = state.getCovariance();
 
-		DenseMatrix64F R = measurement.getCovariance();
+		DMatrixRMaj R = measurement.getCovariance();
 
 		// compute the residual while taking in account the non-linearities of the bearings measurement
-		DenseMatrix64F z_hat = projector.getProjected();
+		DMatrixRMaj z_hat = projector.getProjected();
 		y.data[0] = obs.range - z_hat.get(0);
 		y.data[1] = UtilAngle.minus(obs.bearing, z_hat.get(1));
 

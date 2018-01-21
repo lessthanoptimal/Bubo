@@ -18,10 +18,11 @@
 
 package bubo.clouds.detect.alg;
 
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
 import georegression.geometry.UtilPlane3D_F64;
 import georegression.metric.Distance3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
@@ -57,7 +58,7 @@ public class TestBoundPlaneRectangle {
 
 		// put the points in some arbitrary orientation to make it harder to process
 		Se3_F64 se = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(0.1, 0.8, -0.5, se.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, 0.8, -0.5, se.getR());
 		se.T.set(-0.5, 1, 2);
 
 		for (Point3D_F64 p : pts) {

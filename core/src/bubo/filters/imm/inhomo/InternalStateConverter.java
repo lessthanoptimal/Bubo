@@ -18,7 +18,7 @@
 
 package bubo.filters.imm.inhomo;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Used to convert between one internal state to another internal state for perposes of merging
@@ -36,7 +36,7 @@ public interface InternalStateConverter {
 	 * <p/>
 	 * If no change is needed the same state vector can be returned from what was provided to it.
 	 */
-	public DenseMatrix64F convertMergeFrom(boolean isMean, DenseMatrix64F fromState,
+	public DMatrixRMaj convertMergeFrom(boolean isMean, DMatrixRMaj fromState,
 										   int fromID, int targetID);
 
 	/**
@@ -44,7 +44,7 @@ public interface InternalStateConverter {
 	 * <p/>
 	 * If no change is needed the same state vector can be returned from what was provided to it.
 	 */
-	public DenseMatrix64F convertOutput(boolean isMean, DenseMatrix64F fromtate, int fromID);
+	public DMatrixRMaj convertOutput(boolean isMean, DMatrixRMaj fromtate, int fromID);
 
 	/**
 	 * Returns the dimension of the output state vector

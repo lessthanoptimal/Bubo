@@ -19,7 +19,7 @@
 package bubo.mapping.models.sensor;
 
 import georegression.metric.UtilAngle;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -55,9 +55,9 @@ public class TestProjectorRangeBearing2D extends StandardProjectorTests {
 								 double d, double bearings) {
 
 		alg.setLandmarkLocation(x, y);
-		alg.compute(new DenseMatrix64F(3, 1, true, robotX, robotY, theta));
+		alg.compute(new DMatrixRMaj(3, 1, true, robotX, robotY, theta));
 
-		DenseMatrix64F z = alg.getProjected();
+		DMatrixRMaj z = alg.getProjected();
 
 		assertEquals(d, z.get(0, 0), 1e-8);
 		assertTrue(UtilAngle.dist(bearings, z.get(1, 0)) <= 1e-8);

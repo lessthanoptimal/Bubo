@@ -18,7 +18,7 @@
 
 package bubo.filters.imm.inhomo;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Just returns the same state as the one that was passed in to it.
@@ -32,12 +32,12 @@ public class TrivialInternalStateConverter implements InternalStateConverter {
 	}
 
 	@Override
-	public DenseMatrix64F convertMergeFrom(boolean isMean, DenseMatrix64F fromState, int fromID, int target) {
+	public DMatrixRMaj convertMergeFrom(boolean isMean, DMatrixRMaj fromState, int fromID, int target) {
 		return fromState;
 	}
 
 	@Override
-	public DenseMatrix64F convertOutput(boolean isMean, DenseMatrix64F input, int type) {
+	public DMatrixRMaj convertOutput(boolean isMean, DMatrixRMaj input, int type) {
 		return input;
 	}
 

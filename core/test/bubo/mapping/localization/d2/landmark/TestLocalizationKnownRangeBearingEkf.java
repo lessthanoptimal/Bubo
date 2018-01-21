@@ -26,8 +26,8 @@ import bubo.maps.d2.LandmarkMap2D;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.NormOps;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.junit.Test;
 
 import java.util.Random;
@@ -57,7 +57,7 @@ public class TestLocalizationKnownRangeBearingEkf {
 			PredictorLocalMotion2D predictor = new PredictorLocalMotion2D(0.1, 0.01, 0.1);
 			LocalizationKnownRangeBearingEkf alg = new LocalizationKnownRangeBearingEkf(predictor, param);
 
-			CommonOps.diag(alg.getState().getCovariance(), 3, 10000, 10000, 100);
+			CommonOps_DDRM.diag(alg.getState().getCovariance(), 3, 10000, 10000, 100);
 			// due to linearization it can't handle a huge error in initial angle
 			Se2_F64 truth = new Se2_F64(0.5, 1, 0.25);
 
@@ -99,13 +99,13 @@ public class TestLocalizationKnownRangeBearingEkf {
 		PredictorLocalMotion2D predictor = new PredictorLocalMotion2D(0.1, 0.01, 0.1);
 		LocalizationKnownRangeBearingEkf<LocalMotion2D> alg = new LocalizationKnownRangeBearingEkf<LocalMotion2D>(predictor, param);
 
-		CommonOps.diag(alg.getState().getCovariance(), 3, 100, 100, 100);
+		CommonOps_DDRM.diag(alg.getState().getCovariance(), 3, 100, 100, 100);
 
-		double before = NormOps.normF(alg.getState().getCovariance());
+		double before = NormOps_DDRM.normF(alg.getState().getCovariance());
 
 		alg.predict(new LocalMotion2D(300,200,0.1));
 
-		double after = NormOps.normF(alg.getState().getCovariance());
+		double after = NormOps_DDRM.normF(alg.getState().getCovariance());
 
 		assertTrue(after>before);
 	}

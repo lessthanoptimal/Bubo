@@ -18,9 +18,9 @@
 
 package bubo.filters.kf;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
-import static org.ejml.ops.CommonOps.multTransB;
+import static org.ejml.dense.row.CommonOps_DDRM.multTransB;
 
 
 /**
@@ -29,28 +29,28 @@ import static org.ejml.ops.CommonOps.multTransB;
  */
 public class ConstAccel1D implements KalmanPredictor {
 
-	DenseMatrix64F F;
-	DenseMatrix64F Q;
+	DMatrixRMaj F;
+	DMatrixRMaj Q;
 	// magnitude of the process noise
 	double q;
 	// an optional fixed control input.  primarily for debuggin toy problems
-	DenseMatrix64F G;
+	DMatrixRMaj G;
 	double T;
 
 	public ConstAccel1D(double q, double T) {
 		this.T = T;
-		F = new DenseMatrix64F(3, 3);
-		Q = new DenseMatrix64F(3, 3);
+		F = new DMatrixRMaj(3, 3);
+		Q = new DMatrixRMaj(3, 3);
 		this.q = q;
 
 		setT(T);
 	}
 
-	public ConstAccel1D(DenseMatrix64F G, double q) {
-		F = new DenseMatrix64F(3, 3);
-		Q = new DenseMatrix64F(3, 3);
+	public ConstAccel1D(DMatrixRMaj G, double q) {
+		F = new DMatrixRMaj(3, 3);
+		Q = new DMatrixRMaj(3, 3);
 		this.q = q;
-		this.G = new DenseMatrix64F(G);
+		this.G = new DMatrixRMaj(G);
 
 		setT(T);
 	}
@@ -63,7 +63,7 @@ public class ConstAccel1D implements KalmanPredictor {
 		F.set(1, 2, T);
 		F.set(2, 2, 1);
 
-		DenseMatrix64F L = new DenseMatrix64F(3, 1);
+		DMatrixRMaj L = new DMatrixRMaj(3, 1);
 		L.set(0, 0, 0.5 * T * T);
 		L.set(1, 0, T);
 		L.set(2, 0, 1);
@@ -75,17 +75,17 @@ public class ConstAccel1D implements KalmanPredictor {
 	public void compute(Object o, double elapsedTime) {}
 
 	@Override
-	public DenseMatrix64F getStateTransition() {
+	public DMatrixRMaj getStateTransition() {
 		return F;
 	}
 
 	@Override
-	public DenseMatrix64F getControlTransition() {
+	public DMatrixRMaj getControlTransition() {
 		return G;
 	}
 
 	@Override
-	public DenseMatrix64F getPlantNoise() {
+	public DMatrixRMaj getPlantNoise() {
 		return Q;
 	}
 

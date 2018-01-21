@@ -18,7 +18,7 @@
 
 package bubo.filters;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.Random;
@@ -34,9 +34,9 @@ public class TestUtilMultivariateGaussian {
 	 */
 	@Test
 	public void testLikelihoodPBehavior() {
-		DenseMatrix64F y = new DenseMatrix64F(1, 1);
-		DenseMatrix64F S = new DenseMatrix64F(1, 1);
-		DenseMatrix64F S_inv = new DenseMatrix64F(1, 1);
+		DMatrixRMaj y = new DMatrixRMaj(1, 1);
+		DMatrixRMaj S = new DMatrixRMaj(1, 1);
+		DMatrixRMaj S_inv = new DMatrixRMaj(1, 1);
 
 		S.set(0, 0, 10);
 		S_inv.set(0, 0, 1.0 / 10.0);
@@ -57,9 +57,9 @@ public class TestUtilMultivariateGaussian {
 	 */
 	@Test
 	public void testLogLikelihood() {
-		DenseMatrix64F y = new DenseMatrix64F(1, 1);
-		DenseMatrix64F S = new DenseMatrix64F(1, 1);
-		DenseMatrix64F S_inv = new DenseMatrix64F(1, 1);
+		DMatrixRMaj y = new DMatrixRMaj(1, 1);
+		DMatrixRMaj S = new DMatrixRMaj(1, 1);
+		DMatrixRMaj S_inv = new DMatrixRMaj(1, 1);
 
 		S.set(0, 0, 10);
 		S_inv.set(0, 0, 1.0 / 10.0);
@@ -81,12 +81,12 @@ public class TestUtilMultivariateGaussian {
 		Random rand = new Random(0xff);
 
 		// see if it actually assigned a value to it
-		DenseMatrix64F x = UtilMultivariateGaussian.randomDraw(d, rand, null);
+		DMatrixRMaj x = UtilMultivariateGaussian.randomDraw(d, rand, null);
 		assertTrue(x.get(0, 0) != 0);
 		assertTrue(x.get(1, 0) != 0);
 
 		// see if anything works correctly if a matrix is provided to it
-		DenseMatrix64F y = new DenseMatrix64F(2, 1);
+		DMatrixRMaj y = new DMatrixRMaj(2, 1);
 		UtilMultivariateGaussian.randomDraw(d, rand, y);
 
 		assertTrue(x.get(0, 0) != y.get(0, 0));

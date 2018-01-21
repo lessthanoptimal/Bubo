@@ -21,8 +21,8 @@ package bubo.filters.specific.ekf;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.UtilEkfPropagator;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -44,19 +44,19 @@ public abstract class GenericEkfPredictorTimeTests {
 	 * See if the answers are the same.
 	 */
 	public void checkDoublePrediction() {
-		DenseMatrix64F initX = createInitState().getMean();
+		DMatrixRMaj initX = createInitState().getMean();
 
 		EkfPredictor prop = createPredictor();
 
 		prop.predict(initX, null, 1);
-		DenseMatrix64F a = new DenseMatrix64F(prop.getPredictedState());
+		DMatrixRMaj a = new DMatrixRMaj(prop.getPredictedState());
 
 		prop.predict(initX, null, 0.5);
-		DenseMatrix64F b = new DenseMatrix64F(prop.getPredictedState());
+		DMatrixRMaj b = new DMatrixRMaj(prop.getPredictedState());
 		prop.predict(b, null, 0.5);
 		b.set(prop.getPredictedState());
 
-		assertTrue(MatrixFeatures.isIdentical(a, b, 1e-5));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(a, b, 1e-5));
 	}
 
 	/**
@@ -68,17 +68,17 @@ public abstract class GenericEkfPredictorTimeTests {
 		double T = 1e-2;
 
 		// numerically compute F
-		DenseMatrix64F a = createInitState().getMean();
+		DMatrixRMaj a = createInitState().getMean();
 
-		DenseMatrix64F F_numerical = UtilEkfPropagator.numericalJacobian(a, prop, T, 1e-3);
+		DMatrixRMaj F_numerical = UtilEkfPropagator.numericalJacobian(a, prop, T, 1e-3);
 
 		// get the one from the propagator
 		prop.predict(a, null, T);
-		DenseMatrix64F F = prop.getJacobianF();
+		DMatrixRMaj F = prop.getJacobianF();
 
 
 		// compare results
-		assertTrue(MatrixFeatures.isIdentical(F_numerical, F, 1e-5));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(F_numerical, F, 1e-5));
 
 	}
 
@@ -88,14 +88,14 @@ public abstract class GenericEkfPredictorTimeTests {
 	public void checkOriginalUnchanged() {
 		EkfPredictor prop = createPredictor();
 
-		DenseMatrix64F orig = createInitState().getMean();
-		DenseMatrix64F origTest = createInitState().getMean();
+		DMatrixRMaj orig = createInitState().getMean();
+		DMatrixRMaj origTest = createInitState().getMean();
 
 		prop.predict(orig, null, 1);
 
-		assertTrue(MatrixFeatures.isIdentical(orig, origTest, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(orig, origTest, 1e-8));
 
-		assertFalse(MatrixFeatures.isIdentical(orig, prop.getPredictedState(), 1e-8));
+		assertFalse(MatrixFeatures_DDRM.isIdentical(orig, prop.getPredictedState(), 1e-8));
 	}
 
 	public abstract EkfPredictor createPredictor();

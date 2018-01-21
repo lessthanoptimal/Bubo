@@ -19,8 +19,8 @@
 package bubo.mapping.models.kinematics;
 
 import bubo.filters.ekf.EkfPredictor;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * <p>
@@ -46,18 +46,18 @@ import org.ejml.ops.CommonOps;
 public class PredictorLocalMotion2D implements EkfPredictor<LocalMotion2D> {
 
 	// estimated state
-	DenseMatrix64F x_est = new DenseMatrix64F(3, 1);
+	DMatrixRMaj x_est = new DMatrixRMaj(3, 1);
 	// state transition matrix
-	DenseMatrix64F G = CommonOps.identity(3);
+	DMatrixRMaj G = CommonOps_DDRM.identity(3);
 	// plant noise covariance matrix
-	DenseMatrix64F Q = new DenseMatrix64F(3, 3);
+	DMatrixRMaj Q = new DMatrixRMaj(3, 3);
 
 	// Control noise model
-	DenseMatrix64F M = new DenseMatrix64F(3, 3);
+	DMatrixRMaj M = new DMatrixRMaj(3, 3);
 	// Control Jacobian.  Used to map noise in control space into state space
-	DenseMatrix64F V = new DenseMatrix64F(3, 3);
+	DMatrixRMaj V = new DMatrixRMaj(3, 3);
 	// holds intermediate results
-	DenseMatrix64F tempVM = new DenseMatrix64F(3, 3);
+	DMatrixRMaj tempVM = new DMatrixRMaj(3, 3);
 
 	// location error per distance traveled
 	double odomTravelSigma;
@@ -80,7 +80,7 @@ public class PredictorLocalMotion2D implements EkfPredictor<LocalMotion2D> {
 	}
 
 	@Override
-	public void predict(DenseMatrix64F state, LocalMotion2D control, double elapsedTime) {
+	public void predict(DMatrixRMaj state, LocalMotion2D control, double elapsedTime) {
 
 		double x = state.get(0);
 		double y = state.get(1);
@@ -110,30 +110,30 @@ public class PredictorLocalMotion2D implements EkfPredictor<LocalMotion2D> {
 		M.unsafe_set(1, 1, d*odomTravelSigma );
 		M.unsafe_set(2, 2, d*odomTravelAngleSigma + Math.abs(control.theta)*odomAngleSigma );
 
-		CommonOps.mult(V, M, tempVM);
-		CommonOps.multTransB(tempVM, V, Q);
+		CommonOps_DDRM.mult(V, M, tempVM);
+		CommonOps_DDRM.multTransB(tempVM, V, Q);
 	}
 
 	@Override
-	public DenseMatrix64F getJacobianF() {
+	public DMatrixRMaj getJacobianF() {
 		return G;
 	}
 
 	@Override
-	public DenseMatrix64F getPlantNoise() {
+	public DMatrixRMaj getPlantNoise() {
 		return Q;
 	}
 
 	@Override
-	public DenseMatrix64F getPredictedState() {
+	public DMatrixRMaj getPredictedState() {
 		return x_est;
 	}
 
-	public DenseMatrix64F getM() {
+	public DMatrixRMaj getM() {
 		return M;
 	}
 
-	public DenseMatrix64F getV() {
+	public DMatrixRMaj getV() {
 		return V;
 	}
 }

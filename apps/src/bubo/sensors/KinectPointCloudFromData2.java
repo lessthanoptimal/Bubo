@@ -22,22 +22,22 @@ import boofcv.alg.depth.VisualDepthOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.gui.d3.PointCloudViewer;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.FastQueueArray_I32;
-import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageUInt16;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
 import bubo.gui.FactoryVisualization3D;
 import bubo.gui.UtilDisplayBubo;
 import bubo.gui.d3.PointCloudPanel;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -57,15 +57,15 @@ public class KinectPointCloudFromData2 {
 		String nameDepth = baseDir+"depth01.depth";
 		String nameCalib = baseDir+"intrinsic.xml";
 
-		IntrinsicParameters param = UtilIO.loadXML(nameCalib);
+		CameraPinholeRadial param = CalibrationIO.load(nameCalib);
 
-		ImageUInt16 depth = new ImageUInt16(1,1);
+		GrayU16 depth = new GrayU16(1,1);
 
 		BufferedImage input = UtilImageIO.loadImage(nameRgb);
 
-		MultiSpectral<ImageUInt8> rgb =
-				new MultiSpectral<ImageUInt8>(ImageUInt8.class,input.getWidth(),input.getHeight(),3);
-		ConvertBufferedImage.convertFromMulti(input, rgb, true, ImageUInt8.class);
+		Planar<GrayU8> rgb =
+				new Planar<GrayU8>(GrayU8.class,input.getWidth(),input.getHeight(),3);
+		ConvertBufferedImage.convertFromPlanar(input, rgb, true, GrayU8.class);
 		UtilOpenKinect.parseDepth(nameDepth,depth,null);
 
 		FastQueue<Point3D_F64> cloud = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
@@ -73,7 +73,7 @@ public class KinectPointCloudFromData2 {
 
 		VisualDepthOps.depthTo3D(param, rgb, depth, cloud, cloudColor);
 
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(param, null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(param, (DMatrixRMaj)null);
 
 		PointCloudViewer viewer = new PointCloudViewer(K, 0.05);
 		viewer.setPreferredSize(new Dimension(rgb.width,rgb.height));

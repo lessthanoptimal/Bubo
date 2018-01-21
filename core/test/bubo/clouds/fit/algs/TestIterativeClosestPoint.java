@@ -21,17 +21,18 @@ package bubo.clouds.fit.algs;
 import bubo.struct.StoppingCondition;
 import georegression.fitting.se.MotionSe2PointSVD_F64;
 import georegression.fitting.se.MotionSe3PointSVD_F64;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.misc.test.GeometryUnitTest;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class TestIterativeClosestPoint {
 	public void test3D() {
 		for (double noise = 0; noise <= 0.01; noise += 0.01) {
 			// can only correct small changes
-			DenseMatrix64F R = RotationMatrixGenerator.eulerXYZ(0.01, -0.002, 0.03, null);
+			DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.01, -0.002, 0.03, null);
 			Vector3D_F64 T = new Vector3D_F64(0.02, 0.03, 0.01);
 
 			Se3_F64 tran = new Se3_F64(R, T);

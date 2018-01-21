@@ -26,7 +26,7 @@ import bubo.filters.kf.KalmanPredictor;
 import bubo.filters.kf.KalmanProjector;
 import bubo.filters.specific.ekf.KfToEkfPredictor;
 import bubo.filters.specific.ekf.KfToEkfProjector;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import static bubo.filters.imm.TestInteractingMultipleModelFilter.createTransitionMatrix;
 
@@ -58,7 +58,7 @@ public class CompareIhImmToKalman extends CompareToKalmanTests {
 			filters[i] = new ExtendedKalmanFilter(pred, proj);
 		}
 
-		DenseMatrix64F pi = createTransitionMatrix(numModels);
+		DMatrixRMaj pi = createTransitionMatrix(numModels);
 
 		InternalStateConverter converter = new TrivialInternalStateConverter(3);
 

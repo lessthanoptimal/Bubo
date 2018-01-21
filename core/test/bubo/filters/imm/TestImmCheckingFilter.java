@@ -21,8 +21,8 @@ package bubo.filters.imm;
 import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.kf.ConstAccel1D;
 import bubo.filters.specific.ekf.KfToEkfPredictor;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -35,7 +35,7 @@ public class TestImmCheckingFilter {
 	 */
 	@Test
 	public void checkBadTransitionMatrix() {
-		DenseMatrix64F pi = CommonOps.identity(3);
+		DMatrixRMaj pi = CommonOps_DDRM.identity(3);
 
 		assertTrue(ImmCheckingFilter.isValidMarkovMatrix(pi));
 
@@ -90,7 +90,7 @@ public class TestImmCheckingFilter {
 			ret[i] = new ImmHypothesis(pred);
 			ret[i].setProbability(prob);
 
-			ret[i].getState().getCovariance().set(CommonOps.identity(3));
+			ret[i].getState().getCovariance().set(CommonOps_DDRM.identity(3));
 
 			if (whatIsBad == 1) {
 				ret[i].getState().getMean().set(1, 0, Double.NaN);

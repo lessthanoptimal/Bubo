@@ -21,9 +21,9 @@ package bubo.filters.ekf;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.abst.KalmanFilterInterface;
 import bubo.filters.kf.DKFCommon;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
-import static org.ejml.ops.CommonOps.subtractEquals;
+import static org.ejml.dense.row.CommonOps_DDRM.subtractEquals;
 
 
 /**
@@ -113,11 +113,11 @@ public class ExtendedKalmanFilter<Control> extends DKFCommon implements KalmanFi
 	public void predict(MultivariateGaussianDM state, Control control , double elapsedTime) {
 		predictor.predict(state.getMean(), control, elapsedTime);
 
-		DenseMatrix64F F = predictor.getJacobianF();
-		DenseMatrix64F Q = predictor.getPlantNoise();
+		DMatrixRMaj F = predictor.getJacobianF();
+		DMatrixRMaj Q = predictor.getPlantNoise();
 
-		DenseMatrix64F x = state.getMean();
-		DenseMatrix64F P = state.getCovariance();
+		DMatrixRMaj x = state.getMean();
+		DMatrixRMaj P = state.getCovariance();
 
 		// update the state estimate
 		x.set(predictor.getPredictedState());
@@ -131,13 +131,13 @@ public class ExtendedKalmanFilter<Control> extends DKFCommon implements KalmanFi
 	@Override
 	public void update(MultivariateGaussianDM state, MultivariateGaussianDM meas) {
 		projector.compute(state.getMean());
-		DenseMatrix64F H = projector.getJacobianH();
+		DMatrixRMaj H = projector.getJacobianH();
 
-		DenseMatrix64F x = state.getMean();
-		DenseMatrix64F P = state.getCovariance();
+		DMatrixRMaj x = state.getMean();
+		DMatrixRMaj P = state.getCovariance();
 
-		DenseMatrix64F z = meas.getMean();
-		DenseMatrix64F R = meas.getCovariance();
+		DMatrixRMaj z = meas.getMean();
+		DMatrixRMaj R = meas.getCovariance();
 
 		// compute the residual
 		y.set(z);

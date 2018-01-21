@@ -33,7 +33,7 @@ import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.util.BufferUtils;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.line.LineSegment3D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -43,7 +43,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.struct.so.Quaternion_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.GrowQueue_I32;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -405,10 +405,10 @@ public class JmePointCloudPanel extends PointCloudPanel {
 		rodToLocal.T.z = armLength/2;
 
 		Se3_F64 rotX = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(-Math.PI/2.0,0,0,rotX.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,-Math.PI/2.0,0,0,rotX.R);
 
 		Se3_F64 rotY = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(0,Math.PI/2.0,0,rotY.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,Math.PI/2.0,0,rotY.R);
 
 		final Transform transformZ = convert(rodToLocal.concat(localToWorld,null));
 		final Transform transformY = convert(rodToLocal.concat(rotX,null).concat(localToWorld,null));
@@ -525,7 +525,7 @@ public class JmePointCloudPanel extends PointCloudPanel {
 	}
 
 	public static Transform convertToJme( Se3_F64 a ) {
-		Quaternion_F64 quat = RotationMatrixGenerator.matrixToQuaternion(a.getR(),null);
+		Quaternion_F64 quat = ConvertRotation3D_F64.matrixToQuaternion(a.getR(),null);
 		Quaternion jmeQaut = new Quaternion((float)quat.x,(float)quat.y,(float)quat.z,(float)quat.w);
 
 		Vector3D_F64 T = a.getT();
@@ -559,8 +559,8 @@ public class JmePointCloudPanel extends PointCloudPanel {
 		return new Transform(T,R);
 	}
 
-	public static Quaternion convert( DenseMatrix64F R ) {
-		Quaternion_F64 quat = RotationMatrixGenerator.matrixToQuaternion(R,null);
+	public static Quaternion convert( DMatrixRMaj R ) {
+		Quaternion_F64 quat = ConvertRotation3D_F64.matrixToQuaternion(R,null);
 		return new Quaternion((float)quat.x,(float)quat.y,(float)quat.z,(float)quat.w);
 	}
 }

@@ -18,7 +18,7 @@
 
 package bubo.filters.kf;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * <p>
@@ -45,7 +45,7 @@ public interface KalmanPredictor<Control> {
 	 * <p/>
 	 * This is sometimes referred to as the F matrix.
 	 */
-	public DenseMatrix64F getStateTransition();
+	public DMatrixRMaj getStateTransition();
 
 	/**
 	 * This is an optional matrix.  The control input in a Kalman filter is assumed to be
@@ -53,14 +53,14 @@ public interface KalmanPredictor<Control> {
 	 * <p/>
 	 * See G(k) above.
 	 */
-	public DenseMatrix64F getControlTransition();
+	public DMatrixRMaj getControlTransition();
 
 	/**
 	 * Amount of noise added to the system in the form of a covariance matrix.
 	 *
 	 * @return Covariance matrix
 	 */
-	public DenseMatrix64F getPlantNoise();
+	public DMatrixRMaj getPlantNoise();
 
 	/**
 	 * Expected length of state vector

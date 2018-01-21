@@ -19,7 +19,7 @@
 package bubo.filters.specific.kf;
 
 import bubo.filters.kf.KalmanPredictor;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Checks to see if the delta time has changed, if so it recomputes everything, otherwise it
@@ -27,20 +27,20 @@ import org.ejml.data.DenseMatrix64F;
  */
 public abstract class CacheKalmanPredictor<Control> implements KalmanPredictor<Control> {
 
-	protected DenseMatrix64F tran;
-	protected DenseMatrix64F control;
-	protected DenseMatrix64F plant;
+	protected DMatrixRMaj tran;
+	protected DMatrixRMaj control;
+	protected DMatrixRMaj plant;
 	private double prevDeltaTime = -1;
 
 	public CacheKalmanPredictor(int stateDimen, int controlDimen) {
-		tran = new DenseMatrix64F(stateDimen, stateDimen);
-		plant = new DenseMatrix64F(stateDimen, stateDimen);
-		control = new DenseMatrix64F(stateDimen, controlDimen);
+		tran = new DMatrixRMaj(stateDimen, stateDimen);
+		plant = new DMatrixRMaj(stateDimen, stateDimen);
+		control = new DMatrixRMaj(stateDimen, controlDimen);
 	}
 
 	public CacheKalmanPredictor(int stateDimen) {
-		tran = new DenseMatrix64F(stateDimen, stateDimen);
-		plant = new DenseMatrix64F(stateDimen, stateDimen);
+		tran = new DMatrixRMaj(stateDimen, stateDimen);
+		plant = new DMatrixRMaj(stateDimen, stateDimen);
 	}
 
 	@Override
@@ -56,15 +56,15 @@ public abstract class CacheKalmanPredictor<Control> implements KalmanPredictor<C
 	 */
 	protected abstract void _compute(double deltaTime);
 
-	public DenseMatrix64F getStateTransition() {
+	public DMatrixRMaj getStateTransition() {
 		return tran;
 	}
 
-	public DenseMatrix64F getControlTransition() {
+	public DMatrixRMaj getControlTransition() {
 		return control;
 	}
 
-	public DenseMatrix64F getPlantNoise() {
+	public DMatrixRMaj getPlantNoise() {
 		return plant;
 	}
 

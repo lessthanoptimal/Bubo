@@ -18,8 +18,8 @@
 
 package bubo.filters.ekf;
 
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * Utility functions related to EkfPropagator
@@ -37,12 +37,12 @@ public class UtilEkfPropagator {
 	 * @param delta How much the state changes should be adjusted
 	 * @return
 	 */
-	public static DenseMatrix64F numericalJacobian(DenseMatrix64F initX, EkfPredictor<?> prop, double T, double delta) {
+	public static DMatrixRMaj numericalJacobian(DMatrixRMaj initX, EkfPredictor<?> prop, double T, double delta) {
 		int N = prop.getSystemSize();
 
-		DenseMatrix64F a = new DenseMatrix64F(N, 1);
-		DenseMatrix64F b = new DenseMatrix64F(initX);
-		DenseMatrix64F F = new DenseMatrix64F(N, N);
+		DMatrixRMaj a = new DMatrixRMaj(N, 1);
+		DMatrixRMaj b = new DMatrixRMaj(initX);
+		DMatrixRMaj F = new DMatrixRMaj(N, N);
 
 		prop.predict(initX, null, T);
 		a.set(prop.getPredictedState());
@@ -52,7 +52,7 @@ public class UtilEkfPropagator {
 
 			prop.predict(b, null, T);
 			b.set(prop.getPredictedState());
-			CommonOps.add(b, -1, a, b);
+			CommonOps_DDRM.add(b, -1, a, b);
 
 
 			for (int j = 0; j < N; j++) {

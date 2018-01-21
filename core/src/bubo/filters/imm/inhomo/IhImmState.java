@@ -19,8 +19,8 @@
 package bubo.filters.imm.inhomo;
 
 import bubo.filters.MultivariateGaussianDM;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * There state of an InhomoInteractingMultipleModel filter.
@@ -33,8 +33,8 @@ public class IhImmState {
 	private InternalStateConverter converter;
 
 	// to cut down on memory each hypothesis could share this memory
-	private DenseMatrix64F d;
-	private DenseMatrix64F outer;
+	private DMatrixRMaj d;
+	private DMatrixRMaj outer;
 
 	public IhImmState(InhomoInteractingMultipleModel filter) {
 		converter = filter.getConverter();
@@ -49,8 +49,8 @@ public class IhImmState {
 
 		stateMOG = new MultivariateGaussianDM(dimen);
 
-		d = new DenseMatrix64F(dimen, 1);
-		outer = new DenseMatrix64F(dimen, dimen);
+		d = new DMatrixRMaj(dimen, 1);
+		outer = new DMatrixRMaj(dimen, dimen);
 	}
 
 	/**
@@ -74,8 +74,8 @@ public class IhImmState {
 	 * Computes a mixture of Gaussians (MOG) from the models.
 	 */
 	public MultivariateGaussianDM computeMOG() {
-		DenseMatrix64F x_ret = stateMOG.getMean();
-		DenseMatrix64F P_ret = stateMOG.getCovariance();
+		DMatrixRMaj x_ret = stateMOG.getMean();
+		DMatrixRMaj P_ret = stateMOG.getCovariance();
 
 		x_ret.zero();
 		P_ret.zero();
@@ -85,28 +85,28 @@ public class IhImmState {
 		for (int i = 0; i < hypotheses.length; i++) {
 			IhImmHypothesis h = hypotheses[i];
 //            System.out.println("  model prob = "+h.getProbability());
-			DenseMatrix64F x_j_orig = h.getState().getMean();
-			DenseMatrix64F x_j = converter.convertOutput(true, x_j_orig, i);
-			CommonOps.add(x_ret, h.getProbability(), x_j, x_ret);
+			DMatrixRMaj x_j_orig = h.getState().getMean();
+			DMatrixRMaj x_j = converter.convertOutput(true, x_j_orig, i);
+			CommonOps_DDRM.add(x_ret, h.getProbability(), x_j, x_ret);
 		}
 
 		// compute the covariance
 		for (int i = 0; i < hypotheses.length; i++) {
 			IhImmHypothesis h = hypotheses[i];
 
-			DenseMatrix64F x_j_orig = h.getState().getMean();
-			DenseMatrix64F x_j = converter.convertOutput(true, x_j_orig, i);
+			DMatrixRMaj x_j_orig = h.getState().getMean();
+			DMatrixRMaj x_j = converter.convertOutput(true, x_j_orig, i);
 
 			d.set(x_j);
-			CommonOps.add(d, -1, x_ret, d);
+			CommonOps_DDRM.add(d, -1, x_ret, d);
 
-			CommonOps.multTransB(d, d, outer);
+			CommonOps_DDRM.multTransB(d, d, outer);
 
-			DenseMatrix64F P_j_orig = h.getState().getCovariance();
-			DenseMatrix64F P_j = converter.convertOutput(false, P_j_orig, i);
-			CommonOps.add(outer, P_j, outer);
+			DMatrixRMaj P_j_orig = h.getState().getCovariance();
+			DMatrixRMaj P_j = converter.convertOutput(false, P_j_orig, i);
+			CommonOps_DDRM.add(outer, P_j, outer);
 
-			CommonOps.add(P_ret, h.getProbability(), outer, P_ret);
+			CommonOps_DDRM.add(P_ret, h.getProbability(), outer, P_ret);
 		}
 
 		return stateMOG;

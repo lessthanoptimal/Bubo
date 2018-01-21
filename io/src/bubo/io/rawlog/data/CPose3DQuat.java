@@ -21,7 +21,7 @@ package bubo.io.rawlog.data;
 import bubo.io.LittleEndianIO;
 import bubo.io.rawlog.RawlogDecoder;
 import bubo.io.rawlog.RawlogSerializableCustom;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.so.Quaternion_F64;
 
@@ -43,7 +43,7 @@ public class CPose3DQuat extends CPose implements RawlogSerializableCustom {
 
 	public CPose3DQuat(CPose3D orig) {
 		position.set(orig.getPosition());
-		RotationMatrixGenerator.matrixToQuaternion(orig.getRotation(), rotation);
+		ConvertRotation3D_F64.matrixToQuaternion(orig.getRotation(), rotation);
 	}
 
 	public CPose3DQuat(Point3D_F64 position, Quaternion_F64 rotation) {

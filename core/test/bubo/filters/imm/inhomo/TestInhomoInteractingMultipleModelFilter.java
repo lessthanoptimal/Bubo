@@ -30,8 +30,8 @@ import bubo.filters.kf.FixedKalmanProjector;
 import bubo.filters.kf.KalmanPredictor;
 import bubo.filters.specific.ekf.KfToEkfPredictor;
 import bubo.filters.specific.ekf.KfToEkfProjector;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -42,23 +42,23 @@ public class TestInhomoInteractingMultipleModelFilter {
 	 * Create a predictor where nothing changes
 	 */
 	public static EkfPredictor createStaticPredictor() {
-		DenseMatrix64F F = CommonOps.identity(3);
-		DenseMatrix64F Q = CommonOps.identity(3);
+		DMatrixRMaj F = CommonOps_DDRM.identity(3);
+		DMatrixRMaj Q = CommonOps_DDRM.identity(3);
 		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
 
 		return new KfToEkfPredictor(kalmanPred, null);
 	}
 
 	public static EkfPredictor createPredictorN(int dof) {
-		DenseMatrix64F F = CommonOps.identity(dof);
-		DenseMatrix64F Q = CommonOps.identity(dof);
+		DMatrixRMaj F = CommonOps_DDRM.identity(dof);
+		DMatrixRMaj Q = CommonOps_DDRM.identity(dof);
 		KalmanPredictor kalmanPred = new FixedKalmanPredictor(F, null, Q);
 
 		return new KfToEkfPredictor(kalmanPred, null);
 	}
 
 	public static EkfProjector createProjectorN(int dof) {
-		DenseMatrix64F H = new DenseMatrix64F(1, dof);
+		DMatrixRMaj H = new DMatrixRMaj(1, dof);
 		H.set(0, 0, 1.0);
 		FixedKalmanProjector kfProj = new FixedKalmanProjector(H);
 
@@ -133,7 +133,7 @@ public class TestInhomoInteractingMultipleModelFilter {
 	private MultivariateGaussianDM createInitState() {
 		MultivariateGaussianDM ret = new MultivariateGaussianDM(3);
 
-		ret.getCovariance().set(CommonOps.identity(3));
+		ret.getCovariance().set(CommonOps_DDRM.identity(3));
 		ret.getMean().set(1, 0, 2);
 		ret.getMean().set(2, 0, 1.5);
 
@@ -144,7 +144,7 @@ public class TestInhomoInteractingMultipleModelFilter {
 	 * Create an IMM with two models.  one is static and the other moves.
 	 */
 	private InhomoInteractingMultipleModel<?> createConvergeIMM() {
-		DenseMatrix64F H = CommonOps.identity(3);
+		DMatrixRMaj H = CommonOps_DDRM.identity(3);
 		FixedKalmanProjector kfProj = new FixedKalmanProjector(H);
 
 		EkfPredictor predMove = new KfToEkfPredictor(new ConstAccel1D(1, 1), null);
@@ -154,7 +154,7 @@ public class TestInhomoInteractingMultipleModelFilter {
 		filters[0] = new ExtendedKalmanFilter(predMove, new KfToEkfProjector(kfProj));
 		filters[1] = new ExtendedKalmanFilter(predStatic, new KfToEkfProjector(kfProj));
 
-		DenseMatrix64F pi = new DenseMatrix64F(new double[][]{{0.95, 0.05}, {0.05, 0.95}});
+		DMatrixRMaj pi = new DMatrixRMaj(new double[][]{{0.95, 0.05}, {0.05, 0.95}});
 
 		InternalStateConverter converter = new TrivialInternalStateConverter(3);
 
@@ -171,7 +171,7 @@ public class TestInhomoInteractingMultipleModelFilter {
 		filters[0] = new ExtendedKalmanFilter(createPredictorN(2), createProjectorN(2));
 		filters[1] = new ExtendedKalmanFilter(createPredictorN(3), createProjectorN(3));
 
-		DenseMatrix64F pi = new DenseMatrix64F(new double[][]{{0.95, 0.05}, {0.05, 0.95}});
+		DMatrixRMaj pi = new DMatrixRMaj(new double[][]{{0.95, 0.05}, {0.05, 0.95}});
 
 		TruncatelInternalStateConverter converter = new TruncatelInternalStateConverter(2, 3);
 		converter.setDefault(UtilMultivariateGaussian.createDummy(3, 0));

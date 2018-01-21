@@ -20,8 +20,8 @@ package bubo.filters.specific.ekf;
 
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.ekf.EkfPredictor;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -43,14 +43,14 @@ public abstract class GenericEkfPredictorDiscreteTests {
 	public void checkOriginalUnchanged() {
 		EkfPredictor prop = createPredictor();
 
-		DenseMatrix64F orig = createInitState().getMean();
-		DenseMatrix64F origTest = createInitState().getMean();
+		DMatrixRMaj orig = createInitState().getMean();
+		DMatrixRMaj origTest = createInitState().getMean();
 
 		prop.predict(orig, null, -1);
 
-		assertTrue(MatrixFeatures.isIdentical(orig, origTest, 1e-8));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(orig, origTest, 1e-8));
 
-		assertFalse(MatrixFeatures.isIdentical(orig, prop.getPredictedState(), 1e-8));
+		assertFalse(MatrixFeatures_DDRM.isIdentical(orig, prop.getPredictedState(), 1e-8));
 	}
 
 	public abstract EkfPredictor createPredictor();

@@ -19,7 +19,8 @@
 package bubo.desc.sensors.lrf3d;
 
 import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -82,11 +83,11 @@ public class SpinningLrf2dScanToPoints {
 			baseToWorld1 = identity;
 
 		// The LRF is spinning.  Compute the transform when the first scan was collected and when it ended
-		RotationMatrixGenerator.eulerXYZ(0,0,meas.angle0, baseRtoBase.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0,0,meas.angle0, baseRtoBase.R);
 		armToBaseR.concat(baseRtoBase, armToBase);
 		param.lrfToArm.concat(armToBase, lrfToBase);
 		lrfToBase.concat(baseToWorld0,lrf0ToWorld0);
-		RotationMatrixGenerator.eulerXYZ(0, 0, meas.angle1, baseRtoBase.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0, 0, meas.angle1, baseRtoBase.R);
 		armToBaseR.concat(baseRtoBase, armToBase);
 		param.lrfToArm.concat(armToBase, lrfToBase);
 		lrfToBase.concat(baseToWorld1,lrf1ToWorld1);

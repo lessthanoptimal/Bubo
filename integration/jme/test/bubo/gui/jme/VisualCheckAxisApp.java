@@ -20,7 +20,7 @@ package bubo.gui.jme;
 
 import bubo.gui.UtilDisplayBubo;
 import bubo.gui.d3.PointCloudPanel;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.awt.*;
@@ -40,7 +40,7 @@ public class VisualCheckAxisApp {
 		// tilt it towards the camera
 		Se3_F64 transform = new Se3_F64();
 		transform.getT().set(0,0,2);
-		RotationMatrixGenerator.eulerXYZ(0.4,0,0,transform.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.4,0,0,transform.R);
 
 		panel.addSphere(0,0,0,0.02,0xFF00FF00);     // origin = green
 		panel.addSphere(0.5,0,0,0.02,0xFFA000A0);   // x-axis = purple

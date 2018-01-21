@@ -20,7 +20,7 @@ package bubo.filters.specific.ekf;
 
 
 import bubo.filters.ekf.EkfPredictor;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import static java.lang.Math.*;
 
@@ -40,28 +40,28 @@ import static java.lang.Math.*;
  */
 public class OscillatingConstMotion implements EkfPredictor {
 
-	DenseMatrix64F x;
-	DenseMatrix64F F;
-	DenseMatrix64F Q;
+	DMatrixRMaj x;
+	DMatrixRMaj F;
+	DMatrixRMaj Q;
 	double T;
 
 	public OscillatingConstMotion(double T) {
-		x = new DenseMatrix64F(3, 1);
-		F = new DenseMatrix64F(3, 3);
-		Q = new DenseMatrix64F(3, 3);
+		x = new DMatrixRMaj(3, 1);
+		F = new DMatrixRMaj(3, 3);
+		Q = new DMatrixRMaj(3, 3);
 		this.T = T;
 	}
 
 	public OscillatingConstMotion() {
-		x = new DenseMatrix64F(3, 1);
-		F = new DenseMatrix64F(3, 3);
-		Q = new DenseMatrix64F(3, 3);
+		x = new DMatrixRMaj(3, 1);
+		F = new DMatrixRMaj(3, 3);
+		Q = new DMatrixRMaj(3, 3);
 
 		T = Double.NaN;
 	}
 
 	@Override
-	public void predict(DenseMatrix64F mean, Object o, double T) {
+	public void predict(DMatrixRMaj mean, Object o, double T) {
 		double x1 = mean.get(0, 0);
 		double x2 = mean.get(1, 0);
 		double x3 = mean.get(2, 0);
@@ -85,17 +85,17 @@ public class OscillatingConstMotion implements EkfPredictor {
 	}
 
 	@Override
-	public DenseMatrix64F getJacobianF() {
+	public DMatrixRMaj getJacobianF() {
 		return F;
 	}
 
 	@Override
-	public DenseMatrix64F getPlantNoise() {
+	public DMatrixRMaj getPlantNoise() {
 		return Q;
 	}
 
 	@Override
-	public DenseMatrix64F getPredictedState() {
+	public DMatrixRMaj getPredictedState() {
 		return x;
 	}
 

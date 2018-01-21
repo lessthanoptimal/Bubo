@@ -18,7 +18,7 @@
 
 package bubo.filters.imm;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Computes an interaction matrix for the IMM filter.  The values in the interaction matrix depend on
@@ -30,5 +30,5 @@ public interface InteractionMatrixInterface {
 	 *
 	 * @param deltaTime The time since the previous observation.
 	 */
-	public DenseMatrix64F computeMatrix(double deltaTime);
+	public DMatrixRMaj computeMatrix(double deltaTime);
 }

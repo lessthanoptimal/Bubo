@@ -20,7 +20,7 @@ package bubo.io.data.encoded;
 
 
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import bubo.io.data.ImageEncoded;
 
 import javax.imageio.ImageIO;
@@ -36,7 +36,7 @@ import java.io.IOException;
  */
 public class ImageJpeg implements ImageEncoded {
 
-	Class imageType = ImageUInt8.class;
+	Class imageType = GrayU8.class;
 	byte[] data;
 	int length;
 

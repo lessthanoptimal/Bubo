@@ -20,8 +20,8 @@ package bubo.filters.imm.inhomo;
 
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.UtilMultivariateGaussian;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,13 +39,13 @@ public class TestTruncatelInternalStateConverter {
 
 		MultivariateGaussianDM large = UtilMultivariateGaussian.createDummy(5, 2);
 
-		CommonOps.fill(large.getMean(), 5);
+		CommonOps_DDRM.fill(large.getMean(), 5);
 
-		DenseMatrix64F x = converter.convertMergeFrom(true, large.getMean(), 0, 1);
-		assertEquals(15, CommonOps.elementSum(x), 1e-6);
+		DMatrixRMaj x = converter.convertMergeFrom(true, large.getMean(), 0, 1);
+		assertEquals(15, CommonOps_DDRM.elementSum(x), 1e-6);
 
-		DenseMatrix64F P = converter.convertMergeFrom(false, large.getCovariance(), 0, 1);
-		assertEquals(6, CommonOps.elementSum(P), 1e-6);
+		DMatrixRMaj P = converter.convertMergeFrom(false, large.getCovariance(), 0, 1);
+		assertEquals(6, CommonOps_DDRM.elementSum(P), 1e-6);
 	}
 
 	/**
@@ -56,19 +56,19 @@ public class TestTruncatelInternalStateConverter {
 	public void smallToLarge() {
 		TruncatelInternalStateConverter converter = new TruncatelInternalStateConverter(2, 6);
 		MultivariateGaussianDM def = new MultivariateGaussianDM(6);
-		CommonOps.fill(def.getMean(), 4);
-		CommonOps.fill(def.getCovariance(), 4);
+		CommonOps_DDRM.fill(def.getMean(), 4);
+		CommonOps_DDRM.fill(def.getCovariance(), 4);
 
 		converter.setModelDimensions(2, 5, 3);
 		converter.setDefault(def);
 
 		MultivariateGaussianDM small = UtilMultivariateGaussian.createDummy(3, 0);
 
-		DenseMatrix64F x = converter.convertMergeFrom(true, small.getMean(), 1, 0);
-		assertEquals(8, CommonOps.elementSum(x), 1e-6);
+		DMatrixRMaj x = converter.convertMergeFrom(true, small.getMean(), 1, 0);
+		assertEquals(8, CommonOps_DDRM.elementSum(x), 1e-6);
 
-		DenseMatrix64F P = converter.convertMergeFrom(false, small.getCovariance(), 1, 0);
-		assertEquals(64, CommonOps.elementSum(P), 1e-6);
+		DMatrixRMaj P = converter.convertMergeFrom(false, small.getCovariance(), 1, 0);
+		assertEquals(64, CommonOps_DDRM.elementSum(P), 1e-6);
 	}
 
 }

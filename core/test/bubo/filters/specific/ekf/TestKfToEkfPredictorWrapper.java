@@ -25,8 +25,8 @@ import bubo.filters.kf.ConstAccel1D;
 import bubo.filters.kf.FixedKalmanProjector;
 import bubo.filters.kf.KalmanFilter;
 import bubo.filters.kf.KalmanPredictor;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -47,7 +47,7 @@ public class TestKfToEkfPredictorWrapper {
 	 * control input to be toggled.
 	 */
 	private void compareToKfPredict(boolean hasInput) {
-		DenseMatrix64F u = null;
+		DMatrixRMaj u = null;
 
 		if (hasInput) {
 			u = createControl();
@@ -61,7 +61,7 @@ public class TestKfToEkfPredictorWrapper {
 		pred.predict(x.getMean(), null, -1);
 		filter.predict(x,null,-1);
 
-		assertTrue(MatrixFeatures.isIdentical(pred.getPredictedState(), x.getMean(), 1e-5));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(pred.getPredictedState(), x.getMean(), 1e-5));
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class TestKfToEkfPredictorWrapper {
 	private KalmanFilter createFilter(boolean withControl) {
 		KalmanPredictor prop = createPredictor(withControl);
 
-		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1, 1, 1}, {0, 1, 2}});
 
 		FixedKalmanProjector projector = new FixedKalmanProjector(H);
 
@@ -105,15 +105,15 @@ public class TestKfToEkfPredictorWrapper {
 		if (!withControl)
 			return new ConstAccel1D(1.0, 1);
 		else {
-			DenseMatrix64F G = new DenseMatrix64F(3, 2);
+			DMatrixRMaj G = new DMatrixRMaj(3, 2);
 			G.set(0, 0, 0.3);
 			G.set(2, 1, 0.8);
 			return new ConstAccel1D(G, 1.0);
 		}
 	}
 
-	private DenseMatrix64F createControl() {
-		DenseMatrix64F ret = new DenseMatrix64F(2, 1);
+	private DMatrixRMaj createControl() {
+		DMatrixRMaj ret = new DMatrixRMaj(2, 1);
 		ret.set(0, 0, 2);
 		ret.set(1, 0, 0.1);
 

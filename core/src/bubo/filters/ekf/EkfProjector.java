@@ -18,7 +18,7 @@
 
 package bubo.filters.ekf;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 
 /**
@@ -42,7 +42,7 @@ public interface EkfProjector {
 	 *
 	 * @param systemState The state of the system making the observation.
 	 */
-	public void compute(DenseMatrix64F systemState);
+	public void compute(DMatrixRMaj systemState);
 
 	/**
 	 * <p>
@@ -55,7 +55,7 @@ public interface EkfProjector {
 	 * @return Observation Jacobian matrix. WARNING DO NOT MODIFY!
 	 * DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
 	 */
-	public DenseMatrix64F getJacobianH();
+	public DMatrixRMaj getJacobianH();
 
 	/**
 	 * Returns the estimated measurement, given the current state estimate.
@@ -63,5 +63,5 @@ public interface EkfProjector {
 	 * @return Estimated measurement column vector.
 	 * WARNING DO NOT MODIFY!  DATA IS MODIFIED EACH TIME {@link #compute} IS CALLED.
 	 */
-	public DenseMatrix64F getProjected();
+	public DMatrixRMaj getProjected();
 }

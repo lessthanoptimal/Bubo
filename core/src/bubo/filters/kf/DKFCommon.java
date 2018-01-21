@@ -19,9 +19,9 @@
 package bubo.filters.kf;
 
 import bubo.filters.abst.InnovationInterface;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
-import static org.ejml.ops.CommonOps.*;
+import static org.ejml.dense.row.CommonOps_DDRM.*;
 
 /**
  * The discrete Kalman Filter (KF) and Extended Kalman Filter (EKF) both share much of the same code.  The
@@ -31,19 +31,19 @@ import static org.ejml.ops.CommonOps.*;
 // TODO add optional runtime matrix tests
 public abstract class DKFCommon implements InnovationInterface {
 	// these are predeclared for efficiency reasons
-	protected DenseMatrix64F a, b;
-	protected DenseMatrix64F y, S, S_inv, c, d;
-	protected DenseMatrix64F K;
+	protected DMatrixRMaj a, b;
+	protected DMatrixRMaj y, S, S_inv, c, d;
+	protected DMatrixRMaj K;
 
 	public DKFCommon(int dimenX, int dimenZ) {
-		a = new DenseMatrix64F(dimenX, 1);
-		b = new DenseMatrix64F(dimenX, dimenX);
-		y = new DenseMatrix64F(dimenZ, 1);
-		S = new DenseMatrix64F(dimenZ, dimenZ);
-		S_inv = new DenseMatrix64F(dimenZ, dimenZ);
-		c = new DenseMatrix64F(dimenZ, dimenX);
-		d = new DenseMatrix64F(dimenX, dimenZ);
-		K = new DenseMatrix64F(dimenX, dimenZ);
+		a = new DMatrixRMaj(dimenX, 1);
+		b = new DMatrixRMaj(dimenX, dimenX);
+		y = new DMatrixRMaj(dimenZ, 1);
+		S = new DMatrixRMaj(dimenZ, dimenZ);
+		S_inv = new DMatrixRMaj(dimenZ, dimenZ);
+		c = new DMatrixRMaj(dimenZ, dimenX);
+		d = new DMatrixRMaj(dimenX, dimenZ);
+		K = new DMatrixRMaj(dimenX, dimenZ);
 	}
 
 	/**
@@ -66,7 +66,7 @@ public abstract class DKFCommon implements InnovationInterface {
 	 * y(k) = z(k) -  H(k)x(k|k-1)
 	 */
 	@Override
-	public DenseMatrix64F getInnovation() {
+	public DMatrixRMaj getInnovation() {
 		return y;
 	}
 
@@ -74,20 +74,20 @@ public abstract class DKFCommon implements InnovationInterface {
 	 * S(k) = H(k) P(k|k-1) H'(k)  + R(k)
 	 */
 	@Override
-	public DenseMatrix64F getInnovationCov() {
+	public DMatrixRMaj getInnovationCov() {
 		return S;
 	}
 
 	@Override
-	public DenseMatrix64F getInnovationCovInverse() {
+	public DMatrixRMaj getInnovationCovInverse() {
 		return S_inv;
 	}
 
-	public DenseMatrix64F getGain() {
+	public DMatrixRMaj getGain() {
 		return K;
 	}
 
-	protected final void _predictCovariance(DenseMatrix64F F, DenseMatrix64F Q, DenseMatrix64F P) {
+	protected final void _predictCovariance(DMatrixRMaj F, DMatrixRMaj Q, DMatrixRMaj P) {
 		// update the covariance estimate
 		// F P F' + Q
 		mult(F, P, b);
@@ -95,7 +95,7 @@ public abstract class DKFCommon implements InnovationInterface {
 		addEquals(P, Q);
 	}
 
-	protected final void _updateCovariance(DenseMatrix64F H, DenseMatrix64F x, DenseMatrix64F P, DenseMatrix64F R) {
+	protected final void _updateCovariance(DMatrixRMaj H, DMatrixRMaj x, DMatrixRMaj P, DMatrixRMaj R) {
 		// compute innovation covariance
 		// H P H' + R
 		mult(H, P, c);

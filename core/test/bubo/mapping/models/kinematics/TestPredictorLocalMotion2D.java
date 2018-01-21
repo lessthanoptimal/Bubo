@@ -19,8 +19,8 @@
 package bubo.mapping.models.kinematics;
 
 import georegression.struct.se.Se2_F64;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.NormOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.NormOps_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -61,7 +61,7 @@ public class TestPredictorLocalMotion2D extends StandardPredictorTests {
 		PredictorLocalMotion2D alg = new PredictorLocalMotion2D(0.1,0.01,0.1);
 
 		Se2_F64 init = new Se2_F64(1,2, Math.PI/2.0);
-		DenseMatrix64F x = new DenseMatrix64F(3, 1, true, init.T.x, init.T.y, init.getYaw());
+		DMatrixRMaj x = new DMatrixRMaj(3, 1, true, init.T.x, init.T.y, init.getYaw());
 
 		control.set(1,0.5,0.1);
 
@@ -70,7 +70,7 @@ public class TestPredictorLocalMotion2D extends StandardPredictorTests {
 		control.addTo(expected);
 
 		alg.predict(x, control, -1);
-		DenseMatrix64F xp = alg.getPredictedState();
+		DMatrixRMaj xp = alg.getPredictedState();
 
 		assertEquals(expected.T.x, xp.get(0), 1e-8);
 		assertEquals(expected.T.y, xp.get(1), 1e-8);
@@ -83,18 +83,18 @@ public class TestPredictorLocalMotion2D extends StandardPredictorTests {
 	@Test
 	public void plantNoise_motion() {
 		PredictorLocalMotion2D alg = new PredictorLocalMotion2D(0.1,0.01,0.1);
-		DenseMatrix64F x = new DenseMatrix64F(3, 1);
+		DMatrixRMaj x = new DMatrixRMaj(3, 1);
 
 		// plant noise should be zero since there is no motion
 		alg.predict(x, new LocalMotion2D(0,0,0), -1);
-		assertEquals(0, NormOps.normF(alg.getPlantNoise()),1e-8);
+		assertEquals(0, NormOps_DDRM.normF(alg.getPlantNoise()),1e-8);
 
 		alg.predict(x, new LocalMotion2D(1,0,0), -1);
-		assertTrue( NormOps.normF(alg.getPlantNoise()) > 0 );
+		assertTrue( NormOps_DDRM.normF(alg.getPlantNoise()) > 0 );
 		alg.predict(x, new LocalMotion2D(0,1,0), -1);
-		assertTrue( NormOps.normF(alg.getPlantNoise()) > 0 );
+		assertTrue( NormOps_DDRM.normF(alg.getPlantNoise()) > 0 );
 		alg.predict(x, new LocalMotion2D(0,0,1), -1);
-		assertTrue( NormOps.normF(alg.getPlantNoise()) > 0 );
+		assertTrue( NormOps_DDRM.normF(alg.getPlantNoise()) > 0 );
 	}
 
 	@Test

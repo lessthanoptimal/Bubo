@@ -62,7 +62,7 @@ public class TestRansacShapeDetection {
 		PlaneNormal3D_F64 planeNorm = new PlaneNormal3D_F64(0, 0, 0, 0, 0, 1);
 		PlaneGeneral3D_F64 plane = UtilPlane3D_F64.convert(planeNorm, null);
 
-		alg.selectMatchSet(o.modelDistance, o.thresholdFit, plane);
+		alg.selectMatchSet(null,o.modelDistance, o.thresholdFit, plane);
 
 		// ,make sure it called the functions
 		assertTrue(dummy.modelDistance);

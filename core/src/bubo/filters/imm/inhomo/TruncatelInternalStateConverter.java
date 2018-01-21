@@ -19,8 +19,8 @@
 package bubo.filters.imm.inhomo;
 
 import bubo.filters.MultivariateGaussianDM;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * Assumes that the states can be converted from one to the other by simply truncating each other.
@@ -36,8 +36,8 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 	// the minimum number of dimension
 	private int min;
 	// predefined matrices for state and covariance
-	private DenseMatrix64F states[];
-	private DenseMatrix64F cov[];
+	private DMatrixRMaj states[];
+	private DMatrixRMaj cov[];
 
 	// number of DOF in the output state
 	private int outputDimen;
@@ -49,12 +49,12 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 	 * @param max the maximum number of DOF the internal models will have (inclusive)
 	 */
 	public TruncatelInternalStateConverter(int min, int max) {
-		states = new DenseMatrix64F[max - min + 1];
-		cov = new DenseMatrix64F[max - min + 1];
+		states = new DMatrixRMaj[max - min + 1];
+		cov = new DMatrixRMaj[max - min + 1];
 
 		for (int i = min; i <= max; i++) {
-			states[i - min] = new DenseMatrix64F(i, 1);
-			cov[i - min] = new DenseMatrix64F(i, i);
+			states[i - min] = new DMatrixRMaj(i, 1);
+			cov[i - min] = new DMatrixRMaj(i, i);
 		}
 		this.min = min;
 	}
@@ -66,7 +66,7 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 	 * <p/>
 	 * An element will be copied if its x index is >= minX OR y index is >= minY
 	 */
-	public static void copyExcludeSubMatrix(DenseMatrix64F src, DenseMatrix64F dest,
+	public static void copyExcludeSubMatrix(DMatrixRMaj src, DMatrixRMaj dest,
 											int minX, int minY) {
 		for (int i = 0; i < dest.numRows; i++) {
 			for (int j = 0; j < dest.numCols; j++) {
@@ -91,8 +91,8 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 	}
 
 	@Override
-	public DenseMatrix64F convertMergeFrom(boolean isMean,
-										   DenseMatrix64F fromState,
+	public DMatrixRMaj convertMergeFrom(boolean isMean,
+										   DMatrixRMaj fromState,
 										   int fromID, int targetID) {
 
 		int targetDimen = internalDimen[targetID];
@@ -102,7 +102,7 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 	}
 
 	@Override
-	public DenseMatrix64F convertOutput(boolean isMean, DenseMatrix64F fromState, int fromID) {
+	public DMatrixRMaj convertOutput(boolean isMean, DMatrixRMaj fromState, int fromID) {
 		int fromDimen = internalDimen[fromID];
 
 		return _convert(isMean, fromState, fromDimen, outputDimen);
@@ -117,19 +117,19 @@ public class TruncatelInternalStateConverter implements InternalStateConverter {
 	 * Copies over the elements in the matrix from the from state.  If it needs more
 	 * it uses the default state to fill in the holes.
 	 */
-	private DenseMatrix64F _convert(boolean isMean,
-									DenseMatrix64F fromState,
+	private DMatrixRMaj _convert(boolean isMean,
+									DMatrixRMaj fromState,
 									int fromDimen, int targetDimen) {
-		DenseMatrix64F a = isMean ? states[targetDimen - min] : cov[targetDimen - min];
+		DMatrixRMaj a = isMean ? states[targetDimen - min] : cov[targetDimen - min];
 
 		if (targetDimen <= fromDimen) {
 			int maxX = isMean ? 1 : targetDimen;
-			CommonOps.extract(fromState, 0, targetDimen, 0, maxX, a, 0, 0);
+			CommonOps_DDRM.extract(fromState, 0, targetDimen, 0, maxX, a, 0, 0);
 //            UtilMtjMatrix.copySubMatrix(fromState,a,maxX,targetDimen);
 		} else {
 			int maxX = isMean ? 1 : fromDimen;
-			DenseMatrix64F def = isMean ? this.def.getMean() : this.def.getCovariance();
-			CommonOps.extract(fromState, 0, fromDimen, 0, maxX, a, 0, 0);
+			DMatrixRMaj def = isMean ? this.def.getMean() : this.def.getCovariance();
+			CommonOps_DDRM.extract(fromState, 0, fromDimen, 0, maxX, a, 0, 0);
 			copyExcludeSubMatrix(def, a, maxX, fromDimen);
 		}
 

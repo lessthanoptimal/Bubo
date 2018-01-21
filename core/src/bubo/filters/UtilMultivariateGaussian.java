@@ -19,9 +19,9 @@
 package bubo.filters;
 
 import org.ddogleg.rand.MultivariateGaussianDraw;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 
 import java.util.Random;
 
@@ -34,11 +34,11 @@ public class UtilMultivariateGaussian {
 	 *
 	 * @param ret If not null the results are stored here.  Otherwise it create a new matrix.
 	 */
-	public static DenseMatrix64F randomDraw(MultivariateGaussianDM dist, Random rand, DenseMatrix64F ret) {
+	public static DMatrixRMaj randomDraw(MultivariateGaussianDM dist, Random rand, DMatrixRMaj ret) {
 		MultivariateGaussianDraw draw = new MultivariateGaussianDraw(rand, dist.getMean(), dist.getCovariance());
 
 		if (ret == null)
-			ret = new DenseMatrix64F(dist.getDimension(), 1);
+			ret = new DMatrixRMaj(dist.getDimension(), 1);
 
 		draw.next(ret);
 
@@ -51,8 +51,8 @@ public class UtilMultivariateGaussian {
 	 * @param y the difference between the mean and the sample
 	 * @param S the covariance of the distribution
 	 */
-	public static double likelihoodP(DenseMatrix64F y, DenseMatrix64F S, DenseMatrix64F S_inv) {
-		DenseMatrix64F d = new DenseMatrix64F(1, y.numRows);
+	public static double likelihoodP(DMatrixRMaj y, DMatrixRMaj S, DMatrixRMaj S_inv) {
+		DMatrixRMaj d = new DMatrixRMaj(1, y.numRows);
 
 		return likelihoodP(y, S, S_inv, d);
 	}
@@ -64,10 +64,10 @@ public class UtilMultivariateGaussian {
 	 * @param S  the covariance of the distribution
 	 * @param _d a variable used to store temporary results that is 1 by N where N is measurement DOF
 	 */
-	public static double likelihoodP(DenseMatrix64F y,
-									 DenseMatrix64F S, DenseMatrix64F S_inv,
-									 DenseMatrix64F _d) {
-		double S_det = CommonOps.det(S);
+	public static double likelihoodP(DMatrixRMaj y,
+									 DMatrixRMaj S, DMatrixRMaj S_inv,
+									 DMatrixRMaj _d) {
+		double S_det = CommonOps_DDRM.det(S);
 
 		double chisq = chiSquare(y, S_inv, _d);
 
@@ -81,8 +81,8 @@ public class UtilMultivariateGaussian {
 	 * @param S     the covariance of the distribution
 	 * @param S_inv the inverse of S
 	 */
-	public static double logLikelihoodP(DenseMatrix64F y, DenseMatrix64F S, DenseMatrix64F S_inv) {
-		DenseMatrix64F d = new DenseMatrix64F(1, y.numRows);
+	public static double logLikelihoodP(DMatrixRMaj y, DMatrixRMaj S, DMatrixRMaj S_inv) {
+		DMatrixRMaj d = new DMatrixRMaj(1, y.numRows);
 
 		return logLikelihoodP(y, S, S_inv, d);
 	}
@@ -95,10 +95,10 @@ public class UtilMultivariateGaussian {
 	 * @param S_inv the inverse of S
 	 * @param _d    a variable used to store temporary results that is 1 by N where N is measurement DOF
 	 */
-	public static double logLikelihoodP(DenseMatrix64F y,
-										DenseMatrix64F S, DenseMatrix64F S_inv,
-										DenseMatrix64F _d) {
-		double S_det = CommonOps.det(S);
+	public static double logLikelihoodP(DMatrixRMaj y,
+										DMatrixRMaj S, DMatrixRMaj S_inv,
+										DMatrixRMaj _d) {
+		double S_det = CommonOps_DDRM.det(S);
 
 		double chisq = chiSquare(y, S_inv, _d);
 
@@ -111,8 +111,8 @@ public class UtilMultivariateGaussian {
 	 * @param y     the difference between the mean and the sample
 	 * @param S_inv the inverse of covariance of the distribution
 	 */
-	public static double chiSquare(DenseMatrix64F y, DenseMatrix64F S_inv) {
-		DenseMatrix64F d = new DenseMatrix64F(1, y.numRows);
+	public static double chiSquare(DMatrixRMaj y, DMatrixRMaj S_inv) {
+		DMatrixRMaj d = new DMatrixRMaj(1, y.numRows);
 
 		return chiSquare(y, S_inv, d);
 	}
@@ -124,8 +124,8 @@ public class UtilMultivariateGaussian {
 	 * @param S_inv the inverse of covariance of the distribution
 	 * @param _d    a variable used to store temporary results that is 1 by N where N is measurement DOF
 	 */
-	public static double chiSquare(DenseMatrix64F y, DenseMatrix64F S_inv, DenseMatrix64F _d) {
-		CommonOps.multTransA(y, S_inv, _d);
+	public static double chiSquare(DMatrixRMaj y, DMatrixRMaj S_inv, DMatrixRMaj _d) {
+		CommonOps_DDRM.multTransA(y, S_inv, _d);
 
 		double val = 0.0;
 		for (int i = 0; i < y.numRows; i++) {
@@ -141,10 +141,10 @@ public class UtilMultivariateGaussian {
 	 */
 	public static boolean isSimilar(MultivariateGaussianDM a, MultivariateGaussianDM b) {
 		boolean check;
-		check = MatrixFeatures.isIdentical(a.getMean(), b.getMean(), 1e-8);
+		check = MatrixFeatures_DDRM.isIdentical(a.getMean(), b.getMean(), 1e-8);
 		if (!check) return false;
 
-		check = MatrixFeatures.isIdentical(a.getCovariance(), b.getCovariance(), 1e-8);
+		check = MatrixFeatures_DDRM.isIdentical(a.getCovariance(), b.getCovariance(), 1e-8);
 		return check;
 	}
 
@@ -155,10 +155,10 @@ public class UtilMultivariateGaussian {
 	public static boolean isSimilar(MultivariateGaussianDM a, MultivariateGaussianDM b,
 									double meanTol, double covTol) {
 		boolean check;
-		check = MatrixFeatures.isIdentical(a.getMean(), b.getMean(), meanTol);
+		check = MatrixFeatures_DDRM.isIdentical(a.getMean(), b.getMean(), meanTol);
 		if (!check) return false;
 
-		check = MatrixFeatures.isIdentical(a.getCovariance(), b.getCovariance(), covTol);
+		check = MatrixFeatures_DDRM.isIdentical(a.getCovariance(), b.getCovariance(), covTol);
 		return check;
 	}
 
@@ -192,11 +192,11 @@ public class UtilMultivariateGaussian {
 	 * Copies all the states of the original into the desitnation.
 	 */
 	public static void copyInto(MultivariateGaussianDM orig, MultivariateGaussianDM dest) {
-		DenseMatrix64F o_x = orig.getMean();
-		DenseMatrix64F o_p = orig.getCovariance();
+		DMatrixRMaj o_x = orig.getMean();
+		DMatrixRMaj o_p = orig.getCovariance();
 
-		DenseMatrix64F d_x = dest.getMean();
-		DenseMatrix64F d_p = dest.getCovariance();
+		DMatrixRMaj d_x = dest.getMean();
+		DMatrixRMaj d_p = dest.getCovariance();
 
 		final int N = orig.getDimension();
 
@@ -215,7 +215,7 @@ public class UtilMultivariateGaussian {
 	public static MultivariateGaussianDM createDummy(int dof, double covMag) {
 		MultivariateGaussianDM ret = new MultivariateGaussianDM(dof);
 
-		DenseMatrix64F P = ret.getCovariance();
+		DMatrixRMaj P = ret.getCovariance();
 
 		for (int i = 0; i < dof; i++) {
 			P.set(i, i, covMag);
@@ -230,8 +230,8 @@ public class UtilMultivariateGaussian {
 	public static void zero(MultivariateGaussianDM state) {
 		final int N = state.getDimension();
 
-		DenseMatrix64F d_x = state.getMean();
-		DenseMatrix64F d_p = state.getCovariance();
+		DMatrixRMaj d_x = state.getMean();
+		DMatrixRMaj d_p = state.getCovariance();
 
 		for (int i = 0; i < N; i++) {
 			d_x.set(i, 0, 0);

@@ -19,7 +19,7 @@
 package bubo.mapping.models.kinematics;
 
 import georegression.geometry.UtilPoint2D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -59,18 +59,18 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTests {
 		// test several simple cases
 
 		// pure translation
-		DenseMatrix64F x = new DenseMatrix64F(3, 1, true, 1, 2, Math.PI / 2.0);
+		DMatrixRMaj x = new DMatrixRMaj(3, 1, true, 1, 2, Math.PI / 2.0);
 
 		control.set(1, 0);
 		alg.predict(x, control, 0.5);
-		DenseMatrix64F xp = alg.getPredictedState();
+		DMatrixRMaj xp = alg.getPredictedState();
 
 		assertEquals(1, xp.get(0), 1e-8);
 		assertEquals(2.5, xp.get(1), 1e-8);
 		assertEquals(Math.PI / 2.0, xp.get(2), 1e-8);
 
 		// point turn
-		x = new DenseMatrix64F(3, 1, true, 1, 2, Math.PI / 2.0);
+		x = new DMatrixRMaj(3, 1, true, 1, 2, Math.PI / 2.0);
 		control.set(0, Math.PI / 4);
 		alg.predict(x, control, 1);
 
@@ -79,7 +79,7 @@ public class TestPredictorRobotVelocity2D extends StandardPredictorTests {
 		assertEquals(3 * Math.PI / 4.0, xp.get(2), 1e-8);
 
 		// translation and rotation
-		x = new DenseMatrix64F(3, 1, true, 1, 2, Math.PI / 2.0);
+		x = new DMatrixRMaj(3, 1, true, 1, 2, Math.PI / 2.0);
 		control.set(2, Math.PI / 4);
 		alg.predict(x, control, 1);
 

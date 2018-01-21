@@ -20,7 +20,7 @@ package bubo.mapping.models.sensor;
 
 import bubo.filters.ekf.EkfProjector;
 import georegression.metric.UtilAngle;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * {@link EkfProjector} for a 2D range bearing sensor.  Input system state is 2D robot location and heading.
@@ -33,9 +33,9 @@ public class ProjectorRangeBearing2D implements LandmarkProjector {
 	double x, y;
 
 	// predicted observation
-	DenseMatrix64F predicted = new DenseMatrix64F(2, 1);
+	DMatrixRMaj predicted = new DMatrixRMaj(2, 1);
 	// observation Jacobian
-	DenseMatrix64F H = new DenseMatrix64F(2, 3);
+	DMatrixRMaj H = new DMatrixRMaj(2, 3);
 
 	@Override
 	public void setLandmarkLocation(double x, double y) {
@@ -54,7 +54,7 @@ public class ProjectorRangeBearing2D implements LandmarkProjector {
 	}
 
 	@Override
-	public void compute(DenseMatrix64F systemState) {
+	public void compute(DMatrixRMaj systemState) {
 		double rx = systemState.get(0);
 		double ry = systemState.get(1);
 		double rtheta = systemState.get(2);
@@ -86,12 +86,12 @@ public class ProjectorRangeBearing2D implements LandmarkProjector {
 	}
 
 	@Override
-	public DenseMatrix64F getJacobianH() {
+	public DMatrixRMaj getJacobianH() {
 		return H;
 	}
 
 	@Override
-	public DenseMatrix64F getProjected() {
+	public DMatrixRMaj getProjected() {
 		return predicted;
 	}
 }

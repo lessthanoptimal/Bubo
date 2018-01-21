@@ -22,10 +22,11 @@ import bubo.filters.ekf.EkfPredictor;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoM;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.MatrixFeatures;
-import org.ejml.ops.NormOps;
+import org.ejml.data.DMatrix;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
+import org.ejml.dense.row.NormOps_DDRM;
 
 import static org.junit.Assert.assertTrue;
 
@@ -49,13 +50,13 @@ public class StandardPredictorTests {
 	 * @param T_init    the smaller time.  the larger time will be 50% larger
 	 */
 	public void checkCovarianceIncreaseWithTime(EkfPredictor predictor, Object control, double T_init, double... state) {
-		DenseMatrix64F x = new DenseMatrix64F(state.length, 1, true, state);
+		DMatrixRMaj x = new DMatrixRMaj(state.length, 1, true, state);
 		predictor.predict(x, control,T_init);
 
 		// Using P2 norm instead of determinant since the determinant seems to produce very small numbers
-		double Q1 = NormOps.normP2(predictor.getPlantNoise());
+		double Q1 = NormOps_DDRM.normP2(predictor.getPlantNoise());
 		predictor.predict(x, control, T_init * 1.5);
-		double Q2 = NormOps.normP2(predictor.getPlantNoise());
+		double Q2 = NormOps_DDRM.normP2(predictor.getPlantNoise());
 
 		assertTrue(Q1 < Q2);
 	}
@@ -81,16 +82,16 @@ public class StandardPredictorTests {
 	 * Checks to see if the covariance matrix is valid
 	 */
 	public void checkValidCovariance(EkfPredictor predictor, Object control , double T, double... state) {
-		DenseMatrix64F x = new DenseMatrix64F(state.length, 1, true, state);
+		DMatrixRMaj x = new DMatrixRMaj(state.length, 1, true, state);
 		predictor.predict(x, control, T);
-		DenseMatrix64F Q = predictor.getPlantNoise();
+		DMatrixRMaj Q = predictor.getPlantNoise();
 
 		// has all valid numbers
-		assertTrue(!MatrixFeatures.hasUncountable(Q));
+		assertTrue(!MatrixFeatures_DDRM.hasUncountable(Q));
 		// test positive definite
-		assertTrue(CommonOps.det(Q) >= 0);
+		assertTrue(CommonOps_DDRM.det(Q) >= 0);
 		// test symmetric
-		assertTrue(MatrixFeatures.isSymmetric(Q, tol));
+		assertTrue(MatrixFeatures_DDRM.isSymmetric(Q, tol));
 	}
 
 	private class PredictorFunction implements FunctionNtoM {
@@ -113,7 +114,7 @@ public class StandardPredictorTests {
 
 		@Override
 		public void process(double[] input, double[] output) {
-			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
+			DMatrixRMaj X = new DMatrixRMaj(3, 1, true, input);
 
 			predictor.predict(X, control, T);
 
@@ -143,8 +144,9 @@ public class StandardPredictorTests {
 		}
 
 		@Override
-		public void process(double[] input, double[] output) {
-			DenseMatrix64F X = new DenseMatrix64F(3, 1, true, input);
+		public void process(double[] input, DMatrix outputM) {
+			double output[] = ((DMatrixRMaj)outputM).data;
+			DMatrixRMaj X = new DMatrixRMaj(3, 1, true, input);
 
 			predictor.predict(X, control, T);
 
@@ -152,5 +154,11 @@ public class StandardPredictorTests {
 
 			System.arraycopy(found, 0, output, 0, found.length);
 		}
+
+		@Override
+		public DMatrix declareMatrixMxN() {
+			return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
+		}
+
 	}
 }

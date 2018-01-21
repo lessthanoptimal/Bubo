@@ -18,7 +18,7 @@
 
 package bubo.filters.ekf;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * A state propagator for an extended Kalman filter.
@@ -33,28 +33,28 @@ public interface EkfPredictor<Control> {
 	 * @param control Known control input.  null if there is none
 	 * @param elapsedTime Elapsed time since previous prediction.  Ignored by discrete filters
 	 */
-	public void predict(DenseMatrix64F state, Control control , double elapsedTime);
+	public void predict(DMatrixRMaj state, Control control , double elapsedTime);
 
 	/**
 	 * Returns the jacobian of f(x) with respect to x.
 	 *
 	 * @return State transition Jacobian matrix. WARNING DO NOT MODIFY!  DATA IS MODIFIED EACH TIME COMPUTE IS CALLED.
 	 */
-	public DenseMatrix64F getJacobianF();
+	public DMatrixRMaj getJacobianF();
 
 	/**
 	 * Returns the propagation noise.
 	 *
 	 * @return Plant noise covariance matrix. WARNING DO NOT MODIFY!  DATA IS MODIFIED EACH TIME COMPUTE IS CALLED.
 	 */
-	public DenseMatrix64F getPlantNoise();
+	public DMatrixRMaj getPlantNoise();
 
 	/**
 	 * Returns the predicted state at the next time step.
 	 *
 	 * @return Predicted state column vector. WARNING DO NOT MODIFY!  DATA IS MODIFIED EACH TIME COMPUTE IS CALLED.
 	 */
-	public DenseMatrix64F getPredictedState();
+	public DMatrixRMaj getPredictedState();
 
 	/**
 	 * The number of states in the state vector which is being manipulated

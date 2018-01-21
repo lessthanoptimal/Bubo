@@ -21,8 +21,8 @@ package bubo.filters.kf;
 import bubo.filters.GenericKalmanFilterTests;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.abst.KalmanFilterInterface;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -60,17 +60,17 @@ public class TestDiscreteKalmanFilter extends GenericKalmanFilterTests {
 	 */
 	@Test
 	public void checkControlUse() {
-		DenseMatrix64F F = CommonOps.identity(3);
-		DenseMatrix64F Q = CommonOps.identity(3);
-		DenseMatrix64F G = new DenseMatrix64F(3, 2);
-		DenseMatrix64F u = new DenseMatrix64F(2, 1);
+		DMatrixRMaj F = CommonOps_DDRM.identity(3);
+		DMatrixRMaj Q = CommonOps_DDRM.identity(3);
+		DMatrixRMaj G = new DMatrixRMaj(3, 2);
+		DMatrixRMaj u = new DMatrixRMaj(2, 1);
 
-		CommonOps.fill(G, 1.0);
-		CommonOps.fill(u, 2.0);
+		CommonOps_DDRM.fill(G, 1.0);
+		CommonOps_DDRM.fill(u, 2.0);
 
 		FixedKalmanPredictor prop = new FixedKalmanPredictor(F, G, Q);
 
-		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1, 1, 1}, {0, 1, 2}});
 
 		KalmanProjector projector = new FixedKalmanProjector(H);
 
@@ -100,7 +100,7 @@ public class TestDiscreteKalmanFilter extends GenericKalmanFilterTests {
 	protected KalmanFilterInterface createFilter() {
 		ConstAccel1D constAccelProp = new ConstAccel1D(1.0, 1);
 
-		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1, 1, 1}, {0, 1, 2}});
 
 		FixedKalmanProjector projector = new FixedKalmanProjector(H);
 
@@ -113,20 +113,20 @@ public class TestDiscreteKalmanFilter extends GenericKalmanFilterTests {
 	}
 
 	@Override
-	protected DenseMatrix64F createTargetState() {
+	protected DMatrixRMaj createTargetState() {
 		return createState(9.0, 1, 1, 1).getMean();
 	}
 
 	@Override
 	protected MultivariateGaussianDM createPerfectMeas(KalmanFilterInterface f,
-													   DenseMatrix64F state) {
+													   DMatrixRMaj state) {
 		KalmanFilter filter = (KalmanFilter) f;
-		DenseMatrix64F H = filter.getProjector().getProjectionMatrix();
-		DenseMatrix64F X = state;
+		DMatrixRMaj H = filter.getProjector().getProjectionMatrix();
+		DMatrixRMaj X = state;
 
-		DenseMatrix64F z = new DenseMatrix64F(2, 1);
+		DMatrixRMaj z = new DMatrixRMaj(2, 1);
 
-		CommonOps.mult(H, X, z);
+		CommonOps_DDRM.mult(H, X, z);
 
 		return createState(2.0, z.get(0, 0), z.get(1, 0));
 	}

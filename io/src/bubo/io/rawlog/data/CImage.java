@@ -18,7 +18,7 @@
 
 package bubo.io.rawlog.data;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 import bubo.io.LittleEndianIO;
 import bubo.io.data.ImageEncoded;
 import bubo.io.data.encoded.ImageFile;
@@ -81,7 +81,7 @@ public class CImage implements RawlogSerializableCustom {
 
 					if (version == 2) {
 						// read in raw bytes
-						ImageUInt8 img = new ImageUInt8();
+						GrayU8 img = new GrayU8();
 						img.data = decoder.readByteArray(imageSize);
 						img.width = width;
 						img.height = height;

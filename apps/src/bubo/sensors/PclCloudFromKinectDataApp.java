@@ -19,10 +19,10 @@
 package bubo.sensors;
 
 import boofcv.alg.depth.VisualDepthOps;
-import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.image.ImageUInt16;
+import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.image.GrayU16;
 import bubo.io.pcl.PointCloudLibraryPcdWriter;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -36,7 +36,7 @@ import java.io.IOException;
  */
 public class PclCloudFromKinectDataApp {
 	public static void main(String[] args) throws IOException {
-		IntrinsicParameters intrinsic = UtilIO.loadXML("data/kinect/trashcan/intrinsic.xml");
+		CameraPinholeRadial intrinsic = CalibrationIO.load("data/kinect/trashcan/intrinsic.xml");
 
 		String inputDirectory = "data/kinect/trashcan";
 		String[] inputNames = new String[]{"01","02"};
@@ -46,7 +46,7 @@ public class PclCloudFromKinectDataApp {
 			fileNames[i] = inputDirectory+"/depth"+inputNames[i]+".depth";
 		}
 
-		ImageUInt16 depth = new ImageUInt16(1,1);
+		GrayU16 depth = new GrayU16(1,1);
 		for (int i = 0; i < inputNames.length; i++) {
 			System.out.println("Processing "+fileNames[i]);
 			UtilOpenKinect.parseDepth(fileNames[i], depth, null);

@@ -22,8 +22,8 @@ import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.UtilMultivariateGaussian;
 import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.ExtendedKalmanFilter;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * The following is a straight forward implementation of the Interacting Multiple Model (IMM) filter.
@@ -40,18 +40,18 @@ public class InteractingMultipleModelFilter<Control> {
 	// the filter which is used to update the state of the internal models
 	private ExtendedKalmanFilter<Control> filter;
 	// creates the interaction matrix based upon the sensors measurement sojourn time
-	private DenseMatrix64F markov;
+	private DMatrixRMaj markov;
 
 	// an array of the internal models
 	private EkfPredictor<Control> models[];
 
-	private DenseMatrix64F c;
+	private DMatrixRMaj c;
 
 	// The DOF of the state for each one of the internal models.
 	// note the all the models' state will have the same dimension/DOF.
 	private int dimen;
-	private DenseMatrix64F d;
-	private DenseMatrix64F outer;
+	private DMatrixRMaj d;
+	private DMatrixRMaj outer;
 
 	/**
 	 * Constructor used to create a new IMM filter.
@@ -62,7 +62,7 @@ public class InteractingMultipleModelFilter<Control> {
 	 */
 	public InteractingMultipleModelFilter(ExtendedKalmanFilter<Control> filter,
 										  EkfPredictor<Control> predictors[],
-										  DenseMatrix64F markov) {
+										  DMatrixRMaj markov) {
 
 		dimen = predictors[0].getSystemSize();
 		final int N = predictors.length;
@@ -74,9 +74,9 @@ public class InteractingMultipleModelFilter<Control> {
 		this.markov = markov;
 		this.filter = filter;
 
-		c = new DenseMatrix64F(N, N);
-		d = new DenseMatrix64F(dimen, 1);
-		outer = new DenseMatrix64F(dimen, dimen);
+		c = new DMatrixRMaj(N, N);
+		d = new DMatrixRMaj(dimen, 1);
+		outer = new DMatrixRMaj(dimen, dimen);
 	}
 
 	protected InteractingMultipleModelFilter() {
@@ -143,9 +143,9 @@ public class InteractingMultipleModelFilter<Control> {
 			filter.update(h.getState(), meas);
 
 			// compute the likelihood
-			DenseMatrix64F y = filter.getInnovation();
-			DenseMatrix64F S = filter.getInnovationCov();
-			DenseMatrix64F S_inv = filter.getInnovationCovInverse();
+			DMatrixRMaj y = filter.getInnovation();
+			DMatrixRMaj S = filter.getInnovationCov();
+			DMatrixRMaj S_inv = filter.getInnovationCovInverse();
 
 			double likelihood = UtilMultivariateGaussian.likelihoodP(y, S, S_inv);
 			double prob = h.getProbability() * likelihood;
@@ -196,13 +196,13 @@ public class InteractingMultipleModelFilter<Control> {
 		ImmHypothesis hypotheses[] = state.hypotheses;
 
 		for (int i = 0; i < hypotheses.length; i++) {
-			DenseMatrix64F mix = hypotheses[i].getMix().getMean();
+			DMatrixRMaj mix = hypotheses[i].getMix().getMean();
 			mix.zero();
 
 			for (int j = 0; j < hypotheses.length; j++) {
-				DenseMatrix64F x_j = hypotheses[j].getState().getMean();
+				DMatrixRMaj x_j = hypotheses[j].getState().getMean();
 
-				CommonOps.add(mix, c.get(i, j), x_j, mix);
+				CommonOps_DDRM.add(mix, c.get(i, j), x_j, mix);
 			}
 		}
 	}
@@ -212,19 +212,19 @@ public class InteractingMultipleModelFilter<Control> {
 
 		for (int i = 0; i < hypotheses.length; i++) {
 			ImmHypothesis m = hypotheses[i];
-			DenseMatrix64F mixMean = m.getMix().getMean();
-			DenseMatrix64F mixCov = m.getMix().getCovariance();
+			DMatrixRMaj mixMean = m.getMix().getMean();
+			DMatrixRMaj mixCov = m.getMix().getCovariance();
 			mixCov.zero();
 
 			for (int j = 0; j < hypotheses.length; j++) {
 				ImmHypothesis m_j = hypotheses[j];
 				d.set(mixMean);
-				CommonOps.add(d, -1, m_j.getMix().getMean(), d);
-				CommonOps.multTransB(d, d, outer);
+				CommonOps_DDRM.add(d, -1, m_j.getMix().getMean(), d);
+				CommonOps_DDRM.multTransB(d, d, outer);
 
-				CommonOps.add(outer, m_j.getState().getCovariance(), outer);
+				CommonOps_DDRM.add(outer, m_j.getState().getCovariance(), outer);
 
-				CommonOps.add(mixCov, c.get(i, j), outer, mixCov);
+				CommonOps_DDRM.add(mixCov, c.get(i, j), outer, mixCov);
 			}
 		}
 	}

@@ -97,5 +97,15 @@ public class TestDistanceFromModel_P_to_PVNN {
 			list = point3D_f64s;
 			calledMultiple = true;
 		}
+
+		@Override
+		public Class<Point3D_F64> getPointType() {
+			return Point3D_F64.class;
+		}
+
+		@Override
+		public Class<Object> getModelType() {
+			return null;
+		}
 	}
 }

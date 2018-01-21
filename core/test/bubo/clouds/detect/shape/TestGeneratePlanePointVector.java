@@ -19,15 +19,15 @@
 package bubo.clouds.detect.shape;
 
 import bubo.clouds.detect.alg.PointVectorNN;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
 import georegression.geometry.UtilPlane3D_F64;
 import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.so.Rodrigues_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class TestGeneratePlanePointVector {
 		angle = Math.acos(angle / (plane.n.norm()));
 
 		Rodrigues_F64 rod = new Rodrigues_F64(angle, cross);
-		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod, null);
+		DMatrixRMaj R = ConvertRotation3D_F64.rodriguesToMatrix(rod, null);
 
 		GeometryMath_F64.mult(R, pv.p, pv.p);
 		pv.p.x += plane.p.x;
@@ -226,7 +226,7 @@ public class TestGeneratePlanePointVector {
 		rotationAxis.normalize();
 
 		Rodrigues_F64 rod = new Rodrigues_F64(angle, rotationAxis);
-		DenseMatrix64F R = RotationMatrixGenerator.rodriguesToMatrix(rod, null);
+		DMatrixRMaj R = ConvertRotation3D_F64.rodriguesToMatrix(rod, null);
 
 		GeometryMath_F64.mult(R, pv.normal, pv.normal);
 	}

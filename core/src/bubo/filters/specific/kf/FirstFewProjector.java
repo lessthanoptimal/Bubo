@@ -19,17 +19,17 @@
 package bubo.filters.specific.kf;
 
 import bubo.filters.kf.KalmanProjector;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * This projector just reads the first few states
  */
 public class FirstFewProjector implements KalmanProjector {
 
-	private DenseMatrix64F H;
+	private DMatrixRMaj H;
 
 	public FirstFewProjector(int readNum, int stateDOF) {
-		H = new DenseMatrix64F(readNum, stateDOF);
+		H = new DMatrixRMaj(readNum, stateDOF);
 
 		for (int i = 0; i < readNum; i++) {
 			H.set(i, i, 1.0);
@@ -40,7 +40,7 @@ public class FirstFewProjector implements KalmanProjector {
 		return H.numRows;
 	}
 
-	public DenseMatrix64F getProjectionMatrix() {
+	public DMatrixRMaj getProjectionMatrix() {
 		return H;
 	}
 }

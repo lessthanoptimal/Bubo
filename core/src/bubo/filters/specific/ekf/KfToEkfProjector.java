@@ -20,21 +20,21 @@ package bubo.filters.specific.ekf;
 
 import bubo.filters.ekf.EkfProjector;
 import bubo.filters.kf.KalmanProjector;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * A wrapper around a KalmanProjector that allows it to be used inside of an EKF.
  */
 public class KfToEkfProjector implements EkfProjector {
 	private KalmanProjector proj;
-	private DenseMatrix64F H;
-	private DenseMatrix64F z_hat;
+	private DMatrixRMaj H;
+	private DMatrixRMaj z_hat;
 
 	public KfToEkfProjector(KalmanProjector proj) {
 		this.proj = proj;
 		H = proj.getProjectionMatrix();
-		z_hat = new DenseMatrix64F(proj.getNumStates(), 1);
+		z_hat = new DMatrixRMaj(proj.getNumStates(), 1);
 	}
 
 	@Override
@@ -48,17 +48,17 @@ public class KfToEkfProjector implements EkfProjector {
 	}
 
 	@Override
-	public void compute(DenseMatrix64F state) {
-		CommonOps.mult(H, state, z_hat);
+	public void compute(DMatrixRMaj state) {
+		CommonOps_DDRM.mult(H, state, z_hat);
 	}
 
 	@Override
-	public DenseMatrix64F getJacobianH() {
+	public DMatrixRMaj getJacobianH() {
 		return H;
 	}
 
 	@Override
-	public DenseMatrix64F getProjected() {
+	public DMatrixRMaj getProjected() {
 		return z_hat;
 	}
 }

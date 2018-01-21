@@ -26,9 +26,9 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector2D_F64;
 import georegression.struct.point.Vector3D_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.interfaces.decomposition.EigenDecomposition;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.interfaces.decomposition.EigenDecomposition_F64;
 
 import java.util.List;
 
@@ -54,8 +54,8 @@ public class BoundPlaneRectangle {
 
 	Point3D_F64 rect[];
 
-	EigenDecomposition<DenseMatrix64F> eigen = DecompositionFactory.eig(3, true, true);
-	DenseMatrix64F A = new DenseMatrix64F(2, 2);
+	EigenDecomposition_F64<DMatrixRMaj> eigen = DecompositionFactory_DDRM.eig(3, true, true);
+	DMatrixRMaj A = new DMatrixRMaj(2, 2);
 
 	double meanX, meanY;
 
@@ -170,8 +170,8 @@ public class BoundPlaneRectangle {
 		if (!eigen.decompose(A))
 			return false;
 
-		DenseMatrix64F v0 = eigen.getEigenVector(0);
-		DenseMatrix64F v1 = eigen.getEigenVector(1);
+		DMatrixRMaj v0 = eigen.getEigenVector(0);
+		DMatrixRMaj v1 = eigen.getEigenVector(1);
 
 		axis2X.set(v0.get(0), v0.get(1));
 		axis2Y.set(v1.get(0), v1.get(1));

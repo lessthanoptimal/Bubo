@@ -21,8 +21,8 @@ package bubo.filters.imm;
 import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.ekf.EkfPredictor;
 import org.ejml.UtilEjml;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 /**
  * The estimated state of an IMM filter
@@ -33,8 +33,8 @@ public class ImmState {
 
 	MultivariateGaussianDM stateMOG;
 
-	private DenseMatrix64F d;
-	private DenseMatrix64F outer;
+	private DMatrixRMaj d;
+	private DMatrixRMaj outer;
 
 	public ImmState(InteractingMultipleModelFilter<?> filter) {
 		EkfPredictor[] models = filter.getModels();
@@ -47,8 +47,8 @@ public class ImmState {
 		int dimen = models[0].getSystemSize();
 
 		// predeclare matrices that will be used later on
-		d = new DenseMatrix64F(dimen, 1);
-		outer = new DenseMatrix64F(dimen, dimen);
+		d = new DMatrixRMaj(dimen, 1);
+		outer = new DMatrixRMaj(dimen, dimen);
 
 		stateMOG = new MultivariateGaussianDM(dimen);
 	}
@@ -91,8 +91,8 @@ public class ImmState {
 	 * Computes a mixture of Gaussians (MOG) from the models.
 	 */
 	public MultivariateGaussianDM computeMOG() {
-		DenseMatrix64F x_ret = stateMOG.getMean();
-		DenseMatrix64F P_ret = stateMOG.getCovariance();
+		DMatrixRMaj x_ret = stateMOG.getMean();
+		DMatrixRMaj P_ret = stateMOG.getCovariance();
 
 		x_ret.zero();
 		P_ret.zero();
@@ -101,18 +101,18 @@ public class ImmState {
 		// compute the mean
 		for (ImmHypothesis h : hypotheses) {
 //            System.out.println("  model prob = "+h.getProbability());
-			CommonOps.add(x_ret, h.getProbability(), h.getState().getMean(), x_ret);
+			CommonOps_DDRM.add(x_ret, h.getProbability(), h.getState().getMean(), x_ret);
 		}
 
 		// compute the covariance
 		for (ImmHypothesis h : hypotheses) {
 			d.set(h.getState().getMean());
-			CommonOps.add(d, -1, x_ret, d);
+			CommonOps_DDRM.add(d, -1, x_ret, d);
 
-			CommonOps.multTransB(d, d, outer);
-			CommonOps.add(outer, h.getState().getCovariance(), outer);
+			CommonOps_DDRM.multTransB(d, d, outer);
+			CommonOps_DDRM.add(outer, h.getState().getCovariance(), outer);
 
-			CommonOps.add(P_ret, h.getProbability(), outer, P_ret);
+			CommonOps_DDRM.add(P_ret, h.getProbability(), outer, P_ret);
 		}
 
 		return stateMOG;

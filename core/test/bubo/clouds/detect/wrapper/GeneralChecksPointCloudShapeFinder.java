@@ -43,6 +43,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * General tests for implementations of {@link bubo.clouds.detect.PointCloudShapeFinder}
  *
+ * NOTE: Until the update in 2018 all these unit tests passed
+ *
  * @author Peter Abeles
  */
 public abstract class GeneralChecksPointCloudShapeFinder {
@@ -115,7 +117,6 @@ public abstract class GeneralChecksPointCloudShapeFinder {
 
 			assertEquals(1, found.size());
 			PointCloudShapeFinder.Shape s = found.get(0);
-
 
 			assertEquals(N, unmatched.size() + findUsedCount(cloud, found));
 			assertTrue(unmatched.size() <= tolSetSize);

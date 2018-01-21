@@ -22,9 +22,9 @@ import bubo.filters.MultivariateGaussianDM;
 import bubo.filters.ekf.EkfPredictor;
 import bubo.filters.ekf.ExtendedKalmanFilter;
 import org.ejml.UtilEjml;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CovarianceOps;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CovarianceOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 
 /**
  * This is a wrapper on top of the IMM filter which provides several additional checks
@@ -39,7 +39,7 @@ public class ImmCheckingFilter<Control> extends InteractingMultipleModelFilter<C
 
 	public ImmCheckingFilter(ExtendedKalmanFilter<Control> filter,
 							 EkfPredictor<Control>[] propagators,
-							 DenseMatrix64F interaction) {
+							 DMatrixRMaj interaction) {
 		super(filter, propagators, interaction);
 
 		isValidMarkovMatrix(interaction);
@@ -49,7 +49,7 @@ public class ImmCheckingFilter<Control> extends InteractingMultipleModelFilter<C
 	 * Makes sure this is a valid Markov state transition matrix.  Checks
 	 * to see if the rows add up to one.
 	 */
-	protected static boolean isValidMarkovMatrix(DenseMatrix64F pi) {
+	protected static boolean isValidMarkovMatrix(DMatrixRMaj pi) {
 		// make sure the Markov matrix is correctly constructed
 		for (int i = 0; i < pi.numRows; i++) {
 			// a row should add up to one.
@@ -78,11 +78,11 @@ public class ImmCheckingFilter<Control> extends InteractingMultipleModelFilter<C
 
 			MultivariateGaussianDM s = m.getState();
 
-			if (MatrixFeatures.hasUncountable(s.getMean())) {
+			if (MatrixFeatures_DDRM.hasUncountable(s.getMean())) {
 				throw new SanityCheck("Bad model state");
 			}
 
-			if (!CovarianceOps.isValidFast(s.getCovariance())) {
+			if (!CovarianceOps_DDRM.isValidFast(s.getCovariance())) {
 				throw new SanityCheck("Bad model covariance");
 			}
 		}

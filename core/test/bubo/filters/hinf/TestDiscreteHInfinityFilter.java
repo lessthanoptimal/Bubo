@@ -24,9 +24,9 @@ import bubo.filters.abst.KalmanFilterInterface;
 import bubo.filters.kf.ConstAccel1D;
 import bubo.filters.kf.FixedKalmanProjector;
 import bubo.filters.kf.KalmanFilter;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.CommonOps_DDRM;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -59,7 +59,7 @@ public class TestDiscreteHInfinityFilter extends GenericKalmanFilterTests {
 		KalmanFilterInterface kalman = createSimilarKalman();
 		KalmanFilterInterface h_inf = createFilter();
 
-		DenseMatrix64F x_tgt = createTargetState();
+		DMatrixRMaj x_tgt = createTargetState();
 
 		MultivariateGaussianDM x_kal = createInitialState();
 		MultivariateGaussianDM x_inf = createInitialState();
@@ -70,14 +70,14 @@ public class TestDiscreteHInfinityFilter extends GenericKalmanFilterTests {
 			kalman.update(x_kal, z);
 			h_inf.update(x_inf, z);
 
-			assertTrue(MatrixFeatures.isIdentical(x_kal.getMean(), x_inf.getMean(), 1e-5));
-			assertTrue(MatrixFeatures.isIdentical(x_kal.getCovariance(), x_inf.getCovariance(), 1e-5));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(x_kal.getMean(), x_inf.getMean(), 1e-5));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(x_kal.getCovariance(), x_inf.getCovariance(), 1e-5));
 
 			kalman.predict(x_kal,null,-1);
 			h_inf.predict(x_inf,null,-1);
 
-			assertTrue(MatrixFeatures.isIdentical(x_kal.getMean(), x_inf.getMean(), 1e-5));
-			assertTrue(MatrixFeatures.isIdentical(x_kal.getCovariance(), x_inf.getCovariance(), 1e-5));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(x_kal.getMean(), x_inf.getMean(), 1e-5));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(x_kal.getCovariance(), x_inf.getCovariance(), 1e-5));
 		}
 	}
 
@@ -85,12 +85,12 @@ public class TestDiscreteHInfinityFilter extends GenericKalmanFilterTests {
 	protected KalmanFilterInterface createFilter() {
 		ConstAccel1D constAccelProp = createProp();
 
-		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1, 1, 1}, {0, 1, 2}});
 
 		FixedKalmanProjector projector = new FixedKalmanProjector(H);
 
-		DenseMatrix64F S = CommonOps.identity(3);
-		DenseMatrix64F L = CommonOps.identity(3);
+		DMatrixRMaj S = CommonOps_DDRM.identity(3);
+		DMatrixRMaj L = CommonOps_DDRM.identity(3);
 
 		return new DiscreteHInfinityFilter(constAccelProp, projector, null, S, L, theta);
 	}
@@ -105,20 +105,20 @@ public class TestDiscreteHInfinityFilter extends GenericKalmanFilterTests {
 	}
 
 	@Override
-	protected DenseMatrix64F createTargetState() {
+	protected DMatrixRMaj createTargetState() {
 		return createState(9.0, 1, 1, 1).getMean();
 	}
 
 	@Override
 	protected MultivariateGaussianDM createPerfectMeas(KalmanFilterInterface f,
-													   DenseMatrix64F state) {
+													   DMatrixRMaj state) {
 		DiscreteHInfinityFilter filter = (DiscreteHInfinityFilter) f;
-		DenseMatrix64F H = filter.getProjector().getProjectionMatrix();
-		DenseMatrix64F X = state;
+		DMatrixRMaj H = filter.getProjector().getProjectionMatrix();
+		DMatrixRMaj X = state;
 
-		DenseMatrix64F z = new DenseMatrix64F(2, 1);
+		DMatrixRMaj z = new DMatrixRMaj(2, 1);
 
-		CommonOps.mult(H, X, z);
+		CommonOps_DDRM.mult(H, X, z);
 
 		return createState(2.0, z.get(0, 0), z.get(1, 0));
 	}
@@ -130,7 +130,7 @@ public class TestDiscreteHInfinityFilter extends GenericKalmanFilterTests {
 	protected KalmanFilterInterface createSimilarKalman() {
 		ConstAccel1D constAccelProp = createProp();
 
-		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1, 1, 1}, {0, 1, 2}});
 
 		FixedKalmanProjector projector = new FixedKalmanProjector(H);
 

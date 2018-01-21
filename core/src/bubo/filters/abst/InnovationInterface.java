@@ -18,7 +18,7 @@
 
 package bubo.filters.abst;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * When a measurement is used to update the filter's state several statistics need to be
@@ -28,10 +28,10 @@ import org.ejml.data.DenseMatrix64F;
 // TODO if nothing is using this, delete it
 public interface InnovationInterface {
 
-	public DenseMatrix64F getInnovation();
+	public DMatrixRMaj getInnovation();
 
-	public DenseMatrix64F getInnovationCov();
+	public DMatrixRMaj getInnovationCov();
 
-	public DenseMatrix64F getInnovationCovInverse();
+	public DMatrixRMaj getInnovationCovInverse();
 
 }

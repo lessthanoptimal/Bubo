@@ -18,18 +18,18 @@
 
 package bubo.filters.kf;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * This KalmanPropagator always returns the same matrices no matter what the time step is.
  * Primarily used for debugging.
  */
 public class FixedKalmanPredictor implements KalmanPredictor {
-	private DenseMatrix64F F;
-	private DenseMatrix64F G;
-	private DenseMatrix64F Q;
+	private DMatrixRMaj F;
+	private DMatrixRMaj G;
+	private DMatrixRMaj Q;
 
-	public FixedKalmanPredictor(DenseMatrix64F F, DenseMatrix64F G, DenseMatrix64F Q) {
+	public FixedKalmanPredictor(DMatrixRMaj F, DMatrixRMaj G, DMatrixRMaj Q) {
 		this.F = F;
 		this.Q = Q;
 		this.G = G;
@@ -39,21 +39,21 @@ public class FixedKalmanPredictor implements KalmanPredictor {
 	public void compute(Object o, double elapsedTime) {}
 
 	@Override
-	public DenseMatrix64F getStateTransition() {
+	public DMatrixRMaj getStateTransition() {
 		return F;
 	}
 
 	@Override
-	public DenseMatrix64F getControlTransition() {
+	public DMatrixRMaj getControlTransition() {
 		return G;
 	}
 
-	public void setControlTransition(DenseMatrix64F G) {
+	public void setControlTransition(DMatrixRMaj G) {
 		this.G = G;
 	}
 
 	@Override
-	public DenseMatrix64F getPlantNoise() {
+	public DMatrixRMaj getPlantNoise() {
 		return Q;
 	}
 

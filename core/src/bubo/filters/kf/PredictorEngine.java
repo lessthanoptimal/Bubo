@@ -18,10 +18,10 @@
 
 package bubo.filters.kf;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
-import static org.ejml.ops.CommonOps.mult;
-import static org.ejml.ops.CommonOps.multAdd;
+import static org.ejml.dense.row.CommonOps_DDRM.mult;
+import static org.ejml.dense.row.CommonOps_DDRM.multAdd;
 
 /**
  * This is useful if a predictor is being used to propagate a state forward in time, but
@@ -29,22 +29,22 @@ import static org.ejml.ops.CommonOps.multAdd;
  */
 public class PredictorEngine {
 
-	private DenseMatrix64F x;
-	private DenseMatrix64F u;
+	private DMatrixRMaj x;
+	private DMatrixRMaj u;
 	private KalmanPredictor pred;
-	private DenseMatrix64F temp;
+	private DMatrixRMaj temp;
 
-	public PredictorEngine(DenseMatrix64F x_init, KalmanPredictor pred) {
-		this.temp = new DenseMatrix64F(pred.getNumStates(), 1);
+	public PredictorEngine(DMatrixRMaj x_init, KalmanPredictor pred) {
+		this.temp = new DMatrixRMaj(pred.getNumStates(), 1);
 
 		this.x = x_init.copy();
 		this.pred = pred;
 	}
 
-	public PredictorEngine(DenseMatrix64F x_init,
-						   DenseMatrix64F u,
+	public PredictorEngine(DMatrixRMaj x_init,
+						   DMatrixRMaj u,
 						   KalmanPredictor pred) {
-		this.temp = new DenseMatrix64F(pred.getNumStates(), 1);
+		this.temp = new DMatrixRMaj(pred.getNumStates(), 1);
 		this.x = x_init.copy();
 		this.u = u.copy();
 		this.pred = pred;
@@ -52,26 +52,26 @@ public class PredictorEngine {
 
 	public void predict() {
 
-		DenseMatrix64F F = pred.getStateTransition();
+		DMatrixRMaj F = pred.getStateTransition();
 
 		mult(F, x, temp);
 
 		if (u != null) {
-			DenseMatrix64F G = pred.getControlTransition();
+			DMatrixRMaj G = pred.getControlTransition();
 			multAdd(G, u, temp);
 		}
 
 		// swap the references around
-		DenseMatrix64F c = temp;
+		DMatrixRMaj c = temp;
 		temp = x;
 		x = c;
 	}
 
-	public DenseMatrix64F getState() {
+	public DMatrixRMaj getState() {
 		return x;
 	}
 
-	public DenseMatrix64F getControl() {
+	public DMatrixRMaj getControl() {
 		return u;
 	}
 }

@@ -18,7 +18,7 @@
 
 package bubo.filters.kf;
 
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Projects measurements from state space to sensor space
@@ -27,5 +27,5 @@ public interface KalmanProjector {
 
 	public int getNumStates();
 
-	public DenseMatrix64F getProjectionMatrix();
+	public DMatrixRMaj getProjectionMatrix();
 }

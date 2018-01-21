@@ -65,4 +65,14 @@ public class DistancePlaneToPointVectorNN implements DistanceFromModel<PlaneGene
 			distance[i] = computeDistance(points.get(i));
 		}
 	}
+
+	@Override
+	public Class<PointVectorNN> getPointType() {
+		return PointVectorNN.class;
+	}
+
+	@Override
+	public Class<PlaneGeneral3D_F64> getModelType() {
+		return PlaneGeneral3D_F64.class;
+	}
 }

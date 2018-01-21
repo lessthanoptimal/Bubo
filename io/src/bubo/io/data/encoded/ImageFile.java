@@ -20,8 +20,8 @@ package bubo.io.data.encoded;
 
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageUInt8;
 import bubo.io.data.ImageEncoded;
 
 import java.awt.image.BufferedImage;
@@ -34,7 +34,7 @@ import java.awt.image.BufferedImage;
  */
 public class ImageFile implements ImageEncoded {
 
-	Class imageType = ImageUInt8.class;
+	Class imageType = GrayU8.class;
 	String fileLocation;
 
 	public ImageFile(String fileLocation) {

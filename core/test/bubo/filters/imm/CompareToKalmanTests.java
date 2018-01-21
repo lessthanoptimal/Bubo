@@ -25,7 +25,7 @@ import bubo.filters.kf.KalmanFilter;
 import bubo.filters.kf.KalmanPredictor;
 import bubo.filters.kf.KalmanProjector;
 import bubo.filters.specific.kf.FirstFewProjector;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 import static org.junit.Assert.assertTrue;
 
@@ -55,7 +55,7 @@ public abstract class CompareToKalmanTests {
 		MultivariateGaussianDM kalState = createPrior();
 		setOtherPriorState(createPrior());
 
-		DenseMatrix64F target = createTrueInitial();
+		DMatrixRMaj target = createTrueInitial();
 
 		MultivariateGaussianDM otherOutput = computeOutput();
 		assertTrue(UtilMultivariateGaussian.isSimilar(kalState, otherOutput, stateTol, covTol));
@@ -97,13 +97,13 @@ public abstract class CompareToKalmanTests {
 		return ret;
 	}
 
-	private DenseMatrix64F createTrueInitial() {
-		DenseMatrix64F ret = new DenseMatrix64F(new double[][]{{0}, {2}, {2}});
+	private DMatrixRMaj createTrueInitial() {
+		DMatrixRMaj ret = new DMatrixRMaj(new double[][]{{0}, {2}, {2}});
 
 		return ret;
 	}
 
-	private MultivariateGaussianDM createMeas(DenseMatrix64F state) {
+	private MultivariateGaussianDM createMeas(DMatrixRMaj state) {
 		MultivariateGaussianDM ret = UtilMultivariateGaussian.createDummy(1, 1);
 
 		ret.getMean().set(0, 0, state.get(0, 0));
@@ -111,7 +111,7 @@ public abstract class CompareToKalmanTests {
 		return ret;
 	}
 
-	private void predict(DenseMatrix64F x) {
+	private void predict(DMatrixRMaj x) {
 		double p = x.get(0, 0);
 		double v = x.get(1, 0);
 		double a = x.get(2, 0);

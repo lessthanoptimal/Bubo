@@ -22,9 +22,10 @@ import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
 import bubo.desc.sensors.lrf3d.SpinningLrf2dMeasurement;
 import bubo.desc.sensors.lrf3d.SpinningLrf2dParam;
 import bubo.maps.d3.triangles.Triangle3dMap;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.geometry.RotationMatrixGenerator;
 import georegression.metric.Intersection3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.line.LineParametric3D_F64;
 import georegression.struct.line.LineSegment3D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -91,11 +92,11 @@ public class RaytraceSpinningLrf2D {
 			baseToWorld1 = identity;
 
 		// The LRF is spinning.  Compute the transform when the first scan was collected and when it ended
-		RotationMatrixGenerator.eulerXYZ(0, 0, meas.angle0, baseRtoBase.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0, 0, meas.angle0, baseRtoBase.R);
 		armToBaseR.concat(baseRtoBase, armToBase);
 		param.lrfToArm.concat(armToBase, lrfToBase);
 		lrfToBase.concat(baseToWorld0,lrf0ToWorld0);
-		RotationMatrixGenerator.eulerXYZ(0, 0, meas.angle1, baseRtoBase.R);
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0, 0, meas.angle1, baseRtoBase.R);
 		armToBaseR.concat(baseRtoBase, armToBase);
 		param.lrfToArm.concat(armToBase, lrfToBase);
 		lrfToBase.concat(baseToWorld1,lrf1ToWorld1);
@@ -136,7 +137,7 @@ public class RaytraceSpinningLrf2D {
 		double best = Double.MAX_VALUE;
 
 		for(Triangle3D_F64 t : map.triangles ) {
-			int result = Intersection3D_F64.intersection(t,segment,hit);
+			int result = Intersection3D_F64.intersect(t,segment,hit);
 
 			if( result == 1 ) {
 				double d = line.p.distance(hit);

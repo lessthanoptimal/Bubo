@@ -19,12 +19,13 @@
 package bubo.clouds.fit.c2c;
 
 import bubo.clouds.fit.MatchCloudToCloud;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.UtilPoint3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.ops.MatrixFeatures;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public abstract class GeneralCloudToCloudChecksSe3 {
 	@Test
 	public void identical_rotate() {
 		Se3_F64 a = new Se3_F64();
-		RotationMatrixGenerator.eulerXYZ(0.01,-0.05,0.02,a.getR());
+		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.01,-0.05,0.02,a.getR());
 		identical(a, 0.01, 0.01);
 	}
 
@@ -83,6 +84,6 @@ public abstract class GeneralCloudToCloudChecksSe3 {
 		assertEquals(expected.T.x,found.T.x,tolTran);
 		assertEquals(expected.T.y,found.T.y,tolTran);
 		assertEquals(expected.T.z, found.T.z, tolTran);
-		assertTrue(MatrixFeatures.isIdentical(expected.getR(), found.getR(), tolAngle));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(expected.getR(), found.getR(), tolAngle));
 	}
 }

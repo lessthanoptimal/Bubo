@@ -64,4 +64,14 @@ public class DistanceCylinderToPointVectorNN implements DistanceFromModel<Cylind
 			distance[i] = computeDistance(points.get(i));
 		}
 	}
+
+	@Override
+	public Class<PointVectorNN> getPointType() {
+		return PointVectorNN.class;
+	}
+
+	@Override
+	public Class<Cylinder3D_F64> getModelType() {
+		return Cylinder3D_F64.class;
+	}
 }

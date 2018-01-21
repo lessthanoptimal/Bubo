@@ -19,9 +19,10 @@
 package bubo.io.rawlog.data;
 
 import bubo.io.rawlog.RawlogSerializableStandard;
-import georegression.geometry.RotationMatrixGenerator;
+import georegression.geometry.ConvertRotation3D_F64;
+import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * <p>
@@ -54,7 +55,7 @@ import org.ejml.data.DenseMatrix64F;
 public class CPose3D extends CPose implements RawlogSerializableStandard {
 
 	Point3D_F64 position = new Point3D_F64();
-	DenseMatrix64F rotation = new DenseMatrix64F(3, 3);
+	DMatrixRMaj rotation = new DMatrixRMaj(3, 3);
 
 	public String[] getVariableOrder(int version) {
 		if (version >= 2) {
@@ -69,7 +70,7 @@ public class CPose3D extends CPose implements RawlogSerializableStandard {
 	public String toReadableText() {
 		String ret = "";
 
-		double euler[] = RotationMatrixGenerator.matrixToEulerXYZ(rotation, (double[])null);
+		double euler[] = ConvertRotation3D_F64.matrixToEuler(rotation, EulerType.XYZ, (double[])null);
 
 		ret += "Position = ( " + position.getX() + " , " + position.getY() + " , " + position.getZ() + " )\n";
 		ret += String.format("Rotation = ( rotX = %5.2f | rotY = %5.2f | rotZ = %5.2f )\n", euler[0], euler[1], euler[2]);
@@ -117,11 +118,11 @@ public class CPose3D extends CPose implements RawlogSerializableStandard {
 		this.position.set(position);
 	}
 
-	public DenseMatrix64F getRotation() {
+	public DMatrixRMaj getRotation() {
 		return rotation;
 	}
 
-	public void setRotation(DenseMatrix64F rotation) {
+	public void setRotation(DMatrixRMaj rotation) {
 		this.rotation.set(rotation);
 	}
 

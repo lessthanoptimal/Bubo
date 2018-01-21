@@ -27,7 +27,7 @@ import bubo.filters.kf.ConstAccel1D;
 import bubo.filters.kf.FixedKalmanProjector;
 import bubo.filters.specific.ekf.KfToEkfPredictor;
 import bubo.filters.specific.ekf.KfToEkfProjector;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Configure an UKF as a Kalman filter and compare the results.
@@ -40,7 +40,7 @@ public class UkfGenericKalmanTests extends GenericKalmanFilterTests {
 
 		EkfPredictor predictor = new KfToEkfPredictor(constAccelProp, null);
 
-		DenseMatrix64F H = new DenseMatrix64F(new double[][]{{1, 1, 1}, {0, 1, 2}});
+		DMatrixRMaj H = new DMatrixRMaj(new double[][]{{1, 1, 1}, {0, 1, 2}});
 
 		EkfProjector projector = new KfToEkfProjector(new FixedKalmanProjector(H));
 
@@ -53,17 +53,17 @@ public class UkfGenericKalmanTests extends GenericKalmanFilterTests {
 	}
 
 	@Override
-	protected DenseMatrix64F createTargetState() {
+	protected DMatrixRMaj createTargetState() {
 		return createState(9.0, 1, 1, 1).getMean();
 	}
 
 	@Override
 	protected MultivariateGaussianDM createPerfectMeas(KalmanFilterInterface f,
-													   DenseMatrix64F state) {
+													   DMatrixRMaj state) {
 		UnscentedKalmanFilter filter = (UnscentedKalmanFilter) f;
 		filter.getProjector().compute(state);
 
-		DenseMatrix64F z = filter.getProjector().getProjected();
+		DMatrixRMaj z = filter.getProjector().getProjected();
 
 		return createState(2.0, z.get(0, 0), z.get(1, 0));
 	}

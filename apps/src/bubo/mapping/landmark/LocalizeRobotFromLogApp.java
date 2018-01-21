@@ -35,7 +35,7 @@ import com.thoughtworks.xstream.XStream;
 import georegression.fitting.ellipse.CovarianceToEllipse_F64;
 import georegression.struct.se.Se2_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.ops.CommonOps;
+import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -98,7 +98,7 @@ public class LocalizeRobotFromLogApp {
 		initState.x.data[0] = initial.getX();
 		initState.x.data[1] = initial.getY();
 		initState.x.data[2] = initial.getYaw();
-		initState.P.set(CommonOps.diag(0.5, 0.5, 0.05));
+		initState.P.set(CommonOps_DDRM.diag(0.5, 0.5, 0.05));
 
 		estimator.setInitialState(initState);
 
