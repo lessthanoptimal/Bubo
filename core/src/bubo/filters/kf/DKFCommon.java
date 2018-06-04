@@ -115,6 +115,8 @@ public abstract class DKFCommon implements InnovationInterface {
 
 		// update the covariance estimate
 		// P = (I-kH)P = P - K(HP)
+		// NOTE: There are alternative formulations which claim better numerical stability
+		//       E.g.  P = (I-KH)P(I-KH)' + KRK'
 		mult(H, P, c);
 		mult(K, c, b);
 		subtractEquals(P, b);
