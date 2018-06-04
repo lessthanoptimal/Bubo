@@ -148,7 +148,10 @@ public class InteractingMultipleModelFilter<Control> {
 			DMatrixRMaj S_inv = filter.getInnovationCovInverse();
 
 			double likelihood = UtilMultivariateGaussian.likelihoodP(y, S, S_inv);
-			double prob = h.getProbability() * likelihood;
+
+			// If the probability goes to zero exactly then it can never recover and is essentially dead
+			// Instead this lets it have a value which is almost zero
+			double prob = Math.max(h.getProbability() * likelihood, Double.MIN_VALUE);
 			total += prob;
 
 //            System.out.printf("  pred pos = %8.2f like = %8.2f prob = %8.2f\n",predPos,likelihood,prob);
