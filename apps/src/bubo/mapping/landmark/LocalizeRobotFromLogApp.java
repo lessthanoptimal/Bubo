@@ -32,7 +32,7 @@ import bubo.mapping.models.kinematics.LocalMotion2D;
 import bubo.mapping.models.kinematics.PredictorLocalMotion2D;
 import bubo.maps.d2.LandmarkMap2D;
 import com.thoughtworks.xstream.XStream;
-import georegression.fitting.ellipse.CovarianceToEllipse_F64;
+import georegression.fitting.curves.CovarianceToEllipse_F64;
 import georegression.struct.se.Se2_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -114,7 +114,7 @@ public class LocalizeRobotFromLogApp {
 			indexMeas++;
 		}
 
-		FastQueue<RangeBearingMeasurement> measurementsRB = new FastQueue<RangeBearingMeasurement>(RangeBearingMeasurement.class,true);
+		FastQueue<RangeBearingMeasurement> measurementsRB = new FastQueue<>(RangeBearingMeasurement::new);
 		for (int i = 0; i < path.size(); i++) {
 
 			LogLSe2_F64 robotToWorld = path.get(i);

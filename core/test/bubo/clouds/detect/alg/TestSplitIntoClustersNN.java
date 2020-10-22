@@ -18,6 +18,7 @@
 
 package bubo.clouds.detect.alg;
 
+import boofcv.alg.nn.KdTreePoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -47,7 +48,8 @@ public class TestSplitIntoClustersNN {
 			cloud.add(createRandomPoint(0,0,3,0.1));
 		}
 
-		PointCloudToGraphNN cloudToNN = new PointCloudToGraphNN((NearestNeighbor)FactoryNearestNeighbor.kdtree(),10,0.025);
+		PointCloudToGraphNN cloudToNN = new PointCloudToGraphNN(
+				(NearestNeighbor)FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64()),10,0.025);
 		cloudToNN.process(cloud);
 
 		SplitIntoClustersNN alg = new SplitIntoClustersNN();

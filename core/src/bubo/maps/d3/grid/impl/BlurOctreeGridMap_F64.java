@@ -54,7 +54,7 @@ public class BlurOctreeGridMap_F64 {
 	protected Box3D_I32 box = new Box3D_I32();
 
 	// stores information on the computed sum for convolution
-	protected FastQueue<SumData> convData = new FastQueue<SumData>(SumData.class,true);
+	protected FastQueue<SumData> convData = new FastQueue<>(SumData::new);
 
 	/**
 	 * Applies the kernel to the map while taking advantage of its sparsity.

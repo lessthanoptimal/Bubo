@@ -26,6 +26,8 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.shapes.Box3D_F64;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -64,10 +66,10 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	private Box3D_F64 bounding = new Box3D_F64();
 
 	// list of leafs in the Octree.  Allows quick finding of the path to the base node
-	private FastQueue<Octree_F64> leafs = new FastQueue<Octree_F64>(Octree_F64.class, false);
+	private FastArray<Octree_F64> leafs = new FastArray<Octree_F64>(Octree_F64.class);
 
 	// found path from leaf to base
-	private FastQueue<Octree_F64> path = new FastQueue<Octree_F64>(Octree_F64.class, false);
+	private FastArray<Octree_F64> path = new FastArray<Octree_F64>(Octree_F64.class);
 
 	// searches the NN graph to find points which match the model.
 	// need to use the same instance for all searches since it modified the points by marking them.
@@ -80,12 +82,12 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	private LocalFitShapeNN refineShape;
 
 	// list of found objects
-	private FastQueue<FoundShape> foundObjects = new FastQueue<FoundShape>(FoundShape.class, true);
+	private FastQueue<FoundShape> foundObjects = new FastQueue<>(FoundShape::new);
 
 	// points with normal vectors
-	private FastQueue<PointVectorNN> pointsNormal = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+	private FastArray<PointVectorNN> pointsNormal = new FastArray<PointVectorNN>(PointVectorNN.class);
 	// points without normal vectors
-	private FastQueue<PointVectorNN> pointsNoNormal = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+	private FastArray<PointVectorNN> pointsNoNormal = new FastArray<PointVectorNN>(PointVectorNN.class);
 
 	// list of shapes which can be fit
 	private List<ShapeDescription> models;
@@ -145,7 +147,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 * @param points      Points in the point cloud.  PointVectorNN.used MUST be set to false.
 	 * @param boundingBox Bonding box for use in the Octree.
 	 */
-	public void process(FastQueue<PointVectorNN> points, Box3D_F64 boundingBox) {
+	public void process(FastAccess<PointVectorNN> points, Box3D_F64 boundingBox) {
 
 		// initialize data structures
 		this.bounding.set(boundingBox);
@@ -283,7 +285,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 */
 	// NOTE: Could optimize by maintaining a list of points which not used the last time it
 	// was called and only search that
-	protected void constructOctree(FastQueue<PointVectorNN> points) {
+	protected void constructOctree(FastAccess<PointVectorNN> points) {
 
 		managerOctree.initialize(bounding);
 
@@ -328,7 +330,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 	 * @param unmatched Output. Where the unmatched points are stored.
 	 */
 	public void findUnmatchedPoints(List<PointVectorNN> unmatched) {
-		FastQueue<Octree.Info<Point3D_F64>> treePts = managerOctree.getTree().points;
+		FastAccess<Octree.Info<Point3D_F64>> treePts = managerOctree.getTree().points;
 
 		for (int i = 0; i < treePts.size; i++) {
 			Octree_F64.Info info = treePts.data[i];
@@ -354,7 +356,7 @@ public class PointCloudShapeDetectionSchnabel2007 {
 		return bounding;
 	}
 
-	public FastQueue<Octree_F64> getLeafs() {
+	public FastArray<Octree_F64> getLeafs() {
 		return leafs;
 	}
 

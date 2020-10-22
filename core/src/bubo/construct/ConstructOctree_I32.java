@@ -29,7 +29,7 @@ import georegression.struct.shapes.Box3D_I32;
 public abstract class ConstructOctree_I32 extends ConstructOctree<Octree_I32,Point3D_I32>{
 
 	public ConstructOctree_I32() {
-		super(Octree_I32.class);
+		super(Octree_I32::new);
 	}
 
 	/**

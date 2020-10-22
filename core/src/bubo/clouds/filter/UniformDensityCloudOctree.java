@@ -54,9 +54,9 @@ public class UniformDensityCloudOctree {
 	Box3D_F64 bounds = new Box3D_F64();
 
 	Se3_F64 worldToOctree = new Se3_F64();
-	FastQueue<Point3D_I32> gridPoints = new FastQueue<Point3D_I32>(Point3D_I32.class,true);
+	FastQueue<Point3D_I32> gridPoints = new FastQueue<>(Point3D_I32::new);
 
-	List<Point3D_F64> shuffleList = new ArrayList<Point3D_F64>();
+	List<Point3D_F64> shuffleList = new ArrayList<>();
 
 	Point3D_F64 local = new Point3D_F64();
 

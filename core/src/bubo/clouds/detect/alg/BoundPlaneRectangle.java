@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class BoundPlaneRectangle {
 
-	FastQueue<Point2D_F64> points2D = new FastQueue<Point2D_F64>(Point2D_F64.class, true);
+	FastQueue<Point2D_F64> points2D = new FastQueue<>(Point2D_F64::new);
 
 	Point3D_F64 origin = new Point3D_F64();
 	Vector3D_F64 norm = new Vector3D_F64();

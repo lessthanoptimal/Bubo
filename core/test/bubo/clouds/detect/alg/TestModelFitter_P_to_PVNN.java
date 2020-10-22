@@ -67,6 +67,11 @@ public class TestModelFitter_P_to_PVNN {
 			calledFit = true;
 			return true;
 		}
+
+		@Override
+		public double getFitScore() {
+			return 0;
+		}
 	}
 
 }

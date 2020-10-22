@@ -27,6 +27,7 @@ import georegression.struct.plane.PlaneGeneral3D_F64;
 import georegression.struct.plane.PlaneNormal3D_F64;
 import georegression.struct.shapes.Box3D_F64;
 import georegression.struct.shapes.Sphere3D_F64;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
@@ -48,7 +49,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 	@Test
 	public void perfectDataNoNoise_singleShape() {
 
-		FastQueue<PointVectorNN> list = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+		FastArray<PointVectorNN> list = new FastArray<>(PointVectorNN.class);
 
 		Sphere3D_F64 sphere = new Sphere3D_F64(1, 2, 3, 4);
 		addSpherePoints(list, sphere, 400);
@@ -71,7 +72,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 	@Test
 	public void perfectDataNoNoise_multipleShapes() {
-		FastQueue<PointVectorNN> list = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+		FastArray<PointVectorNN> list = new FastArray<>(PointVectorNN.class);
 
 		Sphere3D_F64 sphere = new Sphere3D_F64(1, 2, 3, 4);
 		addSpherePoints(list, sphere, 400);
@@ -140,11 +141,11 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 
 		alg.findLeafs();
 
-		FastQueue<Octree_F64> leafs = alg.getLeafs();
+		FastArray<Octree_F64> leafs = alg.getLeafs();
 		assertEquals(10 + 1, leafs.size);
 	}
 
-	private void addSpherePoints(FastQueue<PointVectorNN> list, Sphere3D_F64 sphere, int N) {
+	private void addSpherePoints(FastArray<PointVectorNN> list, Sphere3D_F64 sphere, int N) {
 		for (int i = 0; i < N; i++) {
 			double phi = 2.0 * rand.nextDouble() * Math.PI;
 			double theta = 2.0 * rand.nextDouble() * Math.PI;
@@ -161,7 +162,7 @@ public class TestPointCloudShapeDetectionSchnabel2007 {
 		}
 	}
 
-	private void addPlanePoints(FastQueue<PointVectorNN> list, PlaneNormal3D_F64 plane, int N) {
+	private void addPlanePoints(FastArray<PointVectorNN> list, PlaneNormal3D_F64 plane, int N) {
 
 		for (int i = 0; i < N; i++) {
 			double x = 3.0 * (rand.nextDouble() - 0.5);

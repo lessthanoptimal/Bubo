@@ -57,7 +57,7 @@ public class SpinningLrf2dScanToPoints {
 	// storage for 2D point
 	private Point2D_F64 point2D = new Point2D_F64();
 	// Storage for 3D points
-	private FastQueue<Point3D_F64> points = new FastQueue<Point3D_F64>(Point3D_F64.class,true);
+	private FastQueue<Point3D_F64> points = new FastQueue<>(Point3D_F64::new);
 
 	// dummy matrix
 	private Se3_F64 identity = new Se3_F64();

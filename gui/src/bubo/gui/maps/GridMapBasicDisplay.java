@@ -23,7 +23,6 @@ import bubo.maps.d2.grid.GridMapSpacialInfo;
 import bubo.maps.d2.grid.OccupancyGrid2D_F32;
 import bubo.maps.d2.grid.OccupancyGrid2D_I;
 import bubo.maps.d2.grid.impl.WrapOccupancy2D_I_to_F32;
-import sun.awt.image.IntegerInterleavedRaster;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -169,11 +168,11 @@ public class GridMapBasicDisplay extends SpacialDisplay {
 			rendered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		}
 
-		if (rendered.getRaster() instanceof IntegerInterleavedRaster) {
-			fastRender(offsetMapX, offsetMapY, pixelOffX, pixelOffY, cellPixels, width, height);
-		} else {
+//		if (rendered.getRaster() instanceof IntegerInterleavedRaster) {
+//			fastRender(offsetMapX, offsetMapY, pixelOffX, pixelOffY, cellPixels, width, height);
+//		} else {
 			safeRender(offsetMapX, offsetMapY, pixelOffX, pixelOffY, cellPixels, width, height);
-		}
+//		}
 	}
 
 	/**
@@ -186,35 +185,35 @@ public class GridMapBasicDisplay extends SpacialDisplay {
 	/**
 	 * Writes directly to the raw data in the buffered image.
 	 */
-	private void fastRender(int offsetX, int offsetY, int pixelOffX, int pixelOffY, double cellPixels, int width, int height) {
-		IntegerInterleavedRaster raster = (IntegerInterleavedRaster) rendered.getRaster();
-		int[] imageData = raster.getDataStorage();
-		int imageIndex = 0;
-
-		double pixelsToCell = 1.0 / cellPixels;
-
-		// step through all the pixels
-		for (int i = height - 1; i >= 0; i--) {   // invert the axis so that +y is on top
-			int y = offsetY + (int) ((i + pixelOffY) * pixelsToCell);
-
-			for (int j = 0; j < width; j++, imageIndex++) {
-				int x = offsetX + (int) ((j + pixelOffX) * pixelsToCell);
-
-				if (map.isInBounds(x, y)) {
-					if (colorUnknown < 0 || map.isKnown(x, y)) {
-						int val = (int) (map.get(x, y) * 255.0f);
-						imageData[imageIndex] = val << 16 | val << 8 | val;
-					} else {
-						imageData[imageIndex] = colorUnknown;
-					}
-				} else {
-					imageData[imageIndex] = colorOutOfBounds;
-				}
-			}
-		}
-		// lets it know it has been modified
-		rendered.setRGB(0,0,rendered.getRGB(0,0));
-	}
+//	private void fastRender(int offsetX, int offsetY, int pixelOffX, int pixelOffY, double cellPixels, int width, int height) {
+//		IntegerInterleavedRaster raster = (IntegerInterleavedRaster) rendered.getRaster();
+//		int[] imageData = raster.getDataStorage();
+//		int imageIndex = 0;
+//
+//		double pixelsToCell = 1.0 / cellPixels;
+//
+//		// step through all the pixels
+//		for (int i = height - 1; i >= 0; i--) {   // invert the axis so that +y is on top
+//			int y = offsetY + (int) ((i + pixelOffY) * pixelsToCell);
+//
+//			for (int j = 0; j < width; j++, imageIndex++) {
+//				int x = offsetX + (int) ((j + pixelOffX) * pixelsToCell);
+//
+//				if (map.isInBounds(x, y)) {
+//					if (colorUnknown < 0 || map.isKnown(x, y)) {
+//						int val = (int) (map.get(x, y) * 255.0f);
+//						imageData[imageIndex] = val << 16 | val << 8 | val;
+//					} else {
+//						imageData[imageIndex] = colorUnknown;
+//					}
+//				} else {
+//					imageData[imageIndex] = colorOutOfBounds;
+//				}
+//			}
+//		}
+//		// lets it know it has been modified
+//		rendered.setRGB(0,0,rendered.getRGB(0,0));
+//	}
 
 	/**
 	 * Writes to the buffered image using its RGB interface

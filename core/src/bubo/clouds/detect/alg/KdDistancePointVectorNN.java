@@ -19,39 +19,29 @@
 package bubo.clouds.detect.alg;
 
 import georegression.struct.point.Point3D_F64;
-import org.ddogleg.fitting.modelset.ModelFitter;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.ddogleg.nn.alg.KdTreeDistance;
 
 /**
- * Converts a {@link Point3D_F64} based {@link ModelFitter} into a {@link PointVectorNN} based one.
- *
  * @author Peter Abeles
  */
-public class ModelFitter_P_to_PVNN<Model> implements ModelFitter<Model, PointVectorNN> {
-
-	private ModelFitter<Model, Point3D_F64> model;
-
-	private List<Point3D_F64> points = new ArrayList<>();
-
-	public ModelFitter_P_to_PVNN(ModelFitter<Model, Point3D_F64> model) {
-		this.model = model;
+public class KdDistancePointVectorNN implements KdTreeDistance<PointVectorNN> {
+	@Override
+	public double distance(PointVectorNN a, PointVectorNN b) {
+		return a.p.distance2(b.p);
 	}
 
 	@Override
-	public boolean fitModel(List<PointVectorNN> dataSet, Model initial, Model found) {
-		points.clear();
-		for (int i = 0; i < dataSet.size(); i++) {
-			PointVectorNN p = dataSet.get(i);
-			points.add(p.p);
+	public double valueAt(PointVectorNN point, int index) {
+		switch( index ) {
+			case 0: return point.p.x;
+			case 1: return point.p.y;
+			case 2: return point.p.z;
 		}
-
-		return model.fitModel(points, initial, found);
+		throw new IllegalArgumentException("Out of bounds. "+index);
 	}
 
 	@Override
-	public double getFitScore() {
-		return 0;
+	public int length() {
+		return 3;
 	}
 }

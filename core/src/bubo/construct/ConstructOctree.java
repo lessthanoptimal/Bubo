@@ -19,6 +19,7 @@
 package bubo.construct;
 
 import georegression.struct.GeoTuple;
+import org.ddogleg.struct.Factory;
 import org.ddogleg.struct.FastQueue;
 
 import java.lang.reflect.Array;
@@ -38,18 +39,18 @@ public abstract class ConstructOctree< O extends Octree, P extends GeoTuple> {
 	protected O tree;
 
 	// save references to all data structures declared to create the tree
-	protected FastQueue<Octree.Info<P>> storageInfo = new FastQueue<Octree_F64.Info<P>>((Class)Octree.Info.class, true);
+	protected FastQueue<Octree.Info<P>> storageInfo = new FastQueue<>(Octree.Info::new);
 	// Contains all nodes in the tree
 	protected FastQueue<O> storageNodes;
-	protected Stack<O[]> storageChildren = new Stack<O[]>();
+	protected Stack<O[]> storageChildren = new Stack<>();
 
 	protected Class<O> octreeType;
 	/**
 	 * Specifies graph construction parameters
 	 */
-	public ConstructOctree( Class<O> octreeType ) {
-		this.octreeType = octreeType;
-		storageNodes = new FastQueue<O>(octreeType, true);
+	public ConstructOctree( Factory<O> factory ) {
+		this.octreeType = (Class<O>)factory.newInstance().getClass();
+		storageNodes = new FastQueue<>(factory);
 
 		this.tree = storageNodes.grow();
 	}

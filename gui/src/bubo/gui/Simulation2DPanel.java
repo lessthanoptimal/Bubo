@@ -24,9 +24,9 @@ import bubo.desc.sensors.lrf2d.Lrf2dParam;
 import bubo.desc.sensors.lrf2d.Lrf2dPrecomputedTrig;
 import bubo.gui.maps.MapDisplay;
 import bubo.simulation.d2.CircularRobot2D;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
-import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -40,7 +40,7 @@ import java.util.List;
 public class Simulation2DPanel extends MapDisplay {
 
 	final CircularRobot2D robot = new CircularRobot2D();
-	final List<Ghost> ghosts = new ArrayList<Ghost>();
+	final List<Ghost> ghosts = new ArrayList<>();
 
 	// LRF stuff
 	Lrf2dMeasurement measurementLrf;
@@ -48,8 +48,7 @@ public class Simulation2DPanel extends MapDisplay {
 	double maxRange;
 
 	// Landmark Stuff
-	final FastQueue<RangeBearingMeasurement> rangeBearing =
-			new FastQueue<RangeBearingMeasurement>(RangeBearingMeasurement.class,true);
+	final FastQueue<RangeBearingMeasurement> rangeBearing = new FastQueue<>(RangeBearingMeasurement::new);
 
 	Se2_F64 lrfToCenter = new Se2_F64();
 
@@ -259,7 +258,6 @@ public class Simulation2DPanel extends MapDisplay {
 	public static class Ghost extends CircularRobot2D {
 		public Color color;
 		public EllipseRotated_F64 ellipse = new EllipseRotated_F64();
-		public FastQueue<RangeBearingMeasurement> rangeBearing =
-				new FastQueue<RangeBearingMeasurement>(RangeBearingMeasurement.class,true);
+		public FastQueue<RangeBearingMeasurement> rangeBearing = new FastQueue<>(RangeBearingMeasurement::new);
 	}
 }

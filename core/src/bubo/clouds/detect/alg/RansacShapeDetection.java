@@ -20,6 +20,8 @@ package bubo.clouds.detect.alg;
 
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.Arrays;
@@ -94,7 +96,7 @@ public class RansacShapeDetection extends RansacMulti<PointVectorNN> {
 	}
 
 	@Override
-	protected FastQueue<PointVectorNN> getInitialSample() {
+	protected FastArray<PointVectorNN> getInitialSample() {
 		return initialSample;
 	}
 }

@@ -19,6 +19,7 @@
 package bubo.clouds.detect.alg;
 
 import georegression.struct.point.Point3D_F64;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.junit.Test;
 
@@ -45,7 +46,7 @@ public class TestApproximateSurfaceNormals {
 		double maxDistance = 0.4;
 		int numNeighbors = 5;
 
-		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> cloud = new ArrayList<>();
 
 		for (int i = 0; i < 50; i++) {
 			for (int j = 0; j < 40; j++) {
@@ -53,7 +54,7 @@ public class TestApproximateSurfaceNormals {
 			}
 		}
 
-		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+		FastArray<PointVectorNN> output = new FastArray<>(PointVectorNN.class);
 
 		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals(numNeighbors, maxDistance);
 
@@ -88,7 +89,7 @@ public class TestApproximateSurfaceNormals {
 	 */
 	@Test
 	public void checkVectorNormalizedToOne_index() {
-		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> cloud = new ArrayList<>();
 
 		for (int i = 0; i < 200; i++) {
 			double x = 3 * (rand.nextDouble() - 0.5);
@@ -98,7 +99,7 @@ public class TestApproximateSurfaceNormals {
 			cloud.add(new Point3D_F64(x, y, z));
 		}
 
-		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+		FastArray<PointVectorNN> output = new FastArray<>(PointVectorNN.class);
 
 		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals( 8, 0.4);
 
@@ -134,7 +135,7 @@ public class TestApproximateSurfaceNormals {
 	 */
 	@Test
 	public void multipleCalls() {
-		List<Point3D_F64> cloud = new ArrayList<Point3D_F64>();
+		List<Point3D_F64> cloud = new ArrayList<>();
 
 		for (int i = 0; i < 200; i++) {
 			double x = 3 * (rand.nextDouble() - 0.5);
@@ -144,7 +145,7 @@ public class TestApproximateSurfaceNormals {
 			cloud.add(new Point3D_F64(x, y, z));
 		}
 
-		FastQueue<PointVectorNN> output = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+		FastArray<PointVectorNN> output = new FastArray<>(PointVectorNN.class);
 
 		ApproximateSurfaceNormals alg = new ApproximateSurfaceNormals( 8, 0.4);
 

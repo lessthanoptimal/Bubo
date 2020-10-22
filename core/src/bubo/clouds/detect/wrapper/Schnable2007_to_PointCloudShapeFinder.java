@@ -24,6 +24,7 @@ import bubo.clouds.detect.alg.*;
 import georegression.geometry.UtilPoint3D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.shapes.Box3D_F64;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -46,9 +47,9 @@ public class Schnable2007_to_PointCloudShapeFinder implements PointCloudShapeFin
 
 	List<FoundShape> mergeList = new ArrayList<FoundShape>();
 
-	FastQueue<PointVectorNN> pointNormList = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+	FastArray<PointVectorNN> pointNormList = new FastArray<>(PointVectorNN.class);
 
-	FastQueue<Shape> output = new FastQueue<Shape>(Shape.class, true);
+	FastQueue<Shape> output = new FastQueue<Shape>(Shape::new);
 
 	Box3D_F64 boundingBox = new Box3D_F64();
 

@@ -43,8 +43,8 @@ public abstract class LocalAssociateInterpolate implements AssociateLrfMeas {
 	protected ScanInfo scanMatch;
 	protected ScanInfo scanRef;
 	// list of associated points
-	private List<Point2D_F64> srcPts = new ArrayList<Point2D_F64>();
-	private FastQueue<Point2D_F64> dstPts = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	private List<Point2D_F64> srcPts = new ArrayList<>();
+	private FastQueue<Point2D_F64> dstPts = new FastQueue<>(Point2D_F64::new);
 	// how many radians around will it search for the best association point
 	private double searchNeighborhood;
 	// the maximum allowed distance between two associated points

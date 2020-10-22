@@ -18,13 +18,13 @@
 
 package bubo.construct;
 
+import georegression.struct.point.Point2D_I32;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Peter Abeles
@@ -49,8 +49,8 @@ public class TestOctreeOps {
 		List<Octree_I32> filtered = OctreeOps.findLeafsWithData(input, null);
 
 		assertEquals(2,filtered.size());
-		assertTrue(filtered.get(0) == input.get(1));
-		assertTrue(filtered.get(1) == input.get(2));
+		assertSame(filtered.get(0), input.get(1));
+		assertSame(filtered.get(1), input.get(2));
 	}
 
 	@Test
@@ -63,15 +63,15 @@ public class TestOctreeOps {
 		input.add( new Octree_I32());
 
 		input.get(1).space.set(2,2,2,3,3,3);
-		input.get(1).points.grow();
+		input.get(1).points.add(new Octree.Info());
 		input.get(2).space.set(2,2,2,3,3,3);
-		input.get(2).points.grow();
+		input.get(2).points.add(new Octree.Info());
 		input.get(3).space.set(2,2,2,3,3,3);
 
 		List<Octree_I32> filtered = OctreeOps.findLeafsWithPoints(input, null);
 
 		assertEquals(2,filtered.size());
-		assertTrue(filtered.get(0) == input.get(1));
-		assertTrue(filtered.get(1) == input.get(2));
+		assertSame(filtered.get(0), input.get(1));
+		assertSame(filtered.get(1), input.get(2));
 	}
 }

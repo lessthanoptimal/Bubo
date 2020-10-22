@@ -18,6 +18,8 @@
 
 package bubo.clouds;
 
+import boofcv.alg.nn.KdTreePoint2D_F64;
+import boofcv.alg.nn.KdTreePoint3D_F64;
 import bubo.clouds.fit.MatchCloudToCloud;
 import bubo.clouds.fit.c2c.MatchCloudToCloudIcp;
 import bubo.struct.StoppingCondition;
@@ -42,7 +44,7 @@ public class FactoryFitting {
 	 * @return ICP based cloud matching
 	 */
 	public static MatchCloudToCloud<Se2_F64,Point2D_F64> cloudIcp2D( double maxDistance, StoppingCondition stop)  {
-		NearestNeighbor<Point2D_F64> nn = FactoryNearestNeighbor.kdtree();
+		NearestNeighbor<Point2D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint2D_F64());
 		return new MatchCloudToCloudIcp.SE2(nn,maxDistance*maxDistance,stop);
 	}
 
@@ -55,7 +57,7 @@ public class FactoryFitting {
 	 * @return ICP based cloud matching
 	 */
 	public static MatchCloudToCloud<Se3_F64,Point3D_F64> cloudIcp3D( double maxDistance, StoppingCondition stop)  {
-		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree();
+		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
 		return new MatchCloudToCloudIcp.SE3(nn,maxDistance*maxDistance,stop);
 	}
 }

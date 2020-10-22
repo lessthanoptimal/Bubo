@@ -53,7 +53,7 @@ public class OctreeGridMap_F64 implements OccupancyGrid3D_F64 {
 	ConstructOctreeLeaf_I32 construct;
 
 	// storage for map info which is placed in each leaf
-	FastQueue<MapLeaf> info = new FastQueue<MapLeaf>(MapLeaf.class,true);
+	FastQueue<MapLeaf> info = new FastQueue<MapLeaf>(MapLeaf::new);
 
 	// used to temporarily store a point's value when looking things up
 	Point3D_I32 temp = new Point3D_I32();

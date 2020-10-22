@@ -25,6 +25,7 @@ import georegression.struct.shapes.Box3D_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ransac.RansacMulti;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
 
@@ -42,18 +43,18 @@ public class FindAllOfShapeInCloud implements PointCloudShapeFinder {
 	ApproximateSurfaceNormals surfaceNormals;
 	List<CloudShapeTypes> shapeList;
 
-	FastQueue<PointVectorNN> pointNormList = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
-	FastQueue<PointVectorNN> prunedList = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+	FastArray<PointVectorNN> pointNormList = new FastArray<>(PointVectorNN.class);
+	FastArray<PointVectorNN> prunedList = new FastArray<>(PointVectorNN.class);
 	// reference to cloud data
 	List<Point3D_F64> cloud;
 	// mark which points are inliers and which are not
 	GrowQueue_B marks = new GrowQueue_B();
 	// storage for the matched shape
-	FastQueue<Shape> output = new FastQueue<Shape>(Shape.class, true);
+	FastQueue<Shape> output = new FastQueue<>(Shape::new);
 	// optimizes the fit parameters to the inlier set
 	List<ModelFitter<Object, PointVectorNN>> fitters;
 	// storage for optimized parameters
-	List<Object> models = new ArrayList<Object>();
+	List<Object> models = new ArrayList<>();
 	List<ModelManager> modelManagers;
 	// the minimum number of points a shape needs for it to be accepted
 	private int minimumPoints;
@@ -153,7 +154,7 @@ public class FindAllOfShapeInCloud implements PointCloudShapeFinder {
 				}
 			}
 
-			FastQueue<PointVectorNN> swap = pointNormList;
+			FastArray<PointVectorNN> swap = pointNormList;
 			pointNormList = prunedList;
 			prunedList = swap;
 		}

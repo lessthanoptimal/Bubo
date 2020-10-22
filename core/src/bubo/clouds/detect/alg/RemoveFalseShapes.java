@@ -35,7 +35,7 @@ public class RemoveFalseShapes implements PostProcessShapes {
 	List<ShapeDescription> models;
 
 	GrowQueue_I32 cloudToShape = new GrowQueue_I32();
-	FastQueue<PixelInfo> shapePixels = new FastQueue<PixelInfo>(PixelInfo.class, true);
+	FastQueue<PixelInfo> shapePixels = new FastQueue<PixelInfo>(PixelInfo::new);
 
 	List<FoundShape> goodShapes = new ArrayList<FoundShape>();
 

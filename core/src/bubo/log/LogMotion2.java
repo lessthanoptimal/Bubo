@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class LogMotion2 {
 
-	protected FastQueue<Element> history = new FastQueue<Element>(Element.class,true);
+	protected FastQueue<Element> history = new FastQueue<>(Element::new);
 
 	public void reset() {
 		history.reset();

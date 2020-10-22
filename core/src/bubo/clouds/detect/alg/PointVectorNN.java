@@ -20,6 +20,7 @@ package bubo.clouds.detect.alg;
 
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -41,7 +42,7 @@ public class PointVectorNN {
 	/**
 	 * Points which are its neighbors.  Does not include this point.
 	 */
-	public FastQueue<PointVectorNN> neighbors = new FastQueue<PointVectorNN>(PointVectorNN.class, false);
+	public FastArray<PointVectorNN> neighbors = new FastArray<>(PointVectorNN.class);
 
 	/**
 	 * Unique ID assigned to the point when it is constructed.  The 'index' in the same as the index in the list.

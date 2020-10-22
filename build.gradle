@@ -7,24 +7,30 @@ allprojects {
     apply plugin: 'eclipse'
 
     group = 'org.projectbubo'
-    version = '1-SNAPSHOT'
+    version = '1.1-SNAPSHOT'
 }
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'osgi'
     apply plugin: 'maven'
     apply plugin: 'signing'
 
-    sourceCompatibility = 1.6
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    // Creates Java 8 byte code
+    tasks.withType(JavaCompile).all { options.compilerArgs = ["--release", "8",] }
 
     repositories {
         mavenCentral()
         mavenLocal()
 
-        maven {
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
+        maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url = 'https://jitpack.io' } // Allows annotations past Java 8 to be used
     }
 
     sourceSets {
@@ -50,33 +56,22 @@ subprojects {
     }
 
     dependencies {
-        ['core','openkinect','WebcamCapture'].each { String a ->
-            compile('org.boofcv:boofcv-' + a + ':0.28')
+        ['core','WebcamCapture'].each { String a ->
+            compile("org.boofcv:boofcv-$a:0.36")
         }
+
+        compileOnly 'org.projectlombok:lombok:1.18.10'
+        compileOnly 'org.jetbrains:annotations:20.0.0' // @Nullable
+        compileOnly 'javax.annotation:jsr250-api:1.0'  // @Generated
+
         compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
-    }
 
-    jar {
-        manifest { // the manifest of the default jar is of type OsgiManifest
-            instruction 'Bundle-Vendor', 'Project BUBO'
-            instruction 'Bundle-DocURL', 'http://projectbubo.org'
-        }
-    }
+        // needed to use Java 11+ syntax with Java 1.8 byte code
+        annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.3.0')
 
-    task javadocJar(type: Jar) {
-        classifier = 'javadoc'
-        from javadoc
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    artifacts {
-        archives javadocJar, sourcesJar
+        annotationProcessor 'org.projectlombok:lombok:1.18.10'  // @Getter @Setter
     }
 
     // if Maven central isn't setup in gradle.properties skip all of this
@@ -140,27 +135,32 @@ try {
     mainProjects.add( ':integration:jme')
 } catch( UnknownProjectException ignore ) {}
 
-// Creates a directory with all the compiled jars and the dependencies for main
-task createLibraryDirectory(dependsOn: mainProjects.collect { it + ":jar" } + mainProjects.collect {
-    it + ":sourcesJar"
-}) << {
+task createLibraryDirectory( dependsOn: mainProjects.collect {[ it+':jar',it+':sourcesJar']}.flatten() ) {
+    doLast {
+        // Compiled jars (bin and src) for all BoofCV modules
+        ext.boofJars = files(javadocProjects.collect { project(it).tasks.jar.archivePath })
+        ext.boofJars += files(javadocProjects.collect { project(it).tasks.sourcesJar.archivePath })
 
-    // dependencies for main and their own jars
-    ext.list = files(mainProjects.collect { project(it).tasks.jar.archivePath })
-    ext.listSource = files(mainProjects.collect { project(it).tasks.sourcesJar.archivePath })
+        // This will be a list of just external dependencies
+        ext.listExternal = files(javadocProjects.collect { project(it).configurations.runtimeClasspath })
+        ext.listExternal = ext.listExternal - ext.boofJars
+        ext.listExternal = ext.listExternal.findAll({ !it.getName().contains("android.jar") })
 
-    file('libraries').deleteDir()
-    file('libraries').mkdir()
+        ext.fileName = "projectbubo-v"+version+"-libs"
+        file(ext.fileName).deleteDir()
+        file(ext.fileName).mkdir()
 
-
-    copy {
-        from ext.list
-        from ext.listSource
-        into 'libraries'
-
-        rename { String fileName ->
-            "BUBO-" + fileName
+        copy {
+            from ext.listExternal
+            into ext.fileName
         }
+
+        copy {
+            from ext.boofJars
+            into ext.fileName
+        }
+
+        println("\n\nSaved to directory "+ext.fileName)
     }
 }
 
@@ -197,23 +197,14 @@ task alljavadoc(type: Javadoc) {
     }
 }
 
-idea {
-    project {
-        jdkName = '1.6 (64bit)'
-        languageLevel = '1.6'
-    }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.3'
+wrapper {
+    distributionType = Wrapper.DistributionType.BIN
+    gradleVersion = '6.4.1'
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
 [':validation'].each {String a ->
     project(a) {
-        if( project.hasProperty('ossrhUsername') ) {
-            signArchives.enabled = false
-        }
         sourcesJar.enabled = false
         javadocJar.enabled = false
         jar.enabled = false

@@ -18,6 +18,7 @@
 
 package bubo.clouds.detect.alg;
 
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class SplitIntoClustersNN {
 
 	List<List<PointVectorNN>> clusters = new ArrayList<List<PointVectorNN>>();
 
-	FastQueue<PointVectorNN> open = new FastQueue<PointVectorNN>(PointVectorNN.class,false);
+	FastArray<PointVectorNN> open = new FastArray<>(PointVectorNN.class);
 
 	/**
 	 * Splits the provided cloud into clusters using the NN graph

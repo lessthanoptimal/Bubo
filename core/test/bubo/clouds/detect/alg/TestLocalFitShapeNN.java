@@ -145,37 +145,21 @@ public class TestLocalFitShapeNN {
 	 * Create a NN graph from the points
 	 */
 	private void createGraph(List<PointVectorNN> cloud) {
-		NearestNeighbor<PointVectorNN> nn = FactoryNearestNeighbor.kdtree();
+		NearestNeighbor<PointVectorNN> nn = FactoryNearestNeighbor.kdtree(new KdDistancePointVectorNN());
+		NearestNeighbor.Search<PointVectorNN> searchNN = nn.createSearch();
 
-		List<double[]> pointsD = new ArrayList<double[]>();
+		nn.setPoints(cloud, false);
 
-		// convert the point cloud into the NN format
-		for (int i = 0; i < cloud.size(); i++) {
-			PointVectorNN p = cloud.get(i);
-
-			double[] d = new double[3];
-
-			d[0] = p.p.x;
-			d[1] = p.p.y;
-			d[2] = p.p.z;
-
-			pointsD.add(d);
-		}
-
-		nn.init(3);
-		nn.setPoints(pointsD, cloud);
-
-		FastQueue<NnData<PointVectorNN>> neighbors = new FastQueue<NnData<PointVectorNN>>((Class) NnData.class, true);
+		FastQueue<NnData<PointVectorNN>> neighbors = new FastQueue<NnData<PointVectorNN>>(NnData::new);
 
 		for (int i = 0; i < cloud.size(); i++) {
 			PointVectorNN p = cloud.get(i);
-			double[] d = pointsD.get(i);
 
 			neighbors.reset();
-			nn.findNearest(d, 2, 8, neighbors);
+			searchNN.findNearest(p, 2, 8, neighbors);
 
 			for (int j = 0; j < neighbors.size; j++) {
-				PointVectorNN pv = neighbors.get(j).data;
+				PointVectorNN pv = neighbors.get(j).point;
 				if (pv == p)
 					continue;
 				p.neighbors.add(pv);

@@ -34,7 +34,7 @@ import org.ddogleg.struct.FastQueue;
 public class SimulateRangeBearing {
 	RangeBearingParam param;
 	FastQueue<RangeBearingMeasurement> measurements =
-			new FastQueue<RangeBearingMeasurement>(RangeBearingMeasurement.class,true);
+			new FastQueue<RangeBearingMeasurement>(RangeBearingMeasurement::new);
 
 	public SimulateRangeBearing(RangeBearingParam param) {
 		this.param = param;

@@ -33,7 +33,6 @@ import georegression.struct.se.Se2_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
@@ -50,19 +49,17 @@ public abstract class MatchCloudToCloudIcp<SE extends InvertibleTransform, P ext
 {
 	// Nearest-neighbor algorithm
 	NearestNeighbor<P> nn;
+	NearestNeighbor.Search<P> searchNN;
 
 	// reference to destination list
 	List<P> source;
 	// maximum distance apart two points can be.  Euclidean squared
 	double maxDistanceSq;
 	// storage for NN results
-	NnData<P> storageNN = new NnData<P>();
+	NnData<P> storageNN = new NnData<>();
 
 	// the actual ICP algorithm
 	IterativeClosestPoint<SE,P> icp;
-
-	// storage for source points
-	FastQueue<double[]> pointsDst;
 
 	// number of dimension on the point
 	int dimen;
@@ -85,15 +82,10 @@ public abstract class MatchCloudToCloudIcp<SE extends InvertibleTransform, P ext
 		this.maxDistanceSq = maxDistanceSq;
 		this.nn = nn;
 		this.dimen = dimen;
-		icp = new IterativeClosestPoint<SE, P>(stop,motion);
+		icp = new IterativeClosestPoint<>(stop, motion);
 		icp.setModel(new Model());
 
-		pointsDst = new FastQueue<double[]>(double[].class,true ) {
-			@Override
-			protected double[] createInstance() {
-				return new double[dimen];
-			}
-		};
+		searchNN = nn.createSearch();
 	}
 
 	@Override
@@ -101,18 +93,9 @@ public abstract class MatchCloudToCloudIcp<SE extends InvertibleTransform, P ext
 		this.source = source;
 	}
 
-	protected abstract void assign( P src , double[] dst );
-
 	@Override
 	public void setDestination(List<P> destination) {
-		// convert the points into a format NN understands
-		pointsDst.reset();
-		for (int i = 0; i < destination.size(); i++) {
-			assign(destination.get(i), pointsDst.grow());
-		}
-
-		nn.init(dimen);
-		nn.setPoints(pointsDst.toList(),destination);
+		nn.setPoints(destination,false);
 	}
 
 	@Override
@@ -126,15 +109,10 @@ public abstract class MatchCloudToCloudIcp<SE extends InvertibleTransform, P ext
 	}
 
 	private class Model implements ClosestPointToModel<P> {
-
-		double srcPt[] = new double[3];
-
 		@Override
 		public P findClosestPoint(P target) {
-			assign(target, srcPt);
-
-			if( nn.findNearest(srcPt, maxDistanceSq, storageNN) ) {
-				return storageNN.data;
+			if(searchNN.findNearest(target, maxDistanceSq, storageNN) ) {
+				return storageNN.point;
 			} else {
 				return null;
 			}
@@ -159,12 +137,6 @@ public abstract class MatchCloudToCloudIcp<SE extends InvertibleTransform, P ext
 		public SE2(NearestNeighbor<Point2D_F64> nn,double maxDistanceSq, StoppingCondition stop) {
 			super(2, new MotionSe2PointSVD_F64(),nn, maxDistanceSq, stop);
 		}
-
-		@Override
-		protected void assign(Point2D_F64 src, double[] dst) {
-			dst[0] = src.x;
-			dst[1] = src.y;
-		}
 	}
 
 	/**
@@ -174,13 +146,6 @@ public abstract class MatchCloudToCloudIcp<SE extends InvertibleTransform, P ext
 
 		public SE3(NearestNeighbor<Point3D_F64> nn,double maxDistanceSq, StoppingCondition stop) {
 			super(3, new MotionSe3PointSVD_F64(),nn, maxDistanceSq, stop);
-		}
-
-		@Override
-		protected void assign(Point3D_F64 src, double[] dst) {
-			dst[0] = src.x;
-			dst[1] = src.y;
-			dst[2] = src.z;
 		}
 	}
 }

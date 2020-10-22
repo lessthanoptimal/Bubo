@@ -18,10 +18,12 @@
 
 package bubo.clouds.detect.alg;
 
+import boofcv.alg.nn.KdTreePoint3D_F64;
 import georegression.fitting.plane.FitPlane3D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -53,7 +55,7 @@ public class ApproximateSurfaceNormals {
 	// the local plane computed using neighbors
 	private FitPlane3D_F64 fitPlane = new FitPlane3D_F64();
 	// array to store points used to compute plane
-	private List<Point3D_F64> fitList = new ArrayList<Point3D_F64>();
+	private List<Point3D_F64> fitList = new ArrayList<>();
 
 	// storage for the center point when computing the local surface normal
 	private Point3D_F64 center = new Point3D_F64();
@@ -65,7 +67,7 @@ public class ApproximateSurfaceNormals {
 	 * @param numNeighbors        Number of neighbors it will find.  Can be useful if another algorithm wants more neighbors than this one will need.
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
-	public ApproximateSurfaceNormals(NearestNeighbor<PointVectorNN> nn,
+	public ApproximateSurfaceNormals(NearestNeighbor<Point3D_F64> nn,
 									 int numNeighbors, double maxDistanceNeighbor) {
 		this.createGraph = new PointCloudToGraphNN(nn,numNeighbors,maxDistanceNeighbor);
 	}
@@ -77,7 +79,7 @@ public class ApproximateSurfaceNormals {
 	 * @param maxDistanceNeighbor The maximum distance two points can be from each other to be considered a neighbor
 	 */
 	public ApproximateSurfaceNormals(int numNeighbors, double maxDistanceNeighbor) {
-		this.createGraph = new PointCloudToGraphNN((NearestNeighbor)FactoryNearestNeighbor.kdtree(),numNeighbors,maxDistanceNeighbor);
+		this.createGraph = new PointCloudToGraphNN((NearestNeighbor)FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64()),numNeighbors,maxDistanceNeighbor);
 	}
 
 	/**
@@ -87,7 +89,7 @@ public class ApproximateSurfaceNormals {
 	 * @param cloud  Input: 3D point cloud
 	 * @param output Output: Storage for the point cloud with normals. Must set declareInstances to false.
 	 */
-	public void process(List<Point3D_F64> cloud, FastQueue<PointVectorNN> output) {
+	public void process(List<Point3D_F64> cloud, FastArray<PointVectorNN> output) {
 
 		// convert the point cloud into a format that the NN algorithm can recognize
 		createGraph.process(cloud);
@@ -112,8 +114,7 @@ public class ApproximateSurfaceNormals {
 
 			fitList.add(point.p);
 			for (int i = 0; i < point.neighbors.size; i++) {
-				PointVectorNN n = point.neighbors.get(i);
-				fitList.add(n.p);
+				fitList.add(point.neighbors.get(i).p);
 			}
 
 			fitPlane.svd(fitList, center, point.normal);

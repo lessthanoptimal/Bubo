@@ -151,7 +151,7 @@ public class TestConstructOctree {
 		Random rand = new Random(234);
 
 		public Dummy() {
-			super(Octree_F64.class);
+			super(Octree_F64::new);
 		}
 
 		@Override
