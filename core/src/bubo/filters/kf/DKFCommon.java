@@ -34,6 +34,7 @@ public abstract class DKFCommon implements InnovationInterface {
 	protected DMatrixRMaj a, b;
 	protected DMatrixRMaj y, S, S_inv, c, d;
 	protected DMatrixRMaj K;
+	protected DMatrixRMaj IMKH;
 
 	public DKFCommon(int dimenX, int dimenZ) {
 		a = new DMatrixRMaj(dimenX, 1);
@@ -44,6 +45,7 @@ public abstract class DKFCommon implements InnovationInterface {
 		c = new DMatrixRMaj(dimenZ, dimenX);
 		d = new DMatrixRMaj(dimenX, dimenZ);
 		K = new DMatrixRMaj(dimenX, dimenZ);
+		IMKH = new DMatrixRMaj(dimenX, dimenX);
 	}
 
 	/**
@@ -114,12 +116,16 @@ public abstract class DKFCommon implements InnovationInterface {
 		addEquals(x, a);
 
 		// update the covariance estimate
-		// P = (I-kH)P = P - K(HP)
-		// NOTE: There are alternative formulations which claim better numerical stability
-		//       E.g.  P = (I-KH)P(I-KH)' + KRK'
-		mult(H, P, c);
-		mult(K, c, b);
-		subtractEquals(P, b);
+		// P = (I-KH)P(I-KH)' + KRK'
+
+                setIdentity(IMKH);
+                mult(K, H, b);
+                subtractEquals(IMKH, b);
+                mult(IMKH, P, b);
+                multTransB(b, IMKH, P);
+                mult(K, R, d);
+                multTransB(d, K, b);
+                addEquals(P, b);
 
 		// the above is correct because matrix multiplication is associative
 		// (KH)P=K(HP)
